@@ -131,6 +131,14 @@
   "onboarding.relationship.married": "Casado(a)",
   "onboarding.relationship.complicated": "É complicado",
 
+  "onboarding.city.title": "Nerede doğdunuz?",
+  "onboarding.city.hint": "Şehrinizi arayın",
+  "onboarding.gender.title": "Kendinizi nasıl tanımlıyorsunuz?",
+  "onboarding.relationship.title": "İlişki durumunuz nedir?",
+  "onboarding.gender.male": "Erkek",
+  "onboarding.gender.female": "Kadın",
+  "onboarding.gender.prefer_not_to_say": "Belirtmek istemiyorum",
+
   "onboarding.name.subtitle": "Kendinizden bahsedin, böylece size daha kişiselleştirilmiş bir tahmin sunabiliriz.",
   "onboarding.birthdate.subtitle": "Tarih, güneş burcunuzu, numerolojinizi ve uyumluluğunuzu belirlemek için önemlidir.",
   "onboarding.birthtime.subtitle": "Saat, evlerinizi, yükselen burcunuzu ve Ay'ın kesin konumunu belirlemek için önemlidir.",

@@ -116,19 +116,27 @@
   "elements.air": "Luft",
   "elements.water": "Wasser",
 
-"onboarding.language.continue": "Auf Deutsch fortfahren",
+  "onboarding.language.continue": "Auf Deutsch fortfahren",
 
-"onboarding.name.label": "Name",
-"onboarding.name.hint": "Geben Sie Ihren Namen ein",
-"onboarding.birthtime.title": "Um wie viel Uhr wurden Sie geboren?",
-"onboarding.birthtime.unknown": "Ich weiß es nicht",
-"onboarding.relationship.single": "Single",
-"onboarding.relationship.in_relationship": "In einer Beziehung",
-"onboarding.relationship.married": "Verheiratet",
-"onboarding.relationship.complicated": "Es ist kompliziert",
+  "onboarding.name.label": "Name",
+  "onboarding.name.hint": "Geben Sie Ihren Namen ein",
+  "onboarding.birthtime.title": "Um wie viel Uhr wurden Sie geboren?",
+  "onboarding.birthtime.unknown": "Ich weiß es nicht",
+  "onboarding.relationship.single": "Single",
+  "onboarding.relationship.in_relationship": "In einer Beziehung",
+  "onboarding.relationship.married": "Verheiratet",
+  "onboarding.relationship.complicated": "Es ist kompliziert",
+
+  "onboarding.city.title": "Wo wurden Sie geboren?",
+  "onboarding.city.hint": "Suchen Sie Ihre Stadt",
+  "onboarding.gender.title": "Wie identifizieren Sie sich?",
+  "onboarding.relationship.title": "Wie ist Ihr Beziehungsstatus?",
+  "onboarding.gender.male": "Männlich",
+  "onboarding.gender.female": "Weiblich",
+  "onboarding.gender.prefer_not_to_say": "Möchte ich nicht angeben",
 
   "onboarding.name.subtitle": "Erzählen Sie uns etwas über sich, damit wir eine persönlichere Vorhersage für Sie erstellen können.",
-"onboarding.birthdate.subtitle": "Das Datum ist wichtig, um Ihr Sonnenzeichen, Ihre Numerologie und Ihre Kompatibilität zu bestimmen.",
-"onboarding.birthtime.subtitle": "Die Uhrzeit ist wichtig, um Ihre Häuser, Ihr Aszendentenzeichen und die genaue Mondposition zu bestimmen.",
-"onboarding.gender.subtitle": "Es wird das Gleichgewicht Ihrer männlichen und weiblichen Energie aufzeigen."
+  "onboarding.birthdate.subtitle": "Das Datum ist wichtig, um Ihr Sonnenzeichen, Ihre Numerologie und Ihre Kompatibilität zu bestimmen.",
+  "onboarding.birthtime.subtitle": "Die Uhrzeit ist wichtig, um Ihre Häuser, Ihr Aszendentenzeichen und die genaue Mondposition zu bestimmen.",
+  "onboarding.gender.subtitle": "Es wird das Gleichgewicht Ihrer männlichen und weiblichen Energie aufzeigen."
 }

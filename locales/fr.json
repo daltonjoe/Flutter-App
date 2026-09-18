@@ -118,16 +118,24 @@
   "onboarding.language.continue": "Continuer en français",
 
   "onboarding.name.label": "Nom",
-"onboarding.name.hint": "Entrez votre nom",
-"onboarding.birthtime.title": "À quelle heure êtes-vous né(e) ?",
-"onboarding.birthtime.unknown": "Je ne sais pas",
-"onboarding.relationship.single": "Célibataire",
-"onboarding.relationship.in_relationship": "En couple",
-"onboarding.relationship.married": "Marié(e)",
-"onboarding.relationship.complicated": "C'est compliqué",
+  "onboarding.name.hint": "Entrez votre nom",
+  "onboarding.birthtime.title": "À quelle heure êtes-vous né(e) ?",
+  "onboarding.birthtime.unknown": "Je ne sais pas",
+  "onboarding.relationship.single": "Célibataire",
+  "onboarding.relationship.in_relationship": "En couple",
+  "onboarding.relationship.married": "Marié(e)",
+  "onboarding.relationship.complicated": "C'est compliqué",
 
-"onboarding.name.subtitle": "Parlez-nous de vous afin que nous puissions vous proposer une prédiction plus personnalisée.",
-"onboarding.birthdate.subtitle": "La date est importante pour déterminer votre signe solaire, votre numérologie et votre compatibilité.",
-"onboarding.birthtime.subtitle": "L'heure est importante pour déterminer vos maisons, votre ascendant et la position exacte de la Lune.",
-"onboarding.gender.subtitle": "Cela révélera l'équilibre entre votre énergie masculine et féminine."
+  "onboarding.city.title": "Où êtes-vous né(e) ?",
+  "onboarding.city.hint": "Recherchez votre ville",
+  "onboarding.gender.title": "Comment vous identifiez-vous ?",
+  "onboarding.relationship.title": "Quel est votre statut amoureux ?",
+  "onboarding.gender.male": "Homme",
+  "onboarding.gender.female": "Femme",
+  "onboarding.gender.prefer_not_to_say": "Je préfère ne pas répondre",
+
+  "onboarding.name.subtitle": "Parlez-nous de vous afin que nous puissions vous proposer une prédiction plus personnalisée.",
+  "onboarding.birthdate.subtitle": "La date est importante pour déterminer votre signe solaire, votre numérologie et votre compatibilité.",
+  "onboarding.birthtime.subtitle": "L'heure est importante pour déterminer vos maisons, votre ascendant et la position exacte de la Lune.",
+  "onboarding.gender.subtitle": "Cela révélera l'équilibre entre votre énergie masculine et féminine."
 }

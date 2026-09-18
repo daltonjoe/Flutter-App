@@ -126,8 +126,16 @@
   "onboarding.relationship.married": "متزوج",
   "onboarding.relationship.complicated": "الأمر معقد",
 
+  "onboarding.city.title": "أين وُلدت؟",
+  "onboarding.city.hint": "ابحث عن مدينتك",
+  "onboarding.gender.title": "كيف تصف هويتك؟",
+  "onboarding.relationship.title": "ما هي حالتك العاطفية؟",
+  "onboarding.gender.male": "ذكر",
+  "onboarding.gender.female": "أنثى",
+  "onboarding.gender.prefer_not_to_say": "أفضل عدم الإفصاح",
+
  "onboarding.name.subtitle": "أخبرنا عن نفسك حتى نتمكن من تقديم توقع أكثر تخصيصًا لك.",
-"onboarding.birthdate.subtitle": "التاريخ مهم لتحديد برجك الشمسي وعلم الأعداد ومدى التوافق.",
-"onboarding.birthtime.subtitle": "الوقت مهم لتحديد بيوتك الفلكية وبرجك الصاعد والموقع الدقيق للقمر.",
-"onboarding.gender.subtitle": "سيساعد ذلك في الكشف عن توازن طاقتك الذكورية والأنثوية."
+  "onboarding.birthdate.subtitle": "التاريخ مهم لتحديد برجك الشمسي وعلم الأعداد ومدى التوافق.",
+  "onboarding.birthtime.subtitle": "الوقت مهم لتحديد بيوتك الفلكية وبرجك الصاعد والموقع الدقيق للقمر.",
+  "onboarding.gender.subtitle": "سيساعد ذلك في الكشف عن توازن طاقتك الذكورية والأنثوية."
 }

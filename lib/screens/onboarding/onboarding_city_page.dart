@@ -3,6 +3,7 @@ import '../../models/onboarding_data.dart';
 import '../../models/city_model.dart';
 import '../../presentation/widgets/components/cosmic_input_field.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
+import '../../i18n/app_localizations.dart';
 
 class OnboardingCityPage extends StatefulWidget {
   final OnboardingData data;
@@ -100,7 +101,7 @@ class _OnboardingCityPageState extends State<OnboardingCityPage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            'Where were you born?',
+                            t(context, 'onboarding.city.title'),
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme
@@ -112,7 +113,7 @@ class _OnboardingCityPageState extends State<OnboardingCityPage> {
                             label: 'City',
                             icon: Icons.location_on_outlined,
                             controller: _controller,
-                            hint: 'Search your city',
+                            hint: t(context, 'onboarding.city.hint'),
                             onChanged: _onSearch,
                           ),
                           if (_results.isNotEmpty)

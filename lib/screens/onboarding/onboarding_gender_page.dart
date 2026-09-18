@@ -24,11 +24,11 @@ class OnboardingGenderPage extends StatefulWidget {
 class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
   String? _selected;
 
-  static const List<String> _options = ['Female', 'Male', 'Prefer not to say'];
+  static const List<String> _options = ['female', 'male', 'prefer_not_to_say'];
 
   String? get _imagePath {
-    if (_selected == 'Male') return 'assets/images/logo/male.png';
-    if (_selected == 'Female') return 'assets/images/logo/female.png';
+    if (_selected == 'male') return 'assets/images/logo/male.png';
+    if (_selected == 'female') return 'assets/images/logo/female.png';
     return null;
   }
 
@@ -75,7 +75,7 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            'How do you identify?',
+                            t(context, 'onboarding.gender.title'),
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme
@@ -110,7 +110,7 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    option,
+                                    t(context, 'onboarding.gender.$option'),
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 16),
                                   ),

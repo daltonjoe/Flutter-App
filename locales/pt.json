@@ -118,16 +118,24 @@
   "onboarding.language.continue": "Continuar em português",
 
   "onboarding.name.label": "Nome",
-"onboarding.name.hint": "Digite seu nome",
-"onboarding.birthtime.title": "A que horas você nasceu?",
-"onboarding.birthtime.unknown": "Não sei",
-"onboarding.relationship.single": "Solteiro(a)",
-"onboarding.relationship.in_relationship": "Em um relacionamento",
-"onboarding.relationship.married": "Casado(a)",
-"onboarding.relationship.complicated": "É complicado",
+  "onboarding.name.hint": "Digite seu nome",
+  "onboarding.birthtime.title": "A que horas você nasceu?",
+  "onboarding.birthtime.unknown": "Não sei",
+  "onboarding.relationship.single": "Solteiro(a)",
+  "onboarding.relationship.in_relationship": "Em um relacionamento",
+  "onboarding.relationship.married": "Casado(a)",
+  "onboarding.relationship.complicated": "É complicado",
+
+  "onboarding.city.title": "Onde você nasceu?",
+  "onboarding.city.hint": "Pesquise sua cidade",
+  "onboarding.gender.title": "Como você se identifica?",
+  "onboarding.relationship.title": "Qual é o seu status de relacionamento?",
+  "onboarding.gender.male": "Masculino",
+  "onboarding.gender.female": "Feminino",
+  "onboarding.gender.prefer_not_to_say": "Prefiro não dizer",
 
   "onboarding.name.subtitle": "Conte-nos sobre você para que possamos oferecer uma previsão mais personalizada.",
-"onboarding.birthdate.subtitle": "A data é importante para determinar seu signo solar, sua numerologia e sua compatibilidade.",
-"onboarding.birthtime.subtitle": "O horário é importante para determinar suas casas, seu ascendente e a posição exata da Lua.",
-"onboarding.gender.subtitle": "Isso revelará o equilíbrio entre sua energia masculina e feminina."
+  "onboarding.birthdate.subtitle": "A data é importante para determinar seu signo solar, sua numerologia e sua compatibilidade.",
+  "onboarding.birthtime.subtitle": "O horário é importante para determinar suas casas, seu ascendente e a posição exata da Lua.",
+  "onboarding.gender.subtitle": "Isso revelará o equilíbrio entre sua energia masculina e feminina."
 }

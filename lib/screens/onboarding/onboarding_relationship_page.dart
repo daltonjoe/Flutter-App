@@ -126,41 +126,41 @@ List<String> get _optionKeys => [
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            "What's your relationship status?",
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(color: descColor),
-                          ),
-                          const SizedBox(height: 24),
-                          _optionKeys.map(
-                            (optionKey) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: GestureDetector(
-                                onTap: () => _select(option),
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: _selected == option
-                                          ? Theme.of(context).colorScheme.primary
-                                          : Theme.of(context).dividerColor,
-                                      width: _selected == option ? 2 : 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    option,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                              ),
+                            Text(
+                                t(context, 'onboarding.relationship.title'),
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(color: descColor),
                             ),
-                          ),
+                          const SizedBox(height: 24),
+                            ..._optionKeys.map(
+                                (optionKey) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: GestureDetector(
+                                    onTap: () => _select(optionKey),
+                                    child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                                        decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: _selected == optionKey
+                                                ? Theme.of(context).colorScheme.primary
+                                                : Theme.of(context).dividerColor,
+                                            width: _selected == optionKey ? 2 : 1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                        t(context, optionKey),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(fontSize: 16),
+                                        ),
+                                    ),
+                                    ),
+                                ),
+                            ),
                           if (_generalError != null)
                             Padding(
                               padding: const EdgeInsets.only(top: 8),
