@@ -1,6 +1,7 @@
 // lib/screens/chart_page.dart
 // Moonly-inspired redesign
 
+import 'package:flutter_application/models/zodiac_sign.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../models/natal_chart_response.dart';
@@ -333,9 +334,10 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                     ],
                   ),
                   child: Center(
-                    child: Text(
-                      ascSymbol,
-                      style: const TextStyle(fontSize: 32, color: Colors.white),
+                    child: Image.asset(
+                      SoulBoundAssets.getZodiac(summary?.ascendantSign ?? ''),
+                      width: 32,
+                      height: 32,
                     ),
                   ),
                 ),
@@ -546,6 +548,14 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
+
+                // Zodiac icon (house'un solunda, aynı boyutta)
+                Image.asset(
+                  SoulBoundAssets.getZodiac(data.sign),
+                  width: 42,
+                  height: 42,
+                ),
+                const SizedBox(width: 8),
 
                 // House badge
                 Container(

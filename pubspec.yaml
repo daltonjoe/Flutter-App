@@ -57,7 +57,10 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  
   assets:
+    - assets/images/logo/
+    - assets/images/zodiac/
     - assets/data/cities.json
     - assets/animations/
     - locales/

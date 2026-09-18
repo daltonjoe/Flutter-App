@@ -23,10 +23,7 @@ String get _kBaseUrl {
     final origin = Uri.base.origin;
     // Eğer Web Debug Proxy (flutter run -d chrome --web-port 5xxxx) kullanıyorsan
     // backend farklı portta olabilir, bu durumda sabit localhost:8000 kullan
-    if (origin.contains('localhost:5') || origin.contains('127.0.0.1:5')) {
-      return 'http://localhost:8000';
-    }
-    return origin;
+        return 'https://soulbound-m1td.onrender.com';
   } else {
     // Native (Android / iOS / Desktop): Her zaman Render URL'i
     return 'https://soulbound-m1td.onrender.com';

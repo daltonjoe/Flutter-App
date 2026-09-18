@@ -10,7 +10,7 @@ import '../services/astro_service.dart';
 import '../widgets/city_search_field.dart';
 import '../widgets/language_selector.dart';
 import '../widgets/animations/zodiac_orbital_animation.dart';
-import '../i18n/app_localizations.dart';
+import '../../i18n/app_localizations.dart';
 import '../core/theme/cosmic_theme.dart';
 import '../presentation/widgets/components/components.dart';
 

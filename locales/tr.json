@@ -118,5 +118,7 @@
   "elements.fire": "Ateş",
   "elements.earth": "Toprak",
   "elements.air": "Hava",
-  "elements.water": "Su"
+  "elements.water": "Su",
+
+  "onboarding.birthdate.subtitle": "Tarih, güneş burcunuzu, numerolojinizi ve uyumunuzu belirlemek için önemlidir."
 }
