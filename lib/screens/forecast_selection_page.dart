@@ -144,7 +144,7 @@ class ForecastSelectionPage extends StatelessWidget {
               child: ListView.separated(
                 itemCount: _options.length,
                 separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemBuilder: (ctx, i) => _buildCard(ctx, _options[i]),
+                itemBuilder: (ctx, i) => _buildCard(ctx, t(context, _optionKeys[i])),
               ),
             ),
           ],

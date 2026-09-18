@@ -30,12 +30,12 @@ class _OnboardingRelationshipPageState
   bool _isLoading = false;
   String? _generalError;
 
-  static const List<String> _options = [
-    'Single',
-    'In a relationship',
-    'Married',
-    "It's complicated",
-  ];
+List<String> get _optionKeys => [
+  'onboarding.relationship.single',
+  'onboarding.relationship.in_relationship',
+  'onboarding.relationship.married',
+  'onboarding.relationship.complicated',
+];
 
   @override
   void initState() {
@@ -102,14 +102,13 @@ class _OnboardingRelationshipPageState
     final descColor = Theme.of(context).textTheme.bodyMedium?.color;
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/logo/background.png'),
-            fit: BoxFit.cover,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            child: Image.asset('assets/images/logo/background.png', fit: BoxFit.cover),
           ),
-        ),
-        child: SafeArea(
+          SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
@@ -136,8 +135,8 @@ class _OnboardingRelationshipPageState
                                 ?.copyWith(color: descColor),
                           ),
                           const SizedBox(height: 24),
-                          ..._options.map(
-                            (option) => Padding(
+                          _optionKeys.map(
+                            (optionKey) => Padding(
                               padding: const EdgeInsets.only(bottom: 12),
                               child: GestureDetector(
                                 onTap: () => _select(option),
@@ -183,7 +182,8 @@ class _OnboardingRelationshipPageState
               ],
             ),
           ),
-        ),
+          ),
+        ],
       ),
     );
   }

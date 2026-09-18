@@ -114,7 +114,18 @@
   "elements.earth": "تراب",
   "elements.air": "هواء",
   "elements.water": "ماء",
-  
+
+  "onboarding.language.continue": "المتابعة باللغة العربية",
+
+  "onboarding.name.label": "الاسم",
+  "onboarding.name.hint": "أدخل اسمك",
+  "onboarding.birthtime.title": "في أي وقت وُلدت؟",
+  "onboarding.birthtime.unknown": "لا أعرف",
+  "onboarding.relationship.single": "أعزب",
+  "onboarding.relationship.in_relationship": "في علاقة",
+  "onboarding.relationship.married": "متزوج",
+  "onboarding.relationship.complicated": "الأمر معقد",
+
  "onboarding.name.subtitle": "أخبرنا عن نفسك حتى نتمكن من تقديم توقع أكثر تخصيصًا لك.",
 "onboarding.birthdate.subtitle": "التاريخ مهم لتحديد برجك الشمسي وعلم الأعداد ومدى التوافق.",
 "onboarding.birthtime.subtitle": "الوقت مهم لتحديد بيوتك الفلكية وبرجك الصاعد والموقع الدقيق للقمر.",

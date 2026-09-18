@@ -48,14 +48,13 @@ class _OnboardingBirthdatePageState extends State<OnboardingBirthdatePage> {
     final descColor = Theme.of(context).textTheme.bodyMedium?.color;
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/logo/background.png'),
-            fit: BoxFit.cover,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            child: Image.asset('assets/images/logo/background.png', fit: BoxFit.cover),
           ),
-        ),
-        child: SafeArea(
+          SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
@@ -73,7 +72,8 @@ class _OnboardingBirthdatePageState extends State<OnboardingBirthdatePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Image.asset(_sign.assetPath, width: 64, height: 64),
+                          const SizedBox(height: 28),
+                          Image.asset(_sign.assetPath, width: 200, height: 200),
                           Text(
                             t(context, 'signs.${_sign.name}').toUpperCase(),
                             textAlign: TextAlign.center,
@@ -83,14 +83,7 @@ class _OnboardingBirthdatePageState extends State<OnboardingBirthdatePage> {
                               color: descColor,
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          Image.asset(
-                            'assets/images/logo/frame13.png',
-                            width: double.infinity,
-                            height: 160,
-                            fit: BoxFit.contain,
-                          ),
-                          const SizedBox(height: 16),
+                         
                           Text(
                             t(context, 'onboarding.birthdate.subtitle'),
                             textAlign: TextAlign.center,
@@ -117,7 +110,8 @@ class _OnboardingBirthdatePageState extends State<OnboardingBirthdatePage> {
               ],
             ),
           ),
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -120,6 +120,17 @@
   "elements.air": "Air",
   "elements.water": "Water",
 
+  "onboarding.language.continue": "Continue with English",
+
+    "onboarding.name.label": "Name",
+  "onboarding.name.hint": "Enter your name",
+  "onboarding.birthtime.title": "What time were you born?",
+  "onboarding.birthtime.unknown": "I don't know",
+  "onboarding.relationship.single": "Single",
+  "onboarding.relationship.in_relationship": "In a relationship",
+  "onboarding.relationship.married": "Married",
+  "onboarding.relationship.complicated": "It's complicated",
+
 "onboarding.name.subtitle": "Tell us about yourself so that we can make a more personalised prediction.",
   "onboarding.birthdate.subtitle": "Date is important for determining your sun sign, numerology and compatibility.",
   "onboarding.birthtime.subtitle": "Time is important for determining your houses, rising sign, and exact moon position.",

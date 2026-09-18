@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/onboarding_data.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../i18n/app_localizations.dart';
+import 'package:flutter/cupertino.dart';
 
 class OnboardingBirthtimePage extends StatefulWidget {
   final OnboardingData data;
@@ -22,50 +23,44 @@ class OnboardingBirthtimePage extends StatefulWidget {
 }
 
 class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
-  TimeOfDay? _selectedTime;
-  bool _unknown = false;
+    late DateTime _selectedTime;
+    bool _unknown = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _selectedTime = widget.data.birthTime;
-  }
+    @override
+    void initState() {
+      super.initState();
+      final t = widget.data.birthTime;
+      _selectedTime = DateTime(2000, 1, 1, t?.hour ?? 12, t?.minute ?? 0);
+    }
 
-  Future<void> _pickTime() async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime ?? const TimeOfDay(hour: 12, minute: 0),
-    );
-    if (picked != null) {
+    void _onTimeChanged(DateTime time) {
       setState(() {
-        _selectedTime = picked;
+        _selectedTime = time;
         _unknown = false;
-        widget.data.birthTime = picked;
+        widget.data.birthTime = TimeOfDay(hour: time.hour, minute: time.minute);
       });
     }
-  }
 
-  void _markUnknown() {
-    setState(() {
-      _unknown = true;
-      _selectedTime = const TimeOfDay(hour: 12, minute: 0);
-      widget.data.birthTime = _selectedTime;
-    });
-  }
+    void _markUnknown() {
+      setState(() {
+        _unknown = true;
+        _selectedTime = DateTime(2000, 1, 1, 12, 0);
+        widget.data.birthTime = const TimeOfDay(hour: 12, minute: 0);
+      });
+    }
 
   @override
   Widget build(BuildContext context) {
     final descColor = Theme.of(context).textTheme.bodyMedium?.color;
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/logo/background.png'),
-            fit: BoxFit.cover,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            child: Image.asset('assets/images/logo/background.png', fit: BoxFit.cover),
           ),
-        ),
-        child: SafeArea(
+          SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
@@ -84,7 +79,7 @@ class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            'What time were you born?',
+                            t(context, 'onboarding.birthtime.title'),
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme
@@ -104,27 +99,20 @@ class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
                             textAlign: TextAlign.center,
                             style: TextStyle(color: descColor),
                           ),
-                          const SizedBox(height: 24),
-                          GestureDetector(
-                            onTap: _pickTime,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Theme.of(context).dividerColor),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                _unknown
-                                    ? "I don't know"
-                                    : (_selectedTime?.format(context) ?? '--:--'),
-                                style: const TextStyle(fontSize: 20),
-                              ),
+                          const SizedBox(height: 24),                   
+                          SizedBox(
+                            height: 200,
+                            child: CupertinoDatePicker(
+                              mode: CupertinoDatePickerMode.time,
+                              use24hFormat: true,
+                              initialDateTime: _selectedTime,
+                              onDateTimeChanged: _onTimeChanged,
                             ),
                           ),
                           const SizedBox(height: 12),
                           TextButton(
                             onPressed: _markUnknown,
-                            child: const Text("I don't know"),
+                            child: Text(_unknown ? t(context, 'onboarding.birthtime.unknown') : t(context, 'onboarding.birthtime.unknown')),
                           ),
                         ],
                       ),
@@ -136,7 +124,8 @@ class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
               ],
             ),
           ),
-        ),
+          ),
+        ],
       ),
     );
   }

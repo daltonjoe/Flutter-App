@@ -120,8 +120,19 @@
   "elements.air": "Hava",
   "elements.water": "Su",
 
+  "onboarding.language.continue": "Türkçe ile Devam Et",
+
+  "onboarding.name.label": "Nome",
+  "onboarding.name.hint": "Digite seu nome",
+  "onboarding.birthtime.title": "A que horas você nasceu?",
+  "onboarding.birthtime.unknown": "Não sei",
+  "onboarding.relationship.single": "Solteiro(a)",
+  "onboarding.relationship.in_relationship": "Em um relacionamento",
+  "onboarding.relationship.married": "Casado(a)",
+  "onboarding.relationship.complicated": "É complicado",
+
   "onboarding.name.subtitle": "Kendinizden bahsedin, böylece size daha kişiselleştirilmiş bir tahmin sunabiliriz.",
-"onboarding.birthdate.subtitle": "Tarih, güneş burcunuzu, numerolojinizi ve uyumluluğunuzu belirlemek için önemlidir.",
-"onboarding.birthtime.subtitle": "Saat, evlerinizi, yükselen burcunuzu ve Ay'ın kesin konumunu belirlemek için önemlidir.",
-"onboarding.gender.subtitle": "Eril ve dişil enerjiniz arasındaki dengeyi ortaya çıkaracaktır."
+  "onboarding.birthdate.subtitle": "Tarih, güneş burcunuzu, numerolojinizi ve uyumluluğunuzu belirlemek için önemlidir.",
+  "onboarding.birthtime.subtitle": "Saat, evlerinizi, yükselen burcunuzu ve Ay'ın kesin konumunu belirlemek için önemlidir.",
+  "onboarding.gender.subtitle": "Eril ve dişil enerjiniz arasındaki dengeyi ortaya çıkaracaktır."
 }

@@ -50,14 +50,13 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
     final descColor = Theme.of(context).textTheme.bodyMedium?.color;
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/logo/background.png'),
-            fit: BoxFit.cover,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            child: Image.asset('assets/images/logo/background.png', fit: BoxFit.cover),
           ),
-        ),
-        child: SafeArea(
+          SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
@@ -129,7 +128,8 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
               ],
             ),
           ),
-        ),
+          ),
+        ],
       ),
     );
   }

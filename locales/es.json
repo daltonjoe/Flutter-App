@@ -115,6 +115,17 @@
   "elements.air": "Aire",
   "elements.water": "Agua",
 
+  "onboarding.language.continue": "Continuar en español",
+
+  "onboarding.name.label": "Nombre",
+"onboarding.name.hint": "Introduce tu nombre",
+"onboarding.birthtime.title": "¿A qué hora naciste?",
+"onboarding.birthtime.unknown": "No lo sé",
+"onboarding.relationship.single": "Soltero/a",
+"onboarding.relationship.in_relationship": "En una relación",
+"onboarding.relationship.married": "Casado/a",
+"onboarding.relationship.complicated": "Es complicado",
+
 "onboarding.name.subtitle": "Cuéntanos sobre ti para que podamos ofrecerte una predicción más personalizada.",
 "onboarding.birthdate.subtitle": "La fecha es importante para determinar tu signo solar, tu numerología y tu compatibilidad.",
 "onboarding.birthtime.subtitle": "La hora es importante para determinar tus casas, tu signo ascendente y la posición exacta de la Luna.",

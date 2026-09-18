@@ -8,4 +8,6 @@ class OnboardingData {
   CityModel? city;
   String? gender;
   String? relationshipStatus;
+
+  String? languageCode;
 }

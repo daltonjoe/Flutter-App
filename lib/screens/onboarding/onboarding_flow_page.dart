@@ -6,6 +6,8 @@ import 'onboarding_city_page.dart';
 import 'onboarding_gender_page.dart';
 import 'onboarding_relationship_page.dart';
 import '../../presentation/widgets/components/onboarding_progress_bar.dart';
+import 'onboarding_birthdate_page.dart';
+import 'onboarding_language_page.dart';
 
 
 class OnboardingFlowPage extends StatefulWidget {
@@ -20,7 +22,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
   final OnboardingData data = OnboardingData();
   int _step = 0;
 
-  static const int totalSteps = 6;
+  static const int totalSteps = 7;
 
   void _next() {
     if (_step < totalSteps - 1) {
@@ -63,6 +65,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
                 controller: _controller,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
+                   OnboardingLanguagePage(data: data, onNext: _next, onBack: _back),
                   OnboardingNamePage(data: data, onNext: _next, onBack: _back),
                   OnboardingBirthdatePage(data: data, onNext: _next, onBack: _back),
                   OnboardingBirthtimePage(data: data, onNext: _next, onBack: _back),
