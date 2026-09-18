@@ -110,10 +110,15 @@
   "signs.aquarius": "Wassermann",
   "signs.pisces": "Fische",
 
-  "onboarding.birthdate.subtitle": "Das Datum ist wichtig, um dein Sonnenzeichen, deine Numerologie und deine Kompatibilität zu bestimmen.",
 
   "elements.fire": "Feuer",
   "elements.earth": "Erde",
   "elements.air": "Luft",
-  "elements.water": "Wasser"
+  "elements.water": "Wasser",
+
+
+  "onboarding.name.subtitle": "Erzählen Sie uns etwas über sich, damit wir eine persönlichere Vorhersage für Sie erstellen können.",
+"onboarding.birthdate.subtitle": "Das Datum ist wichtig, um Ihr Sonnenzeichen, Ihre Numerologie und Ihre Kompatibilität zu bestimmen.",
+"onboarding.birthtime.subtitle": "Die Uhrzeit ist wichtig, um Ihre Häuser, Ihr Aszendentenzeichen und die genaue Mondposition zu bestimmen.",
+"onboarding.gender.subtitle": "Es wird das Gleichgewicht Ihrer männlichen und weiblichen Energie aufzeigen."
 }

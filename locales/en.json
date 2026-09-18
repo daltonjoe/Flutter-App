@@ -115,10 +115,13 @@
   "signs.aquarius": "Aquarius",
   "signs.pisces": "Pisces",
 
-  "onboarding.birthdate.subtitle": "Date is important for determining your sun sign, numerology and compatibility.",
-
   "elements.fire": "Fire",
   "elements.earth": "Earth",
   "elements.air": "Air",
-  "elements.water": "Water"
+  "elements.water": "Water",
+
+"onboarding.name.subtitle": "Tell us about yourself so that we can make a more personalised prediction.",
+  "onboarding.birthdate.subtitle": "Date is important for determining your sun sign, numerology and compatibility.",
+  "onboarding.birthtime.subtitle": "Time is important for determining your houses, rising sign, and exact moon position.",
+  "onboarding.gender.subtitle": "It will reveal the balance of your masculine and feminine energy."
 }

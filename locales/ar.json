@@ -110,10 +110,13 @@
   "signs.aquarius": "الدلو",
   "signs.pisces": "الحوت",
 
-  "onboarding.birthdate.subtitle": "التاريخ مهم لتحديد برجك الشمسي وعلم الأعداد ومدى توافقك.",
-
   "elements.fire": "نار",
   "elements.earth": "تراب",
   "elements.air": "هواء",
-  "elements.water": "ماء"
+  "elements.water": "ماء",
+  
+ "onboarding.name.subtitle": "أخبرنا عن نفسك حتى نتمكن من تقديم توقع أكثر تخصيصًا لك.",
+"onboarding.birthdate.subtitle": "التاريخ مهم لتحديد برجك الشمسي وعلم الأعداد ومدى التوافق.",
+"onboarding.birthtime.subtitle": "الوقت مهم لتحديد بيوتك الفلكية وبرجك الصاعد والموقع الدقيق للقمر.",
+"onboarding.gender.subtitle": "سيساعد ذلك في الكشف عن توازن طاقتك الذكورية والأنثوية."
 }

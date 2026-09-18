@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../models/onboarding_data.dart';
-import '../../models/city_model.dart';
-import '../../presentation/widgets/components/cosmic_input_field.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
+import '../../i18n/app_localizations.dart';
 
-class OnboardingCityPage extends StatefulWidget {
+class OnboardingBirthtimePage extends StatefulWidget {
   final OnboardingData data;
   final VoidCallback onNext;
   final VoidCallback onBack;
   final bool isLast;
 
-  const OnboardingCityPage({
+  const OnboardingBirthtimePage({
     super.key,
     required this.data,
     required this.onNext,
@@ -19,54 +18,38 @@ class OnboardingCityPage extends StatefulWidget {
   });
 
   @override
-  State<OnboardingCityPage> createState() => _OnboardingCityPageState();
+  State<OnboardingBirthtimePage> createState() => _OnboardingBirthtimePageState();
 }
 
-class _OnboardingCityPageState extends State<OnboardingCityPage> {
-  late TextEditingController _controller;
-  List<CityModel> _allCities = [];
-  List<CityModel> _results = [];
-  CityModel? _selected;
+class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
+  TimeOfDay? _selectedTime;
+  bool _unknown = false;
 
   @override
   void initState() {
     super.initState();
-    _selected = widget.data.city;
-    _controller = TextEditingController(text: _selected?.display ?? '');
-    _loadCities();
+    _selectedTime = widget.data.birthTime;
   }
 
-  Future<void> _loadCities() async {
-    final cities = await CityModel.loadAll();
-    if (mounted) setState(() => _allCities = cities);
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime ?? const TimeOfDay(hour: 12, minute: 0),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedTime = picked;
+        _unknown = false;
+        widget.data.birthTime = picked;
+      });
+    }
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onSearch(String value) {
+  void _markUnknown() {
     setState(() {
-      _selected = null;
-      if (value.trim().isEmpty) {
-        _results = [];
-      } else {
-        _results = _allCities
-            .where((c) => c.display.toLowerCase().contains(value.toLowerCase()))
-            .take(6)
-            .toList();
-      }
-    });
-  }
-
-  void _selectCity(CityModel city) {
-    setState(() {
-      _selected = city;
-      _controller.text = city.display;
-      _results = [];
-      widget.data.city = city;
+      _unknown = true;
+      _selectedTime = const TimeOfDay(hour: 12, minute: 0);
+      widget.data.birthTime = _selectedTime;
     });
   }
 
@@ -101,41 +84,48 @@ class _OnboardingCityPageState extends State<OnboardingCityPage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            'Where were you born?',
+                            'What time were you born?',
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge
                                 ?.copyWith(color: descColor),
                           ),
-                          const SizedBox(height: 24),
-                          CosmicInputField(
-                            label: 'City',
-                            icon: Icons.location_on_outlined,
-                            controller: _controller,
-                            hint: 'Search your city',
-                            onChanged: _onSearch,
+                          const SizedBox(height: 16),
+                          Image.asset(
+                            'assets/images/logo/frame13.png',
+                            width: double.infinity,
+                            height: 160,
+                            fit: BoxFit.contain,
                           ),
-                          if (_results.isNotEmpty)
-                            Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              constraints: const BoxConstraints(maxHeight: 220),
+                          const SizedBox(height: 16),
+                          Text(
+                            t(context, 'onboarding.birthtime.subtitle'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: descColor),
+                          ),
+                          const SizedBox(height: 24),
+                          GestureDetector(
+                            onTap: _pickTime,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Theme.of(context).dividerColor),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: _results.length,
-                                itemBuilder: (context, index) {
-                                  final city = _results[index];
-                                  return ListTile(
-                                    title: Text(city.display),
-                                    onTap: () => _selectCity(city),
-                                  );
-                                },
+                              child: Text(
+                                _unknown
+                                    ? "I don't know"
+                                    : (_selectedTime?.format(context) ?? '--:--'),
+                                style: const TextStyle(fontSize: 20),
                               ),
                             ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextButton(
+                            onPressed: _markUnknown,
+                            child: const Text("I don't know"),
+                          ),
                         ],
                       ),
                     ),

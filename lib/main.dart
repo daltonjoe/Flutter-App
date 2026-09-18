@@ -9,6 +9,7 @@ import 'screens/chart_page.dart';
 import 'models/natal_chart_response.dart';
 import 'providers/language_provider.dart';
 import 'i18n/app_localizations.dart';
+import 'screens/onboarding/onboarding_flow_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,7 +62,7 @@ class SoulBoundApp extends StatelessWidget {
           child: child!,
         );
       },
-      home: const CreateProfilePage(),
+      home: const OnboardingFlowPage(),
       onGenerateRoute: (settings) {
         if (settings.name == '/chart') {
           final args = settings.arguments as Map<String, dynamic>;

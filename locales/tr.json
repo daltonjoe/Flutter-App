@@ -120,5 +120,8 @@
   "elements.air": "Hava",
   "elements.water": "Su",
 
-  "onboarding.birthdate.subtitle": "Tarih, güneş burcunuzu, numerolojinizi ve uyumunuzu belirlemek için önemlidir."
+  "onboarding.name.subtitle": "Kendinizden bahsedin, böylece size daha kişiselleştirilmiş bir tahmin sunabiliriz.",
+"onboarding.birthdate.subtitle": "Tarih, güneş burcunuzu, numerolojinizi ve uyumluluğunuzu belirlemek için önemlidir.",
+"onboarding.birthtime.subtitle": "Saat, evlerinizi, yükselen burcunuzu ve Ay'ın kesin konumunu belirlemek için önemlidir.",
+"onboarding.gender.subtitle": "Eril ve dişil enerjiniz arasındaki dengeyi ortaya çıkaracaktır."
 }

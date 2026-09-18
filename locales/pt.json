@@ -110,10 +110,13 @@
   "signs.aquarius": "Aquário",
   "signs.pisces": "Peixes",
 
-  "onboarding.birthdate.subtitle": "A data é importante para determinar o seu signo solar, a sua numerologia e a sua compatibilidade.",
-
   "elements.fire": "Fogo",
   "elements.earth": "Terra",
   "elements.air": "Ar",
-  "elements.water": "Água"
+  "elements.water": "Água",
+
+  "onboarding.name.subtitle": "Conte-nos sobre você para que possamos oferecer uma previsão mais personalizada.",
+"onboarding.birthdate.subtitle": "A data é importante para determinar seu signo solar, sua numerologia e sua compatibilidade.",
+"onboarding.birthtime.subtitle": "O horário é importante para determinar suas casas, seu ascendente e a posição exata da Lua.",
+"onboarding.gender.subtitle": "Isso revelará o equilíbrio entre sua energia masculina e feminina."
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/onboarding_data.dart';
 import 'onboarding_name_page.dart';
-import 'onboarding_birthdate_page.dart';
+import 'onboarding_birthtime_page.dart';
 import 'onboarding_city_page.dart';
 import 'onboarding_gender_page.dart';
 import 'onboarding_relationship_page.dart';
@@ -47,7 +47,14 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: Container(
+  decoration: const BoxDecoration(
+    image: DecorationImage(
+      image: AssetImage('assets/images/logo/background.png'),
+      fit: BoxFit.cover,
+    ),
+  ),
+  child: SafeArea(
         child: Column(
           children: [
             OnboardingProgressBar(currentStep: _step, totalSteps: totalSteps),
@@ -67,7 +74,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 }

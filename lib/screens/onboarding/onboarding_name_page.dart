@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/onboarding_data.dart';
 import '../../presentation/widgets/components/cosmic_input_field.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
-import '../../presentation/widgets/components/cosmic_outline_button.dart';
+import '../../i18n/app_localizations.dart';
 
 class OnboardingNamePage extends StatefulWidget {
   final OnboardingData data;
@@ -39,45 +39,52 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
 
   @override
   Widget build(BuildContext context) {
+    final descColor = Theme.of(context).textTheme.bodyMedium?.color;
+
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: widget.onBack,
-              ),
-              // Title, subtitle, progress bar burada
-              CosmicInputField(
-                label: 'Name',
-                icon: Icons.person_outline,
-                controller: _controller,
-                hint: 'Enter your name',
-                onChanged: (value) => widget.data.name = value,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/logo/background.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            t(context, 'onboarding.name.subtitle'),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(color: descColor),
+                          ),
+                          const SizedBox(height: 24),
+                          CosmicInputField(
+                            label: 'Name',
+                            icon: Icons.person_outline,
+                            controller: _controller,
+                            hint: 'Enter your name',
+                            onChanged: (value) => widget.data.name = value,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              const Spacer(),
-              Row(
-                children: [
-                  Expanded(
-                    child: CosmicOutlineButton(
-                            label: 'Skip!',
-                            onTap: widget.onNext,
-                            ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: CosmicCtaButton(
-                        label: 'Next',
-                        onTap: widget.onNext,
-                        ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-            ],
+                CosmicCtaButton(label: 'Next', onTap: widget.onNext),
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
       ),
