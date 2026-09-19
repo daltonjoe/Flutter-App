@@ -4,6 +4,7 @@ import '../../models/onboarding_data.dart';
 import '../../services/astro_service.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../i18n/app_localizations.dart';
+import '../../presentation/widgets/components/cosmic_wheel_picker.dart';
 
 class OnboardingRelationshipPage extends StatefulWidget {
   final OnboardingData data;
@@ -30,12 +31,25 @@ class _OnboardingRelationshipPageState
   bool _isLoading = false;
   String? _generalError;
 
-List<String> get _optionKeys => [
-  'onboarding.relationship.single',
-  'onboarding.relationship.in_relationship',
-  'onboarding.relationship.married',
-  'onboarding.relationship.complicated',
-];
+  static const List<String> _options = [
+    'single', 'dating', 'engaged', 'married', 'divorced', 'separated'
+  ];
+
+  List<String> get _optionKeys =>
+      _options.map((o) => 'onboarding.relationship.$o').toList();
+
+  static const Map<String, WheelTone> _tones = {
+    'single': WheelTone.neutral,
+    'dating': WheelTone.female,
+    'engaged': WheelTone.male,
+    'married': WheelTone.gold,
+    'divorced': WheelTone.purple,
+    'separated': WheelTone.indigo,
+  };
+
+  String? get _imagePath => _selected != null
+      ? 'assets/images/relationship/${_selected == 'separated' ? 'seperated' : _selected}.png'
+      : null;
 
   @override
   void initState() {
@@ -54,6 +68,7 @@ List<String> get _optionKeys => [
     setState(() => _generalError = null);
 
     final d = widget.data;
+    debugPrint('date=${d.birthDate} time=${d.birthTime} city=${d.city}');
     if (d.birthDate == null || d.birthTime == null || d.city == null) {
       setState(() => _generalError = t(context, 'common.unknown_error'));
       return;
@@ -89,10 +104,13 @@ List<String> get _optionKeys => [
         });
       }
     } on AstroServiceException catch (e) {
-      setState(() => _generalError = e.message);
-    } catch (_) {
-      setState(() => _generalError = t(context, 'common.unknown_error'));
-    } finally {
+    if (!mounted) return;
+    setState(() => _generalError = e.message);
+    } catch (e) {
+  debugPrint('Natal chart error: $e');
+  if (!mounted) return;
+  setState(() => _generalError = t(context, 'common.unknown_error'));
+} finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -109,79 +127,64 @@ List<String> get _optionKeys => [
             child: Image.asset('assets/images/logo/background.png', fit: BoxFit.cover),
           ),
           SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: widget.onBack,
-                  ),
-                ),
-                Expanded(
-                  child: Center(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                            Text(
-                                t(context, 'onboarding.relationship.title'),
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(color: descColor),
-                            ),
-                          const SizedBox(height: 24),
-                            ..._optionKeys.map(
-                                (optionKey) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    child: GestureDetector(
-                                    onTap: () => _select(optionKey),
-                                    child: Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                                        decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: _selected == optionKey
-                                                ? Theme.of(context).colorScheme.primary
-                                                : Theme.of(context).dividerColor,
-                                            width: _selected == optionKey ? 2 : 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Text(
-                                        t(context, optionKey),
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(fontSize: 16),
-                                        ),
-                                    ),
-                                    ),
-                                ),
-                            ),
-                          if (_generalError != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Text(
-                                _generalError!,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(color: Colors.red),
-                              ),
-                            ),
-                        ],
-                      ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: widget.onBack,
                     ),
                   ),
-                ),
-                _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : CosmicCtaButton(label: 'Continue', onTap: _onSubmit),
-                const SizedBox(height: 24),
-              ],
+                  Text(
+                    t(context, 'onboarding.relationship.title'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(color: descColor),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 250,
+                    child: _imagePath != null
+                        ? Image.asset(
+                            _imagePath!,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const SizedBox.shrink(),
+                          )
+                        : null,
+                  ),
+                  Expanded(
+                    child: CosmicWheelPicker(
+                      options: List.generate(_options.length, (i) => WheelOption(
+                          _options[i],
+                          t(context, _optionKeys[i]),
+                          _tones[_options[i]]!,
+                      )),
+                      selected: _selected,
+                      onSelected: _select,
+                    ),
+                  ),
+                  if (_generalError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        _generalError!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : CosmicCtaButton(
+                      label: t(context, 'common.next'), // diğer sayfalarda kullandığınız Next key'i neyse onu yazın
+                      disabled: _selected == null,
+                      onTap: widget.isLast ? _onSubmit : widget.onNext,
+                    ),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
-          ),
           ),
         ],
       ),

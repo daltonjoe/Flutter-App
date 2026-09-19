@@ -110,10 +110,33 @@
   "signs.aquarius": "Acuario",
   "signs.pisces": "Piscis",
 
+  "placement.title": "Interpretación detallada",
+"placement.theme.love": "Amor y relaciones",
+"placement.theme.career": "Carrera y dinero",
+"placement.theme.identity": "Identidad y yo",
+"placement.theme.health": "Salud y energía",
+"placement.strengths": "Fortalezas",
+"placement.challenges": "Desafíos",
+"placement.button": "Ver interpretación detallada",
+
+"placement.error": "Se produjo un problema al cargar el contenido.",
+"placement.retry": "Intentar de nuevo",
+"placement.empty": "Todavía no hay contenido disponible para esta posición.",
+
+
   "elements.fire": "Fuego",
   "elements.earth": "Tierra",
   "elements.air": "Aire",
   "elements.water": "Agua",
+
+  "common.ok": "Aceptar",
+  "onboarding.name.required": "Introduce tu nombre para que podamos preparar una carta personalizada para ti.",
+  "onboarding.city.required": "Debes seleccionar tu lugar de nacimiento para que podamos analizar con precisión la posición de los planetas y las estrellas.",
+  "onboarding.birthtime.popup_title": "Hora de nacimiento",
+  "onboarding.birthtime.popup_message": "La hora de nacimiento es muy importante para calcular con precisión tu signo ascendente y la posición de la Luna. Si no la sabes por ahora, no pasa nada. Puedes actualizarla en cualquier momento cuando la descubras.",
+  "onboarding.birthtime.ask_relative": "Preguntaré a un familiar",
+  "onboarding.birthtime.skip": "Omitir",
+  "onboarding.birthtime.share_message": "¿Sabes a qué hora nací?",
 
   "onboarding.language.continue": "Continuar en español",
 
@@ -121,15 +144,18 @@
   "onboarding.name.hint": "Introduce tu nombre",
   "onboarding.birthtime.title": "¿A qué hora naciste?",
   "onboarding.birthtime.unknown": "No lo sé",
+  "onboarding.relationship.title": "¿Cuál es tu estado sentimental?",
   "onboarding.relationship.single": "Soltero/a",
-  "onboarding.relationship.in_relationship": "En una relación",
+  "onboarding.relationship.dating": "Estoy saliendo con alguien",
+  "onboarding.relationship.engaged": "Comprometido/a",
   "onboarding.relationship.married": "Casado/a",
-  "onboarding.relationship.complicated": "Es complicado",
+  "onboarding.relationship.divorced": "Divorciado/a",
+  "onboarding.relationship.separated": "Separado/a",
 
   "onboarding.city.title": "¿Dónde naciste?",
   "onboarding.city.hint": "Busca tu ciudad",
   "onboarding.gender.title": "¿Cómo te identificas?",
-  "onboarding.relationship.title": "¿Cuál es tu estado sentimental?",
+ 
   "onboarding.gender.male": "Hombre",
   "onboarding.gender.female": "Mujer",
   "onboarding.gender.prefer_not_to_say": "Prefiero no decirlo",

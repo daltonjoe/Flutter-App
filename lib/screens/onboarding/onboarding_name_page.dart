@@ -3,6 +3,9 @@ import '../../models/onboarding_data.dart';
 import '../../presentation/widgets/components/cosmic_input_field.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../i18n/app_localizations.dart';
+import 'dart:math' as math;
+import '../../presentation/widgets/components/cosmic_alert_dialog.dart';
+
 
 class OnboardingNamePage extends StatefulWidget {
   final OnboardingData data;
@@ -22,19 +25,43 @@ class OnboardingNamePage extends StatefulWidget {
   State<OnboardingNamePage> createState() => _OnboardingNamePageState();
 }
 
-class _OnboardingNamePageState extends State<OnboardingNamePage> {
+class _OnboardingNamePageState extends State<OnboardingNamePage>
+    with SingleTickerProviderStateMixin {
   late TextEditingController _controller;
+  late AnimationController _shake;
+  bool _warned = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.data.name);
+    _shake = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 450));
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _shake.dispose();
     super.dispose();
+  }
+
+  Future<void> _onNext() async {
+    if ((widget.data.name ?? '').trim().isNotEmpty) {
+      widget.onNext();
+      return;
+    }
+    if (_warned) {
+      _shake.forward(from: 0);
+      return;
+    }
+    _warned = true;
+    FocusScope.of(context).unfocus();
+    await showCosmicAlert(
+      context,
+      message: t(context, 'onboarding.name.required'),
+      actions: [CosmicAlertAction(label: t(context, 'common.ok'))],
+    );
   }
 
   @override
@@ -75,19 +102,32 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
                                 ?.copyWith(color: descColor),
                           ),
                           const SizedBox(height: 24),
-                          CosmicInputField(
+
+
+                          AnimatedBuilder(
+                            animation: _shake,
+                            builder: (context, child) => Transform.translate(
+                              offset: Offset(
+                                  math.sin(_shake.value * math.pi * 6) * (1 - _shake.value) * 12, 0),
+                              child: child,
+                            ),
+                            child: CosmicInputField(
                             label: t(context, 'onboarding.name.label'),
                             icon: Icons.person_outline,
                             controller: _controller,
                             hint: t(context, 'onboarding.name.hint'),
                             onChanged: (value) => widget.data.name = value,
                           ),
+                          ),
+
+
+
                         ],
                       ),
                     ),
                   ),
                 ),
-                CosmicCtaButton(label: 'Next', onTap: widget.onNext),
+                CosmicCtaButton(label: t(context, 'common.next'), onTap: _onNext),
                 const SizedBox(height: 24),
               ],
             ),

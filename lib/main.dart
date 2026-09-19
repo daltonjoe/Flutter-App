@@ -10,6 +10,8 @@ import 'models/natal_chart_response.dart';
 import 'providers/language_provider.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/onboarding/onboarding_flow_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/config/supabase_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +25,12 @@ void main() async {
       statusBarIconBrightness: Brightness.light,
       systemNavigationBarColor: AppTheme.bgDeep,
     ),
+  );
+  
+
+  await Supabase.initialize(
+    url: SupabaseConfig.url,
+    anonKey: SupabaseConfig.anonKey,
   );
 
   runApp(
@@ -55,11 +63,19 @@ class SoulBoundApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       builder: (context, child) {
-        return Directionality(
-          textDirection: languageProvider.isRtl
-              ? TextDirection.rtl
-              : TextDirection.ltr,
-          child: child!,
+        return ColoredBox(
+          color: Colors.black,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Directionality(
+                textDirection: languageProvider.isRtl
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+                child: child!,
+              ),
+            ),
+          ),
         );
       },
       home: const OnboardingFlowPage(),

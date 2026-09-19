@@ -3,6 +3,8 @@ import '../../models/onboarding_data.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../i18n/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../presentation/widgets/components/cosmic_alert_dialog.dart';
 
 class OnboardingBirthtimePage extends StatefulWidget {
   final OnboardingData data;
@@ -18,19 +20,19 @@ class OnboardingBirthtimePage extends StatefulWidget {
     this.isLast = false,
   });
 
-  @override
   State<OnboardingBirthtimePage> createState() => _OnboardingBirthtimePageState();
-}
+  }
 
-class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
-    late DateTime _selectedTime;
-    bool _unknown = false;
+  class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
+      late DateTime _selectedTime;
+      bool _unknown = false;
 
     @override
     void initState() {
       super.initState();
-      final t = widget.data.birthTime;
-      _selectedTime = DateTime(2000, 1, 1, t?.hour ?? 12, t?.minute ?? 0);
+      final saved = widget.data.birthTime;
+      _selectedTime = DateTime(2000, 1, 1, saved?.hour ?? 12, saved?.minute ?? 0);
+      widget.data.birthTime ??= TimeOfDay(hour: _selectedTime.hour, minute: _selectedTime.minute);
     }
 
     void _onTimeChanged(DateTime time) {
@@ -48,7 +50,28 @@ class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
         widget.data.birthTime = const TimeOfDay(hour: 12, minute: 0);
       });
     }
-
+      Future<void> _onUnknown() async {
+      final shareMsg = t(context, 'onboarding.birthtime.share_message');
+      await showCosmicAlert(
+        context,
+        title: t(context, 'onboarding.birthtime.popup_title'),
+        message: t(context, 'onboarding.birthtime.popup_message'),
+        actions: [
+          CosmicAlertAction(
+            label: t(context, 'onboarding.birthtime.ask_relative'),
+            onTap: () => Share.share(shareMsg),
+          ),
+          CosmicAlertAction(
+            label: t(context, 'onboarding.birthtime.skip'),
+            primary: false,
+            onTap: () {
+              _markUnknown();
+              widget.onNext();
+            },
+          ),
+        ],
+      );
+    }
   @override
   Widget build(BuildContext context) {
     final descColor = Theme.of(context).textTheme.bodyMedium?.color;
@@ -86,11 +109,11 @@ class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
                                 .titleLarge
                                 ?.copyWith(color: descColor),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 30),
                           Image.asset(
                             'assets/images/logo/frame13.png',
                             width: double.infinity,
-                            height: 160,
+                            height: 300,
                             fit: BoxFit.contain,
                           ),
                           const SizedBox(height: 16),
@@ -111,7 +134,7 @@ class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
                           ),
                           const SizedBox(height: 12),
                           TextButton(
-                            onPressed: _markUnknown,
+                            onPressed: _onUnknown,
                             child: Text(_unknown ? t(context, 'onboarding.birthtime.unknown') : t(context, 'onboarding.birthtime.unknown')),
                           ),
                         ],
@@ -119,7 +142,7 @@ class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
                     ),
                   ),
                 ),
-                CosmicCtaButton(label: 'Next', onTap: widget.onNext),
+                CosmicCtaButton(label: t(context, 'common.next'), onTap: widget.onNext),
                 const SizedBox(height: 24),
               ],
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/onboarding_data.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../i18n/app_localizations.dart';
+import '../../presentation/widgets/components/cosmic_wheel_picker.dart';
 
 class OnboardingGenderPage extends StatefulWidget {
   final OnboardingData data;
@@ -29,6 +30,7 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
   String? get _imagePath {
     if (_selected == 'male') return 'assets/images/logo/male.png';
     if (_selected == 'female') return 'assets/images/logo/female.png';
+    if (_selected == 'prefer_not_to_say') return 'assets/images/logo/prefernottosay.png';
     return null;
   }
 
@@ -68,62 +70,42 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
                     onPressed: widget.onBack,
                   ),
                 ),
-                Expanded(
-                  child: Center(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            t(context, 'onboarding.gender.title'),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(color: descColor),
-                          ),
-                          const SizedBox(height: 16),
-                          if (_imagePath != null)
-                            Image.asset(_imagePath!, width: 200, height: 200),
-                          const SizedBox(height: 16),
-                          Text(
-                            t(context, 'onboarding.gender.subtitle'),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: descColor),
-                          ),
-                          const SizedBox(height: 16),
-                          ..._options.map(
-                            (option) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: GestureDetector(
-                                onTap: () => _select(option),
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: _selected == option
-                                          ? Theme.of(context).colorScheme.primary
-                                          : Theme.of(context).dividerColor,
-                                      width: _selected == option ? 2 : 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    t(context, 'onboarding.gender.$option'),
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                Text(
+                t(context, 'onboarding.gender.title'),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(color: descColor),
                 ),
-                CosmicCtaButton(label: 'Next', onTap: widget.onNext),
+                const SizedBox(height: 12),
+                SizedBox(
+                height: 260,
+                child: _imagePath != null
+                    ? Image.asset(_imagePath!, fit: BoxFit.contain)
+                    : null,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                t(context, 'onboarding.gender.subtitle'),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: descColor),
+                ),
+                Expanded(
+                child: CosmicWheelPicker(
+                    options: _options
+                        .map((o) => WheelOption(
+                            o,
+                            t(context, 'onboarding.gender.$o'),
+                            o == 'female'
+                                ? WheelTone.female
+                                : o == 'male'
+                                    ? WheelTone.male
+                                    : WheelTone.neutral,
+                            ))
+                        .toList(),
+                    selected: _selected,
+                    onSelected: _select,
+                ),
+                ),
+                CosmicCtaButton(label: t(context, 'common.next'), onTap: widget.onNext),
                 const SizedBox(height: 24),
               ],
             ),

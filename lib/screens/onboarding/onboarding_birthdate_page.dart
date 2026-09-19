@@ -32,6 +32,7 @@ class _OnboardingBirthdatePageState extends State<OnboardingBirthdatePage> {
   void initState() {
     super.initState();
     _selectedDate = widget.data.birthDate ?? DateTime(2000, 1, 1);
+    widget.data.birthDate ??= _selectedDate;
     _sign = ZodiacSign.fromString(ZodiacUtils.getSignKey(_selectedDate));
   }
 
@@ -72,8 +73,8 @@ class _OnboardingBirthdatePageState extends State<OnboardingBirthdatePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 28),
-                          Image.asset(_sign.assetPath, width: 200, height: 200),
+                          const SizedBox(height: 100),
+                          Image.asset(_sign.assetPath, width: 400, height: 400),
                           Text(
                             t(context, 'signs.${_sign.name}').toUpperCase(),
                             textAlign: TextAlign.center,
@@ -105,7 +106,7 @@ class _OnboardingBirthdatePageState extends State<OnboardingBirthdatePage> {
                     ),
                   ),
                 ),
-                CosmicCtaButton(label: 'Next', onTap: widget.onNext),
+                CosmicCtaButton(label: t(context, 'common.next'), onTap: widget.onNext),
                 const SizedBox(height: 24),
               ],
             ),

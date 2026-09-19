@@ -11,6 +11,7 @@ import '../i18n/app_localizations.dart';
 import 'natal_report_page.dart';
 import 'planet_report_page.dart';
 import 'forecast_selection_page.dart';
+import 'placement_content_page.dart';
 
 class ChartPage extends StatefulWidget {
   final NatalChartResponse chartData;
@@ -21,6 +22,7 @@ class ChartPage extends StatefulWidget {
   @override
   State<ChartPage> createState() => _ChartPageState();
 }
+
 
 class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   late AnimationController _entranceCtrl;
@@ -224,6 +226,17 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                     const SizedBox(height: 32),
 
                     // ── CTA butonlar ───────────────────────
+                    _outlineBtn(
+                      label: t(context, 'placement.button'),
+                      icon: Icons.stars_rounded,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PlacementContentPage(chartData: widget.chartData),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     _buildForecastBtn(),
                     const SizedBox(height: 12),
                     _buildAnalysisBtn(),

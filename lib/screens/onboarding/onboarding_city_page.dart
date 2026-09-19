@@ -4,6 +4,7 @@ import '../../models/city_model.dart';
 import '../../presentation/widgets/components/cosmic_input_field.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../i18n/app_localizations.dart';
+import '../../presentation/widgets/components/cosmic_alert_dialog.dart';
 
 class OnboardingCityPage extends StatefulWidget {
   final OnboardingData data;
@@ -51,6 +52,7 @@ class _OnboardingCityPageState extends State<OnboardingCityPage> {
   void _onSearch(String value) {
     setState(() {
       _selected = null;
+    widget.data.city = null;
       if (value.trim().isEmpty) {
         _results = [];
       } else {
@@ -69,6 +71,19 @@ class _OnboardingCityPageState extends State<OnboardingCityPage> {
       _results = [];
       widget.data.city = city;
     });
+  }
+
+    Future<void> _onNext() async {
+    if (_selected != null) {
+      widget.onNext();
+      return;
+    }
+    FocusScope.of(context).unfocus();
+    await showCosmicAlert(
+      context,
+      message: t(context, 'onboarding.city.required'),
+      actions: [CosmicAlertAction(label: t(context, 'common.ok'))],
+    );
   }
 
   @override
@@ -110,7 +125,7 @@ class _OnboardingCityPageState extends State<OnboardingCityPage> {
                           ),
                           const SizedBox(height: 24),
                           CosmicInputField(
-                            label: 'City',
+                            label: t(context, 'create_profile.city_hint'),
                             icon: Icons.location_on_outlined,
                             controller: _controller,
                             hint: t(context, 'onboarding.city.hint'),
@@ -141,7 +156,10 @@ class _OnboardingCityPageState extends State<OnboardingCityPage> {
                     ),
                   ),
                 ),
-                CosmicCtaButton(label: 'Next', onTap: widget.onNext),
+                CosmicCtaButton(
+                  label: t(context, 'common.next'),
+                  onTap: _onNext,
+                ),
                 const SizedBox(height: 24),
               ],
             ),
