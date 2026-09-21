@@ -1,33 +1,20 @@
 // flutter_application/lib/services/astro_service.dart
 //
-// AKILLI URL DETEKSIYONU:
-//   - Web modunda: mevcut tarayici origin'ini kullanir (localhost veya Render)
-//   - Native modda: direkt Render Production URL'ini kullanir
-//
-// EKSTRA: CORS ve Web'de URI bazli origin tespiti
-
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/natal_chart_response.dart';
 
+// Lokal backend servisi.
+const _kLocalBaseUrl = 'http://127.0.0.1:8000';
+
 String? _authToken;
 
-// ────────────────────────────────────────────────────────────────────
-// AKILLI BASE URL: Hiç elle değiştirmen GEREK YOK!
-// ────────────────────────────────────────────────────────────────────
 String get _kBaseUrl {
   if (kIsWeb) {
-    // Flutter WEB: Tarayıcının açık olduğu adresi kullan
-    // (Örn: http://localhost:8000  VEYA  https://soulbound-m1td.onrender.com)
-    final origin = Uri.base.origin;
-    // Eğer Web Debug Proxy (flutter run -d chrome --web-port 5xxxx) kullanıyorsan
-    // backend farklı portta olabilir, bu durumda sabit localhost:8000 kullan
-        return 'https://soulbound-m1td.onrender.com';
-  } else {
-    // Native (Android / iOS / Desktop): Her zaman Render URL'i
-    return 'https://soulbound-m1td.onrender.com';
+    return _kLocalBaseUrl;
   }
+  return _kLocalBaseUrl;
 }
 
 Future<String> _getToken() async {
@@ -101,7 +88,7 @@ class AstroService {
             body: jsonEncode(requestBody),
           )
           .timeout(const Duration(seconds: 60));
-    } on Exception catch (e) {
+    } on Exception {
       throw AstroServiceException(
         code: 'NETWORK_ERROR',
         message: 'Sunucuya bağlanılamadı. (URL: $_kBaseUrl)',

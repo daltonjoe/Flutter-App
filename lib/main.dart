@@ -4,12 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
-import 'screens/create_profile_page.dart';
 import 'screens/chart_page.dart';
 import 'models/natal_chart_response.dart';
 import 'providers/language_provider.dart';
+import 'providers/active_profile_provider.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/onboarding/onboarding_flow_page.dart';
+import 'screens/profile_switcher_page.dart';
+import 'screens/active_chart_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/supabase_config.dart';
 
@@ -18,6 +20,8 @@ void main() async {
 
   final languageProvider = LanguageProvider();
   await languageProvider.loadSavedLocale();
+  final activeProfileProvider = ActiveProfileProvider();
+  await activeProfileProvider.load();
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -26,16 +30,26 @@ void main() async {
       systemNavigationBarColor: AppTheme.bgDeep,
     ),
   );
-  
 
   await Supabase.initialize(
     url: SupabaseConfig.url,
     anonKey: SupabaseConfig.anonKey,
   );
 
+  if (Supabase.instance.client.auth.currentSession == null) {
+    try {
+      await Supabase.instance.client.auth.signInAnonymously();
+    } catch (e) {
+      debugPrint('Anonymous Supabase sign-in failed: $e');
+    }
+  }
+
   runApp(
-    ChangeNotifierProvider.value(
-      value: languageProvider,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: languageProvider),
+        ChangeNotifierProvider.value(value: activeProfileProvider),
+      ],
       child: const SoulBoundApp(),
     ),
   );
@@ -78,8 +92,19 @@ class SoulBoundApp extends StatelessWidget {
           ),
         );
       },
-      home: const OnboardingFlowPage(),
+      home: context.watch<ActiveProfileProvider>().activeProfileId != null
+          ? const ActiveChartPage()
+          : const OnboardingFlowPage(),
       onGenerateRoute: (settings) {
+        if (settings.name == '/onboarding') {
+          return MaterialPageRoute(builder: (_) => const OnboardingFlowPage());
+        }
+        if (settings.name == '/profiles') {
+          return MaterialPageRoute(builder: (_) => const ProfileSwitcherPage());
+        }
+        if (settings.name == '/home') {
+          return MaterialPageRoute(builder: (_) => const ActiveChartPage());
+        }
         if (settings.name == '/chart') {
           final args = settings.arguments as Map<String, dynamic>;
           return MaterialPageRoute(

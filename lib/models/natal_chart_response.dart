@@ -16,11 +16,13 @@ class NatalChartResponse {
   final String? errorCode;
   final String? message;
   final String? suggestion;
+  final Map<String, HouseData>? houses;
 
   NatalChartResponse({
     required this.status,
     required this.requestId,
     this.input,
+    this.houses,
     this.location,
     this.summary,
     this.planets,
@@ -38,7 +40,7 @@ class NatalChartResponse {
     return { 
       'planets': planets?.map((k, v) => MapEntry(k, { 
         'sign': v.sign, 'degree_in_sign': v.degreeInSign, 
-        'house': v.house, 'retrograde': v.retrograde, 
+        'house_number': v.houseNumber, 'retrograde': v.retrograde, 
       })) ?? {}, 
       'aspects': aspects?.map((a) => {'planet1': a.planet1, 
         'aspect': a.aspect, 'planet2': a.planet2, 
@@ -70,6 +72,10 @@ class NatalChartResponse {
       errorCode: json['error_code'],
       message: json['message'],
       suggestion: json['suggestion'],
+      houses: json['houses'] != null
+    ? (json['houses'] as Map<String, dynamic>)
+        .map((k, v) => MapEntry(k, HouseData.fromJson(v as Map<String, dynamic>)))
+    : null,
     );
   }
 }
@@ -152,21 +158,37 @@ class ChartSummary {
 
 class PlanetData {
   final String sign;
+  final int signIndex;
+  final double longitude;
+  final double latitude;
   final double degreeInSign;
   final int house;
+  final int houseNumber;
   final bool retrograde;
 
   PlanetData({
     required this.sign,
+    required this.signIndex,
+    required this.longitude,
+    required this.latitude,
     required this.degreeInSign,
     required this.house,
+    required this.houseNumber,
     required this.retrograde,
   });
 
   factory PlanetData.fromJson(Map<String, dynamic> json) => PlanetData(
         sign: json['sign'] ?? '',
+        signIndex: (json['sign_index'] as num?)?.toInt() ?? 0,
+        longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+        latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
         degreeInSign: (json['degree_in_sign'] as num?)?.toDouble() ?? 0.0,
-        house: (json['house'] as num?)?.toInt() ?? 0,
+        house: (json['house'] as num?)?.toInt() ??
+            (json['house_number'] as num?)?.toInt() ??
+            0,
+        houseNumber: (json['house'] as num?)?.toInt() ??
+            (json['house_number'] as num?)?.toInt() ??
+            0,
         retrograde: json['retrograde'] ?? false,
       );
 }
@@ -175,14 +197,20 @@ class AspectData {
   final String planet1;
   final String aspect;
   final String planet2;
+  final num angle;
+  final double actualAngle;
   final double orb;
+  final bool applying;
   final bool isMajor;
 
   AspectData({
     required this.planet1,
     required this.aspect,
     required this.planet2,
+    required this.angle,
+    required this.actualAngle,
     required this.orb,
+    required this.applying,
     required this.isMajor,
   });
 
@@ -190,7 +218,10 @@ class AspectData {
         planet1: json['planet1'] ?? '',
         aspect: json['aspect'] ?? '',
         planet2: json['planet2'] ?? '',
+        angle: (json['angle'] as num?) ?? 0,
+        actualAngle: (json['actual_angle'] as num?)?.toDouble() ?? 0.0,
         orb: (json['orb'] as num?)?.toDouble() ?? 0.0,
+        applying: json['applying'] ?? false,
         isMajor: json['is_major'] ?? true,
       );
 }
@@ -215,5 +246,32 @@ class ChartAngles {
         mcSign: json['midheaven']?['sign'] ?? '',
         mcDegree:
             (json['midheaven']?['degree_in_sign'] as num?)?.toDouble() ?? 0.0,
+      );
+}
+
+class HouseData {
+  final String sign;
+  final double cuspDegree;
+  final int signIndex;
+  final double longitude;
+  final double degreeInSign;
+  final int houseNumber;
+
+  HouseData({
+    required this.sign,
+    required this.cuspDegree,
+    required this.signIndex,
+    required this.longitude,
+    required this.degreeInSign,
+    required this.houseNumber,
+  });
+
+  factory HouseData.fromJson(Map<String, dynamic> json) => HouseData(
+        sign: json['sign'] ?? '',
+        cuspDegree: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+        signIndex: (json['sign_index'] as num?)?.toInt() ?? 0,
+        longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+        degreeInSign: (json['degree_in_sign'] as num?)?.toDouble() ?? 0.0,
+        houseNumber: (json['house_number'] as num?)?.toInt() ?? 0,
       );
 }

@@ -23,7 +23,6 @@ class ChartPage extends StatefulWidget {
   State<ChartPage> createState() => _ChartPageState();
 }
 
-
 class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   late AnimationController _entranceCtrl;
   late AnimationController _orbitCtrl;
@@ -160,6 +159,12 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.person_outline),
+                    onPressed: () => Navigator.pushNamed(context, '/profiles'),
+                  ),
+                ],
               ),
 
               SliverPadding(
@@ -232,7 +237,8 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => PlacementContentPage(chartData: widget.chartData),
+                          builder: (_) =>
+                              PlacementContentPage(chartData: widget.chartData),
                         ),
                       ),
                     ),

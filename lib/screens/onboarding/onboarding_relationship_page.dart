@@ -1,10 +1,14 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/onboarding_data.dart';
 import '../../services/astro_service.dart';
+import '../../services/chart_persistence_service.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_wheel_picker.dart';
+import '../../providers/language_provider.dart';
+import '../../providers/active_profile_provider.dart';
 
 class OnboardingRelationshipPage extends StatefulWidget {
   final OnboardingData data;
@@ -32,7 +36,13 @@ class _OnboardingRelationshipPageState
   String? _generalError;
 
   static const List<String> _options = [
-    'single', 'dating', 'engaged', 'married', 'divorced', 'separated'
+    'single',
+    'in_relationship',
+    'engaged',
+    'married',
+    'divorced',
+    'separated',
+    'prefer_not_to_say',
   ];
 
   List<String> get _optionKeys =>
@@ -40,11 +50,12 @@ class _OnboardingRelationshipPageState
 
   static const Map<String, WheelTone> _tones = {
     'single': WheelTone.neutral,
-    'dating': WheelTone.female,
+    'in_relationship': WheelTone.female,
     'engaged': WheelTone.male,
     'married': WheelTone.gold,
     'divorced': WheelTone.purple,
     'separated': WheelTone.indigo,
+    'prefer_not_to_say': WheelTone.neutral,
   };
 
   String? get _imagePath => _selected != null
@@ -54,7 +65,10 @@ class _OnboardingRelationshipPageState
   @override
   void initState() {
     super.initState();
-    _selected = widget.data.relationshipStatus;
+    _selected = widget.data.relationshipStatus == 'dating'
+        ? 'in_relationship'
+        : widget.data.relationshipStatus;
+    widget.data.relationshipStatus = _selected;
   }
 
   void _select(String value) {
@@ -93,24 +107,33 @@ class _OnboardingRelationshipPageState
       if (!mounted) return;
 
       if (result.isSuccess) {
-        Navigator.pushNamed(
+        final locale = Provider.of<LanguageProvider>(
           context,
-          '/chart',
-          arguments: {'chartData': result, 'userName': d.name ?? ''},
+          listen: false,
+        ).locale.languageCode;
+        final activeProfileProvider = context.read<ActiveProfileProvider>();
+        final profileId = await ChartPersistenceService.saveChart(
+          data: d,
+          chart: result,
+          locale: locale,
         );
+        if (!mounted) return;
+        await activeProfileProvider.setActive(profileId);
+        if (!mounted) return;
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       } else {
         setState(() {
           _generalError = result.message ?? t(context, 'common.unknown_error');
         });
       }
     } on AstroServiceException catch (e) {
-    if (!mounted) return;
-    setState(() => _generalError = e.message);
+      if (!mounted) return;
+      setState(() => _generalError = e.message);
     } catch (e) {
-  debugPrint('Natal chart error: $e');
-  if (!mounted) return;
-  setState(() => _generalError = t(context, 'common.unknown_error'));
-} finally {
+      debugPrint('Natal chart error: $e');
+      if (!mounted) return;
+      setState(() => _generalError = t(context, 'common.unknown_error'));
+    } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -124,7 +147,10 @@ class _OnboardingRelationshipPageState
         fit: StackFit.expand,
         children: [
           Positioned.fill(
-            child: Image.asset('assets/images/logo/background.png', fit: BoxFit.cover),
+            child: Image.asset(
+              'assets/images/logo/background.png',
+              fit: BoxFit.cover,
+            ),
           ),
           SafeArea(
             child: Padding(
@@ -141,7 +167,9 @@ class _OnboardingRelationshipPageState
                   Text(
                     t(context, 'onboarding.relationship.title'),
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(color: descColor),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleLarge?.copyWith(color: descColor),
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
@@ -156,11 +184,14 @@ class _OnboardingRelationshipPageState
                   ),
                   Expanded(
                     child: CosmicWheelPicker(
-                      options: List.generate(_options.length, (i) => WheelOption(
+                      options: List.generate(
+                        _options.length,
+                        (i) => WheelOption(
                           _options[i],
                           t(context, _optionKeys[i]),
                           _tones[_options[i]]!,
-                      )),
+                        ),
+                      ),
                       selected: _selected,
                       onSelected: _select,
                     ),
@@ -177,10 +208,13 @@ class _OnboardingRelationshipPageState
                   _isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : CosmicCtaButton(
-                      label: t(context, 'common.next'), // diğer sayfalarda kullandığınız Next key'i neyse onu yazın
-                      disabled: _selected == null,
-                      onTap: widget.isLast ? _onSubmit : widget.onNext,
-                    ),
+                          label: t(
+                            context,
+                            'common.next',
+                          ), // diğer sayfalarda kullandığınız Next key'i neyse onu yazın
+                          disabled: _selected == null,
+                          onTap: widget.isLast ? _onSubmit : widget.onNext,
+                        ),
                   const SizedBox(height: 24),
                 ],
               ),

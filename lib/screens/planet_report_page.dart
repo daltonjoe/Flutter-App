@@ -13,6 +13,7 @@ import '../core/utils/text_parser.dart';
 import '../widgets/analysis/analysis_section_card.dart';
 import '../widgets/analysis/floating_analysis_icon.dart';
 import '../widgets/animations/zodiac_orbital_animation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PlanetReportPage extends StatefulWidget {
   final String planetName;
@@ -31,8 +32,10 @@ class PlanetReportPage extends StatefulWidget {
 }
 
 class _PlanetReportPageState extends State<PlanetReportPage> {
-  String? _report;
+ List<Map<String, dynamic>> _sections = [];
   bool _isLoading = true;
+  bool _isFallback = false;
+  String? _report;
   String? _error;
 
   static const Map<String, Map<String, dynamic>> _meta = {
@@ -66,35 +69,79 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
   @override
   void initState() {
     super.initState();
-    _fetch();
+    List<Map<String, dynamic>> _sections = [];
+
+    Future<void> _fetch() async {
+      setState(() { _isLoading = true; _error = null; });
+
+      final locale = Provider.of<LanguageProvider>(context, listen: false)
+          .locale.languageCode;
+      final pd = widget.chartData.planets?[widget.planetName];
+      if (pd == null) { setState(() => _isLoading = false); return; }
+
+      final signCode = _signKeys[pd.sign]?.split('.').last ?? '';
+
+      try {
+        final rows = await Supabase.instance.client
+            .from('placement_content')
+            .select('title, content, keywords, strengths, challenges, '
+                'content_themes!inner(code), celestial_bodies!inner(code), '
+                'zodiac_signs!inner(code), astrological_houses!inner(house_number)')
+            .eq('celestial_bodies.code', widget.planetName.toLowerCase())
+            .eq('zodiac_signs.code', signCode)
+            .eq('astrological_houses.house_number', pd.house)
+            .eq('locale', locale)
+            .eq('is_active', true);
+
+        setState(() {
+          _sections = List<Map<String, dynamic>>.from(rows);
+          _isLoading = false;
+        });
+      } catch (_) {
+        setState(() {
+          _error = t(context, 'planet_report.unexpected_error');
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   Future<void> _fetch() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-    try {
-      // ── FIX: Read locale from LanguageProvider and pass to API ────
-      final locale = Provider.of<LanguageProvider>(
-        context,
-        listen: false,
-      ).locale.languageCode;
+    setState(() { _isLoading = true; _error = null; _isFallback = false; });
 
-      final r = await AstroService.generatePlanetReport(
-        planetName: widget.planetName,
-        chartData: widget.chartData.toChartPayload(),
-        locale: locale, // ← FIX: was missing, defaulted to 'tr'
-      );
-      setState(() {
-        _report = r;
-        _isLoading = false;
-      });
+    final locale = Provider.of<LanguageProvider>(context, listen: false)
+        .locale.languageCode;
+    final pd = widget.chartData.planets?[widget.planetName];
+
+    try {
+      final signCode = _signKeys[pd?.sign]?.split('.').last ?? '';
+      final rows = await Supabase.instance.client
+          .from('placement_content')
+          .select('title, content, strengths, challenges, '
+              'celestial_bodies!inner(code), zodiac_signs!inner(code), '
+              'astrological_houses!inner(house_number)')
+          .eq('celestial_bodies.code', widget.planetName.toLowerCase())
+          .eq('zodiac_signs.code', signCode)
+          .eq('astrological_houses.house_number', pd?.house ?? -1)
+          .eq('locale', locale)
+          .eq('is_active', true);
+
+      if (rows.isEmpty) {
+        // Fallback: Supabase'de içerik yoksa eski AI akışına düş
+        final r = await AstroService.generatePlanetReport(
+          planetName: widget.planetName,
+          chartData: widget.chartData.toChartPayload(),
+          locale: locale,
+        );
+        setState(() { _report = r; _isFallback = true; _isLoading = false; });
+      } else {
+        setState(() {
+          _sections = List<Map<String, dynamic>>.from(rows);
+          _isLoading = false;
+        });
+      }
     } on AstroServiceException catch (e) {
-      setState(() {
-        _error = e.message;
-        _isLoading = false;
-      });
+      setState(() { _error = e.message; _isLoading = false; });
     } catch (_) {
       setState(() {
         _error = t(context, 'planet_report.unexpected_error');
@@ -230,16 +277,35 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
           const SizedBox(height: 24),
 
           // Report
-          ..._renderModernReport(_report!, color),
+                    // Report
+          if (_isFallback)
+            ..._renderModernReportText(_report!, color)
+          else
+            ..._renderModernReport(color),
         ],
       ),
     );
   }
 
-  List<Widget> _renderModernReport(String report, Color accent) {
+  // Supabase'den gelen structured içerik
+  List<Widget> _renderModernReport(Color accent) {
+    return _sections.map((row) {
+      final s = List<String>.from(row['strengths'] ?? []);
+      final c = List<String>.from(row['challenges'] ?? []);
+      return AnalysisSectionCard(
+        title: row['title'] ?? '',
+        content: row['content'] ?? '',
+        bulletPoints: [...s, ...c],
+        color: accent,
+        icon: _getIconForTitle(row['title'] ?? ''),
+      );
+    }).toList();
+  }
+
+  // AI fallback (eski davranış)
+  List<Widget> _renderModernReportText(String report, Color accent) {
     final sections = TextParser.parse(report);
     if (sections.isEmpty) return [];
-
     return sections.map((section) {
       return AnalysisSectionCard(
         title: section.title,

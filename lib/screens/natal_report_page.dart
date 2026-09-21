@@ -103,6 +103,13 @@ class _NatalReportPageState extends State<NatalReportPage> {
     try {
       final location = widget.chartData.location;
       final input = widget.chartData.input;
+      if (location == null || input == null) {
+        setState(() {
+          _errorMsg = t(context, 'natal_report.unexpected_error');
+          _isLoading = false;
+        });
+        return;
+      }
 
       // ── FIX: Read locale from LanguageProvider and pass to API ────
       final locale = Provider.of<LanguageProvider>(
@@ -111,9 +118,9 @@ class _NatalReportPageState extends State<NatalReportPage> {
       ).locale.languageCode;
 
       final report = await AstroService.generateAstroReport(
-        birthDate: input!.birthDate,
+        birthDate: input.birthDate,
         birthTime: input.birthTimeLocal,
-        city: location!.cityResolved,
+        city: location.cityResolved,
         latitude: location.latitude,
         longitude: location.longitude,
         timezone: location.timezone,
