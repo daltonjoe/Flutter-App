@@ -12,6 +12,7 @@ class NatalChartResponse {
   final Map<String, PlanetData>? planets;
   final List<AspectData>? aspects;
   final ChartAngles? angles;
+  final Map<String, HouseData>? houses;
   final String? aiReport;
   final String? errorCode;
   final String? message;
@@ -26,6 +27,7 @@ class NatalChartResponse {
     this.planets,
     this.aspects,
     this.angles,
+    this.houses,
     this.aiReport,
     this.errorCode,
     this.message,
@@ -66,6 +68,11 @@ class NatalChartResponse {
           ? (json['aspects'] as List).map((a) => AspectData.fromJson(a)).toList()
           : null,
       angles: json['angles'] != null ? ChartAngles.fromJson(json['angles']) : null,
+      houses: json['houses'] is Map<String, dynamic>
+          ? (json['houses'] as Map<String, dynamic>).map(
+              (k, v) => MapEntry(k, HouseData.fromJson(v as Map<String, dynamic>)),
+            )
+          : null,
       aiReport: json['ai_report'],
       errorCode: json['error_code'],
       message: json['message'],
@@ -215,5 +222,20 @@ class ChartAngles {
         mcSign: json['midheaven']?['sign'] ?? '',
         mcDegree:
             (json['midheaven']?['degree_in_sign'] as num?)?.toDouble() ?? 0.0,
+      );
+}
+
+class HouseData {
+  final double cuspDegree;
+  final int signIndex;
+
+  HouseData({
+    required this.cuspDegree,
+    required this.signIndex,
+  });
+
+  factory HouseData.fromJson(Map<String, dynamic> json) => HouseData(
+        cuspDegree: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+        signIndex: (json['sign_index'] as num?)?.toInt() ?? 0,
       );
 }

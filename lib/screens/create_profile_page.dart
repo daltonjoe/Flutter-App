@@ -290,7 +290,6 @@ class _CreateProfilePageState extends State<CreateProfilePage>
         longitude: _selectedCity!.longitude,
         timezone: _selectedCity!.timezone,
       );
-
       if (!mounted) return;
 
       if (result.isSuccess) {
