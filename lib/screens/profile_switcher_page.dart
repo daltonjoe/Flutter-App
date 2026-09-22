@@ -7,6 +7,7 @@ import '../presentation/widgets/components/cosmic_cta_button.dart';
 import '../presentation/widgets/components/cosmic_error_state.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
 import '../providers/active_profile_provider.dart';
+import '../services/account_deletion_service.dart';
 
 class ProfileSwitcherPage extends StatefulWidget {
   const ProfileSwitcherPage({super.key});
@@ -17,6 +18,7 @@ class ProfileSwitcherPage extends StatefulWidget {
 
 class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
   bool _isLoading = true;
+  bool _isDeletingAccount = false;
   String? _error;
   List<Map<String, dynamic>> _profiles = [];
 
@@ -108,68 +110,115 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
     }
   }
 
+  Future<void> _deleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(t(context, 'account_deletion.title')),
+        content: Text(t(context, 'account_deletion.message')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(t(context, 'common.cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(t(context, 'account_deletion.confirm')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isDeletingAccount = true);
+    try {
+      await AccountDeletionService.deleteAccount();
+      if (!mounted) return;
+      await context.read<ActiveProfileProvider>().clearActive();
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/onboarding',
+        (route) => false,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isDeletingAccount = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(t(context, 'account_deletion.error'))),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final activeProfileId =
-        context.watch<ActiveProfileProvider>().activeProfileId;
+    final activeProfileId = context
+        .watch<ActiveProfileProvider>()
+        .activeProfileId;
+
+    if (_isDeletingAccount) {
+      return CosmicLoader(message: t(context, 'account_deletion.loading'));
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text(t(context, 'profile_switcher.title'))),
       body: _isLoading
           ? const CosmicLoader()
           : _error != null
-              ? CosmicErrorState(
-                  message: _error!,
-                  onRetry: _loadProfiles,
-                  retryLabel: t(context, 'profile_switcher.retry'),
-                )
-              : _profiles.isEmpty
-                  ? CosmicErrorState(
-                      message: t(context, 'profile_switcher.empty'),
-                    )
-                  : ListView(
-                      padding: const EdgeInsets.all(20),
-                      children: [
-                        ..._profiles.map(
-                          (profile) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: CosmicCard(
-                              onTap: () => _selectProfile(profile['id'] as String),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(profile['display_name'] as String),
-                                        const SizedBox(height: 4),
-                                        Text(profile['birth_date'].toString()),
-                                      ],
-                                    ),
-                                  ),
-                                  if (profile['id'] == activeProfileId)
-                                    const Icon(Icons.check_circle),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete_outline),
-                                    onPressed: () =>
-                                        _deleteProfile(profile['id'] as String),
-                                  ),
-                                ],
-                              ),
+          ? CosmicErrorState(
+              message: _error!,
+              onRetry: _loadProfiles,
+              retryLabel: t(context, 'profile_switcher.retry'),
+            )
+          : _profiles.isEmpty
+          ? CosmicErrorState(message: t(context, 'profile_switcher.empty'))
+          : ListView(
+              padding: const EdgeInsets.all(20),
+              children: [
+                ..._profiles.map(
+                  (profile) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: CosmicCard(
+                      onTap: () => _selectProfile(profile['id'] as String),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(profile['display_name'] as String),
+                                const SizedBox(height: 4),
+                                Text(profile['birth_date'].toString()),
+                              ],
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        CosmicCtaButton(
-                          label: t(context, 'profile_switcher.add'),
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            '/onboarding',
+                          if (profile['id'] == activeProfileId)
+                            const Icon(Icons.check_circle),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () =>
+                                _deleteProfile(profile['id'] as String),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                CosmicCtaButton(
+                  label: t(context, 'profile_switcher.add'),
+                  onTap: () => Navigator.pushNamed(context, '/onboarding'),
+                ),
+                TextButton(
+                  onPressed: _deleteAccount,
+                  child: Text(
+                    t(context, 'account_deletion.confirm'),
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

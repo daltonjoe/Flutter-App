@@ -166,6 +166,11 @@
   "profile_switcher.delete_message": "هل أنت متأكد من رغبتك في حذف هذا الملف الشخصي؟",
   "profile_switcher.delete_confirm": "حذف",
   "profile_switcher.delete_error": "تعذر حذف الملف الشخصي.",
+  "account_deletion.title": "حذف الحساب نهائيًا؟",
+  "account_deletion.message": "سيتم حذف حسابك وجميع ملفاتك الشخصية وكل بياناتك المرتبطة نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+  "account_deletion.confirm": "حذف حسابي",
+  "account_deletion.error": "تعذر حذف حسابك.",
+  "account_deletion.loading": "جارٍ حذف حسابك...",
 
   "onboarding.city.title": "أين وُلدت؟",
   "onboarding.city.hint": "ابحث عن مدينتك",

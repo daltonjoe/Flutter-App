@@ -14,5 +14,6 @@ class AccountDeletionService {
     }
 
     await Supabase.instance.client.auth.signOut();
+    await Supabase.instance.client.auth.signInAnonymously();
   }
 }

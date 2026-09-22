@@ -166,6 +166,11 @@
   "profile_switcher.delete_message": "Möchtest du dieses Profil wirklich löschen?",
   "profile_switcher.delete_confirm": "Löschen",
   "profile_switcher.delete_error": "Profil konnte nicht gelöscht werden.",
+  "account_deletion.title": "Konto dauerhaft löschen?",
+  "account_deletion.message": "Dein Konto, alle Profile und alle zugehörigen Daten werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+  "account_deletion.confirm": "Mein Konto löschen",
+  "account_deletion.error": "Dein Konto konnte nicht gelöscht werden.",
+  "account_deletion.loading": "Dein Konto wird gelöscht...",
 
   "onboarding.city.title": "Wo wurden Sie geboren?",
   "onboarding.city.hint": "Suchen Sie Ihre Stadt",

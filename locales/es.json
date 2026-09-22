@@ -167,6 +167,11 @@
   "profile_switcher.delete_message": "¿Seguro que quieres eliminar este perfil?",
   "profile_switcher.delete_confirm": "Eliminar",
   "profile_switcher.delete_error": "No se pudo eliminar el perfil.",
+  "account_deletion.title": "¿Eliminar la cuenta permanentemente?",
+  "account_deletion.message": "Tu cuenta, todos tus perfiles y todos los datos asociados se eliminarán permanentemente. Esta acción no se puede deshacer.",
+  "account_deletion.confirm": "Eliminar mi cuenta",
+  "account_deletion.error": "No se pudo eliminar tu cuenta.",
+  "account_deletion.loading": "Eliminando tu cuenta...",
 
   "onboarding.city.title": "¿Dónde naciste?",
   "onboarding.city.hint": "Busca tu ciudad",

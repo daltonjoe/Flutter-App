@@ -165,6 +165,11 @@
   "profile_switcher.delete_message": "Bu profili silmek istediğinizden emin misiniz?",
   "profile_switcher.delete_confirm": "Sil",
   "profile_switcher.delete_error": "Profil silinemedi.",
+  "account_deletion.title": "Hesap kalıcı olarak silinsin mi?",
+  "account_deletion.message": "Hesabınız, tüm profilleriniz ve ilişkili tüm verileriniz kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+  "account_deletion.confirm": "Hesabımı Sil",
+  "account_deletion.error": "Hesabınız silinemedi.",
+  "account_deletion.loading": "Hesabınız siliniyor...",
 
   "onboarding.city.title": "Nerede doğdunuz?",
   "onboarding.city.hint": "Şehrinizi arayın",

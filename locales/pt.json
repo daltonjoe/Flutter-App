@@ -166,6 +166,11 @@
   "profile_switcher.delete_message": "Tem certeza de que deseja excluir este perfil?",
   "profile_switcher.delete_confirm": "Excluir",
   "profile_switcher.delete_error": "Não foi possível excluir o perfil.",
+  "account_deletion.title": "Excluir a conta permanentemente?",
+  "account_deletion.message": "Sua conta, todos os seus perfis e todos os dados associados serão excluídos permanentemente. Esta ação não pode ser desfeita.",
+  "account_deletion.confirm": "Excluir minha conta",
+  "account_deletion.error": "Não foi possível excluir sua conta.",
+  "account_deletion.loading": "Excluindo sua conta...",
 
   "onboarding.city.title": "Onde você nasceu?",
   "onboarding.city.hint": "Pesquise sua cidade",

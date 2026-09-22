@@ -167,6 +167,11 @@
   "profile_switcher.delete_message": "Voulez-vous vraiment supprimer ce profil ?",
   "profile_switcher.delete_confirm": "Supprimer",
   "profile_switcher.delete_error": "Impossible de supprimer le profil.",
+  "account_deletion.title": "Supprimer définitivement le compte ?",
+  "account_deletion.message": "Votre compte, tous vos profils et toutes les données associées seront définitivement supprimés. Cette action est irréversible.",
+  "account_deletion.confirm": "Supprimer mon compte",
+  "account_deletion.error": "Impossible de supprimer votre compte.",
+  "account_deletion.loading": "Suppression de votre compte...",
 
   "onboarding.city.title": "Où êtes-vous né(e) ?",
   "onboarding.city.hint": "Recherchez votre ville",
