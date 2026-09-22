@@ -69,6 +69,11 @@
   "create_profile.city_error": "Selecione uma cidade da lista",
   "create_profile.submit_button": "Criar meu Mapa",
   "create_profile.disclaimer": "Seus dados são usados apenas para análise.",
+  "create_profile.ephemeris_live": "EFEMÉRIDES AO VIVO",
+  "create_profile.guidance_title": "Precisão cósmica",
+  "create_profile.guidance_desc": "Um horário de nascimento preciso aumenta diretamente a precisão do seu signo ascendente e das posições das casas.",
+  "create_profile.security_footer": "Seus dados são criptografados e processados com efemérides suíças e IA.",
+  "create_profile.quick_cities": "Seleção rápida de cidades",
 
   "chart.planets": "Planetas",
   "chart.signs": "Signos",
@@ -157,6 +162,10 @@
   "profile_switcher.error": "Profiles could not be loaded.",
   "profile_switcher.retry": "Try Again",
   "profile_switcher.add": "Add new profile",
+  "profile_switcher.delete_title": "Excluir perfil?",
+  "profile_switcher.delete_message": "Tem certeza de que deseja excluir este perfil?",
+  "profile_switcher.delete_confirm": "Excluir",
+  "profile_switcher.delete_error": "Não foi possível excluir o perfil.",
 
   "onboarding.city.title": "Onde você nasceu?",
   "onboarding.city.hint": "Pesquise sua cidade",

@@ -69,6 +69,11 @@
   "create_profile.city_error": "Sélectionnez une ville dans la liste",
   "create_profile.submit_button": "Créer mon Thème",
   "create_profile.disclaimer": "Vos données sont utilisées uniquement pour l'analyse.",
+  "create_profile.ephemeris_live": "ÉPHÉMÉRIDES EN DIRECT",
+  "create_profile.guidance_title": "Précision cosmique",
+  "create_profile.guidance_desc": "Une heure de naissance précise améliore directement la précision de votre signe ascendant et des positions des maisons.",
+  "create_profile.security_footer": "Vos données sont chiffrées et traitées avec les éphémérides suisses et l'IA.",
+  "create_profile.quick_cities": "Sélection rapide de villes",
 
   "chart.planets": "Planètes",
   "chart.signs": "Signes",
@@ -158,6 +163,10 @@
   "profile_switcher.error": "Profiles could not be loaded.",
   "profile_switcher.retry": "Try Again",
   "profile_switcher.add": "Add new profile",
+  "profile_switcher.delete_title": "Supprimer le profil ?",
+  "profile_switcher.delete_message": "Voulez-vous vraiment supprimer ce profil ?",
+  "profile_switcher.delete_confirm": "Supprimer",
+  "profile_switcher.delete_error": "Impossible de supprimer le profil.",
 
   "onboarding.city.title": "Où êtes-vous né(e) ?",
   "onboarding.city.hint": "Recherchez votre ville",

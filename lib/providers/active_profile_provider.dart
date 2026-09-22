@@ -17,4 +17,11 @@ class ActiveProfileProvider extends ChangeNotifier {
     await prefs.setString(_prefKey, id);
     notifyListeners();
   }
+
+  Future<void> clearActive() async {
+    activeProfileId = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_prefKey);
+    notifyListeners();
+  }
 }

@@ -69,6 +69,11 @@
   "create_profile.city_error": "Wähle eine Stadt aus der Liste",
   "create_profile.submit_button": "Mein Horoskop erstellen",
   "create_profile.disclaimer": "Deine Daten werden nur zur Analyse verwendet.",
+  "create_profile.ephemeris_live": "LIVE-EPHEMERIDEN",
+  "create_profile.guidance_title": "Kosmische Präzision",
+  "create_profile.guidance_desc": "Eine genaue Geburtszeit erhöht direkt die Genauigkeit deines Aszendenten und deiner Häuser.",
+  "create_profile.security_footer": "Deine Daten werden verschlüsselt mit Schweizer Ephemeriden und KI verarbeitet.",
+  "create_profile.quick_cities": "Schnelle Stadtauswahl",
 
   "chart.planets": "Planeten",
   "chart.signs": "Sternzeichen",
@@ -157,6 +162,10 @@
   "profile_switcher.error": "Profiles could not be loaded.",
   "profile_switcher.retry": "Try Again",
   "profile_switcher.add": "Add new profile",
+  "profile_switcher.delete_title": "Profil löschen?",
+  "profile_switcher.delete_message": "Möchtest du dieses Profil wirklich löschen?",
+  "profile_switcher.delete_confirm": "Löschen",
+  "profile_switcher.delete_error": "Profil konnte nicht gelöscht werden.",
 
   "onboarding.city.title": "Wo wurden Sie geboren?",
   "onboarding.city.hint": "Suchen Sie Ihre Stadt",

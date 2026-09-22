@@ -161,6 +161,10 @@
     "profile_switcher.error": "Profiles could not be loaded.",
     "profile_switcher.retry": "Try Again",
     "profile_switcher.add": "Add new profile",
+    "profile_switcher.delete_title": "Delete profile?",
+    "profile_switcher.delete_message": "Are you sure you want to delete this profile?",
+    "profile_switcher.delete_confirm": "Delete",
+    "profile_switcher.delete_error": "Profile could not be deleted.",
 
     "onboarding.city.title" : "Where were you born?", 
     "onboarding.city.hint": "Search your city", 

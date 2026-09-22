@@ -69,6 +69,11 @@
   "create_profile.city_error": "اختر مدينة من القائمة",
   "create_profile.submit_button": "أنشئ خريطتي",
   "create_profile.disclaimer": "تُستخدم بياناتك للتحليل فقط.",
+  "create_profile.ephemeris_live": "الروزنامة الفلكية المباشرة",
+  "create_profile.guidance_title": "دقة كونية",
+  "create_profile.guidance_desc": "تزيد دقة وقت الميلاد مباشرةً من دقة برجك الصاعد ومواضع البيوت.",
+  "create_profile.security_footer": "يتم تشفير بياناتك ومعالجتها باستخدام الجداول الفلكية السويسرية والذكاء الاصطناعي.",
+  "create_profile.quick_cities": "اختيار سريع للمدن",
 
   "chart.planets": "الكواكب",
   "chart.signs": "الأبراج",
@@ -157,6 +162,10 @@
   "profile_switcher.error": "Profiles could not be loaded.",
   "profile_switcher.retry": "Try Again",
   "profile_switcher.add": "Add new profile",
+  "profile_switcher.delete_title": "حذف الملف الشخصي؟",
+  "profile_switcher.delete_message": "هل أنت متأكد من رغبتك في حذف هذا الملف الشخصي؟",
+  "profile_switcher.delete_confirm": "حذف",
+  "profile_switcher.delete_error": "تعذر حذف الملف الشخصي.",
 
   "onboarding.city.title": "أين وُلدت؟",
   "onboarding.city.hint": "ابحث عن مدينتك",

@@ -69,41 +69,6 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
   @override
   void initState() {
     super.initState();
-    List<Map<String, dynamic>> _sections = [];
-
-    Future<void> _fetch() async {
-      setState(() { _isLoading = true; _error = null; });
-
-      final locale = Provider.of<LanguageProvider>(context, listen: false)
-          .locale.languageCode;
-      final pd = widget.chartData.planets?[widget.planetName];
-      if (pd == null) { setState(() => _isLoading = false); return; }
-
-      final signCode = _signKeys[pd.sign]?.split('.').last ?? '';
-
-      try {
-        final rows = await Supabase.instance.client
-            .from('placement_content')
-            .select('title, content, keywords, strengths, challenges, '
-                'content_themes!inner(code), celestial_bodies!inner(code), '
-                'zodiac_signs!inner(code), astrological_houses!inner(house_number)')
-            .eq('celestial_bodies.code', widget.planetName.toLowerCase())
-            .eq('zodiac_signs.code', signCode)
-            .eq('astrological_houses.house_number', pd.house)
-            .eq('locale', locale)
-            .eq('is_active', true);
-
-        setState(() {
-          _sections = List<Map<String, dynamic>>.from(rows);
-          _isLoading = false;
-        });
-      } catch (_) {
-        setState(() {
-          _error = t(context, 'planet_report.unexpected_error');
-          _isLoading = false;
-        });
-      }
-    }
   }
 
   Future<void> _fetch() async {

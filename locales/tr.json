@@ -161,6 +161,10 @@
   "profile_switcher.error": "Profiller yüklenemedi.",
   "profile_switcher.retry": "Tekrar Dene",
   "profile_switcher.add": "Yeni profil ekle",
+  "profile_switcher.delete_title": "Profil silinsin mi?",
+  "profile_switcher.delete_message": "Bu profili silmek istediğinizden emin misiniz?",
+  "profile_switcher.delete_confirm": "Sil",
+  "profile_switcher.delete_error": "Profil silinemedi.",
 
   "onboarding.city.title": "Nerede doğdunuz?",
   "onboarding.city.hint": "Şehrinizi arayın",

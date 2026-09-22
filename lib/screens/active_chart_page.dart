@@ -18,26 +18,40 @@ class ActiveChartPage extends StatefulWidget {
 class _ActiveChartPageState extends State<ActiveChartPage> {
   String? _loadedProfileId;
   String? _loadingProfileId;
+  String? _requestedProfileId;
   String? _error;
   ({NatalChartResponse chart, String name})? _result;
+  bool _redirectedToOnboarding = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final profileId = context.watch<ActiveProfileProvider>().activeProfileId;
-    if (profileId != _loadingProfileId && profileId != _loadedProfileId) {
+    if (profileId == null) {
+      if (!_redirectedToOnboarding) {
+        _load(null);
+      }
+      return;
+    }
+    if (profileId != _requestedProfileId && profileId != _loadedProfileId) {
+      _requestedProfileId = profileId;
       _load(profileId);
     }
   }
 
   Future<void> _load(String? profileId) async {
     if (profileId == null) {
-      setState(() {
-        _loadingProfileId = null;
-        _loadedProfileId = null;
-        _result = null;
-        _error = 'profile_switcher.empty';
-      });
+      if (!_redirectedToOnboarding) {
+        _redirectedToOnboarding = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/onboarding',
+            (route) => false,
+          );
+        });
+      }
       return;
     }
     setState(() {
@@ -79,7 +93,8 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
     }
     final result = _result;
     if (result == null) return const CosmicLoader();
-    final profileId = context.watch<ActiveProfileProvider>().activeProfileId!;
+    final profileId = context.watch<ActiveProfileProvider>().activeProfileId;
+    if (profileId == null) return const CosmicLoader();
     return ChartPage(
       key: ValueKey(profileId),
       chartData: result.chart,

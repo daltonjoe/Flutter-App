@@ -66,6 +66,48 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
     if (mounted) Navigator.pop(context);
   }
 
+  Future<void> _deleteProfile(String id) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(t(context, 'profile_switcher.delete_title')),
+        content: Text(t(context, 'profile_switcher.delete_message')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(t(context, 'common.cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(t(context, 'profile_switcher.delete_confirm')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    try {
+      await Supabase.instance.client
+          .from('user_profiles')
+          .delete()
+          .eq('id', id);
+      if (!mounted) return;
+
+      final activeProfileProvider = context.read<ActiveProfileProvider>();
+      if (activeProfileProvider.activeProfileId == id) {
+        await activeProfileProvider.clearActive();
+      }
+      if (!mounted) return;
+      await _loadProfiles();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(t(context, 'profile_switcher.delete_error'))),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeProfileId =
@@ -108,6 +150,11 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
                                   ),
                                   if (profile['id'] == activeProfileId)
                                     const Icon(Icons.check_circle),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline),
+                                    onPressed: () =>
+                                        _deleteProfile(profile['id'] as String),
+                                  ),
                                 ],
                               ),
                             ),
