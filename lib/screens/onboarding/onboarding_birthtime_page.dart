@@ -39,6 +39,7 @@ class OnboardingBirthtimePage extends StatefulWidget {
       setState(() {
         _selectedTime = time;
         _unknown = false;
+        widget.data.birthTimeKnown = true;
         widget.data.birthTime = TimeOfDay(hour: time.hour, minute: time.minute);
       });
     }
@@ -46,6 +47,7 @@ class OnboardingBirthtimePage extends StatefulWidget {
     void _markUnknown() {
       setState(() {
         _unknown = true;
+        widget.data.birthTimeKnown = false;
         _selectedTime = DateTime(2000, 1, 1, 12, 0);
         widget.data.birthTime = const TimeOfDay(hour: 12, minute: 0);
       });

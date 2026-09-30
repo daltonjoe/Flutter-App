@@ -59,6 +59,7 @@ class _AppLocalizationsDelegate
       'es',
       'fr',
       'pt',
+      'it',
     ].contains(locale.languageCode);
   }
 

@@ -8,6 +8,7 @@ import 'screens/chart_page.dart';
 import 'models/natal_chart_response.dart';
 import 'providers/language_provider.dart';
 import 'providers/active_profile_provider.dart';
+import 'services/reference_names_service.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/onboarding/onboarding_flow_page.dart';
 import 'screens/profile_switcher_page.dart';
@@ -49,8 +50,11 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => LanguageProvider()),
-        ChangeNotifierProvider(create: (_) => ActiveProfileProvider()),
+        ChangeNotifierProvider.value(value: languageProvider),
+        ChangeNotifierProvider.value(value: activeProfileProvider),
+        ChangeNotifierProvider(
+          create: (_) => ReferenceNamesService(languageProvider),
+        ),
       ],
       child: const SoulBoundApp(),
     ),

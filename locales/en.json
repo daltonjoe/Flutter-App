@@ -78,6 +78,8 @@
   "chart.planets": "Planets",
   "chart.signs": "Signs",
   "chart.elements": "Elements",
+  "chart.time_unknown": "Birth time unknown",
+  "chart.house": "house",
   "chart.sun_label": "Sun",
   "chart.rising_label": "Rising",
   "chart.title": "{name}'s Chart",

@@ -1,4 +1,5 @@
 {
+  "chart.house": "house",
   "app.title": "SoulBound",
   "common.error": "Erro",
   "common.unknown_error": "Ocorreu um erro desconhecido",
@@ -78,6 +79,7 @@
   "chart.planets": "Planetas",
   "chart.signs": "Signos",
   "chart.elements": "Elementos",
+  "chart.time_unknown": "Birth time unknown",
   "chart.sun_label": "Sol",
   "chart.rising_label": "Ascendente",
   "chart.title": "Mapa de {name}",

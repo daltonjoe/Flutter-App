@@ -5,6 +5,7 @@ class OnboardingData {
   String? name;
   DateTime? birthDate;
   TimeOfDay? birthTime;
+  bool birthTimeKnown = true;
   CityModel? city;
   String? gender;
   String? relationshipStatus;

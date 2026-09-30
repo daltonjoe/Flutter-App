@@ -78,6 +78,8 @@
   "chart.planets": "Gezegenler",
   "chart.signs": "Burçlar",
   "chart.elements": "Elementler",
+  "chart.time_unknown": "Doğum saati bilinmiyor",
+  "chart.house": "ev",
   "chart.sun_label": "Güneşi",
   "chart.rising_label": "Yükselen",
   "chart.title": "{name}'ın Haritası",

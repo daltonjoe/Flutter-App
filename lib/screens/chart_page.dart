@@ -3,11 +3,14 @@
 
 import 'package:flutter_application/models/zodiac_sign.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../models/natal_chart_response.dart';
+import '../core/reference_ids.dart';
 import '../widgets/animations/zodiac_orbital_animation.dart';
 import '../theme/app_theme.dart';
 import '../i18n/app_localizations.dart';
+import '../services/reference_names_service.dart';
 import 'natal_report_page.dart';
 import 'planet_report_page.dart';
 import 'forecast_selection_page.dart';
@@ -51,36 +54,6 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
       'color': Color(0xFF87CEEB),
     },
     'Pluto': {'emoji': '♇', 'key': 'chart.pluto', 'color': Color(0xFFDDA0DD)},
-  };
-
-  static const Map<String, String> _signKeys = {
-    'Koç': 'signs.aries',
-    'Boğa': 'signs.taurus',
-    'İkizler': 'signs.gemini',
-    'Yengeç': 'signs.cancer',
-    'Aslan': 'signs.leo',
-    'Başak': 'signs.virgo',
-    'Terazi': 'signs.libra',
-    'Akrep': 'signs.scorpio',
-    'Yay': 'signs.sagittarius',
-    'Oğlak': 'signs.capricorn',
-    'Kova': 'signs.aquarius',
-    'Balık': 'signs.pisces',
-  };
-
-  static const Map<String, String> _signSymbols = {
-    'Koç': '♈',
-    'Boğa': '♉',
-    'İkizler': '♊',
-    'Yengeç': '♋',
-    'Aslan': '♌',
-    'Başak': '♍',
-    'Terazi': '♎',
-    'Akrep': '♏',
-    'Yay': '♐',
-    'Oğlak': '♑',
-    'Kova': '♒',
-    'Balık': '♓',
   };
 
   static const Map<String, String> _elementKeys = {
@@ -134,6 +107,9 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     final summary = widget.chartData.summary;
     final planets = widget.chartData.planets ?? {};
     final angles = widget.chartData.angles;
+    final birthTimeKnown =
+        widget.chartData.input?.birthTimeLocal.isNotEmpty == true;
+    final names = context.watch<ReferenceNamesService>();
 
     return Scaffold(
       backgroundColor: AppTheme.bgDeep,
@@ -149,7 +125,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                 backgroundColor: AppTheme.bgDeep,
                 iconTheme: const IconThemeData(color: AppTheme.textPrimary),
                 flexibleSpace: FlexibleSpaceBar(
-                  background: _buildHero(summary, angles),
+                  background: _buildHero(summary, angles, birthTimeKnown, names),
                 ),
                 title: Text(
                   t(context, 'chart.title', args: {'name': widget.userName}),
@@ -172,7 +148,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     // ── Üçlü rozet ─────────────────────────
-                    _buildTrioBadges(summary),
+                    _buildTrioBadges(summary, names),
                     const SizedBox(height: 28),
 
                     // ── Gezegen başlığı ────────────────────
@@ -308,9 +284,23 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   }
 
   // ── Hero ──────────────────────────────────────────────────────────
-  Widget _buildHero(ChartSummary? summary, ChartAngles? angles) {
-    final ascSymbol = _signSymbols[summary?.ascendantSign] ?? '✦';
+  Widget _buildHero(
+    ChartSummary? summary,
+    ChartAngles? angles,
+    bool birthTimeKnown,
+    ReferenceNamesService names,
+  ) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final sunSign = _resolvedSign(
+      names,
+      widget.chartData.planets?['Sun']?.signIndex,
+      summary?.sunSign,
+    );
+    final ascSign = _resolvedSign(
+      names,
+      widget.chartData.houses?['house_1']?.signIndex,
+      summary?.ascendantSign,
+    );
 
     return Container(
       decoration: const BoxDecoration(
@@ -354,7 +344,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                   ),
                   child: Center(
                     child: Image.asset(
-                      SoulBoundAssets.getZodiac(summary?.ascendantSign ?? ''),
+                      SoulBoundAssets.getZodiac(ascSign),
                       width: 32,
                       height: 32,
                     ),
@@ -377,9 +367,9 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        '${t(context, _signKeys[summary?.sunSign] ?? (summary?.sunSign ?? ''))} '
+                        '$sunSign '
                         '${t(context, 'chart.sun_label')} · '
-                        '${t(context, _signKeys[summary?.ascendantSign] ?? (summary?.ascendantSign ?? ''))} '
+                        '$ascSign '
                         '${t(context, 'chart.rising_label')}',
                         style: const TextStyle(
                           color: AppTheme.textSecondary,
@@ -387,7 +377,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      if (angles != null) ...[
+                      if (birthTimeKnown && angles != null) ...[
                         const SizedBox(height: 10),
                         Row(
                           children: [
@@ -432,21 +422,50 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   );
 
   // ── Üçlü rozet ────────────────────────────────────────────────────
-  Widget _buildTrioBadges(ChartSummary? summary) {
+  Widget _buildTrioBadges(
+    ChartSummary? summary,
+    ReferenceNamesService names,
+  ) {
+    final sunSign = _resolvedSign(
+      names,
+      widget.chartData.planets?['Sun']?.signIndex,
+      summary?.sunSign,
+    );
+    final moonSign = _resolvedSign(
+      names,
+      widget.chartData.planets?['Moon']?.signIndex,
+      summary?.moonSign,
+    );
+    final ascSign = _resolvedSign(
+      names,
+      widget.chartData.houses?['house_1']?.signIndex,
+      summary?.ascendantSign,
+    );
     return Row(
       children: [
-        _trioItem(t(context, 'chart.sun'), summary?.sunSign, '☀️'),
+        _trioItem(t(context, 'chart.sun'), sunSign, '☀️'),
         const SizedBox(width: 8),
-        _trioItem(t(context, 'chart.moon'), summary?.moonSign, '🌙'),
+        _trioItem(t(context, 'chart.moon'), moonSign, '🌙'),
         const SizedBox(width: 8),
-        _trioItem(t(context, 'chart.ascendant'), summary?.ascendantSign, '⬆️'),
+        _trioItem(t(context, 'chart.ascendant'), ascSign, '⬆️'),
       ],
     );
   }
 
+  String _resolvedSign(
+    ReferenceNamesService names,
+    int? signIndex,
+    String? fallback,
+  ) {
+    if (signIndex == null || signIndex < 0) return fallback ?? '-';
+    final translated = names.sign(RefIds.signId(signIndex));
+    return translated == RefIds.signId(signIndex).toString()
+        ? fallback ?? translated
+        : translated;
+  }
+
   Widget _trioItem(String label, String? sign, String icon) {
-    final signKey = _signKeys[sign] ?? sign ?? '';
-    final translatedSign = sign != null ? t(context, signKey) : '-';
+    final translatedSign = sign ?? '-';
 
     return Expanded(
       child: Container(
@@ -480,10 +499,11 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     final meta = _planetMeta[key];
     final color = (meta?['color'] as Color?) ?? AppTheme.violet;
     final emoji = meta?['emoji'] as String? ?? '✦';
-    final planetName = meta != null ? t(context, meta['key']) : key;
-    final signKey = _signKeys[data.sign] ?? data.sign;
-    final translatedSign = t(context, signKey);
-    final symbol = _signSymbols[data.sign] ?? '';
+    final names = context.watch<ReferenceNamesService>();
+    final planetName = names.planet(RefIds.planets[key] ?? 0);
+    final translatedSign = names.sign(data.signIndex + 1);
+    const symbol = '✦';
+    final houseName = names.house(data.house);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -577,7 +597,8 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                 const SizedBox(width: 8),
 
                 // House badge
-                Container(
+                if (widget.chartData.input?.birthTimeLocal.isNotEmpty == true)
+                  Container(
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
@@ -588,7 +609,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${data.house}',
+                        houseName,
                         style: TextStyle(
                           color: color,
                           fontSize: 16,
@@ -596,7 +617,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                         ),
                       ),
                       Text(
-                        'ev',
+                        t(context, 'chart.house'),
                         style: const TextStyle(
                           color: AppTheme.textMuted,
                           fontSize: 8,

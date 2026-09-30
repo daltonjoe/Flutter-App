@@ -10,6 +10,7 @@ class LanguageProvider extends ChangeNotifier {
     {"code": "es", "label": "Español", "flag": "🇪🇸"},
     {"code": "fr", "label": "Français", "flag": "🇫🇷"},
     {"code": "pt", "label": "Português", "flag": "🇧🇷"},
+    {"code": "it", "label": "Italiano", "flag": "🇮🇹"},
   ];
 
   Locale _locale = const Locale('tr');

@@ -6,9 +6,9 @@ import 'onboarding_city_page.dart';
 import 'onboarding_gender_page.dart';
 import 'onboarding_relationship_page.dart';
 import '../../presentation/widgets/components/onboarding_progress_bar.dart';
-import '../../widgets/silhouette_rive_view.dart';
 import 'onboarding_birthdate_page.dart';
 import 'onboarding_language_page.dart';
+
 
 
 class OnboardingFlowPage extends StatefulWidget {
@@ -51,23 +51,16 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
 
   @override
   Widget build(BuildContext context) {
-    final silhouetteStep = (_step - 1).clamp(0, 5).toInt();
-
     return Scaffold(
+      backgroundColor: Colors.black, // background.png yüklenemezse siyah kalsın
       body: Stack(
+        fit: StackFit.expand,
         children: [
+          // 1) Statik yedek arka plan
           Positioned.fill(
             child: Image.asset(
               'assets/images/logo/background.png',
               fit: BoxFit.cover,
-            ),
-          ),
-
-          Positioned.fill(
-            child: SilhouetteRiveView(
-              step: silhouetteStep,
-              totalSteps: 6,
-              reveal: silhouetteStep == 5,
             ),
           ),
 

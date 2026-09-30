@@ -20,6 +20,7 @@ class ChartPersistenceService {
     final sun = planets?['Sun'];
     final moon = planets?['Moon'];
     final firstHouse = houses?['house_1'];
+    final mcLongitude = _mcLongitude(chart.angles);
     if (data.name == null ||
         data.birthDate == null ||
         data.birthTime == null ||
@@ -38,6 +39,7 @@ class ChartPersistenceService {
       'relationship_status': data.relationshipStatus,
       'birth_date': _formatDate(data.birthDate!),
       'birth_time': _formatTime(data.birthTime!),
+      'birth_time_known': data.birthTimeKnown,
       'birth_city': data.city!.city,
       'latitude': data.city!.latitude,
       'longitude': data.city!.longitude,
@@ -46,6 +48,10 @@ class ChartPersistenceService {
       'sun_sign_id': RefIds.signId(sun.signIndex),
       'moon_sign_id': RefIds.signId(moon.signIndex),
       'ascendant_sign_id': RefIds.signId(firstHouse.signIndex),
+      'mc_degree': mcLongitude,
+      'mc_sign_id': mcLongitude == null
+          ? null
+          : RefIds.signId((mcLongitude / 30).floor()),
     }).select('id').single();
 
     final profileId = profile['id'] as String;
@@ -130,4 +136,25 @@ class ChartPersistenceService {
   static String _formatTime(TimeOfDay time) =>
       '${time.hour.toString().padLeft(2, '0')}:'
       '${time.minute.toString().padLeft(2, '0')}';
+
+  static double? _mcLongitude(ChartAngles? angles) {
+    if (angles == null) return null;
+    const signs = [
+      'Koç',
+      'Boğa',
+      'İkizler',
+      'Yengeç',
+      'Aslan',
+      'Başak',
+      'Terazi',
+      'Akrep',
+      'Yay',
+      'Oğlak',
+      'Kova',
+      'Balık',
+    ];
+    final signIndex = signs.indexOf(angles.mcSign);
+    if (signIndex < 0) return null;
+    return signIndex * 30 + angles.mcDegree;
+  }
 }
