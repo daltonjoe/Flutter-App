@@ -6,10 +6,9 @@ import 'onboarding_city_page.dart';
 import 'onboarding_gender_page.dart';
 import 'onboarding_relationship_page.dart';
 import '../../presentation/widgets/components/onboarding_progress_bar.dart';
+import '../../widgets/silhouette_rive_view.dart';
 import 'onboarding_birthdate_page.dart';
 import 'onboarding_language_page.dart';
-import '../../widgets/silhouette_rive_view.dart';
-
 
 
 class OnboardingFlowPage extends StatefulWidget {
@@ -52,10 +51,11 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
 
   @override
   Widget build(BuildContext context) {
+    final silhouetteStep = (_step - 1).clamp(0, 5).toInt();
+
     return Scaffold(
       body: Stack(
         children: [
-          // 1) Yedek statik arka plan (Rive yüklenene kadar görünür)
           Positioned.fill(
             child: Image.asset(
               'assets/images/logo/background.png',
@@ -63,16 +63,14 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
             ),
           ),
 
-          // 2) Rive silhouette animasyonu
           Positioned.fill(
             child: SilhouetteRiveView(
-              step: _step,
-              totalSteps: totalSteps,
-              reveal: _step == totalSteps - 1, // son sayfada reveal
+              step: silhouetteStep,
+              totalSteps: 6,
+              reveal: silhouetteStep == 5,
             ),
           ),
 
-          // 3) Mevcut onboarding içeriği (değişmedi)
           SafeArea(
             child: Column(
               children: [
@@ -83,6 +81,11 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
                 Expanded(
                   child: PageView(
                     controller: _controller,
+                    onPageChanged: (index) {
+                      if (_step != index) {
+                        setState(() => _step = index);
+                      }
+                    },
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
                       OnboardingLanguagePage(

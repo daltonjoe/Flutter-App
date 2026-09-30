@@ -91,6 +91,7 @@ class _OnboardingCityPageState extends State<OnboardingCityPage> {
     final descColor = Theme.of(context).textTheme.bodyMedium?.color;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Stack(
         fit: StackFit.expand,
         children: [
