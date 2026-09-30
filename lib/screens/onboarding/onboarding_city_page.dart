@@ -92,13 +92,7 @@ class _OnboardingCityPageState extends State<OnboardingCityPage> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: Image.asset('assets/images/logo/background.png', fit: BoxFit.cover),
-          ),
-          SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
@@ -166,8 +160,6 @@ class _OnboardingCityPageState extends State<OnboardingCityPage> {
             ),
           ),
           ),
-        ],
-      ),
     );
   }
 }
