@@ -144,6 +144,23 @@
 
   "onboarding.language.continue": "المتابعة باللغة العربية",
 
+   "onboarding.chart_save_failed": "تعذر حفظ خريطة ميلادك، يرجى المحاولة مرة أخرى.",
+  "onboarding.link_account.title": "حفظ حسابك",
+  "onboarding.link_account.description": "لتجنب فقدان بياناتك، يمكنك حفظ حسابك باستخدام بريدك الإلكتروني. يمكنك أيضًا تخطي هذه الخطوة الآن.",
+  "onboarding.link_account.email_label": "البريد الإلكتروني",
+  "onboarding.link_account.password_label": "كلمة المرور",
+  "onboarding.link_account.email_invalid": "أدخل عنوان بريد إلكتروني صالحًا",
+  "onboarding.link_account.password_too_short": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
+
+  "onboarding.link_account.skip_button": "ليس الآن، تخطي",
+  "onboarding.link_account.email_sent": "تم إرسال بريد إلكتروني للتحقق. يرجى التحقق من صندوق الوارد.",
+  "onboarding.link_account.rate_limit_error": "تم إجراء محاولات كثيرة جدًا. يرجى المحاولة مرة أخرى بعد بضع دقائق.",
+
+  "onboarding.link_account.save_button": "حفظ",
+"onboarding.link_account.or_divider": "أو",
+"onboarding.link_account.google_button": "المتابعة باستخدام Google",
+"onboarding.link_account.apple_button": "المتابعة باستخدام Apple",
+
   "onboarding.name.label": "الاسم",
   "onboarding.name.hint": "أدخل اسمك",
   "onboarding.birthtime.title": "في أي وقت وُلدت؟",

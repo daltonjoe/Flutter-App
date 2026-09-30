@@ -9,12 +9,14 @@ import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_wheel_picker.dart';
 import '../../providers/language_provider.dart';
 import '../../providers/active_profile_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class OnboardingRelationshipPage extends StatefulWidget {
   final OnboardingData data;
   final VoidCallback onNext;
   final VoidCallback onBack;
   final bool isLast;
+  final bool isFirstProfile;
 
   const OnboardingRelationshipPage({
     super.key,
@@ -22,6 +24,7 @@ class OnboardingRelationshipPage extends StatefulWidget {
     required this.onNext,
     required this.onBack,
     this.isLast = false,
+    required this.isFirstProfile,
   });
 
   @override
@@ -94,48 +97,70 @@ class _OnboardingRelationshipPageState
 
     setState(() => _isLoading = true);
 
-    try {
-      final result = await AstroService.generateNatalChart(
-        birthDate: date,
-        birthTime: time,
-        city: d.city!.display,
-        latitude: d.city!.latitude,
-        longitude: d.city!.longitude,
-        timezone: d.city!.timezone,
-      );
+    final locale = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    ).locale.languageCode;
+    final activeProfileProvider = context.read<ActiveProfileProvider>();
 
-      if (!mounted) return;
+    final setupFactory = () => _generateAndSaveChart(
+      d: d,
+      date: date,
+      time: time,
+      locale: locale,
+      activeProfileProvider: activeProfileProvider,
+    );
 
-      if (result.isSuccess) {
-        final locale = Provider.of<LanguageProvider>(
-          context,
-          listen: false,
-        ).locale.languageCode;
-        final activeProfileProvider = context.read<ActiveProfileProvider>();
-        final profileId = await ChartPersistenceService.saveChart(
-          data: d,
-          chart: result,
-          locale: locale,
-        );
-        if (!mounted) return;
-        await activeProfileProvider.setActive(profileId);
-        if (!mounted) return;
-        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-      } else {
-        setState(() {
-          _generalError = result.message ?? t(context, 'common.unknown_error');
-        });
-      }
-    } on AstroServiceException catch (e) {
-      if (!mounted) return;
-      setState(() => _generalError = e.message);
-    } catch (e) {
-      debugPrint('Natal chart error: $e');
-      if (!mounted) return;
-      setState(() => _generalError = t(context, 'common.unknown_error'));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    final currentUser = Supabase.instance.client.auth.currentUser;
+    final alreadyLinked =
+        currentUser != null &&
+        currentUser.email != null &&
+        currentUser.email!.isNotEmpty;
+
+    if (!widget.isFirstProfile || alreadyLinked) {
+      activeProfileProvider.pendingProfileSetup = setupFactory;
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      return;
     }
+
+    await Navigator.pushNamed(
+      context,
+      '/onboarding/link-account',
+      arguments: setupFactory,
+    );
+
+    if (!mounted) return;
+  }
+
+  Future<void> _generateAndSaveChart({
+    required OnboardingData d,
+    required String date,
+    required String time,
+    required String locale,
+    required ActiveProfileProvider activeProfileProvider,
+  }) async {
+    final result = await AstroService.generateNatalChart(
+      birthDate: date,
+      birthTime: time,
+      city: d.city!.display,
+      latitude: d.city!.latitude,
+      longitude: d.city!.longitude,
+      timezone: d.city!.timezone,
+    );
+
+    if (!result.isSuccess) {
+      throw Exception(result.message ?? 'unknown_error');
+    }
+
+    final profileId = await ChartPersistenceService.saveChart(
+      data: d,
+      chart: result,
+      locale: locale,
+    );
+    await activeProfileProvider.setActive(profileId);
   }
 
   @override

@@ -176,6 +176,24 @@
   "onboarding.city.hint": "Suchen Sie Ihre Stadt",
   "onboarding.gender.title": "Wie identifizieren Sie sich?",
 
+"onboarding.link_account.or_divider": "oder",
+"onboarding.link_account.google_button": "Mit Google fortfahren",
+"onboarding.link_account.apple_button": "Mit Apple fortfahren",
+
+  
+  "onboarding.chart_save_failed": "Dein Geburtshoroskop konnte nicht gespeichert werden. Bitte versuche es erneut.",
+  "onboarding.link_account.title": "Dein Konto speichern",
+  "onboarding.link_account.description": "Damit deine Daten nicht verloren gehen, kannst du dein Konto mit deiner E-Mail-Adresse speichern. Du kannst diesen Schritt auch jetzt überspringen.",
+  "onboarding.link_account.email_label": "E-Mail",
+  "onboarding.link_account.password_label": "Passwort",
+  "onboarding.link_account.email_invalid": "Gib eine gültige E-Mail-Adresse ein",
+  "onboarding.link_account.password_too_short": "Das Passwort muss mindestens 6 Zeichen lang sein",
+  "onboarding.link_account.save_button": "Speichern",
+  "onboarding.link_account.skip_button": "Nicht jetzt, überspringen",
+  "onboarding.link_account.email_sent": "Eine Bestätigungs-E-Mail wurde gesendet. Bitte überprüfe deinen Posteingang.",
+  "onboarding.link_account.rate_limit_error": "Zu viele Versuche. Bitte versuche es in ein paar Minuten erneut.",
+
+
   "onboarding.gender.male": "Männlich",
   "onboarding.gender.female": "Weiblich",
   "onboarding.gender.prefer_not_to_say": "Möchte ich nicht angeben",

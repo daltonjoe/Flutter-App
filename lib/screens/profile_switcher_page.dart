@@ -194,7 +194,7 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
                             ),
                           ),
                           if (profile['id'] == activeProfileId)
-                            const Icon(Icons.check_circle),
+                            const Icon(Icons.check_circle), 
                           IconButton(
                             icon: const Icon(Icons.delete_outline),
                             onPressed: () =>
@@ -208,7 +208,11 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
                 const SizedBox(height: 12),
                 CosmicCtaButton(
                   label: t(context, 'profile_switcher.add'),
-                  onTap: () => Navigator.pushNamed(context, '/onboarding'),
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    '/onboarding',
+                    arguments: {'isFirstProfile': false},
+                  ),
                 ),
                 TextButton(
                   onPressed: _deleteAccount,

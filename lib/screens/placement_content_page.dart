@@ -5,6 +5,7 @@ import '../services/placement_content_service.dart';
 import '../providers/language_provider.dart'; // yolu düzelt
 import '../theme/app_theme.dart';
 import '../i18n/app_localizations.dart';
+import '../core/content_theme_colors.dart';
 
 class PlacementContentPage extends StatefulWidget {
   final NatalChartResponse chartData;
@@ -133,23 +134,34 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
   }
 
   Widget _themeCard(PlacementContent c) {
+    final themeColor = themeColorFor(c.themeCode);
     return Container(
-      decoration: cosmicCard(),
+      decoration: cosmicCard(border: themeColor.withOpacity(0.25)),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           initiallyExpanded: c.themeOrder == 1,
-          iconColor: AppTheme.violet,
+          iconColor: themeColor,
           collapsedIconColor: AppTheme.textMuted,
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           expandedCrossAxisAlignment: CrossAxisAlignment.start,
-          title: Text(
-            t(context, 'placement.theme.${c.themeCode}'),
-            style: const TextStyle(
-                color: AppTheme.violet,
-                fontSize: 12,
-                fontWeight: FontWeight.w700),
+          title: Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                margin: const EdgeInsets.only(right: 6),
+                decoration: BoxDecoration(color: themeColor, shape: BoxShape.circle),
+              ),
+              Text(
+                t(context, 'placement.theme.${c.themeCode}'),
+                style: TextStyle(
+                    color: themeColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700),
+              ),
+            ],
           ),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 4),
@@ -180,12 +192,11 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0x268B5CF6),
+                      color: themeColor.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(k,
-                        style: const TextStyle(
-                            color: AppTheme.violet, fontSize: 11)),
+                        style: TextStyle(color: themeColor, fontSize: 11)),
                   ),
               ]),
             ],

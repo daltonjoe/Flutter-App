@@ -21,26 +21,13 @@ class CosmicLoader extends StatefulWidget {
 
 class _CosmicLoaderState extends State<CosmicLoader>
     with TickerProviderStateMixin {
-  static const List<String> _messageKeys = [
-    'loader.msg_1',
-    'loader.msg_2',
-    'loader.msg_3',
-    'loader.msg_4',
-    'loader.msg_5',
-    'loader.msg_6',
-    'loader.msg_7',
-  ];
-
-  int _msgIndex = 0;
   Timer? _msgTimer;
 
   late AnimationController _pulseCtrl;
   late AnimationController _rotateCtrl;
-  late AnimationController _fadeCtrl;
   late AnimationController _orbitCtrl;
   late Animation<double> _pulseAnim;
   late Animation<double> _rotateAnim;
-  late Animation<double> _fadeAnim;
   late Animation<double> _orbitAnim;
 
   @override
@@ -62,31 +49,13 @@ class _CosmicLoaderState extends State<CosmicLoader>
       duration: const Duration(seconds: 6),
     )..repeat();
 
-    _fadeCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    )..forward();
-
     _pulseAnim = Tween<double>(
       begin: 0.8,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
     _rotateAnim = Tween<double>(begin: 0, end: 1).animate(_rotateCtrl);
     _orbitAnim = Tween<double>(begin: 0, end: 1).animate(_orbitCtrl);
-    _fadeAnim = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeIn));
 
-    if (widget.message == null) {
-      _msgTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-        _fadeCtrl.reverse().then((_) {
-          if (!mounted) return;
-          setState(() => _msgIndex = (_msgIndex + 1) % _messageKeys.length);
-          _fadeCtrl.forward();
-        });
-      });
-    }
   }
 
   @override
@@ -95,14 +64,11 @@ class _CosmicLoaderState extends State<CosmicLoader>
     _pulseCtrl.dispose();
     _rotateCtrl.dispose();
     _orbitCtrl.dispose();
-    _fadeCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final message = widget.message ?? t(context, _messageKeys[_msgIndex]);
-
     return Container(
       color: AppTheme.bgDeep,
       child: SafeArea(
@@ -130,27 +96,6 @@ class _CosmicLoaderState extends State<CosmicLoader>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  // ── Dönen mesaj ───────────────────────────────────
-                  FadeTransition(
-                    opacity: _fadeAnim,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
-                      child: Text(
-                        message,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-
                   // ── Progress bar ──────────────────────────────────
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 60),

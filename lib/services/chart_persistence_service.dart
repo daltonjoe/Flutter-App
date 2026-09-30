@@ -92,10 +92,6 @@ class ChartPersistenceService {
         final planetBId = RefIds.planets[aspect.planet2];
         final aspectTypeId = RefIds.aspectId(aspect.angle);
         if (planetAId == null || planetBId == null || aspectTypeId == null) {
-          debugPrint(
-            'Skipping aspect: ${aspect.planet1}/${aspect.planet2}, '
-            'angle=${aspect.angle}',
-          );
           continue;
         }
         aspectRows.add({

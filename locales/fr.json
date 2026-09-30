@@ -120,6 +120,25 @@
   "elements.air": "Air",
   "elements.water": "Eau",
 
+  
+  "onboarding.chart_save_failed": "Votre thème natal n'a pas pu être enregistré. Veuillez réessayer.",
+  "onboarding.link_account.title": "Enregistrer votre compte",
+  "onboarding.link_account.description": "Pour éviter de perdre vos données, vous pouvez enregistrer votre compte avec votre adresse e-mail. Vous pouvez également passer cette étape pour le moment.",
+  "onboarding.link_account.email_label": "E-mail",
+  "onboarding.link_account.password_label": "Mot de passe",
+  "onboarding.link_account.email_invalid": "Saisissez une adresse e-mail valide",
+  "onboarding.link_account.password_too_short": "Le mot de passe doit comporter au moins 6 caractères",
+  "onboarding.link_account.save_button": "Enregistrer",
+  "onboarding.link_account.skip_button": "Pas maintenant, passer",
+  "onboarding.link_account.email_sent": "Un e-mail de vérification a été envoyé. Veuillez vérifier votre boîte de réception.",
+  "onboarding.link_account.rate_limit_error": "Trop de tentatives. Veuillez réessayer dans quelques minutes.",
+
+
+"onboarding.link_account.or_divider": "ou",
+"onboarding.link_account.google_button": "Continuer avec Google",
+"onboarding.link_account.apple_button": "Continuer avec Apple",
+
+
   "placement.title": "Interprétation détaillée",
 "placement.theme.love": "Amour et relations",
 "placement.theme.career": "Carrière et finances",

@@ -5,6 +5,10 @@ class ActiveProfileProvider extends ChangeNotifier {
   String? activeProfileId;
   static const String _prefKey = 'active_profile_id';
 
+  /// Yeni oluşturulan profil için chart üretim+kayıt işlemini taşır.
+  /// ActiveChartPage, activeProfileId null iken bunu bulursa çalıştırır.
+  Future<void> Function()? pendingProfileSetup;
+
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     activeProfileId = prefs.getString(_prefKey);

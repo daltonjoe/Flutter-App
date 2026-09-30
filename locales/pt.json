@@ -129,6 +129,24 @@
 "placement.challenges": "Desafios",
 "placement.button": "Ver interpretação detalhada",
 
+"onboarding.link_account.or_divider": "ou",
+"onboarding.link_account.google_button": "Continuar com o Google",
+"onboarding.link_account.apple_button": "Continuar com a Apple",
+
+
+  "onboarding.chart_save_failed": "Não foi possível salvar seu mapa astral. Tente novamente.",
+  "onboarding.link_account.title": "Salvar sua conta",
+  "onboarding.link_account.description": "Para evitar perder seus dados, você pode salvar sua conta usando seu e-mail. Você também pode pular esta etapa por enquanto.",
+  "onboarding.link_account.email_label": "E-mail",
+  "onboarding.link_account.password_label": "Senha",
+  "onboarding.link_account.email_invalid": "Digite um endereço de e-mail válido",
+  "onboarding.link_account.password_too_short": "A senha deve ter pelo menos 6 caracteres",
+  "onboarding.link_account.save_button": "Salvar",
+  "onboarding.link_account.skip_button": "Agora não, pular",
+  "onboarding.link_account.email_sent": "Um e-mail de verificação foi enviado. Verifique sua caixa de entrada.",
+  "onboarding.link_account.rate_limit_error": "Muitas tentativas. Tente novamente em alguns minutos.",
+
+
 "placement.error": "Ocorreu um problema ao carregar o conteúdo.",
 "placement.retry": "Tentar novamente",
 "placement.empty": "Ainda não há conteúdo disponível para esta posição.",

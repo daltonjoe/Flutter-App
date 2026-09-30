@@ -8,10 +8,14 @@ import 'onboarding_relationship_page.dart';
 import '../../presentation/widgets/components/onboarding_progress_bar.dart';
 import 'onboarding_birthdate_page.dart';
 import 'onboarding_language_page.dart';
+import '../../widgets/silhouette_rive_view.dart';
+
 
 
 class OnboardingFlowPage extends StatefulWidget {
-  const OnboardingFlowPage({super.key});
+  const OnboardingFlowPage({super.key, required this.isFirstProfile});
+
+  final bool isFirstProfile;
 
   @override
   State<OnboardingFlowPage> createState() => _OnboardingFlowPageState();
@@ -49,35 +53,65 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-  decoration: const BoxDecoration(
-    image: DecorationImage(
-      image: AssetImage('assets/images/logo/background.png'),
-      fit: BoxFit.cover,
-    ),
-  ),
-  child: SafeArea(
-        child: Column(
-          children: [
-            OnboardingProgressBar(currentStep: _step, totalSteps: totalSteps),
-            Expanded(
-              child: PageView(
-                controller: _controller,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                   OnboardingLanguagePage(data: data, onNext: _next, onBack: _back),
-                  OnboardingNamePage(data: data, onNext: _next, onBack: _back),
-                  OnboardingBirthdatePage(data: data, onNext: _next, onBack: _back),
-                  OnboardingBirthtimePage(data: data, onNext: _next, onBack: _back),
-                  OnboardingCityPage(data: data, onNext: _next, onBack: _back),
-                  OnboardingGenderPage(data: data, onNext: _next, onBack: _back),
-                  OnboardingRelationshipPage(data: data, onNext: _next, onBack: _back, isLast: true),
-                ],
-              ),
+      body: Stack(
+        children: [
+          // 1) Yedek statik arka plan (Rive yüklenene kadar görünür)
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/logo/background.png',
+              fit: BoxFit.cover,
             ),
-          ],
-        ),
-      )),
+          ),
+
+          // 2) Rive silhouette animasyonu
+          Positioned.fill(
+            child: SilhouetteRiveView(
+              step: _step,
+              totalSteps: totalSteps,
+              reveal: _step == totalSteps - 1, // son sayfada reveal
+            ),
+          ),
+
+          // 3) Mevcut onboarding içeriği (değişmedi)
+          SafeArea(
+            child: Column(
+              children: [
+                OnboardingProgressBar(
+                  currentStep: _step,
+                  totalSteps: totalSteps,
+                ),
+                Expanded(
+                  child: PageView(
+                    controller: _controller,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      OnboardingLanguagePage(
+                          data: data, onNext: _next, onBack: _back),
+                      OnboardingNamePage(
+                          data: data, onNext: _next, onBack: _back),
+                      OnboardingBirthdatePage(
+                          data: data, onNext: _next, onBack: _back),
+                      OnboardingBirthtimePage(
+                          data: data, onNext: _next, onBack: _back),
+                      OnboardingCityPage(
+                          data: data, onNext: _next, onBack: _back),
+                      OnboardingGenderPage(
+                          data: data, onNext: _next, onBack: _back),
+                      OnboardingRelationshipPage(
+                        data: data,
+                        onNext: _next,
+                        onBack: _back,
+                        isLast: true,
+                        isFirstProfile: widget.isFirstProfile,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

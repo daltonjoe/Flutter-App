@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   supabase_flutter: ^2.0.0
+  rive: ^0.13.20 
   flutter:
     sdk: flutter
   flutter_localizations:

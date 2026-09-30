@@ -10,10 +10,12 @@ import '../theme/app_theme.dart';
 import '../widgets/cosmic_loader.dart';
 import '../i18n/app_localizations.dart';
 import '../core/utils/text_parser.dart';
-import '../widgets/analysis/analysis_section_card.dart';
+import '../presentation/widgets/components/analysis_section_card.dart';
 import '../widgets/analysis/floating_analysis_icon.dart';
 import '../widgets/animations/zodiac_orbital_animation.dart';
+import '../core/content_theme_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 
 class PlanetReportPage extends StatefulWidget {
   final String planetName;
@@ -69,6 +71,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
   @override
   void initState() {
     super.initState();
+    _fetch();
   }
 
   Future<void> _fetch() async {
@@ -80,17 +83,20 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
 
     try {
       final signCode = _signKeys[pd?.sign]?.split('.').last ?? '';
+      debugPrint('DEBUG query: planet=${widget.planetName} sign=$signCode house=${pd?.house} locale=$locale');
       final rows = await Supabase.instance.client
           .from('placement_content')
           .select('title, content, strengths, challenges, '
               'celestial_bodies!inner(code), zodiac_signs!inner(code), '
-              'astrological_houses!inner(house_number)')
-          .eq('celestial_bodies.code', widget.planetName.toLowerCase())
+              'astrological_houses!inner(house_number), '
+              'content_themes(code, sort_order)')
+          .eq('celestial_bodies.code', widget.planetName)
           .eq('zodiac_signs.code', signCode)
           .eq('astrological_houses.house_number', pd?.house ?? -1)
           .eq('locale', locale)
           .eq('is_active', true);
 
+       debugPrint('DEBUG rows.length = ${rows.length}');
       if (rows.isEmpty) {
         // Fallback: Supabase'de içerik yoksa eski AI akışına düş
         final r = await AstroService.generatePlanetReport(
@@ -252,16 +258,27 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
     );
   }
 
-  // Supabase'den gelen structured içerik
+  // Supabase'den gelen structured içerik — her tema kendi rengiyle
   List<Widget> _renderModernReport(Color accent) {
-    return _sections.map((row) {
+    final sorted = List<Map<String, dynamic>>.from(_sections)
+      ..sort((a, b) {
+        final ao = (a['content_themes']?['sort_order'] as num?) ?? 0;
+        final bo = (b['content_themes']?['sort_order'] as num?) ?? 0;
+        return ao.compareTo(bo);
+      });
+    return sorted.map((row) {
       final s = List<String>.from(row['strengths'] ?? []);
       final c = List<String>.from(row['challenges'] ?? []);
+      final themeCode = row['content_themes']?['code'] as String? ?? '';
+      final color = themeCode.isNotEmpty ? themeColorFor(themeCode) : accent;
       return AnalysisSectionCard(
         title: row['title'] ?? '',
         content: row['content'] ?? '',
-        bulletPoints: [...s, ...c],
-        color: accent,
+        strengths: s,
+        challenges: c,
+        strengthsLabel: t(context, 'placement.strengths'),
+        challengesLabel: t(context, 'placement.challenges'),
+        color: color,
         icon: _getIconForTitle(row['title'] ?? ''),
       );
     }).toList();

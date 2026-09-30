@@ -134,6 +134,25 @@
   "elements.air": "Aire",
   "elements.water": "Agua",
 
+
+"onboarding.link_account.or_divider": "o",
+"onboarding.link_account.google_button": "Continuar con Google",
+"onboarding.link_account.apple_button": "Continuar con Apple",
+
+
+  "onboarding.chart_save_failed": "No se ha podido guardar tu carta natal. Inténtalo de nuevo.",
+  "onboarding.link_account.title": "Guardar tu cuenta",
+  "onboarding.link_account.description": "Para evitar perder tus datos, puedes guardar tu cuenta con tu correo electrónico. También puedes omitir este paso por ahora.",
+  "onboarding.link_account.email_label": "Correo electrónico",
+  "onboarding.link_account.password_label": "Contraseña",
+  "onboarding.link_account.email_invalid": "Introduce un correo electrónico válido",
+  "onboarding.link_account.password_too_short": "La contraseña debe tener al menos 6 caracteres",
+  "onboarding.link_account.save_button": "Guardar",
+  "onboarding.link_account.skip_button": "Ahora no, omitir",
+  "onboarding.link_account.email_sent": "Se ha enviado un correo de verificación. Revisa tu bandeja de entrada.",
+  "onboarding.link_account.rate_limit_error": "Se han realizado demasiados intentos. Inténtalo de nuevo en unos minutos.",
+
+
   "common.ok": "Aceptar",
   "onboarding.name.required": "Introduce tu nombre para que podamos preparar una carta personalizada para ti.",
   "onboarding.city.required": "Debes seleccionar tu lugar de nacimiento para que podamos analizar con precisión la posición de los planetas y las estrellas.",

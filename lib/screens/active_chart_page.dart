@@ -16,6 +16,8 @@ class ActiveChartPage extends StatefulWidget {
 }
 
 class _ActiveChartPageState extends State<ActiveChartPage> {
+  static const String _pendingSetupKey = 'pending-setup';
+
   String? _loadedProfileId;
   String? _loadingProfileId;
   String? _requestedProfileId;
@@ -26,34 +28,68 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final profileId = context.watch<ActiveProfileProvider>().activeProfileId;
-    if (profileId == null) {
-      if (!_redirectedToOnboarding) {
-        _load(null);
+    final provider = context.watch<ActiveProfileProvider>();
+    final profileId = provider.activeProfileId;
+
+    // pendingProfileSetup kontrolü artık activeProfileId'den BAĞIMSIZ —
+    // ikinci+ profil eklerken activeProfileId zaten eski profile işaret
+    // ediyor olabilir, bu yüzden null kontrolünden ÖNCE bakılmalı.
+    if (provider.pendingProfileSetup != null) {
+      if (_requestedProfileId != _pendingSetupKey) {
+        _requestedProfileId = _pendingSetupKey;
+        _runPendingSetup(provider);
       }
       return;
     }
+
+    if (profileId == null) {
+      if (!_redirectedToOnboarding) {
+        _redirectToOnboarding();
+      }
+      return;
+    }
+
     if (profileId != _requestedProfileId && profileId != _loadedProfileId) {
       _requestedProfileId = profileId;
       _load(profileId);
     }
   }
 
-  Future<void> _load(String? profileId) async {
-    if (profileId == null) {
-      if (!_redirectedToOnboarding) {
-        _redirectedToOnboarding = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/onboarding',
-            (route) => false,
-          );
-        });
-      }
-      return;
+  void _redirectToOnboarding() {
+    _redirectedToOnboarding = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/onboarding',
+        (route) => false,
+      );
+    });
+  }
+
+  Future<void> _runPendingSetup(ActiveProfileProvider provider) async {
+    setState(() {
+      _loadingProfileId = _pendingSetupKey;
+      _error = null;
+      _result = null;
+      _loadedProfileId = null;
+    });
+    try {
+      await provider.pendingProfileSetup!();
+      provider.pendingProfileSetup = null;
+      // setActive() bu closure'ın içinde çağrılıyor; bu da activeProfileId'yi
+      // değiştirip didChangeDependencies'i gerçek profileId ile tekrar tetikler.
+    } catch (e, st) {
+      debugPrint('Pending setup error: $e\n$st');
+      if (!mounted) return;
+      setState(() {
+        _loadingProfileId = null;
+        _error = 'onboarding.chart_save_failed';
+      });
     }
+  }
+
+  Future<void> _load(String profileId) async {
     setState(() {
       _loadingProfileId = profileId;
       _error = null;
@@ -61,11 +97,8 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
       _loadedProfileId = null;
     });
     try {
-      debugPrint('LOAD profile=$profileId');
       final result = await ChartRepository.load(profileId);
-      if (!mounted || _loadingProfileId != profileId) {
-        return;
-      }
+      if (!mounted || _loadingProfileId != profileId) return;
       setState(() {
         _result = result;
         _loadedProfileId = profileId;
@@ -80,15 +113,24 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
     }
   }
 
+  void _retry() {
+    final provider = context.read<ActiveProfileProvider>();
+    if (provider.pendingProfileSetup != null) {
+      _requestedProfileId = null;
+      _runPendingSetup(provider);
+    } else if (provider.activeProfileId != null) {
+      _load(provider.activeProfileId!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loadingProfileId != null) return const CosmicLoader();
     if (_error != null) {
-      final profileId = context.watch<ActiveProfileProvider>().activeProfileId;
       return CosmicErrorState(
         message: t(context, _error!),
         retryLabel: t(context, 'profile_switcher.retry'),
-        onRetry: () => _load(profileId),
+        onRetry: _retry,
       );
     }
     final result = _result;

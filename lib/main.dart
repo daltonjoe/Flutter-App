@@ -14,6 +14,8 @@ import 'screens/profile_switcher_page.dart';
 import 'screens/active_chart_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/supabase_config.dart';
+import 'screens/onboarding/onboarding_link_account_page.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,8 +49,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: languageProvider),
-        ChangeNotifierProvider.value(value: activeProfileProvider),
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => ActiveProfileProvider()),
       ],
       child: const SoulBoundApp(),
     ),
@@ -94,13 +96,23 @@ class SoulBoundApp extends StatelessWidget {
       },
       home: context.watch<ActiveProfileProvider>().activeProfileId != null
           ? const ActiveChartPage()
-          : const OnboardingFlowPage(),
+          : const OnboardingFlowPage(isFirstProfile: true),
       onGenerateRoute: (settings) {
         if (settings.name == '/onboarding') {
-          return MaterialPageRoute(builder: (_) => const OnboardingFlowPage());
+          final args = settings.arguments as Map<String, dynamic>?;
+          final isFirstProfile = args?['isFirstProfile'] as bool? ?? false;
+          return MaterialPageRoute(
+            builder: (_) => OnboardingFlowPage(isFirstProfile: isFirstProfile),
+          );
         }
         if (settings.name == '/profiles') {
-          return MaterialPageRoute(builder: (_) => const ProfileSwitcherPage());
+        return MaterialPageRoute(builder: (_) => const ProfileSwitcherPage());
+        }
+        if (settings.name == '/onboarding/link-account') {
+          final setupFactory = settings.arguments as Future<void> Function();
+          return MaterialPageRoute(
+            builder: (_) => OnboardingLinkAccountPage(setupFactory: setupFactory),
+          );
         }
         if (settings.name == '/home') {
           return MaterialPageRoute(builder: (_) => const ActiveChartPage());

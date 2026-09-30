@@ -134,6 +134,18 @@
   "placement.retry": "Tekrar Dene",
   "placement.empty": "Bu yerleşim için henüz içerik bulunmuyor.",
 
+   "onboarding.chart_save_failed": "Doğum haritan kaydedilemedi, lütfen tekrar dene.",
+  "onboarding.link_account.title": "Hesabını Kaydet",
+  "onboarding.link_account.description": "Verilerini kaybetmemek için hesabını e-posta ile kaydedebilirsin. Bu adımı istersen şimdi atlayabilirsin.",
+  "onboarding.link_account.email_label": "E-posta",
+  "onboarding.link_account.password_label": "Şifre",
+  "onboarding.link_account.email_invalid": "Geçerli bir e-posta gir",
+  "onboarding.link_account.password_too_short": "Şifre en az 6 karakter olmalı",
+  "onboarding.link_account.save_button": "Kaydet",
+  "onboarding.link_account.skip_button": "Şimdi değil, Atla",
+  "onboarding.link_account.email_sent": "Doğrulama e-postası gönderildi. Lütfen gelen kutunu kontrol et.",
+  "onboarding.link_account.rate_limit_error": "Çok fazla deneme yapıldı, birkaç dakika sonra tekrar dene.",
+
   "onboarding.name.required": "Size özel bir harita hazırlayabilmemiz için lütfen adınızı girin.",
   "onboarding.city.required": "Gezegenlerin ve yıldızların konumunu doğru analiz edebilmemiz için doğum yerinizi seçmeniz gerekiyor.",
   "onboarding.birthtime.popup_title": "Doğum Saati",
@@ -143,6 +155,9 @@
   "onboarding.birthtime.share_message": "Doğum saatimi biliyor musun?",
 
   "onboarding.language.continue": "Türkçe ile Devam Et",
+"onboarding.link_account.or_divider": "veya",
+"onboarding.link_account.google_button": "Google ile devam et",
+"onboarding.link_account.apple_button": "Apple ile devam et",
 
   "onboarding.name.label": "İsim",
   "onboarding.name.hint": "İsminizi girin",

@@ -28,6 +28,10 @@ class AnalysisSectionCard extends StatelessWidget {
     this.icon,
     this.color,
     this.bulletPoints,
+    this.strengths,
+    this.challenges,
+    this.strengthsLabel,
+    this.challengesLabel,
   });
 
   final String title;
@@ -40,6 +44,13 @@ class AnalysisSectionCard extends StatelessWidget {
   final Color? color;
 
   final List<String>? bulletPoints;
+
+  /// Etiketli güçlü yönler / zorluklar listeleri (bulletPoints'ten ayrı,
+  /// belirtilirse ayrı başlıklarla gösterilir).
+  final List<String>? strengths;
+  final List<String>? challenges;
+  final String? strengthsLabel;
+  final String? challengesLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -129,45 +140,69 @@ class AnalysisSectionCard extends StatelessWidget {
                     ),
                   ),
 
-                  // ── Bullet points ────────────────────────────────────
+                  // ── Bullet points (etiketsiz, AI fallback için) ─────
                   if (bulletPoints != null && bulletPoints!.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    ...bulletPoints!.map(
-                      (point) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 6),
-                              child: Container(
-                                width: 6,
-                                height: 6,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: accent.withValues(alpha: 0.6),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                point,
-                                style: AppTextStyles.bodySm(
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    ...bulletPoints!.map((point) => _bulletRow(point, accent)),
+                  ],
+
+                  // ── Güçlü yönler (etiketli) ──────────────────────────
+                  if (strengths != null && strengths!.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      strengthsLabel ?? 'Güçlü Yönler',
+                      style: AppTextStyles.bodyLg(color: AppColors.textPrimary)
+                          .copyWith(fontWeight: FontWeight.w700, fontSize: 13),
                     ),
+                    const SizedBox(height: 8),
+                    ...strengths!.map((point) => _bulletRow(point, accent)),
+                  ],
+
+                  // ── Zorluklar (etiketli) ─────────────────────────────
+                  if (challenges != null && challenges!.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      challengesLabel ?? 'Zorluklar',
+                      style: AppTextStyles.bodyLg(color: AppColors.textPrimary)
+                          .copyWith(fontWeight: FontWeight.w700, fontSize: 13),
+                    ),
+                    const SizedBox(height: 8),
+                    ...challenges!.map((point) => _bulletRow(point, accent)),
                   ],
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _bulletRow(String point, Color accent) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: accent.withValues(alpha: 0.6),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              point,
+              style: AppTextStyles.bodySm(color: AppColors.textSecondary),
+            ),
+          ),
+        ],
       ),
     );
   }
