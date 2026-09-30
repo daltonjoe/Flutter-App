@@ -69,6 +69,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage>
     final descColor = Theme.of(context).textTheme.bodyMedium?.color;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Stack(
         fit: StackFit.expand,
         children: [

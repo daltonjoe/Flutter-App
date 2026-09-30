@@ -6,6 +6,7 @@ import 'onboarding_city_page.dart';
 import 'onboarding_gender_page.dart';
 import 'onboarding_relationship_page.dart';
 import '../../presentation/widgets/components/onboarding_progress_bar.dart';
+import '../../widgets/silhouette_rive_view.dart';
 import 'onboarding_birthdate_page.dart';
 import 'onboarding_language_page.dart';
 
@@ -48,6 +49,8 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
 
   @override
   Widget build(BuildContext context) {
+    final silhouetteStep = (_step - 1).clamp(0, 5).toInt();
+
     return Scaffold(
       body: Container(
   decoration: const BoxDecoration(
@@ -61,17 +64,33 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
           children: [
             OnboardingProgressBar(currentStep: _step, totalSteps: totalSteps),
             Expanded(
-              child: PageView(
-                controller: _controller,
-                physics: const NeverScrollableScrollPhysics(),
+              child: Stack(
                 children: [
-                   OnboardingLanguagePage(data: data, onNext: _next, onBack: _back),
-                  OnboardingNamePage(data: data, onNext: _next, onBack: _back),
-                  OnboardingBirthdatePage(data: data, onNext: _next, onBack: _back),
-                  OnboardingBirthtimePage(data: data, onNext: _next, onBack: _back),
-                  OnboardingCityPage(data: data, onNext: _next, onBack: _back),
-                  OnboardingGenderPage(data: data, onNext: _next, onBack: _back),
-                  OnboardingRelationshipPage(data: data, onNext: _next, onBack: _back, isLast: true),
+                  Positioned.fill(
+                    child: SilhouetteRiveView(
+                      step: silhouetteStep,
+                      totalSteps: 6,
+                      reveal: silhouetteStep == 5,
+                    ),
+                  ),
+                  PageView(
+                    controller: _controller,
+                    onPageChanged: (index) {
+                      if (_step != index) {
+                        setState(() => _step = index);
+                      }
+                    },
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      OnboardingLanguagePage(data: data, onNext: _next, onBack: _back),
+                      OnboardingNamePage(data: data, onNext: _next, onBack: _back),
+                      OnboardingBirthdatePage(data: data, onNext: _next, onBack: _back),
+                      OnboardingBirthtimePage(data: data, onNext: _next, onBack: _back),
+                      OnboardingCityPage(data: data, onNext: _next, onBack: _back),
+                      OnboardingGenderPage(data: data, onNext: _next, onBack: _back),
+                      OnboardingRelationshipPage(data: data, onNext: _next, onBack: _back, isLast: true),
+                    ],
+                  ),
                 ],
               ),
             ),
