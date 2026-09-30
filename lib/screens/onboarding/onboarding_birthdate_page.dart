@@ -49,13 +49,8 @@ class _OnboardingBirthdatePageState extends State<OnboardingBirthdatePage> {
     final descColor = Theme.of(context).textTheme.bodyMedium?.color;
 
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: Image.asset('assets/images/logo/background.png', fit: BoxFit.cover),
-          ),
-          SafeArea(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
@@ -112,8 +107,6 @@ class _OnboardingBirthdatePageState extends State<OnboardingBirthdatePage> {
             ),
           ),
           ),
-        ],
-      ),
     );
   }
 }
