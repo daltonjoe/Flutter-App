@@ -1,21 +1,19 @@
 // flutter_application/lib/services/astro_service.dart
 //
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/natal_chart_response.dart';
 
-// Lokal backend servisi.
-const _kLocalBaseUrl = 'http://127.0.0.1:8000';
+// Backend adresi. Varsayılan: lokal. Emülatör için:
+//   --dart-define=API_BASE_URL=http://10.0.2.2:8000
+// Gerçek cihaz için bilgisayarın LAN IP'si:
+//   --dart-define=API_BASE_URL=http://192.168.x.x:8000
+const _kBaseUrl = String.fromEnvironment(
+  'API_BASE_URL',
+  defaultValue: 'http://127.0.0.1:8000',
+);
 
 String? _authToken;
-
-String get _kBaseUrl {
-  if (kIsWeb) {
-    return _kLocalBaseUrl;
-  }
-  return _kLocalBaseUrl;
-}
 
 Future<String> _getToken() async {
   if (_authToken != null) return _authToken!;
