@@ -47,19 +47,18 @@ class PlacementContentService {
 
   static const _locales = {'tr', 'en', 'de', 'es', 'fr'};
 
-  static const _signCodes = {
-  'Koç': 'aries', 'Boğa': 'taurus', 'İkizler': 'gemini', 'Yengeç': 'cancer',
-  'Aslan': 'leo', 'Başak': 'virgo', 'Terazi': 'libra', 'Akrep': 'scorpio',
-  'Yay': 'sagittarius', 'Oğlak': 'capricorn', 'Kova': 'aquarius', 'Balık': 'pisces',
-    };
-
-  /// placements: {'sun': sunSign, 'moon': moonSign, 'ascendant': ascSign}
+  /// placements: {'sun': 'aries', 'moon': 'leo', 'ascendant': 'virgo'}
+  /// Değerler dil-bağımsız burç kodudur (RefIds.signCode ile üretilir).
   static Future<Map<String, List<PlacementContent>>> fetch({
     required Map<String, String> placements,
     required String locale,
   }) async {
     final result = <String, List<PlacementContent>>{};
     for (final e in placements.entries) {
+      if (e.value.isEmpty) {
+        result[e.key] = [];
+        continue;
+      }
       final rows = await _db
           .from('placement_sign_theme_content')
           .select(
@@ -68,7 +67,7 @@ class PlacementContentService {
           .eq('placement_type', e.key)
           .eq('locale', _locales.contains(locale) ? locale : 'en')
           .eq('is_active', true)
-          .eq('zodiac_signs.code', _signCodes[e.value] ?? e.value.toLowerCase());
+          .eq('zodiac_signs.code', e.value);
       result[e.key] = rows
           .map<PlacementContent>((r) => PlacementContent.fromJson(r))
           .toList()

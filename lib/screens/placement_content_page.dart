@@ -6,6 +6,7 @@ import '../providers/language_provider.dart'; // yolu düzelt
 import '../theme/app_theme.dart';
 import '../i18n/app_localizations.dart';
 import '../core/content_theme_colors.dart';
+import '../core/reference_ids.dart';
 
 class PlacementContentPage extends StatefulWidget {
   final NatalChartResponse chartData;
@@ -33,14 +34,15 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
   }
 
   Future<void> _load() async {
-    final s = widget.chartData.summary;
+    final c = widget.chartData;
     final locale = context.read<LanguageProvider>().locale.languageCode;
+    String code(int? i) => i == null ? '' : (RefIds.signCode(i) ?? '');
     try {
       final r = await PlacementContentService.fetch(
         placements: {
-          'sun': s?.sunSign ?? '',
-          'moon': s?.moonSign ?? '',
-          'ascendant': s?.ascendantSign ?? '',
+          'sun': code(c.planets?['Sun']?.signIndex),
+          'moon': code(c.planets?['Moon']?.signIndex),
+          'ascendant': code(c.houses?['house_1']?.signIndex),
         },
         locale: locale,
       );

@@ -344,7 +344,9 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                   ),
                   child: Center(
                     child: Image.asset(
-                      SoulBoundAssets.getZodiac(ascSign),
+                        SoulBoundAssets.getZodiacByIndex(
+                        widget.chartData.houses?['house_1']?.signIndex ?? 0,
+                      ),
                       width: 32,
                       height: 32,
                     ),
@@ -590,7 +592,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
 
                 // Zodiac icon (house'un solunda, aynı boyutta)
                 Image.asset(
-                  SoulBoundAssets.getZodiac(data.sign),
+                  SoulBoundAssets.getZodiacByIndex(data.signIndex),
                   width: 42,
                   height: 42,
                 ),

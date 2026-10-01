@@ -1,5 +1,15 @@
 class RefIds {
   static int signId(int signIndex) => signIndex + 1;
+    static const signCodes = [
+    'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
+    'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces',
+  ];
+
+  /// signIndex (0-11) -> dil-bağımsız burç kodu. Geçersizse null.
+  static String? signCode(int signIndex) =>
+      (signIndex >= 0 && signIndex < signCodes.length)
+          ? signCodes[signIndex]
+          : null;
   static int houseId(int houseNumber) => houseNumber;
 
   static const planets = {

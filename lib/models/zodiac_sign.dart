@@ -14,6 +14,10 @@ enum ZodiacSign {
 
   String get assetPath => 'assets/images/zodiac/$name.png';
 
+    /// signIndex (0-11) ile eşleme. Dil-bağımsız, isim kullanmaz.
+  static ZodiacSign fromSignIndex(int signIndex) =>
+      ZodiacSign.values[signIndex.clamp(0, 11)];
+
   static ZodiacSign fromString(String sign) {
     switch (sign.toLowerCase().trim()) {
       case 'aries':
@@ -69,4 +73,7 @@ abstract class SoulBoundAssets {
 
   static String getZodiac(String signName) =>
       ZodiacSign.fromString(signName).assetPath;
+
+  static String getZodiacByIndex(int signIndex) =>
+    ZodiacSign.fromSignIndex(signIndex).assetPath;
 }

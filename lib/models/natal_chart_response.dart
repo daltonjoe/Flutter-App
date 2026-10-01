@@ -48,7 +48,8 @@ class NatalChartResponse {
       'summary': {'sun_sign': summary?.sunSign ?? '', 
         'moon_sign': summary?.moonSign ?? '', 
         'ascendant_sign': summary?.ascendantSign ?? '', 
-        'element_distribution': summary?.elementDistribution ?? {}, 
+        'element_distribution':
+            elementsToBackend(summary?.elementDistribution ?? {}),
         'retrograde_planets': summary?.retrogradePlanets ?? []}, 
     }; 
   } 
@@ -128,6 +129,27 @@ class ChartLocation {
       );
 }
 
+const _elementCodeToTr = {
+  'fire': 'Ateş',
+  'earth': 'Toprak',
+  'air': 'Hava',
+  'water': 'Su',
+};
+const _elementTrToCode = {
+  'Ateş': 'fire',
+  'Toprak': 'earth',
+  'Hava': 'air',
+  'Su': 'water',
+};
+
+/// Backend'e giderken: kod -> Türkçe anahtar.
+Map<String, int> elementsToBackend(Map<String, int> m) =>
+    m.map((k, v) => MapEntry(_elementCodeToTr[k] ?? k, v));
+
+/// Backend'den gelirken: Türkçe anahtar -> kod. Zaten kodsa dokunmaz.
+Map<String, int> elementsFromBackend(Map<String, dynamic> m) =>
+    m.map((k, v) => MapEntry(_elementTrToCode[k] ?? k, (v as num).toInt()));
+
 class ChartSummary {
   final String sunSign;
   final String moonSign;
@@ -148,7 +170,8 @@ class ChartSummary {
         moonSign: json['moon_sign'] ?? '',
         ascendantSign: json['ascendant_sign'] ?? '',
         elementDistribution: json['element_distribution'] != null
-            ? Map<String, int>.from(json['element_distribution'])
+            ? elementsFromBackend(
+                Map<String, dynamic>.from(json['element_distribution']))
             : {},
         retrogradePlanets: json['retrograde_planets'] != null
             ? List<String>.from(json['retrograde_planets'])
