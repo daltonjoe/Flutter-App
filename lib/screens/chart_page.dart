@@ -57,17 +57,17 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   };
 
   static const Map<String, String> _elementKeys = {
-    'Ateş': 'elements.fire',
-    'Toprak': 'elements.earth',
-    'Hava': 'elements.air',
-    'Su': 'elements.water',
+    'fire': 'elements.fire',
+    'earth': 'elements.earth',
+    'air': 'elements.air',
+    'water': 'elements.water',
   };
 
   static const Map<String, Color> _elementColors = {
-    'Ateş': Color(0xFFFF6B6B),
-    'Toprak': Color(0xFF98C379),
-    'Hava': Color(0xFF61AFEF),
-    'Su': Color(0xFF56B6C2),
+    'fire': Color(0xFFFF6B6B),
+    'earth': Color(0xFF98C379),
+    'air': Color(0xFF61AFEF),
+    'water': Color(0xFF56B6C2),
   };
 
   @override
@@ -605,25 +605,34 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                     color: color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        houseName,
-                        style: TextStyle(
-                          color: color,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                        ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            houseName,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: color,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          Text(
+                            t(context, 'chart.house'),
+                            maxLines: 1,
+                            style: const TextStyle(
+                              color: AppTheme.textMuted,
+                              fontSize: 8,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        t(context, 'chart.house'),
-                        style: const TextStyle(
-                          color: AppTheme.textMuted,
-                          fontSize: 8,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),

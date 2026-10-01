@@ -39,21 +39,21 @@ void main() async {
     publishableKey: SupabaseConfig.anonKey,
   );
 
-  if (Supabase.instance.client.auth.currentSession == null) {
+   if (Supabase.instance.client.auth.currentSession == null) {
     try {
       await Supabase.instance.client.auth.signInAnonymously();
     } catch (e) {
       debugPrint('Anonymous Supabase sign-in failed: $e');
     }
   }
-
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: languageProvider),
         ChangeNotifierProvider.value(value: activeProfileProvider),
         ChangeNotifierProvider(
-          create: (_) => ReferenceNamesService(languageProvider),
+          lazy: false,
+          create: (ctx) => ReferenceNamesService(ctx.read<LanguageProvider>()),
         ),
       ],
       child: const SoulBoundApp(),

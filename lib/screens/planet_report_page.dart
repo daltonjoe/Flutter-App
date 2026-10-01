@@ -53,20 +53,17 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
     'Pluto': {'emoji': '♇', 'color': Color(0xFFDDA0DD)},
   };
 
-  static const Map<String, String> _signKeys = {
-    'Koç': 'signs.aries',
-    'Boğa': 'signs.taurus',
-    'İkizler': 'signs.gemini',
-    'Yengeç': 'signs.cancer',
-    'Aslan': 'signs.leo',
-    'Başak': 'signs.virgo',
-    'Terazi': 'signs.libra',
-    'Akrep': 'signs.scorpio',
-    'Yay': 'signs.sagittarius',
-    'Oğlak': 'signs.capricorn',
-    'Kova': 'signs.aquarius',
-    'Balık': 'signs.pisces',
-  };
+  // signIndex (0-11) -> zodiac_signs.code. Sıra DB'de doğrulandı (1-12).
+  static const List<String> _signCodes = [
+    'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
+    'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces',
+  ];
+
+  static String _signCodeOf(PlanetData? pd) {
+    final i = pd?.signIndex;
+    if (i == null || i < 0 || i >= _signCodes.length) return '';
+    return _signCodes[i];
+  }
 
   @override
   void initState() {
@@ -82,8 +79,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
     final pd = widget.chartData.planets?[widget.planetName];
 
     try {
-      final signCode = _signKeys[pd?.sign]?.split('.').last ?? '';
-      debugPrint('DEBUG query: planet=${widget.planetName} sign=$signCode house=${pd?.house} locale=$locale');
+      final signCode = _signCodeOf(pd);
       final rows = await Supabase.instance.client
           .from('placement_content')
           .select('title, content, strengths, challenges, '
@@ -95,8 +91,6 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
           .eq('astrological_houses.house_number', pd?.house ?? -1)
           .eq('locale', locale)
           .eq('is_active', true);
-
-       debugPrint('DEBUG rows.length = ${rows.length}');
       if (rows.isEmpty) {
         // Fallback: Supabase'de içerik yoksa eski AI akışına düş
         final r = await AstroService.generatePlanetReport(
@@ -300,11 +294,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
   }
 
   /// Translates a backend sign name (always Turkish) to active locale.
-  String _translateSign(String sign) {
-    final key = _signKeys[sign];
-    if (key == null) return sign;
-    return t(context, key);
-  }
+  String _translateSign(String sign) => sign;
 
   String? _getIconForTitle(String title) {
     final t = title.toLowerCase();

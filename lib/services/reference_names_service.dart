@@ -9,11 +9,12 @@ class ReferenceNamesService extends ChangeNotifier {
   ReferenceNamesService(this._languageProvider) {
     _instance = this;
     _languageProvider.addListener(_onLanguageChanged);
-    unawaited(_load(_languageProvider.locale.languageCode));
+    _loadFuture = _load(_languageProvider.locale.languageCode);
   }
 
   final LanguageProvider _languageProvider;
   static ReferenceNamesService? _instance;
+  Future<void>? _loadFuture;
   final Map<int, String> _planets = {};
   final Map<int, String> _aspects = {};
   final Map<int, String> _houses = {};
@@ -39,12 +40,28 @@ class ReferenceNamesService extends ChangeNotifier {
     return value;
   }
 
-  Future<void> loadLocale(String locale) => _load(locale);
+  /// Servis henüz oluşmadıysa (lazy provider) kısa süre bekler.
+  static Future<ReferenceNamesService> waitForInstance() async {
+    for (var i = 0; i < 50; i++) {
+      final value = _instance;
+      if (value != null) return value;
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+    return instance; // 5 sn sonra hâlâ yoksa net hata fırlatır
+  }
+
+  Future<void> loadLocale(String locale) => _loadFuture = _load(locale);
+
+  /// Cache hazır olana kadar bekler. _load hataları yutuyor, throw etmez.
+  Future<void> ensureLoaded() async {
+    final f = _loadFuture;
+    if (f != null) await f;
+  }
 
   void _onLanguageChanged() {
     final locale = _languageProvider.locale.languageCode;
     if (locale != _loadedLocale && !_loading) {
-      unawaited(_load(locale));
+      _loadFuture = _load(locale);
     }
   }
 
@@ -53,10 +70,10 @@ class ReferenceNamesService extends ChangeNotifier {
     try {
       final client = Supabase.instance.client;
       final results = await Future.wait<List<Map<String, dynamic>>>([
-        _loadTable(client, 'celestial_body_translations', 'celestial_body_id', locale),
-        _loadTable(client, 'aspect_type_translations', 'aspect_type_id', locale),
-        _loadTable(client, 'astrological_house_translations', 'astrological_house_id', locale),
-        _loadTable(client, 'zodiac_sign_translations', 'zodiac_sign_id', locale),
+        _loadTable(client, 'celestial_body_translations', locale),
+        _loadTable(client, 'aspect_type_translations', locale),
+        _loadTable(client, 'astrological_house_translations', locale),
+        _loadTable(client, 'zodiac_sign_translations', locale),
       ]);
 
       _replace(_planets, results[0]);
@@ -76,7 +93,6 @@ class ReferenceNamesService extends ChangeNotifier {
   Future<List<Map<String, dynamic>>> _loadTable(
     SupabaseClient client,
     String table,
-    String idColumn,
     String locale,
   ) async {
     final localized = await client
@@ -111,13 +127,10 @@ class ReferenceNamesService extends ChangeNotifier {
 
   int? _id(Map<String, dynamic> row) {
     for (final key in [
-      'celestial_body_id',
-      'aspect_type_id',
-      'astrological_house_id',
-      'zodiac_sign_id',
       'body_id',
+      'aspect_type_id',
       'house_id',
-      'id',
+      'sign_id',
     ]) {
       final value = row[key];
       if (value is num) return value.toInt();

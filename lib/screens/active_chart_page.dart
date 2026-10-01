@@ -77,8 +77,18 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
     try {
       await provider.pendingProfileSetup!();
       provider.pendingProfileSetup = null;
-      // setActive() bu closure'ın içinde çağrılıyor; bu da activeProfileId'yi
-      // değiştirip didChangeDependencies'i gerçek profileId ile tekrar tetikler.
+      if (!mounted) return;
+      final newId = provider.activeProfileId;
+      if (newId != null) {
+        // didChangeDependencies'e güvenme: yüklemeyi burada açıkça başlat.
+        _requestedProfileId = newId;
+        await _load(newId);
+      } else {
+        setState(() {
+          _loadingProfileId = null;
+          _error = 'onboarding.chart_save_failed';
+        });
+      }
     } catch (e, st) {
       debugPrint('Pending setup error: $e\n$st');
       if (!mounted) return;
@@ -104,7 +114,9 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
         _loadedProfileId = profileId;
         _loadingProfileId = null;
       });
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('ActiveChartPage load failed: ${e.runtimeType}: $e');
+      debugPrintStack(stackTrace: st);
       if (!mounted) return;
       setState(() {
         _loadingProfileId = null;

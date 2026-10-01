@@ -7,6 +7,8 @@ class ChartRepository {
   static Future<({NatalChartResponse chart, String name})> load(
     String profileId,
   ) async {
+    final names = await ReferenceNamesService.waitForInstance();
+    await names.ensureLoaded();
     final client = Supabase.instance.client;
     final aspectAngles = {
       for (final entry in RefIds.aspectByAngle.entries) entry.value: entry.key,
@@ -48,8 +50,6 @@ class ChartRepository {
     final houseRows = List<Map<String, dynamic>>.from(results[1] as List);
     final placementRows = List<Map<String, dynamic>>.from(results[2] as List);
     final aspectRows = List<Map<String, dynamic>>.from(results[3] as List);
-    final names = ReferenceNamesService.instance;
-    await names.loadLocale(names.localeCode);
 
     final houses = <String, HouseData>{};
     for (final row in houseRows) {
@@ -107,10 +107,10 @@ class ChartRepository {
     }
 
     final elementDistribution = <String, int>{
-      'Ateş': 0,
-      'Toprak': 0,
-      'Hava': 0,
-      'Su': 0,
+      'fire': 0,
+      'earth': 0,
+      'air': 0,
+      'water': 0,
     };
     for (final planet in planets.values) {
       final element = _elementForSign(planet.signIndex);
@@ -195,9 +195,9 @@ class ChartRepository {
   }
 
   static String _elementForSign(int signIndex) {
-    if ([0, 4, 8].contains(signIndex)) return 'Ateş';
-    if ([1, 5, 9].contains(signIndex)) return 'Toprak';
-    if ([2, 6, 10].contains(signIndex)) return 'Hava';
-    return 'Su';
+    if ([0, 4, 8].contains(signIndex)) return 'fire';
+    if ([1, 5, 9].contains(signIndex)) return 'earth';
+    if ([2, 6, 10].contains(signIndex)) return 'air';
+    return 'water';
   }
 }
