@@ -24,8 +24,8 @@ class OnboardingBirthtimePage extends StatefulWidget {
   }
 
   class _OnboardingBirthtimePageState extends State<OnboardingBirthtimePage> {
-      late DateTime _selectedTime;
-      bool _unknown = false;
+    late DateTime _selectedTime;
+    late bool _unknown = !widget.data.birthTimeKnown;
 
     @override
     void initState() {
