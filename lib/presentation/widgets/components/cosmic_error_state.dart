@@ -81,8 +81,8 @@ class CosmicErrorState extends StatelessWidget {
             if (onRetry != null) ...[
               SizedBox(height: compact ? AppSpacing.md : AppSpacing.lg),
               // ── Retry button ──────────────────────────────────────────
-              SizedBox(
-                width: compact ? 160 : 220,
+              ConstrainedBox(
+                constraints: BoxConstraints(minWidth: compact ? 160 : 220),
                 child: CosmicCtaButton(
                   label: retryLabel,
                   onTap: onRetry,

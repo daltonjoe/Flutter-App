@@ -146,6 +146,7 @@ class ChartRepository {
       status: 'success',
       requestId: profileId,
       input: ChartInput(
+        birthTimeKnown: birthTimeKnown,
         birthDate: birthDate,
         birthTimeLocal: birthTimeKnown ? birthTime : '',
         // The persisted profile stores local birth time only.

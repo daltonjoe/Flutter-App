@@ -107,8 +107,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     final summary = widget.chartData.summary;
     final planets = widget.chartData.planets ?? {};
     final angles = widget.chartData.angles;
-    final birthTimeKnown =
-        widget.chartData.input?.birthTimeLocal.isNotEmpty == true;
+    final birthTimeKnown = widget.chartData.input?.birthTimeKnown == true;
     final names = context.watch<ReferenceNamesService>();
 
     return Scaffold(
@@ -599,7 +598,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                 const SizedBox(width: 8),
 
                 // House badge
-                if (widget.chartData.input?.birthTimeLocal.isNotEmpty == true)
+                              if (widget.chartData.input?.birthTimeKnown == true)
                   Container(
                   width: 42,
                   height: 42,

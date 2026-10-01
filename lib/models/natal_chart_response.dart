@@ -86,12 +86,14 @@ class ChartInput {
   final String birthTimeLocal;
   final String birthTimeUtc;
   final double julianDay;
+  final bool birthTimeKnown;
 
   ChartInput({
     required this.birthDate,
     required this.birthTimeLocal,
     required this.birthTimeUtc,
     required this.julianDay,
+    this.birthTimeKnown = true,
   });
 
   factory ChartInput.fromJson(Map<String, dynamic> json) => ChartInput(
