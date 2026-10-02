@@ -161,6 +161,13 @@
 "onboarding.link_account.google_button": "Google ile devam et",
 "onboarding.link_account.apple_button": "Apple ile devam et",
 
+  "onboarding.calculating.title": "Göğün okunuyor…",
+  "onboarding.first_result.title": "İlk bakış",
+  "onboarding.first_result.sun": "Güneş",
+  "onboarding.first_result.moon": "Ay",
+  "onboarding.first_result.rising": "Yükselen",
+  "onboarding.first_result.time_hint": "Ay ve Yükselen burcunu açmak için doğum saatini ekle.",
+
   "onboarding.name.label": "İsim",
   "onboarding.name.hint": "İsminizi girin",
   "onboarding.birthtime.title": "Saat kaçta doğdunuz?",

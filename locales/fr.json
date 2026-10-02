@@ -166,6 +166,13 @@
 
   "onboarding.language.continue": "Continuer en français",
 
+  "onboarding.calculating.title": "Lecture de ton ciel…",
+  "onboarding.first_result.title": "Ton premier aperçu",
+  "onboarding.first_result.sun": "Soleil",
+  "onboarding.first_result.moon": "Lune",
+  "onboarding.first_result.rising": "Ascendant",
+  "onboarding.first_result.time_hint": "Ajoute ton heure de naissance pour débloquer ta Lune et ton Ascendant.",
+
   "onboarding.name.label": "Nom",
   "onboarding.name.hint": "Entrez votre nom",
   "onboarding.birthtime.title": "À quelle heure êtes-vous né(e) ?",

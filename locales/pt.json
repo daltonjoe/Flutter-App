@@ -164,6 +164,13 @@
 
   "onboarding.language.continue": "Continuar em português",
 
+  "onboarding.calculating.title": "Lendo o seu céu…",
+  "onboarding.first_result.title": "Seu primeiro olhar",
+  "onboarding.first_result.sun": "Sol",
+  "onboarding.first_result.moon": "Lua",
+  "onboarding.first_result.rising": "Ascendente",
+  "onboarding.first_result.time_hint": "Adicione sua hora de nascimento para liberar sua Lua e seu Ascendente.",
+
   "onboarding.name.label": "Nome",
   "onboarding.name.hint": "Digite seu nome",
   "onboarding.birthtime.title": "A que horas você nasceu?",

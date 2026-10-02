@@ -145,6 +145,13 @@
 
   "onboarding.language.continue": "Continue with English",
 
+  "onboarding.calculating.title": "Reading your sky…",
+  "onboarding.first_result.title": "Your first look",
+  "onboarding.first_result.sun": "Sun",
+  "onboarding.first_result.moon": "Moon",
+  "onboarding.first_result.rising": "Rising",
+  "onboarding.first_result.time_hint": "Add your birth time to unlock your Moon and Rising sign.",
+
   "onboarding.name.label": "Name",
   "onboarding.name.hint": "Enter your name",
   "onboarding.birthtime.title": "What time were you born?",
