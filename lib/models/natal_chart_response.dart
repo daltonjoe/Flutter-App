@@ -35,12 +35,15 @@ class NatalChartResponse {
   });
 
   bool get isSuccess => status == 'success';
+    bool get hasBirthTime => planets?.values.any((p) => p.house > 0) ?? true;
 
   Map<String, dynamic> toChartPayload() { 
     return { 
+      'birth_time_known': hasBirthTime,
       'planets': planets?.map((k, v) => MapEntry(k, { 
         'sign': v.sign, 'degree_in_sign': v.degreeInSign, 
-        'house_number': v.houseNumber, 'retrograde': v.retrograde, 
+           if (v.houseNumber > 0) 'house_number': v.houseNumber,
+        'retrograde': v.retrograde,
       })) ?? {}, 
       'aspects': aspects?.map((a) => {'planet1': a.planet1, 
         'aspect': a.aspect, 'planet2': a.planet2, 

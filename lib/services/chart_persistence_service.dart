@@ -20,14 +20,15 @@ class ChartPersistenceService {
     final sun = planets?['Sun'];
     final moon = planets?['Moon'];
     final firstHouse = houses?['house_1'];
-    final mcLongitude = _mcLongitude(chart.angles);
+    final mcLongitude =
+        data.birthTimeKnown ? _mcLongitude(chart.angles) : null;
     if (data.name == null ||
         data.birthDate == null ||
         data.birthTime == null ||
         data.city == null ||
         sun == null ||
         moon == null ||
-        firstHouse == null) {
+        (data.birthTimeKnown && firstHouse == null)) {
       throw Exception('MISSING_CHART_DATA');
     }
 
@@ -47,7 +48,8 @@ class ChartPersistenceService {
       'locale': locale,
       'sun_sign_id': RefIds.signId(sun.signIndex),
       'moon_sign_id': RefIds.signId(moon.signIndex),
-      'ascendant_sign_id': RefIds.signId(firstHouse.signIndex),
+      'ascendant_sign_id':
+          data.birthTimeKnown ? RefIds.signId(firstHouse!.signIndex) : null,
       'mc_degree': mcLongitude,
       'mc_sign_id': mcLongitude == null
           ? null
@@ -56,19 +58,21 @@ class ChartPersistenceService {
 
     final profileId = profile['id'] as String;
     try {
-      final houseRows = houses!.values
-          .map(
-            (house) => {
-              'profile_id': profileId,
-              'house_id': RefIds.houseId(house.houseNumber),
-              'cusp_degree': house.longitude,
-              'sign_id': RefIds.signId(house.signIndex),
-            },
-          )
-          .toList();
-      await client
-          .from('user_chart_houses')
-          .upsert(houseRows, onConflict: 'profile_id,house_id');
+      if (data.birthTimeKnown) {
+        final houseRows = houses!.values
+            .map(
+              (house) => {
+                'profile_id': profileId,
+                'house_id': RefIds.houseId(house.houseNumber),
+                'cusp_degree': house.longitude,
+                'sign_id': RefIds.signId(house.signIndex),
+              },
+            )
+            .toList();
+        await client
+            .from('user_chart_houses')
+            .upsert(houseRows, onConflict: 'profile_id,house_id');
+      }
 
       final placementRows = <Map<String, dynamic>>[];
       for (final entry in planets!.entries) {
@@ -82,7 +86,8 @@ class ChartPersistenceService {
           'profile_id': profileId,
           'planet_id': planetId,
           'sign_id': RefIds.signId(planet.signIndex),
-          'house_id': RefIds.houseId(planet.house),
+          'house_id':
+              data.birthTimeKnown ? RefIds.houseId(planet.house) : null,
           'longitude_degree': planet.longitude,
           'latitude_degree': planet.latitude,
           'retrograde': planet.retrograde,

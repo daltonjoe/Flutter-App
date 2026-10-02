@@ -100,7 +100,13 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
                     onSelected: _select,
                 ),
                 ),
-                CosmicCtaButton(label: t(context, 'common.next'), onTap: widget.onNext),
+                CosmicCtaButton(
+                  label: t(context, 'common.next'),
+                  onTap: () {
+                    widget.data.gender ??= 'prefer_not_to_say';
+                    widget.onNext();
+                  },
+                ),
                 const SizedBox(height: 24),
               ],
             ),

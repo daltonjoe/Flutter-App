@@ -47,7 +47,10 @@ class ChartRepository {
       aspectsFuture,
     ]);
     final profile = Map<String, dynamic>.from(results[0] as Map);
-    final houseRows = List<Map<String, dynamic>>.from(results[1] as List);
+    final birthTimeKnown = profile['birth_time_known'] != false;
+    final houseRows = birthTimeKnown
+        ? List<Map<String, dynamic>>.from(results[1] as List)
+        : <Map<String, dynamic>>[];
     final placementRows = List<Map<String, dynamic>>.from(results[2] as List);
     final aspectRows = List<Map<String, dynamic>>.from(results[3] as List);
 
@@ -73,7 +76,7 @@ class ChartRepository {
       if (planetName == null) continue;
       final longitude = _double(row['longitude_degree']);
       final signIndex = _signIndex(row['sign_id']);
-      final house = _int(row['house_id']);
+      final house = birthTimeKnown ? _int(row['house_id']) : 0;
       planets[planetName] = PlanetData(
         sign: names.sign(RefIds.signId(signIndex)),
         signIndex: signIndex,
@@ -127,7 +130,6 @@ class ChartRepository {
     final latitude = _double(profile['latitude']);
     final longitude = _double(profile['longitude']);
     final timezone = profile['timezone']?.toString() ?? '';
-    final birthTimeKnown = profile['birth_time_known'] != false;
     final firstHouse = houses['house_1'];
     final mcDegree = profile['mc_degree'] == null
         ? null
@@ -164,11 +166,11 @@ class ChartRepository {
       summary: ChartSummary(
         sunSign: names.sign(RefIds.signId(_signIndex(profile['sun_sign_id']))),
         moonSign: names.sign(RefIds.signId(_signIndex(profile['moon_sign_id']))),
-        ascendantSign: names.sign(
-          RefIds.signId(
-          _signIndex(profile['ascendant_sign_id']),
-          ),
-        ),
+        ascendantSign: profile['ascendant_sign_id'] == null
+            ? ''
+            : names.sign(
+                RefIds.signId(_signIndex(profile['ascendant_sign_id'])),
+              ),
         elementDistribution: elementDistribution,
         retrogradePlanets: retrogradePlanets,
       ),

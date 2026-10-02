@@ -110,29 +110,17 @@ class _OnboardingRelationshipPageState
       locale: locale,
       activeProfileProvider: activeProfileProvider,
     );
-
-    if (!mounted) return;
+  if (!mounted) return;
     setState(() => _isLoading = false);
-
-    final currentUser = Supabase.instance.client.auth.currentUser;
-    final alreadyLinked =
-        currentUser != null &&
-        currentUser.email != null &&
-        currentUser.email!.isNotEmpty;
-
-    if (!widget.isFirstProfile || alreadyLinked) {
-      activeProfileProvider.pendingProfileSetup = setupFactory;
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-      return;
-    }
 
     await Navigator.pushNamed(
       context,
-      '/onboarding/link-account',
-      arguments: setupFactory,
+      '/onboarding/calculating',
+      arguments: {
+        'setupFactory': setupFactory,
+        'isFirstProfile': widget.isFirstProfile,
+      },
     );
-
-    if (!mounted) return;
   }
 
   Future<void> _generateAndSaveChart({

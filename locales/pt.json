@@ -136,6 +136,9 @@
 "onboarding.link_account.apple_button": "Continuar com a Apple",
 
 
+   "planet_report.time_unknown":"Adicione sua hora de nascimento para liberar a leitura por casa deste planeta.",
+
+
   "onboarding.chart_save_failed": "Não foi possível salvar seu mapa astral. Tente novamente.",
   "onboarding.link_account.title": "Salvar sua conta",
   "onboarding.link_account.description": "Para evitar perder seus dados, você pode salvar sua conta usando seu e-mail. Você também pode pular esta etapa por enquanto.",

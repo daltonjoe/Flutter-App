@@ -16,6 +16,8 @@ import 'screens/active_chart_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/supabase_config.dart';
 import 'screens/onboarding/onboarding_link_account_page.dart';
+import 'screens/onboarding/onboarding_calculating_page.dart';
+import 'screens/onboarding/onboarding_first_result_page.dart';
 
 
 void main() async {
@@ -112,10 +114,25 @@ class SoulBoundApp extends StatelessWidget {
         if (settings.name == '/profiles') {
         return MaterialPageRoute(builder: (_) => const ProfileSwitcherPage());
         }
-        if (settings.name == '/onboarding/link-account') {
-          final setupFactory = settings.arguments as Future<void> Function();
+  if (settings.name == '/onboarding/calculating') {
+          final a = settings.arguments as Map<String, dynamic>;
           return MaterialPageRoute(
-            builder: (_) => OnboardingLinkAccountPage(setupFactory: setupFactory),
+            builder: (_) => OnboardingCalculatingPage(
+              setupFactory: a['setupFactory'] as Future<void> Function(),
+              isFirstProfile: a['isFirstProfile'] as bool,
+            ),
+          );
+        }
+        if (settings.name == '/onboarding/first-result') {
+          return MaterialPageRoute(
+            builder: (_) => OnboardingFirstResultPage(
+              isFirstProfile: settings.arguments as bool? ?? false,
+            ),
+          );
+        }
+        if (settings.name == '/onboarding/link-account') {
+          return MaterialPageRoute(
+            builder: (_) => const OnboardingLinkAccountPage(),
           );
         }
         if (settings.name == '/home') {

@@ -182,9 +182,15 @@
     "onboarding.link_account.save_button":  "Save",
     "onboarding.link_account.or_divider":  "or",
     "onboarding.link_account.google_button":  "Continue with Google",
+
+    
+   "planet_report.time_unknown":"Aggiungi l'ora di nascita per sbloccare la lettura per casa di questo pianeta.",
+
     "onboarding.link_account.apple_button":  "Continue with Apple",
     "onboarding.name.subtitle":  "Tell us about yourself so that we can make a more personalised prediction.",
     "onboarding.birthdate.subtitle":  "Date is important for determining your sun sign, numerology and compatibility.",
     "onboarding.birthtime.subtitle":  "Time is important for determining your houses, rising sign, and exact moon position.",
     "onboarding.gender.subtitle":  "It will reveal the balance of your masculine and feminine energy."
+
+    
 }

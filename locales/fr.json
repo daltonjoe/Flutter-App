@@ -135,6 +135,8 @@
   "onboarding.link_account.email_sent": "Un e-mail de vérification a été envoyé. Veuillez vérifier votre boîte de réception.",
   "onboarding.link_account.rate_limit_error": "Trop de tentatives. Veuillez réessayer dans quelques minutes.",
 
+   "planet_report.time_unknown":"Ajoute ton heure de naissance pour débloquer la lecture par maison de cette planète.",
+
 
 "onboarding.link_account.or_divider": "ou",
 "onboarding.link_account.google_button": "Continuer avec Google",

@@ -77,6 +77,10 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
     final locale = Provider.of<LanguageProvider>(context, listen: false)
         .locale.languageCode;
     final pd = widget.chartData.planets?[widget.planetName];
+    if ((pd?.house ?? 0) <= 0) {
+      setState(() { _isLoading = false; });
+      return;
+    }
 
     try {
       final signCode = _signCodeOf(pd);
@@ -214,7 +218,8 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
                         const SizedBox(height: 4),
                         Text(
                           // ── FIX: use translatedSign ───────────────
-                          '$translatedSign  ·  ${t(context, 'planet_report.house', args: {'number': pd.house.toString()})}'
+                          '$translatedSign'
+                          '${pd.house > 0 ? '  ·  ${t(context, 'planet_report.house', args: {'number': pd.house.toString()})}' : ''}'
                           '${pd.retrograde ? '  ·  ${t(context, 'planet_report.retrograde')}' : ''}',
                           style: const TextStyle(
                             color: AppTheme.textSecondary,
@@ -243,7 +248,13 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
 
           // Report
                     // Report
-          if (_isFallback)
+  if (pd != null && pd.house <= 0)
+            Text(
+              t(context, 'planet_report.time_unknown'),
+              style: const TextStyle(
+                  color: AppTheme.textSecondary, fontSize: 14, height: 1.5),
+            )
+          else if (_isFallback)
             ..._renderModernReportText(_report!, color)
           else
             ..._renderModernReport(color),

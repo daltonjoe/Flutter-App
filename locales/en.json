@@ -183,6 +183,7 @@
   "onboarding.city.title" : "Where were you born?", 
   "onboarding.city.hint": "Search your city", 
   "onboarding.gender.title":"How do you identify?", 
+  "planet_report.time_unknown":"Add your birth time to unlock the house interpretation of this planet.",
 
   "onboarding.gender.male": "Male",
   "onboarding.gender.female": "Female",

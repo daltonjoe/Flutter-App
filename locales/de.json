@@ -181,6 +181,8 @@
   "account_deletion.error": "Dein Konto konnte nicht gelöscht werden.",
   "account_deletion.loading": "Dein Konto wird gelöscht...",
 
+  "planet_report.time_unknown":"Füge deine Geburtszeit hinzu, um die Häuser-Deutung dieses Planeten freizuschalten.",
+
   "onboarding.city.title": "Wo wurden Sie geboren?",
   "onboarding.city.hint": "Suchen Sie Ihre Stadt",
   "onboarding.gender.title": "Wie identifizieren Sie sich?",

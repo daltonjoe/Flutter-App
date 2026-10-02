@@ -3,12 +3,11 @@ import 'package:provider/provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../services/account_linking_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../providers/active_profile_provider.dart';
+
 import 'dart:async';
 
 class OnboardingLinkAccountPage extends StatefulWidget {
-  const OnboardingLinkAccountPage({super.key, required this.setupFactory});
-  final Future<void> Function() setupFactory;
+const OnboardingLinkAccountPage({super.key});
 
   @override
   State<OnboardingLinkAccountPage> createState() =>
@@ -28,10 +27,10 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
     super.initState();
     // Google/Apple OAuth tarayıcı akışı dönünce (deep-link) buradan yakalanır.
     _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((state) {
-      if (!mounted || _isSubmitting) return;
+          if (!mounted) return;
       final identities = state.session?.user.identities ?? [];
       final hasOAuth = identities.any((i) => i.provider != 'anonymous');
-      if (hasOAuth) _goHomeWithPendingSetup();
+      _goHome();
     });
   }
 
@@ -43,15 +42,12 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
     super.dispose();
   }
 
-  void _goHomeWithPendingSetup() {
-    context.read<ActiveProfileProvider>().pendingProfileSetup =
-        widget.setupFactory;
-    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-  }
-
-  Future<void> _goHome() async {
-    _goHomeWithPendingSetup();
-  }
+  bool _navigated = false;
+    void _goHome() {
+      if (_navigated || !mounted) return;
+      _navigated = true;
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    }
 
   Future<void> _onSave() async {
     if (!_formKey.currentState!.validate()) return;
@@ -89,7 +85,7 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
       }
     }
 
-    _goHomeWithPendingSetup();
+    _goHome();
   }
 
   Future<void> _onOAuth(Future<void> Function() linkFn) async {
