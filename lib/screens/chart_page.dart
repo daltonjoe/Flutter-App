@@ -432,16 +432,21 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
       widget.chartData.planets?['Sun']?.signIndex,
       summary?.sunSign,
     );
-    final moonSign = _resolvedSign(
-      names,
-      widget.chartData.planets?['Moon']?.signIndex,
-      summary?.moonSign,
-    );
-    final ascSign = _resolvedSign(
-      names,
-      widget.chartData.houses?['house_1']?.signIndex,
-      summary?.ascendantSign,
-    );
+    final timeKnown = widget.chartData.input?.birthTimeKnown == true;
+    final moonSign = timeKnown
+        ? _resolvedSign(
+            names,
+            widget.chartData.planets?['Moon']?.signIndex,
+            summary?.moonSign,
+          )
+        : '-';
+    final ascSign = timeKnown
+        ? _resolvedSign(
+            names,
+            widget.chartData.houses?['house_1']?.signIndex,
+            summary?.ascendantSign,
+          )
+        : '-';
     return Row(
       children: [
         _trioItem(t(context, 'chart.sun'), sunSign, '☀️'),
