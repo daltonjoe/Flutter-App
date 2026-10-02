@@ -146,6 +146,13 @@
 
   "onboarding.language.continue": "Auf Deutsch fortfahren",
 
+  "onboarding.calculating.title": "Dein Himmel wird gelesen…",
+  "onboarding.first_result.title": "Dein erster Blick",
+  "onboarding.first_result.sun": "Sonne",
+  "onboarding.first_result.moon": "Mond",
+  "onboarding.first_result.rising": "Aszendent",
+  "onboarding.first_result.time_hint": "Füge deine Geburtszeit hinzu, um Mond- und Aszendentenzeichen freizuschalten.",
+
   "onboarding.name.label": "Name",
   "onboarding.name.hint": "Geben Sie Ihren Namen ein",
   "onboarding.birthtime.title": "Um wie viel Uhr wurden Sie geboren?",

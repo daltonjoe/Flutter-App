@@ -166,6 +166,13 @@
 
   "onboarding.language.continue": "Continuar en español",
 
+  "onboarding.calculating.title": "Leyendo tu cielo…",
+  "onboarding.first_result.title": "Tu primer vistazo",
+  "onboarding.first_result.sun": "Sol",
+  "onboarding.first_result.moon": "Luna",
+  "onboarding.first_result.rising": "Ascendente",
+  "onboarding.first_result.time_hint": "Añade tu hora de nacimiento para desbloquear tu Luna y tu Ascendente.",
+
   "onboarding.name.label": "Nombre",
   "onboarding.name.hint": "Introduce tu nombre",
   "onboarding.birthtime.title": "¿A qué hora naciste?",
