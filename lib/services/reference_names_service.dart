@@ -19,8 +19,9 @@ class ReferenceNamesService extends ChangeNotifier {
   final Map<int, String> _aspects = {};
   final Map<int, String> _houses = {};
   final Map<int, String> _signs = {};
-  String? _loadedLocale;
-  bool _loading = false;
+String? _loadedLocale;
+  bool _retried = false;
+
 
   String planet(int id) => _planets[id] ?? id.toString();
 
@@ -59,14 +60,14 @@ class ReferenceNamesService extends ChangeNotifier {
   }
 
   void _onLanguageChanged() {
-    final locale = _languageProvider.locale.languageCode;
-    if (locale != _loadedLocale && !_loading) {
+ final locale = _languageProvider.locale.languageCode;
+    if (locale != _loadedLocale) {
       _loadFuture = _load(locale);
     }
   }
 
   Future<void> _load(String locale) async {
-    _loading = true;
+   
     try {
       final client = Supabase.instance.client;
       final results = await Future.wait<List<Map<String, dynamic>>>([
@@ -75,18 +76,25 @@ class ReferenceNamesService extends ChangeNotifier {
         _loadTable(client, 'astrological_house_translations', locale),
         _loadTable(client, 'zodiac_sign_translations', locale),
       ]);
-
+         // Yükleme sürerken dil değiştiyse eski sonucu at; yenisi zaten yükleniyor.
+     if (locale != _languageProvider.locale.languageCode) return;
       _replace(_planets, results[0]);
       _replace(_aspects, results[1]);
       _replace(_houses, results[2]);
       _replace(_signs, results[3]);
       _loadedLocale = locale;
+      _retried = false;
       notifyListeners();
-    } catch (error, stackTrace) {
+  } catch (error, stackTrace) {
       debugPrint('Reference name translations failed for $locale: $error');
       debugPrintStack(stackTrace: stackTrace);
+      if (!_retried) {
+        _retried = true;
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          _loadFuture = _load(locale);
+        });
+      }
     } finally {
-      _loading = false;
     }
   }
 
@@ -126,7 +134,7 @@ class ReferenceNamesService extends ChangeNotifier {
   }
 
   int? _id(Map<String, dynamic> row) {
-    for (final key in [
+  for (final key in [
       'body_id',
       'aspect_type_id',
       'house_id',

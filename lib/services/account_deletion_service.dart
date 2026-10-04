@@ -13,7 +13,26 @@ class AccountDeletionService {
       throw Exception(error ?? 'Account deletion failed');
     }
 
-    await Supabase.instance.client.auth.signOut();
+    try {
+      await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
+    } catch (_) {}
     await Supabase.instance.client.auth.signInAnonymously();
+  }
+
+    /// Oturum sunucuda hâlâ geçerli mi? Silinmiş kullanıcıysa yerel oturumu
+  /// temizleyip yeni anonim oturum açar. Ağ hatasında dokunmaz.
+  static Future<void> ensureValidSession() async {
+    final auth = Supabase.instance.client.auth;
+    if (auth.currentSession == null) return;
+    try {
+      await auth.getUser();
+ } on AuthRetryableFetchException {
+      return; // ağ hatası: oturuma dokunma
+    } on AuthException {
+      try {
+        await auth.signOut(scope: SignOutScope.local);
+      } catch (_) {}
+      await auth.signInAnonymously();
+    }
   }
 }
