@@ -6,6 +6,7 @@ import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/reference_names_service.dart';
 import '../services/today_service.dart';
+import 'transit_detail_page.dart';
 
 class TodayPage extends StatefulWidget {
   const TodayPage({super.key});
@@ -236,9 +237,22 @@ class _TodayPageState extends State<TodayPage> {
                           ? Icons.north_east
                           : Icons.south_east,
                       size: 16,
-                      color: AppColors.textSecondary,
+     color: AppColors.textSecondary,
                     )
                   : null,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => TransitDetailPage(
+                   event: Map<String, dynamic>.from(e),
+                    locale: context.read<LanguageProvider>().locale.languageCode,
+                    title: _label(
+                      _id(e['transit_body_id']),
+                      _id(e['aspect_type_id']),
+                      _id(e['natal_body_id']),
+                    ),
+                  ),
+                ),
+              ),
             ),
         ],
         if (!known) ...[
@@ -266,10 +280,23 @@ class _TodayPageState extends State<TodayPage> {
     final color = avg > 0.7
         ? AppColors.tealSuccess
         : (avg < 0.3 ? AppColors.amberTransit : AppColors.textMuted);
+    final valenceKey = avg > 0.7
+        ? 'valence.power'
+        : (avg < 0.3 ? 'valence.pressure' : 'valence.neutral');
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Center(
-        child: _EnergyRing(value: avg, color: color),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _EnergyRing(value: avg, color: color),
+            const SizedBox(height: 6),
+            Text(
+              _t(valenceKey),
+              style: TextStyle(fontSize: 12, color: color),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -17,8 +17,6 @@ class ActiveChartPage extends StatefulWidget {
 }
 
 class _ActiveChartPageState extends State<ActiveChartPage> {
-  static const String _pendingSetupKey = 'pending-setup';
-
   String? _loadedProfileId;
   String? _loadingProfileId;
   String? _requestedProfileId;
@@ -31,17 +29,6 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
     super.didChangeDependencies();
     final provider = context.watch<ActiveProfileProvider>();
     final profileId = provider.activeProfileId;
-
-    // pendingProfileSetup kontrolü artık activeProfileId'den BAĞIMSIZ —
-    // ikinci+ profil eklerken activeProfileId zaten eski profile işaret
-    // ediyor olabilir, bu yüzden null kontrolünden ÖNCE bakılmalı.
-    if (provider.pendingProfileSetup != null) {
-      if (_requestedProfileId != _pendingSetupKey) {
-        _requestedProfileId = _pendingSetupKey;
-        _runPendingSetup(provider);
-      }
-      return;
-    }
 
     if (profileId == null) {
       if (!_redirectedToOnboarding) {
@@ -60,43 +47,11 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
     _redirectedToOnboarding = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-        '/onboarding',
-        (route) => false,
-      );
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pushNamedAndRemoveUntil('/onboarding', (route) => false);
     });
-  }
-
-  Future<void> _runPendingSetup(ActiveProfileProvider provider) async {
-    setState(() {
-      _loadingProfileId = _pendingSetupKey;
-      _error = null;
-      _result = null;
-      _loadedProfileId = null;
-    });
-    try {
-      await provider.pendingProfileSetup!();
-      provider.pendingProfileSetup = null;
-      if (!mounted) return;
-      final newId = provider.activeProfileId;
-      if (newId != null) {
-        // didChangeDependencies'e güvenme: yüklemeyi burada açıkça başlat.
-        _requestedProfileId = newId;
-        await _load(newId);
-      } else {
-        setState(() {
-          _loadingProfileId = null;
-          _error = 'onboarding.chart_save_failed';
-        });
-      }
-    } catch (e, st) {
-      debugPrint('Pending setup error: $e\n$st');
-      if (!mounted) return;
-      setState(() {
-        _loadingProfileId = null;
-        _error = 'onboarding.chart_save_failed';
-      });
-    }
   }
 
   Future<void> _load(String profileId) async {
@@ -153,10 +108,7 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
 
   void _retry() {
     final provider = context.read<ActiveProfileProvider>();
-    if (provider.pendingProfileSetup != null) {
-      _requestedProfileId = null;
-      _runPendingSetup(provider);
-    } else if (provider.activeProfileId != null) {
+    if (provider.activeProfileId != null) {
       _load(provider.activeProfileId!);
     }
   }

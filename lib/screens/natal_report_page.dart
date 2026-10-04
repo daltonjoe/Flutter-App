@@ -208,6 +208,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
   Widget _buildPersonHero() {
     final summary = widget.chartData.summary;
     final location = widget.chartData.location;
+    final birthTimeKnown = widget.chartData.input?.birthTimeKnown == true;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -270,7 +271,8 @@ class _NatalReportPageState extends State<NatalReportPage> {
               children: [
                 // ── FIX: Translate sign names from backend (always TR) ─
                 _heroChip('☀️', _translateSign(summary.sunSign)),
-                _heroChip('🌙', _translateSign(summary.moonSign)),
+                if (birthTimeKnown)
+                  _heroChip('🌙', _translateSign(summary.moonSign)),
                 _heroChip('⬆️', _translateSign(summary.ascendantSign)),
               ],
             ),
@@ -317,16 +319,24 @@ class _NatalReportPageState extends State<NatalReportPage> {
   List<Widget> _renderModernReport(String report) {
     final sections = TextParser.parse(report);
     if (sections.isEmpty) return [];
+    final birthTimeKnown = widget.chartData.input?.birthTimeKnown == true;
 
-    return sections.map((section) {
-      return AnalysisSectionCard(
-        title: section.title,
-        content: section.content,
-        icon: _getIconForTitle(section.title),
-        bulletPoints: section.bulletPoints,
-        color: _getColorForTitle(section.title),
-      );
-    }).toList();
+    return sections
+        .where((section) {
+          final lower = section.title.toLowerCase();
+          final isMoon = lower.contains('ay') || lower.contains('moon');
+          return birthTimeKnown || !isMoon;
+        })
+        .map((section) {
+          return AnalysisSectionCard(
+            title: section.title,
+            content: section.content,
+            icon: _getIconForTitle(section.title),
+            bulletPoints: section.bulletPoints,
+            color: _getColorForTitle(section.title),
+          );
+        })
+        .toList();
   }
 
   Color? _getColorForTitle(String title) {

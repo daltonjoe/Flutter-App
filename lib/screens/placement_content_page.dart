@@ -17,11 +17,14 @@ class PlacementContentPage extends StatefulWidget {
 }
 
 class _PlacementContentPageState extends State<PlacementContentPage> {
-  static const _tabs = [
+  static const _allTabs = [
     ('sun', 'chart.sun'),
     ('moon', 'chart.moon'),
     ('ascendant', 'chart.ascendant'),
   ];
+
+  late final bool _birthTimeKnown;
+  late final List<(String, String)> _tabs;
 
   bool _loading = true;
   bool _error = false;
@@ -30,6 +33,10 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
   @override
   void initState() {
     super.initState();
+    _birthTimeKnown = widget.chartData.input?.birthTimeKnown == true;
+    _tabs = _allTabs
+        .where((t) => _birthTimeKnown || t.$1 != 'moon')
+        .toList();
     _load();
   }
 
@@ -38,12 +45,15 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
     final locale = context.read<LanguageProvider>().locale.languageCode;
     String code(int? i) => i == null ? '' : (RefIds.signCode(i) ?? '');
     try {
+      final placements = <String, String>{
+        'sun': code(c.planets?['Sun']?.signIndex),
+        'ascendant': code(c.houses?['house_1']?.signIndex),
+      };
+      if (_birthTimeKnown) {
+        placements['moon'] = code(c.planets?['Moon']?.signIndex);
+      }
       final r = await PlacementContentService.fetch(
-        placements: {
-          'sun': code(c.planets?['Sun']?.signIndex),
-          'moon': code(c.planets?['Moon']?.signIndex),
-          'ascendant': code(c.houses?['house_1']?.signIndex),
-        },
+        placements: placements,
         locale: locale,
       );
       if (!mounted) return;

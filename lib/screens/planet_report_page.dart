@@ -77,22 +77,28 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
     final locale = Provider.of<LanguageProvider>(context, listen: false)
         .locale.languageCode;
     final pd = widget.chartData.planets?[widget.planetName];
-    if ((pd?.house ?? 0) <= 0) {
+    final birthTimeKnown = widget.chartData.input?.birthTimeKnown == true;
+    final house = pd?.house ?? 0;
+
+    if (widget.planetName == 'Moon' && !birthTimeKnown) {
       setState(() { _isLoading = false; });
       return;
     }
 
     try {
       final signCode = _signCodeOf(pd);
-      final rows = await Supabase.instance.client
+      var query = Supabase.instance.client
           .from('placement_content')
           .select('title, content, strengths, challenges, '
               'celestial_bodies!inner(code), zodiac_signs!inner(code), '
               'astrological_houses!inner(house_number), '
               'content_themes(code, sort_order)')
           .eq('celestial_bodies.code', widget.planetName)
-          .eq('zodiac_signs.code', signCode)
-          .eq('astrological_houses.house_number', pd?.house ?? -1)
+          .eq('zodiac_signs.code', signCode);
+      if (birthTimeKnown && house > 0) {
+        query = query.eq('astrological_houses.house_number', house);
+      }
+      final rows = await query
           .eq('locale', locale)
           .eq('is_active', true);
       if (rows.isEmpty) {
