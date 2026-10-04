@@ -206,5 +206,9 @@
   "theme.career": "Kariyer",
   "theme.identity": "Kimlik",
   "theme.health": "Sağlık",
-  "today.offline": "Çevrimdışı – son güncelleme {time}"
+  "today.offline": "Çevrimdışı – son güncelleme {time}",
+  "transit.orb": "Orb",
+  "transit.applying": "Yaklaşıyor",
+  "transit.separating": "Uzaklaşıyor",
+  "transit.no_text": "Bu olay için henüz açıklama yok."
 }

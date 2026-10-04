@@ -206,5 +206,9 @@
   "theme.career": "Carriera",
   "theme.identity": "Identità",
   "theme.health": "Salute",
-  "today.offline": "Offline – ultimo aggiornamento {time}"
+  "today.offline": "Offline – ultimo aggiornamento {time}",
+  "transit.orb": "Orbe",
+  "transit.applying": "In avvicinamento",
+  "transit.separating": "In allontanamento",
+  "transit.no_text": "Nessuna descrizione per questo evento ancora."
 }

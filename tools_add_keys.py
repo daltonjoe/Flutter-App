@@ -23,6 +23,10 @@ KEYS = [
  ("theme.identity", "Kimlik", "Identity", "Identität", "Identité", "Identidad", "Identidade", "Identità"),
  ("theme.health", "Sağlık", "Health", "Gesundheit", "Santé", "Salud", "Saúde", "Salute"),
   ("today.offline", "Çevrimdışı – son güncelleme {time}", "Offline – last updated {time}", "Offline – zuletzt aktualisiert {time}", "Hors ligne – dernière mise à jour {time}", "Sin conexión – última actualización {time}", "Offline – última atualização {time}", "Offline – ultimo aggiornamento {time}"),
+   ("transit.orb", "Orb", "Orb", "Orbis", "Orbe", "Orbe", "Orbe", "Orbe"),
+ ("transit.applying", "Yaklaşıyor", "Applying", "Sich nähernd", "En approche", "Acercándose", "Aproximando-se", "In avvicinamento"),
+ ("transit.separating", "Uzaklaşıyor", "Separating", "Sich entfernend", "En éloignement", "Alejándose", "Afastando-se", "In allontanamento"),
+ ("transit.no_text", "Bu olay için henüz açıklama yok.", "No description for this event yet.", "Für dieses Ereignis gibt es noch keine Beschreibung.", "Pas encore de description pour cet événement.", "Aún no hay descripción para este evento.", "Ainda não há descrição para este evento.", "Nessuna descrizione per questo evento ancora."),
 ]
 
 def load(p):
