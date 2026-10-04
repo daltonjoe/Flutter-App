@@ -12,12 +12,13 @@ import 'services/reference_names_service.dart';
 import 'i18n/app_localizations.dart';
 import 'screens/onboarding/onboarding_flow_page.dart';
 import 'screens/profile_switcher_page.dart';
-import 'screens/active_chart_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/supabase_config.dart';
 import 'screens/onboarding/onboarding_link_account_page.dart';
 import 'screens/onboarding/onboarding_calculating_page.dart';
 import 'screens/onboarding/onboarding_first_result_page.dart';
+import 'screens/main_shell.dart';
+import 'services/account_deletion_service.dart';
 
 
 void main() async {
@@ -26,7 +27,6 @@ void main() async {
   final languageProvider = LanguageProvider();
   await languageProvider.loadSavedLocale();
   final activeProfileProvider = ActiveProfileProvider();
-  await activeProfileProvider.load();
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -41,13 +41,22 @@ void main() async {
     publishableKey: SupabaseConfig.anonKey,
   );
 
-   if (Supabase.instance.client.auth.currentSession == null) {
+  // Bayat (sunucuda silinmiş) oturumu temizle; initialize'dan SONRA olmalı.
+  try {
+    await AccountDeletionService.ensureValidSession();
+  } catch (e) {
+    debugPrint('ensureValidSession failed: $e');
+  }
+
+  if (Supabase.instance.client.auth.currentSession == null) {
     try {
       await Supabase.instance.client.auth.signInAnonymously();
     } catch (e) {
       debugPrint('Anonymous Supabase sign-in failed: $e');
     }
   }
+
+await activeProfileProvider.load();
   runApp(
     MultiProvider(
       providers: [
@@ -100,55 +109,55 @@ class SoulBoundApp extends StatelessWidget {
           ),
         );
       },
-      home: context.watch<ActiveProfileProvider>().activeProfileId != null
-          ? const ActiveChartPage()
+          home: context.watch<ActiveProfileProvider>().activeProfileId != null
+          ? const MainShell()
           : const OnboardingFlowPage(isFirstProfile: true),
-      onGenerateRoute: (settings) {
-        if (settings.name == '/onboarding') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          final isFirstProfile = args?['isFirstProfile'] as bool? ?? false;
-          return MaterialPageRoute(
-            builder: (_) => OnboardingFlowPage(isFirstProfile: isFirstProfile),
-          );
-        }
-        if (settings.name == '/profiles') {
-        return MaterialPageRoute(builder: (_) => const ProfileSwitcherPage());
-        }
-  if (settings.name == '/onboarding/calculating') {
-          final a = settings.arguments as Map<String, dynamic>;
-          return MaterialPageRoute(
-            builder: (_) => OnboardingCalculatingPage(
-              setupFactory: a['setupFactory'] as Future<void> Function(),
-              isFirstProfile: a['isFirstProfile'] as bool,
-            ),
-          );
-        }
-        if (settings.name == '/onboarding/first-result') {
-          return MaterialPageRoute(
-            builder: (_) => OnboardingFirstResultPage(
-              isFirstProfile: settings.arguments as bool? ?? false,
-            ),
-          );
-        }
-        if (settings.name == '/onboarding/link-account') {
-          return MaterialPageRoute(
-            builder: (_) => const OnboardingLinkAccountPage(),
-          );
-        }
-        if (settings.name == '/home') {
-          return MaterialPageRoute(builder: (_) => const ActiveChartPage());
-        }
-        if (settings.name == '/chart') {
-          final args = settings.arguments as Map<String, dynamic>;
-          return MaterialPageRoute(
-            builder: (_) => ChartPage(
-              chartData: args['chartData'] as NatalChartResponse,
-              userName: args['userName'] as String,
-            ),
-          );
-        }
-        return null;
-      },
+      onGenerateRoute: appOnGenerateRoute,
     );
   }
+}
+
+Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
+  if (settings.name == '/onboarding') {
+    final args = settings.arguments as Map<String, dynamic>?;
+final isFirstProfile = args?['isFirstProfile'] as bool? ?? true;
+    return MaterialPageRoute(
+      builder: (_) => OnboardingFlowPage(isFirstProfile: isFirstProfile),
+    );
+  }
+  if (settings.name == '/profiles') {
+    return MaterialPageRoute(builder: (_) => const ProfileSwitcherPage());
+  }
+  if (settings.name == '/onboarding/calculating') {
+    final a = settings.arguments as Map<String, dynamic>;
+    return MaterialPageRoute(
+      builder: (_) => OnboardingCalculatingPage(
+        setupFactory: a['setupFactory'] as Future<void> Function(),
+        isFirstProfile: a['isFirstProfile'] as bool,
+      ),
+    );
+  }
+  if (settings.name == '/onboarding/first-result') {
+    return MaterialPageRoute(
+      builder: (_) => OnboardingFirstResultPage(
+        isFirstProfile: settings.arguments as bool? ?? false,
+      ),
+    );
+  }
+  if (settings.name == '/onboarding/link-account') {
+    return MaterialPageRoute(builder: (_) => const OnboardingLinkAccountPage());
+  }
+  if (settings.name == '/home') {
+    return MaterialPageRoute(builder: (_) => const MainShell());
+  }
+  if (settings.name == '/chart') {
+    final args = settings.arguments as Map<String, dynamic>;
+    return MaterialPageRoute(
+      builder: (_) => ChartPage(
+        chartData: args['chartData'] as NatalChartResponse,
+        userName: args['userName'] as String,
+      ),
+    );
+  }
+  return null;
 }

@@ -135,10 +135,6 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                   ),
                 ),
                 actions: [
-                  IconButton(
-                    icon: const Icon(Icons.person_outline),
-                    onPressed: () => Navigator.pushNamed(context, '/profiles'),
-                  ),
                 ],
               ),
 
@@ -156,13 +152,23 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                       t(
                         context,
                         'chart.planets_count',
-                        args: {'count': planets.length.toString()},
+                                                args: {
+                          'count': planets.entries
+                              .where((e) => birthTimeKnown || e.key != 'Moon')
+                              .length
+                              .toString(),
+                        },
                       ),
                     ),
                     const SizedBox(height: 12),
 
                     // ── Gezegen kartları ───────────────────
-                    ...planets.entries.toList().asMap().entries.map((e) {
+                    ...planets.entries
+                        .where((e) => birthTimeKnown || e.key != 'Moon')
+                        .toList()
+                        .asMap()
+                        .entries
+                        .map((e) {
                       final i = e.key;
                       final key = e.value.key;
                       final data = e.value.value;

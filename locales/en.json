@@ -9,7 +9,6 @@
   "common.select": "Select",
   "common.cancel": "Cancel",
   "common.done": "Done",
-
   "loader.msg_1": "Calculating planet positions...",
   "loader.msg_2": "Reading your cosmic plan...",
   "loader.msg_3": "Analyzing planet aspects...",
@@ -17,12 +16,10 @@
   "loader.msg_5": "Generating personal insights...",
   "loader.msg_6": "Unlocking birth chart secrets...",
   "loader.msg_7": "Preparing the universe's message...",
-
   "forecast.result_title": "{period} Forecast",
   "forecast.unexpected_error": "Unexpected error.",
   "forecast.loading": "Preparing your forecast, this may take 15-30 seconds...",
   "forecast.analysis_header": "{period} Forecast Analysis",
-
   "forecast.title": "Forecast Analysis",
   "forecast.daily": "Daily",
   "forecast.daily_subtitle": "What awaits you today?",
@@ -36,21 +33,17 @@
   "forecast.select_period": "Select your personalized periodic analysis.",
   "forecast.which_period": "Which time period?",
   "forecast.personalized_notice": "Personalized analysis will be generated based on your chart.",
-
   "planet_report.house": "{number}. House",
   "planet_report.retrograde": "Retrograde ℞",
-
   "planet_report.title": "{name} Analysis",
   "planet_report.unexpected_error": "Unexpected error.",
   "planet_report.loading": "Preparing your planet report...",
-
   "natal_report.loading": "Analyzing your birth chart, this may take 15-30 seconds...",
   "natal_report.title": "{name}'s Analysis",
   "natal_report.refresh": "Refresh",
   "natal_report.unexpected_error": "An unexpected error occurred.",
   "natal_report.retry": "Try Again",
   "natal_report.footer_tagline": "Your Cosmic Guide",
-
   "create_profile.title": "Discover Your Destiny",
   "create_profile.subtitle": "How were the heavens aligned for you the moment you were born?",
   "create_profile.name_label": "FULL NAME",
@@ -74,7 +67,6 @@
   "create_profile.guidance_desc": "An accurate birth time directly enhances the precision of your rising sign and house placements.",
   "create_profile.security_footer": "Your data is encrypted and processed via Swiss Ephemeris and AI.",
   "create_profile.quick_cities": "Quick Cities",
-
   "chart.planets": "Planets",
   "chart.signs": "Signs",
   "chart.elements": "Elements",
@@ -91,9 +83,8 @@
   "chart.analysis_button": "Detailed Analysis",
   "chart.natal_report": "Natal Chart Analysis",
   "chart.planet_report": "Planet Analysis",
-   "chart.ascendant": "Ascendant",
-
-   "chart.sun": "Sun",
+  "chart.ascendant": "Ascendant",
+  "chart.sun": "Sun",
   "chart.moon": "Moon",
   "chart.mercury": "Mercury",
   "chart.venus": "Venus",
@@ -103,7 +94,6 @@
   "chart.uranus": "Uranus",
   "chart.neptune": "Neptune",
   "chart.pluto": "Pluto",
-
   "signs.aries": "Aries",
   "signs.taurus": "Taurus",
   "signs.gemini": "Gemini",
@@ -116,7 +106,6 @@
   "signs.capricorn": "Capricorn",
   "signs.aquarius": "Aquarius",
   "signs.pisces": "Pisces",
-
   "placement.title": "Detailed Interpretation",
   "placement.theme.love": "Love & Relationships",
   "placement.theme.career": "Career & Money",
@@ -125,11 +114,9 @@
   "placement.strengths": "Strengths",
   "placement.challenges": "Challenges",
   "placement.button": "View Detailed Interpretation",
-
   "placement.error": "There was a problem loading the content.",
   "placement.retry": "Try Again",
   "placement.empty": "No content is available for this placement yet.",
-
   "elements.fire": "Fire",
   "elements.earth": "Earth",
   "elements.air": "Air",
@@ -142,21 +129,18 @@
   "onboarding.birthtime.ask_relative": "I'll ask a relative",
   "onboarding.birthtime.skip": "Skip",
   "onboarding.birthtime.share_message": "Do you know my birth time?",
-
   "onboarding.language.continue": "Continue with English",
-
   "onboarding.calculating.title": "Reading your sky…",
   "onboarding.first_result.title": "Your first look",
   "onboarding.first_result.sun": "Sun",
   "onboarding.first_result.moon": "Moon",
   "onboarding.first_result.rising": "Rising",
   "onboarding.first_result.time_hint": "Add your birth time to unlock your Moon and Rising sign.",
-
   "onboarding.name.label": "Name",
   "onboarding.name.hint": "Enter your name",
   "onboarding.birthtime.title": "What time were you born?",
   "onboarding.birthtime.unknown": "I don't know",
-  "onboarding.relationship.title":"What's your relationship status?",
+  "onboarding.relationship.title": "What's your relationship status?",
   "onboarding.relationship.single": "Single",
   "onboarding.relationship.dating": "Dating",
   "onboarding.relationship.in_relationship": "In a relationship",
@@ -179,16 +163,13 @@
   "account_deletion.confirm": "Delete my account",
   "account_deletion.error": "Your account could not be deleted.",
   "account_deletion.loading": "Deleting your account...",
-
-  "onboarding.city.title" : "Where were you born?", 
-  "onboarding.city.hint": "Search your city", 
-  "onboarding.gender.title":"How do you identify?", 
-  "planet_report.time_unknown":"Add your birth time to unlock the house interpretation of this planet.",
-
+  "onboarding.city.title": "Where were you born?",
+  "onboarding.city.hint": "Search your city",
+  "onboarding.gender.title": "How do you identify?",
+  "planet_report.time_unknown": "Add your birth time to unlock the house interpretation of this planet.",
   "onboarding.gender.male": "Male",
   "onboarding.gender.female": "Female",
   "onboarding.gender.prefer_not_to_say": "Prefer not to say",
-
   "onboarding.chart_save_failed": "Your birth chart could not be saved. Please try again.",
   "onboarding.link_account.title": "Save Your Account",
   "onboarding.link_account.description": "To avoid losing your data, you can save your account with your email. You can also skip this step for now.",
@@ -199,14 +180,30 @@
   "onboarding.link_account.skip_button": "Not now, Skip",
   "onboarding.link_account.email_sent": "A verification email has been sent. Please check your inbox.",
   "onboarding.link_account.rate_limit_error": "Too many attempts. Please try again in a few minutes.",
-
   "onboarding.link_account.save_button": "Save",
-"onboarding.link_account.or_divider": "or",
-"onboarding.link_account.google_button": "Continue with Google",
-"onboarding.link_account.apple_button": "Continue with Apple",
-
-"onboarding.name.subtitle": "Tell us about yourself so that we can make a more personalised prediction.",
+  "onboarding.link_account.or_divider": "or",
+  "onboarding.link_account.google_button": "Continue with Google",
+  "onboarding.link_account.apple_button": "Continue with Apple",
+  "onboarding.name.subtitle": "Tell us about yourself so that we can make a more personalised prediction.",
   "onboarding.birthdate.subtitle": "Date is important for determining your sun sign, numerology and compatibility.",
   "onboarding.birthtime.subtitle": "Time is important for determining your houses, rising sign, and exact moon position.",
-  "onboarding.gender.subtitle": "It will reveal the balance of your masculine and feminine energy."
+  "onboarding.gender.subtitle": "It will reveal the balance of your masculine and feminine energy.",
+  "nav.today": "Today",
+  "nav.chart": "Chart",
+  "nav.profile": "Profile",
+  "today.title": "Today",
+  "today.empty": "No events today for this profile.",
+  "today.error": "Couldn't load Today.",
+  "today.retry": "Retry",
+  "today.events": "Today's events",
+  "today.unknown_time_hint": "Add your birth time to unlock Moon and Ascendant readings.",
+  "today.rarity": "This aspect is active in {pct}% of charts",
+  "valence.power": "Flow",
+  "valence.pressure": "Pressure",
+  "valence.trouble": "Caution",
+  "valence.neutral": "Neutral",
+  "theme.love": "Love",
+  "theme.career": "Career",
+  "theme.identity": "Identity",
+  "theme.health": "Health"
 }

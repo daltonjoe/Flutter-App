@@ -9,7 +9,6 @@
   "common.select": "Seç",
   "common.cancel": "İptal",
   "common.done": "Tamam",
-
   "loader.msg_1": "Gezegen pozisyonları hesaplanıyor...",
   "loader.msg_2": "Kozmik planın okunuyor...",
   "loader.msg_3": "Gezegen açıları analiz ediliyor...",
@@ -17,12 +16,10 @@
   "loader.msg_5": "Kişisel içgörün üretiliyor...",
   "loader.msg_6": "Doğum haritanın sırları çözülüyor...",
   "loader.msg_7": "Evrenin mesajı hazırlanıyor...",
-
   "forecast.result_title": "{period} Öngörü",
   "forecast.unexpected_error": "Beklenmeyen hata.",
   "forecast.loading": "Öngörünüz hazırlanıyor, bu işlem 15-30 saniye sürebilir...",
   "forecast.analysis_header": "{period} Öngörü Analizi",
-
   "forecast.title": "Öngörü Analizi",
   "forecast.daily": "Günlük",
   "forecast.daily_subtitle": "Bugün seni neler bekliyor?",
@@ -36,21 +33,17 @@
   "forecast.select_period": "Sana özel periyodik analizini seç.",
   "forecast.which_period": "Hangi zaman dilimi?",
   "forecast.personalized_notice": "Haritanı baz alarak kişisel analiz üretilecek.",
-
   "planet_report.house": "{number}. Ev",
   "planet_report.retrograde": "Retrograde ℞",
-
   "planet_report.title": "{name} Analizi",
   "planet_report.unexpected_error": "Beklenmeyen hata.",
   "planet_report.loading": "Gezegen raporu hazırlanıyor...",
-
   "natal_report.loading": "Doğum haritanız analiz ediliyor, bu işlem 15-30 saniye sürebilir...",
   "natal_report.title": "{name} Analizi",
   "natal_report.refresh": "Yenile",
   "natal_report.unexpected_error": "Beklenmeyen bir hata oluştu.",
   "natal_report.retry": "Tekrar Dene",
   "natal_report.footer_tagline": "Kozmik Rehberin Yanında",
-
   "create_profile.title": "Kaderinizi Keşfedin",
   "create_profile.subtitle": "Gökyüzü doğduğunuz anda sizin için nasıl hizalandı?",
   "create_profile.name_label": "AD SOYAD",
@@ -74,7 +67,6 @@
   "create_profile.guidance_desc": "Doğum saatinizin kesin olması, yükselen burç ve ev yerleşimlerinin doğruluğunu doğrudan artırır.",
   "create_profile.security_footer": "Verileriniz İsviçre efemerisleri ve yapay zeka ile şifreli işlenir.",
   "create_profile.quick_cities": "Hızlı Şehir Seçimi",
-
   "chart.planets": "Gezegenler",
   "chart.signs": "Burçlar",
   "chart.elements": "Elementler",
@@ -91,8 +83,7 @@
   "chart.analysis_button": "Detaylı Analiz",
   "chart.natal_report": "Doğum Haritası Analizi",
   "chart.planet_report": "Gezegen Analizi",
-   "chart.ascendant": "Yükselen",
-
+  "chart.ascendant": "Yükselen",
   "chart.sun": "Güneş",
   "chart.moon": "Ay",
   "chart.mercury": "Merkür",
@@ -103,7 +94,6 @@
   "chart.uranus": "Uranüs",
   "chart.neptune": "Neptün",
   "chart.pluto": "Plüton",
-
   "signs.aries": "Koç",
   "signs.taurus": "Boğa",
   "signs.gemini": "İkizler",
@@ -116,13 +106,11 @@
   "signs.capricorn": "Oğlak",
   "signs.aquarius": "Kova",
   "signs.pisces": "Balık",
-
   "elements.fire": "Ateş",
   "elements.earth": "Toprak",
   "elements.air": "Hava",
   "elements.water": "Su",
   "common.ok": "Tamam",
-
   "placement.title": "Detaylı Yorum",
   "placement.theme.love": "Aşk ve İlişkiler",
   "placement.theme.career": "Kariyer ve Para",
@@ -131,12 +119,10 @@
   "placement.strengths": "Güçlü Yönler",
   "placement.challenges": "Zorlayıcı Yönler",
   "placement.button": "Detaylı Yorumu Gör",
-
   "placement.error": "İçerik yüklenirken bir sorun oluştu.",
   "placement.retry": "Tekrar Dene",
   "placement.empty": "Bu yerleşim için henüz içerik bulunmuyor.",
-
-   "onboarding.chart_save_failed": "Doğum haritan kaydedilemedi, lütfen tekrar dene.",
+  "onboarding.chart_save_failed": "Doğum haritan kaydedilemedi, lütfen tekrar dene.",
   "onboarding.link_account.title": "Hesabını Kaydet",
   "onboarding.link_account.description": "Verilerini kaybetmemek için hesabını e-posta ile kaydedebilirsin. Bu adımı istersen şimdi atlayabilirsin.",
   "onboarding.link_account.email_label": "E-posta",
@@ -147,7 +133,6 @@
   "onboarding.link_account.skip_button": "Şimdi değil, Atla",
   "onboarding.link_account.email_sent": "Doğrulama e-postası gönderildi. Lütfen gelen kutunu kontrol et.",
   "onboarding.link_account.rate_limit_error": "Çok fazla deneme yapıldı, birkaç dakika sonra tekrar dene.",
-
   "onboarding.name.required": "Size özel bir harita hazırlayabilmemiz için lütfen adınızı girin.",
   "onboarding.city.required": "Gezegenlerin ve yıldızların konumunu doğru analiz edebilmemiz için doğum yerinizi seçmeniz gerekiyor.",
   "onboarding.birthtime.popup_title": "Doğum Saati",
@@ -155,21 +140,17 @@
   "onboarding.birthtime.ask_relative": "Bir yakınıma sorayım",
   "onboarding.birthtime.skip": "Geç",
   "onboarding.birthtime.share_message": "Doğum saatimi biliyor musun?",
-
   "onboarding.language.continue": "Türkçe ile Devam Et",
-"onboarding.link_account.or_divider": "veya",
-"onboarding.link_account.google_button": "Google ile devam et",
-"onboarding.link_account.apple_button": "Apple ile devam et",
-
+  "onboarding.link_account.or_divider": "veya",
+  "onboarding.link_account.google_button": "Google ile devam et",
+  "onboarding.link_account.apple_button": "Apple ile devam et",
   "onboarding.calculating.title": "Göğün okunuyor…",
   "onboarding.first_result.title": "İlk bakış",
   "onboarding.first_result.sun": "Güneş",
   "onboarding.first_result.moon": "Ay",
   "onboarding.first_result.rising": "Yükselen",
   "onboarding.first_result.time_hint": "Ay ve Yükselen burcunu açmak için doğum saatini ekle.",
-
-   "planet_report.time_unknown":"Bu gezegenin ev yorumunu açmak için doğum saatini ekle.",
-
+  "planet_report.time_unknown": "Bu gezegenin ev yorumunu açmak için doğum saatini ekle.",
   "onboarding.name.label": "İsim",
   "onboarding.name.hint": "İsminizi girin",
   "onboarding.birthtime.title": "Saat kaçta doğdunuz?",
@@ -196,7 +177,6 @@
   "account_deletion.confirm": "Hesabımı Sil",
   "account_deletion.error": "Hesabınız silinemedi.",
   "account_deletion.loading": "Hesabınız siliniyor...",
-
   "onboarding.city.title": "Nerede doğdunuz?",
   "onboarding.city.hint": "Şehrinizi arayın",
   "onboarding.gender.title": "Kendinizi nasıl tanımlıyorsunuz?",
@@ -204,9 +184,26 @@
   "onboarding.gender.male": "Erkek",
   "onboarding.gender.female": "Kadın",
   "onboarding.gender.prefer_not_to_say": "Belirtmek istemiyorum",
-
   "onboarding.name.subtitle": "Kendinizden bahsedin, böylece size daha kişiselleştirilmiş bir tahmin sunabiliriz.",
   "onboarding.birthdate.subtitle": "Tarih, güneş burcunuzu, numerolojinizi ve uyumluluğunuzu belirlemek için önemlidir.",
   "onboarding.birthtime.subtitle": "Saat, evlerinizi, yükselen burcunuzu ve Ay'ın kesin konumunu belirlemek için önemlidir.",
-  "onboarding.gender.subtitle": "Eril ve dişil enerjiniz arasındaki dengeyi ortaya çıkaracaktır."
+  "onboarding.gender.subtitle": "Eril ve dişil enerjiniz arasındaki dengeyi ortaya çıkaracaktır.",
+  "nav.today": "Bugün",
+  "nav.chart": "Harita",
+  "nav.profile": "Profil",
+  "today.title": "Bugün",
+  "today.empty": "Bu profil için bugün olay yok.",
+  "today.error": "Bugün yüklenemedi.",
+  "today.retry": "Tekrar dene",
+  "today.events": "Bugünün olayları",
+  "today.unknown_time_hint": "Doğum saatini eklersen Ay ve Yükselen bazlı okumalar açılır.",
+  "today.rarity": "Haritaların %{pct}'inde bu açı aktif",
+  "valence.power": "Akış",
+  "valence.pressure": "Baskı",
+  "valence.trouble": "Dikkat",
+  "valence.neutral": "Nötr",
+  "theme.love": "Aşk",
+  "theme.career": "Kariyer",
+  "theme.identity": "Kimlik",
+  "theme.health": "Sağlık"
 }

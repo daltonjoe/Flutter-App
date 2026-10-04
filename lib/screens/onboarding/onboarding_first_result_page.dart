@@ -37,7 +37,8 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage> {
     final u = Supabase.instance.client.auth.currentUser;
     final linked = u != null && !u.isAnonymous;
     if (!widget.isFirstProfile || linked) {
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (r) => false);
+      Navigator.of(context, rootNavigator: true)
+    .pushNamedAndRemoveUntil('/home', (r) => false);
     } else {
       Navigator.pushReplacementNamed(context, '/onboarding/link-account');
     }

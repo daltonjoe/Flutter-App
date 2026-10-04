@@ -10,7 +10,6 @@
   "common.select": "Auswählen",
   "common.cancel": "Abbrechen",
   "common.done": "Fertig",
-
   "loader.msg_1": "Berechnung der Planetenpositionen...",
   "loader.msg_2": "Dein kosmischer Plan wird gelesen...",
   "loader.msg_3": "Planetenaspekte werden analysiert...",
@@ -18,12 +17,10 @@
   "loader.msg_5": "Deine persönliche Einsicht wird erstellt...",
   "loader.msg_6": "Geheimnisse deines Geburtshoroskops werden gelüftet...",
   "loader.msg_7": "Die Botschaft des Universums wird vorbereitet...",
-
   "forecast.result_title": "{period}-Vorhersage",
   "forecast.unexpected_error": "Unerwarteter Fehler.",
   "forecast.loading": "Vorhersage wird vorbereitet, dies kann 15-30 Sekunden dauern...",
   "forecast.analysis_header": "{period}-Vorhersageanalyse",
-
   "forecast.title": "Vorhersageanalyse",
   "forecast.daily": "Täglich",
   "forecast.daily_subtitle": "Was erwartet dich heute?",
@@ -37,21 +34,17 @@
   "forecast.select_period": "Wähle deine personalisierte periodische Analyse.",
   "forecast.which_period": "Welcher Zeitraum?",
   "forecast.personalized_notice": "Eine personalisierte Analyse wird basierend auf deinem Horoskop erstellt.",
-
   "planet_report.house": "{number}. Haus",
   "planet_report.retrograde": "Rückläufig ℞",
-
   "planet_report.title": "{name}-Analyse",
   "planet_report.unexpected_error": "Unerwarteter Fehler.",
   "planet_report.loading": "Planetenbericht wird vorbereitet...",
-
   "natal_report.loading": "Geburtshoroskop wird analysiert, dies kann 15-30 Sekunden dauern...",
   "natal_report.title": "{name}-Analyse",
   "natal_report.refresh": "Aktualisieren",
   "natal_report.unexpected_error": "Ein unerwarteter Fehler ist aufgetreten.",
   "natal_report.retry": "Erneut versuchen",
   "natal_report.footer_tagline": "An der Seite deines kosmischen Begleiters",
-
   "create_profile.title": "Entdecke dein\nGeburtshoroskop",
   "create_profile.subtitle": "Gib deine Geburtsdaten ein, um\ndeine kosmische Reise zu beginnen.",
   "create_profile.name_label": "VOLLSTÄNDIGER NAME",
@@ -75,7 +68,6 @@
   "create_profile.guidance_desc": "Eine genaue Geburtszeit erhöht direkt die Genauigkeit deines Aszendenten und deiner Häuser.",
   "create_profile.security_footer": "Deine Daten werden verschlüsselt mit Schweizer Ephemeriden und KI verarbeitet.",
   "create_profile.quick_cities": "Schnelle Stadtauswahl",
-
   "chart.planets": "Planeten",
   "chart.signs": "Sternzeichen",
   "chart.elements": "Elemente",
@@ -92,7 +84,6 @@
   "chart.natal_report": "Geburtshoroskop-Analyse",
   "chart.planet_report": "Planeten-Analyse",
   "chart.ascendant": "Aszendent",
-
   "chart.sun": "Sonne",
   "chart.moon": "Mond",
   "chart.mercury": "Merkur",
@@ -103,7 +94,6 @@
   "chart.uranus": "Uranus",
   "chart.neptune": "Neptun",
   "chart.pluto": "Pluto",
-
   "signs.aries": "Widder",
   "signs.taurus": "Stier",
   "signs.gemini": "Zwillinge",
@@ -116,25 +106,21 @@
   "signs.capricorn": "Steinbock",
   "signs.aquarius": "Wassermann",
   "signs.pisces": "Fische",
-
   "placement.title": "Detaillierte Interpretation",
-"placement.theme.love": "Liebe & Beziehungen",
-"placement.theme.career": "Karriere & Finanzen",
-"placement.theme.identity": "Identität & Selbst",
-"placement.theme.health": "Gesundheit & Energie",
-"placement.strengths": "Stärken",
-"placement.challenges": "Herausforderungen",
-"placement.button": "Detaillierte Interpretation anzeigen",
-
-"placement.error": "Beim Laden des Inhalts ist ein Problem aufgetreten.",
-"placement.retry": "Erneut versuchen",
-"placement.empty": "Für diese Platzierung sind noch keine Inhalte verfügbar.",
-
+  "placement.theme.love": "Liebe & Beziehungen",
+  "placement.theme.career": "Karriere & Finanzen",
+  "placement.theme.identity": "Identität & Selbst",
+  "placement.theme.health": "Gesundheit & Energie",
+  "placement.strengths": "Stärken",
+  "placement.challenges": "Herausforderungen",
+  "placement.button": "Detaillierte Interpretation anzeigen",
+  "placement.error": "Beim Laden des Inhalts ist ein Problem aufgetreten.",
+  "placement.retry": "Erneut versuchen",
+  "placement.empty": "Für diese Platzierung sind noch keine Inhalte verfügbar.",
   "elements.fire": "Feuer",
   "elements.earth": "Erde",
   "elements.air": "Luft",
   "elements.water": "Wasser",
-
   "common.ok": "OK",
   "onboarding.name.required": "Bitte geben Sie Ihren Namen ein, damit wir eine persönliche Karte für Sie erstellen können.",
   "onboarding.city.required": "Bitte wählen Sie Ihren Geburtsort aus, damit wir die Positionen der Planeten und Sterne genau analysieren können.",
@@ -143,16 +129,13 @@
   "onboarding.birthtime.ask_relative": "Ich frage eine Person aus meiner Familie",
   "onboarding.birthtime.skip": "Überspringen",
   "onboarding.birthtime.share_message": "Kennst du meine Geburtszeit?",
-
   "onboarding.language.continue": "Auf Deutsch fortfahren",
-
   "onboarding.calculating.title": "Dein Himmel wird gelesen…",
   "onboarding.first_result.title": "Dein erster Blick",
   "onboarding.first_result.sun": "Sonne",
   "onboarding.first_result.moon": "Mond",
   "onboarding.first_result.rising": "Aszendent",
   "onboarding.first_result.time_hint": "Füge deine Geburtszeit hinzu, um Mond- und Aszendentenzeichen freizuschalten.",
-
   "onboarding.name.label": "Name",
   "onboarding.name.hint": "Geben Sie Ihren Namen ein",
   "onboarding.birthtime.title": "Um wie viel Uhr wurden Sie geboren?",
@@ -180,18 +163,13 @@
   "account_deletion.confirm": "Mein Konto löschen",
   "account_deletion.error": "Dein Konto konnte nicht gelöscht werden.",
   "account_deletion.loading": "Dein Konto wird gelöscht...",
-
-  "planet_report.time_unknown":"Füge deine Geburtszeit hinzu, um die Häuser-Deutung dieses Planeten freizuschalten.",
-
+  "planet_report.time_unknown": "Füge deine Geburtszeit hinzu, um die Häuser-Deutung dieses Planeten freizuschalten.",
   "onboarding.city.title": "Wo wurden Sie geboren?",
   "onboarding.city.hint": "Suchen Sie Ihre Stadt",
   "onboarding.gender.title": "Wie identifizieren Sie sich?",
-
-"onboarding.link_account.or_divider": "oder",
-"onboarding.link_account.google_button": "Mit Google fortfahren",
-"onboarding.link_account.apple_button": "Mit Apple fortfahren",
-
-  
+  "onboarding.link_account.or_divider": "oder",
+  "onboarding.link_account.google_button": "Mit Google fortfahren",
+  "onboarding.link_account.apple_button": "Mit Apple fortfahren",
   "onboarding.chart_save_failed": "Dein Geburtshoroskop konnte nicht gespeichert werden. Bitte versuche es erneut.",
   "onboarding.link_account.title": "Dein Konto speichern",
   "onboarding.link_account.description": "Damit deine Daten nicht verloren gehen, kannst du dein Konto mit deiner E-Mail-Adresse speichern. Du kannst diesen Schritt auch jetzt überspringen.",
@@ -203,14 +181,29 @@
   "onboarding.link_account.skip_button": "Nicht jetzt, überspringen",
   "onboarding.link_account.email_sent": "Eine Bestätigungs-E-Mail wurde gesendet. Bitte überprüfe deinen Posteingang.",
   "onboarding.link_account.rate_limit_error": "Zu viele Versuche. Bitte versuche es in ein paar Minuten erneut.",
-
-
   "onboarding.gender.male": "Männlich",
   "onboarding.gender.female": "Weiblich",
   "onboarding.gender.prefer_not_to_say": "Möchte ich nicht angeben",
-
   "onboarding.name.subtitle": "Erzählen Sie uns etwas über sich, damit wir eine persönlichere Vorhersage für Sie erstellen können.",
   "onboarding.birthdate.subtitle": "Das Datum ist wichtig, um Ihr Sonnenzeichen, Ihre Numerologie und Ihre Kompatibilität zu bestimmen.",
   "onboarding.birthtime.subtitle": "Die Uhrzeit ist wichtig, um Ihre Häuser, Ihr Aszendentenzeichen und die genaue Mondposition zu bestimmen.",
-  "onboarding.gender.subtitle": "Es wird das Gleichgewicht Ihrer männlichen und weiblichen Energie aufzeigen."
+  "onboarding.gender.subtitle": "Es wird das Gleichgewicht Ihrer männlichen und weiblichen Energie aufzeigen.",
+  "nav.today": "Heute",
+  "nav.chart": "Horoskop",
+  "nav.profile": "Profil",
+  "today.title": "Heute",
+  "today.empty": "Heute keine Ereignisse für dieses Profil.",
+  "today.error": "Heute konnte nicht geladen werden.",
+  "today.retry": "Erneut versuchen",
+  "today.events": "Ereignisse heute",
+  "today.unknown_time_hint": "Mit der Geburtszeit werden Mond- und Aszendenten-Deutungen freigeschaltet.",
+  "today.rarity": "Dieser Aspekt ist in {pct}% der Horoskope aktiv",
+  "valence.power": "Fluss",
+  "valence.pressure": "Druck",
+  "valence.trouble": "Vorsicht",
+  "valence.neutral": "Neutral",
+  "theme.love": "Liebe",
+  "theme.career": "Karriere",
+  "theme.identity": "Identität",
+  "theme.health": "Gesundheit"
 }

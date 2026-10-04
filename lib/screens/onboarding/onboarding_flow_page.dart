@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/language_provider.dart';
 import '../../models/onboarding_data.dart';
 import 'onboarding_name_page.dart';
 import 'onboarding_birthtime_page.dart';
@@ -8,6 +10,7 @@ import 'onboarding_relationship_page.dart';
 import '../../presentation/widgets/components/onboarding_progress_bar.dart';
 import 'onboarding_birthdate_page.dart';
 import 'onboarding_language_page.dart';
+import 'package:flutter/services.dart';
 
 
 
@@ -21,11 +24,23 @@ class OnboardingFlowPage extends StatefulWidget {
 }
 
 class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
-  final PageController _controller = PageController();
+  late final PageController _controller;
   final OnboardingData data = OnboardingData();
-  int _step = 0;
+  late int _step;
 
   static const int totalSteps = 7;
+
+  int get _minStep => widget.isFirstProfile ? 0 : 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _step = _minStep;
+    _controller = PageController(initialPage: _minStep);
+    if (!widget.isFirstProfile) {
+      data.languageCode = context.read<LanguageProvider>().locale.languageCode;
+    }
+  }
 
   void _next() {
     if (_step < totalSteps - 1) {
@@ -38,20 +53,27 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
   }
 
   void _back() {
-    if (_step > 0) {
+    if (_step > _minStep) {
       setState(() => _step--);
       _controller.previousPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-    } else {
+    } else if (Navigator.of(context).canPop()) {
       Navigator.pop(context);
+    } else {
+      SystemNavigator.pop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+  onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _back();
+      },
+      child: Scaffold(
       backgroundColor: Colors.black, // background.png yüklenemezse siyah kalsın
       body: Stack(
         fit: StackFit.expand,
@@ -108,6 +130,6 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
           ),
         ],
       ),
-    );
+    ));
   }
 }

@@ -8,6 +8,7 @@ import '../presentation/widgets/components/cosmic_error_state.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
 import '../providers/active_profile_provider.dart';
 import '../services/account_deletion_service.dart';
+import 'main_shell.dart' show shellTab, mapPopToRoot;
 
 class ProfileSwitcherPage extends StatefulWidget {
   const ProfileSwitcherPage({super.key});
@@ -65,7 +66,8 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
 
   Future<void> _selectProfile(String id) async {
     await context.read<ActiveProfileProvider>().setActive(id);
-    if (mounted) Navigator.pop(context);
+    mapPopToRoot.value++;
+    shellTab.value = 1;
   }
 
   Future<void> _deleteProfile(String id) async {
@@ -137,10 +139,10 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
       if (!mounted) return;
       await context.read<ActiveProfileProvider>().clearActive();
       if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/onboarding',
-        (route) => false,
+Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+  '/onboarding',
+  (route) => false,
+  arguments: {'isFirstProfile': true},
       );
     } catch (_) {
       if (!mounted) return;
@@ -208,8 +210,7 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
                 const SizedBox(height: 12),
                 CosmicCtaButton(
                   label: t(context, 'profile_switcher.add'),
-                  onTap: () => Navigator.pushNamed(
-                    context,
+                  onTap: () => Navigator.of(context, rootNavigator: true).pushNamed(
                     '/onboarding',
                     arguments: {'isFirstProfile': false},
                   ),

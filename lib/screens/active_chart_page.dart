@@ -4,6 +4,7 @@ import '../i18n/app_localizations.dart';
 import '../models/natal_chart_response.dart';
 import '../presentation/widgets/components/cosmic_error_state.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/active_profile_provider.dart';
 import '../services/chart_repository.dart';
 import 'chart_page.dart';
@@ -59,8 +60,7 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
     _redirectedToOnboarding = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(
-        context,
+      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
         '/onboarding',
         (route) => false,
       );
@@ -118,10 +118,36 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
       debugPrint('ActiveChartPage load failed: ${e.runtimeType}: $e');
       debugPrintStack(stackTrace: st);
       if (!mounted) return;
+      if (e is PostgrestException && e.code == 'PGRST116') {
+        setState(() => _loadingProfileId = null);
+        await _recoverMissingProfile();
+        return;
+      }
       setState(() {
         _loadingProfileId = null;
         _error = 'profile_switcher.error';
       });
+    }
+  }
+
+  Future<void> _recoverMissingProfile() async {
+    final provider = context.read<ActiveProfileProvider>();
+    final user = Supabase.instance.client.auth.currentUser;
+    String? firstId;
+    if (user != null) {
+      final rows = await Supabase.instance.client
+          .from('user_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .order('created_at')
+          .limit(1);
+      if (rows.isNotEmpty) firstId = rows.first['id'] as String;
+    }
+    if (!mounted) return;
+    if (firstId != null) {
+      await provider.setActive(firstId);
+    } else {
+      await provider.clearActive();
     }
   }
 

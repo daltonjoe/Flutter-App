@@ -9,7 +9,6 @@ import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_wheel_picker.dart';
 import '../../providers/language_provider.dart';
 import '../../providers/active_profile_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class OnboardingRelationshipPage extends StatefulWidget {
   final OnboardingData data;

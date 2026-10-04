@@ -10,7 +10,6 @@
   "common.select": "Selecionar",
   "common.cancel": "Cancelar",
   "common.done": "Pronto",
-
   "loader.msg_1": "Calculando posições planetárias...",
   "loader.msg_2": "Lendo seu plano cósmico...",
   "loader.msg_3": "Analisando aspectos planetários...",
@@ -18,12 +17,10 @@
   "loader.msg_5": "Gerando sua visão pessoal...",
   "loader.msg_6": "Decifrando segredos do seu mapa natal...",
   "loader.msg_7": "Preparando a mensagem do universo...",
-
   "forecast.result_title": "Previsão {period}",
   "forecast.unexpected_error": "Erro inesperado.",
   "forecast.loading": "Preparando sua previsão, isso pode levar de 15 a 30 segundos...",
   "forecast.analysis_header": "Análise de previsão {period}",
-
   "forecast.title": "Análise de Previsões",
   "forecast.daily": "Diário",
   "forecast.daily_subtitle": "O que te espera hoje?",
@@ -37,21 +34,17 @@
   "forecast.select_period": "Escolha sua análise periódica personalizada.",
   "forecast.which_period": "Qual período de tempo?",
   "forecast.personalized_notice": "Uma análise personalizada será gerada com base no seu mapa.",
-
   "planet_report.house": "Casa {number}",
   "planet_report.retrograde": "Retrógrado ℞",
-
   "planet_report.title": "Análise de {name}",
   "planet_report.unexpected_error": "Erro inesperado.",
   "planet_report.loading": "Preparando relatório do planeta...",
-
   "natal_report.loading": "Analisando seu mapa natal, isso pode levar de 15 a 30 segundos...",
   "natal_report.title": "Análise de {name}",
   "natal_report.refresh": "Atualizar",
   "natal_report.unexpected_error": "Ocorreu un erro inesperado.",
   "natal_report.retry": "Tentar Novamente",
   "natal_report.footer_tagline": "Ao lado do seu guia cósmico",
-
   "create_profile.title": "Descubra seu\nMapa Natal",
   "create_profile.subtitle": "Compartilhe seus dados de nascimento para começar\nsua jornada cósmica.",
   "create_profile.name_label": "NOME COMPLETO",
@@ -75,7 +68,6 @@
   "create_profile.guidance_desc": "Um horário de nascimento preciso aumenta diretamente a precisão do seu signo ascendente e das posições das casas.",
   "create_profile.security_footer": "Seus dados são criptografados e processados com efemérides suíças e IA.",
   "create_profile.quick_cities": "Seleção rápida de cidades",
-
   "chart.planets": "Planetas",
   "chart.signs": "Signos",
   "chart.elements": "Elementos",
@@ -92,7 +84,6 @@
   "chart.natal_report": "Análise do Mapa Natal",
   "chart.planet_report": "Análise Planetária",
   "chart.ascendant": "Ascendente",
-
   "chart.sun": "Sol",
   "chart.moon": "Lua",
   "chart.mercury": "Mercúrio",
@@ -103,7 +94,6 @@
   "chart.uranus": "Urano",
   "chart.neptune": "Netuno",
   "chart.pluto": "Plutão",
-
   "signs.aries": "Áries",
   "signs.taurus": "Touro",
   "signs.gemini": "Gêmeos",
@@ -116,29 +106,22 @@
   "signs.capricorn": "Capricórnio",
   "signs.aquarius": "Aquário",
   "signs.pisces": "Peixes",
-
   "elements.fire": "Fogo",
   "elements.earth": "Terra",
   "elements.air": "Ar",
   "elements.water": "Água",
-
   "placement.title": "Interpretação detalhada",
-"placement.theme.love": "Amor e relacionamentos",
-"placement.theme.career": "Carreira e dinheiro",
-"placement.theme.identity": "Identidade e eu",
-"placement.theme.health": "Saúde e energia",
-"placement.strengths": "Pontos fortes",
-"placement.challenges": "Desafios",
-"placement.button": "Ver interpretação detalhada",
-
-"onboarding.link_account.or_divider": "ou",
-"onboarding.link_account.google_button": "Continuar com o Google",
-"onboarding.link_account.apple_button": "Continuar com a Apple",
-
-
-   "planet_report.time_unknown":"Adicione sua hora de nascimento para liberar a leitura por casa deste planeta.",
-
-
+  "placement.theme.love": "Amor e relacionamentos",
+  "placement.theme.career": "Carreira e dinheiro",
+  "placement.theme.identity": "Identidade e eu",
+  "placement.theme.health": "Saúde e energia",
+  "placement.strengths": "Pontos fortes",
+  "placement.challenges": "Desafios",
+  "placement.button": "Ver interpretação detalhada",
+  "onboarding.link_account.or_divider": "ou",
+  "onboarding.link_account.google_button": "Continuar com o Google",
+  "onboarding.link_account.apple_button": "Continuar com a Apple",
+  "planet_report.time_unknown": "Adicione sua hora de nascimento para liberar a leitura por casa deste planeta.",
   "onboarding.chart_save_failed": "Não foi possível salvar seu mapa astral. Tente novamente.",
   "onboarding.link_account.title": "Salvar sua conta",
   "onboarding.link_account.description": "Para evitar perder seus dados, você pode salvar sua conta usando seu e-mail. Você também pode pular esta etapa por enquanto.",
@@ -150,12 +133,9 @@
   "onboarding.link_account.skip_button": "Agora não, pular",
   "onboarding.link_account.email_sent": "Um e-mail de verificação foi enviado. Verifique sua caixa de entrada.",
   "onboarding.link_account.rate_limit_error": "Muitas tentativas. Tente novamente em alguns minutos.",
-
-
-"placement.error": "Ocorreu um problema ao carregar o conteúdo.",
-"placement.retry": "Tentar novamente",
-"placement.empty": "Ainda não há conteúdo disponível para esta posição.",
-
+  "placement.error": "Ocorreu um problema ao carregar o conteúdo.",
+  "placement.retry": "Tentar novamente",
+  "placement.empty": "Ainda não há conteúdo disponível para esta posição.",
   "common.ok": "OK",
   "onboarding.name.required": "Digite seu nome para que possamos preparar um mapa personalizado para você.",
   "onboarding.city.required": "Você precisa selecionar seu local de nascimento para que possamos analisar com precisão a posição dos planetas e das estrelas.",
@@ -164,16 +144,13 @@
   "onboarding.birthtime.ask_relative": "Vou perguntar a um familiar",
   "onboarding.birthtime.skip": "Pular",
   "onboarding.birthtime.share_message": "Você sabe a que horas eu nasci?",
-
   "onboarding.language.continue": "Continuar em português",
-
   "onboarding.calculating.title": "Lendo o seu céu…",
   "onboarding.first_result.title": "Seu primeiro olhar",
   "onboarding.first_result.sun": "Sol",
   "onboarding.first_result.moon": "Lua",
   "onboarding.first_result.rising": "Ascendente",
   "onboarding.first_result.time_hint": "Adicione sua hora de nascimento para liberar sua Lua e seu Ascendente.",
-
   "onboarding.name.label": "Nome",
   "onboarding.name.hint": "Digite seu nome",
   "onboarding.birthtime.title": "A que horas você nasceu?",
@@ -201,17 +178,32 @@
   "account_deletion.confirm": "Excluir minha conta",
   "account_deletion.error": "Não foi possível excluir sua conta.",
   "account_deletion.loading": "Excluindo sua conta...",
-
   "onboarding.city.title": "Onde você nasceu?",
   "onboarding.city.hint": "Pesquise sua cidade",
   "onboarding.gender.title": "Como você se identifica?",
-
   "onboarding.gender.male": "Masculino",
   "onboarding.gender.female": "Feminino",
   "onboarding.gender.prefer_not_to_say": "Prefiro não dizer",
-
   "onboarding.name.subtitle": "Conte-nos sobre você para que possamos oferecer uma previsão mais personalizada.",
   "onboarding.birthdate.subtitle": "A data é importante para determinar seu signo solar, sua numerologia e sua compatibilidade.",
   "onboarding.birthtime.subtitle": "O horário é importante para determinar suas casas, seu ascendente e a posição exata da Lua.",
-  "onboarding.gender.subtitle": "Isso revelará o equilíbrio entre sua energia masculina e feminina."
+  "onboarding.gender.subtitle": "Isso revelará o equilíbrio entre sua energia masculina e feminina.",
+  "nav.today": "Hoje",
+  "nav.chart": "Mapa",
+  "nav.profile": "Perfil",
+  "today.title": "Hoje",
+  "today.empty": "Hoje não há eventos para este perfil.",
+  "today.error": "Não foi possível carregar Hoje.",
+  "today.retry": "Tentar de novo",
+  "today.events": "Eventos de hoje",
+  "today.unknown_time_hint": "Adicione sua hora de nascimento para liberar a Lua e o Ascendente.",
+  "today.rarity": "Este aspecto está ativo em {pct}% dos mapas",
+  "valence.power": "Fluxo",
+  "valence.pressure": "Pressão",
+  "valence.trouble": "Cautela",
+  "valence.neutral": "Neutro",
+  "theme.love": "Amor",
+  "theme.career": "Carreira",
+  "theme.identity": "Identidade",
+  "theme.health": "Saúde"
 }
