@@ -20,9 +20,7 @@ class CitySearchField extends StatefulWidget {
 
 class _CitySearchFieldState extends State<CitySearchField> {
   // ── App renkleri (create_profile_page ile aynı) ───────────────────
-  static const Color _bg = Color(0xFF0D0B1A);
   static const Color _surface = Color(0xFF1A1730);
-  static const Color _surfaceHover = Color(0xFF221F3A);
   static const Color _accent = Color(0xFFB07BFF);
   static const Color _textPrimary = Color(0xFFF0EAFF);
   static const Color _textSecondary = Color(0xFF9985C0);
