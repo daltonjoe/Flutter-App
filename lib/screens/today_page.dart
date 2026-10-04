@@ -132,7 +132,15 @@ class _TodayPageState extends State<TodayPage> {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: Text(_t('today.title'))),
+           appBar: AppBar(
+        title: Text(_t('today.title')),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: pid == null || _loading ? null : () => _load(pid, loc),
+          ),
+        ],
+      ),
       body: SafeArea(child: body),
     );
   }
@@ -145,7 +153,11 @@ class _TodayPageState extends State<TodayPage> {
     final events = (d['events'] as List?) ?? const [];
     final rate = (d['rarity'] as Map?)?['event_rate_pct'];
     final known = d['time_known'] != false;
-    return ListView(padding: const EdgeInsets.all(16), children: [
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [
+        
       if (_cachedAt != null) ...[
         Text(
           AppLocalizations.of(context)!.translate('today.offline',

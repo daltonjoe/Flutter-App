@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'astro_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 
 class TodayService {
@@ -20,6 +21,7 @@ class TodayService {
     final d = date ?? DateTime.now();
     final day =
         '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    final tz = await _tz();
     http.Response r;
     try {
       r = await http
@@ -29,7 +31,12 @@ class TodayService {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $jwt',
             },
-            body: jsonEncode({'profile_id': profileId, 'date': day, 'locale': locale}),
+            body: jsonEncode({
+              'profile_id': profileId,
+              'date': day,
+              'locale': locale,
+              if (tz != null) 'timezone': tz,
+            }),
           )
           .timeout(const Duration(seconds: 20));
     } on Exception {
@@ -44,9 +51,31 @@ class TodayService {
     }
     final out = Map<String, dynamic>.from(jsonDecode(utf8.decode(r.bodyBytes)) as Map);
     await _save(profileId, locale, out);
+        if (tz != null) {
+      try {
+        final uid = Supabase.instance.client.auth.currentUser?.id;
+        if (uid != null) {
+          await Supabase.instance.client.from('user_settings').upsert({
+            'user_id': uid,
+            'current_timezone': tz,
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          }, onConflict: 'user_id');
+        }
+      } catch (e) {
+        debugPrint('user_settings upsert: $e');
+      }
+    }
     return out;
   }
-
+      static Future<String?> _tz() async {
+    try {
+      final v = await FlutterTimezone.getLocalTimezone();
+      return v.toString().isEmpty ? null : v.toString();
+    } catch (e) {
+      debugPrint('timezone: $e');
+      return null;
+    }
+  }
   static String _ck(String pid, String loc) => 'today_last_$pid|$loc';
 
   static Future<void> _save(String pid, String loc, Map<String, dynamic> data) async {
