@@ -205,5 +205,6 @@
   "theme.love": "Amour",
   "theme.career": "Carrière",
   "theme.identity": "Identité",
-  "theme.health": "Santé"
+  "theme.health": "Santé",
+  "today.offline": "Hors ligne – dernière mise à jour {time}"
 }

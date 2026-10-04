@@ -22,6 +22,7 @@ KEYS = [
  ("theme.career", "Kariyer", "Career", "Karriere", "Carrière", "Carrera", "Carreira", "Carriera"),
  ("theme.identity", "Kimlik", "Identity", "Identität", "Identité", "Identidad", "Identidade", "Identità"),
  ("theme.health", "Sağlık", "Health", "Gesundheit", "Santé", "Salud", "Saúde", "Salute"),
+  ("today.offline", "Çevrimdışı – son güncelleme {time}", "Offline – last updated {time}", "Offline – zuletzt aktualisiert {time}", "Hors ligne – dernière mise à jour {time}", "Sin conexión – última actualización {time}", "Offline – última atualização {time}", "Offline – ultimo aggiornamento {time}"),
 ]
 
 def load(p):
@@ -46,3 +47,4 @@ for i, loc in enumerate(LANGS):
             d[k] = v
             added += 1
     io.open(p, "w", encoding="utf-8", newline="\n").write(json.dumps(d, ensure_ascii=False, indent=2) + "\n")
+    print(f"{loc}: +{added} eklendi, {fb} en'e düştü")

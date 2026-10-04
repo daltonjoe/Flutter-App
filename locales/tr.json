@@ -205,5 +205,6 @@
   "theme.love": "Aşk",
   "theme.career": "Kariyer",
   "theme.identity": "Kimlik",
-  "theme.health": "Sağlık"
+  "theme.health": "Sağlık",
+  "today.offline": "Çevrimdışı – son güncelleme {time}"
 }

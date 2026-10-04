@@ -18,6 +18,7 @@ class _TodayPageState extends State<TodayPage> {
   String? _error;
   bool _loading = false;
   String? _key;
+  DateTime? _cachedAt;
 
   String _t(String k) => AppLocalizations.of(context)?.translate(k) ?? k;
 
@@ -29,6 +30,8 @@ class _TodayPageState extends State<TodayPage> {
     final key = '$pid|$loc';
     if (pid != null && key != _key) {
       _key = key;
+      _data = null;
+      _cachedAt = null;
       _load(pid, loc);
     }
   }
@@ -41,14 +44,31 @@ class _TodayPageState extends State<TodayPage> {
     try {
       final d = await TodayService.fetch(profileId: pid, locale: loc);
       if (!mounted) return;
-      setState(() => _data = d);
+      setState(() {
+        _data = d;
+        _cachedAt = null;
+      });
     } catch (e) {
+      final c = _data == null ? await TodayService.cached(pid, loc) : null;
       if (!mounted) return;
-      setState(() => _error = e.toString());
+      setState(() {
+        if (c != null) {
+          _data = c['data'] as Map<String, dynamic>;
+          _cachedAt = c['saved_at'] as DateTime;
+        } else if (_data != null) {
+          _cachedAt ??= DateTime.now();
+        } else {
+          _error = e.toString();
+        }
+      });
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
+
+  String _fmt(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')} '
+      '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
 
   int? _id(dynamic v) => v is num ? v.toInt() : null;
 
@@ -126,6 +146,14 @@ class _TodayPageState extends State<TodayPage> {
     final rate = (d['rarity'] as Map?)?['event_rate_pct'];
     final known = d['time_known'] != false;
     return ListView(padding: const EdgeInsets.all(16), children: [
+      if (_cachedAt != null) ...[
+        Text(
+          AppLocalizations.of(context)!.translate('today.offline',
+              args: {'time': _fmt(_cachedAt!)}),
+          style: const TextStyle(color: AppColors.amberTransit, fontSize: 12),
+        ),
+        const SizedBox(height: 12),
+      ],
       if (head != null) ...[
         Text(
           _label(_id(tag?['transit']), _id(tag?['aspect']), _id(tag?['natal'])),
