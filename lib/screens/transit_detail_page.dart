@@ -70,12 +70,13 @@ class _TransitDetailPageState extends State<TransitDetailPage> {
       });
     } catch (e) {
       debugPrint('TransitDetail load error: $e');
-     if (mounted) {
+       if (mounted) {
         setState(() {
           _loading = false;
           _failed = true;
         });
       }
+    }
   }
 
   Color _valenceColor(String? v) {
