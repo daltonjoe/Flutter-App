@@ -84,7 +84,8 @@ class _TodayPageState extends State<TodayPage> {
         return AppColors.textMuted;
     }
   }
-    IconData _valenceIcon(String? v) {
+
+  IconData _valenceIcon(String? v) {
     switch (v) {
       case 'power':
         return Icons.trending_up;
@@ -112,16 +113,23 @@ class _TodayPageState extends State<TodayPage> {
       body = const Center(child: CircularProgressIndicator());
     } else if (_error != null && _data == null) {
       body = Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(_t('today.error')),
-          const SizedBox(height: 8),
-          Text(_error!, style: const TextStyle(fontSize: 11), textAlign: TextAlign.center),
-          const SizedBox(height: 12),
-          FilledButton(
-            onPressed: pid == null ? null : () => _load(pid, loc),
-            child: Text(_t('today.retry')),
-          ),
-        ]),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(_t('today.error')),
+            const SizedBox(height: 8),
+            Text(
+              _error!,
+              style: const TextStyle(fontSize: 11),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: pid == null ? null : () => _load(pid, loc),
+              child: Text(_t('today.retry')),
+            ),
+          ],
+        ),
       );
     } else if (_data == null) {
       body = Center(child: Text(_t('today.empty')));
@@ -132,7 +140,7 @@ class _TodayPageState extends State<TodayPage> {
       );
     }
     return Scaffold(
-           appBar: AppBar(
+      appBar: AppBar(
         title: Text(_t('today.title')),
         actions: [
           IconButton(
@@ -153,108 +161,194 @@ class _TodayPageState extends State<TodayPage> {
     final events = (d['events'] as List?) ?? const [];
     final rate = (d['rarity'] as Map?)?['event_rate_pct'];
     final known = d['time_known'] != false;
-      return ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
-        children: [
-        
-      if (_cachedAt != null) ...[
-        Text(
-          AppLocalizations.of(context)!.translate('today.offline',
-              args: {'time': _fmt(_cachedAt!)}),
-          style: const TextStyle(color: AppColors.amberTransit, fontSize: 12),
-        ),
-        const SizedBox(height: 12),
-      ],
-      if (head != null) ...[
-        Text(
-          _label(_id(tag?['transit']), _id(tag?['aspect']), _id(tag?['natal'])),
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge
-              ?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        if (text != null && text.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text(text),
-        ],
-        if (rate is num) ...[
-          const SizedBox(height: 8),
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16),
+      children: [
+        if (_cachedAt != null) ...[
           Text(
-            AppLocalizations.of(context)!.translate('today.rarity',
-                args: {'pct': rate.toStringAsFixed(1)}),
+            AppLocalizations.of(
+              context,
+            )!.translate('today.offline', args: {'time': _fmt(_cachedAt!)}),
+            style: const TextStyle(color: AppColors.amberTransit, fontSize: 12),
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (head != null) ...[
+          Text(
+            _label(
+              _id(tag?['transit']),
+              _id(tag?['aspect']),
+              _id(tag?['natal']),
+            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          if (text != null && text.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(text),
+          ],
+          if (rate is num) ...[
+            const SizedBox(height: 8),
+            Text(
+              AppLocalizations.of(context)!.translate(
+                'today.rarity',
+                args: {'pct': rate.toStringAsFixed(1)},
+              ),
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+            ),
+          ],
+          const SizedBox(height: 20),
+        ],
+        _ring(cats),
+        for (final c in cats) _catRow(c as Map),
+        if (events.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          Text(
+            _t('today.events'),
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+          for (final e in events.take(3))
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+              title: Text(
+                _label(
+                  _id((e as Map)['transit_body_id']),
+                  _id(e['aspect_type_id']),
+                  _id(e['natal_body_id']),
+                ),
+              ),
+              subtitle: e['orb'] is num
+                  ? Text(
+                      '${(e['orb'] as num).toStringAsFixed(1)}°',
+                      style: const TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 11,
+                      ),
+                    )
+                  : null,
+              trailing: e['applying'] is bool
+                  ? Icon(
+                      (e['applying'] as bool)
+                          ? Icons.north_east
+                          : Icons.south_east,
+                      size: 16,
+                      color: AppColors.textSecondary,
+                    )
+                  : null,
+            ),
+        ],
+        if (!known) ...[
+          const SizedBox(height: 20),
+          Text(
+            _t('today.unknown_time_hint'),
             style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
           ),
         ],
-        const SizedBox(height: 20),
       ],
-      for (final c in cats) _catRow(c as Map),
-      if (events.isNotEmpty) ...[
-        const SizedBox(height: 20),
-        Text(_t('today.events'), style: Theme.of(context).textTheme.titleSmall),
-        const SizedBox(height: 8),
-        for (final e in events.take(3))
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            title: Text(_label(_id((e as Map)['transit_body_id']),
-                _id(e['aspect_type_id']), _id(e['natal_body_id']))),
-            subtitle: e['orb'] is num
-                ? Text('${(e['orb'] as num).toStringAsFixed(1)}°',
-                    style: const TextStyle(
-                        color: AppColors.textMuted, fontSize: 11))
-                : null,
-            trailing: e['applying'] is bool
-                ? Icon(
-                    (e['applying'] as bool)
-                        ? Icons.north_east
-                        : Icons.south_east,
-                    size: 16,
-                    color: AppColors.textSecondary)
-                : null,
-          ),
-      ],
-      if (!known) ...[
-        const SizedBox(height: 20),
-        Text(_t('today.unknown_time_hint'),
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
-      ],
-    ]);
+    );
+  }
+
+  Widget _ring(List cats) {
+    final ps = <double>[];
+    for (final c in cats) {
+      final pr = (c as Map)['percentile'];
+      if (pr is num) {
+        final v = pr.toDouble();
+        ps.add(v > 1 ? v / 100 : v);
+      }
+    }
+    if (ps.isEmpty) return const SizedBox.shrink();
+    final avg = ps.reduce((a, b) => a + b) / ps.length;
+    final color = avg > 0.7
+        ? AppColors.tealSuccess
+        : (avg < 0.3 ? AppColors.amberTransit : AppColors.textMuted);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Center(
+        child: _EnergyRing(value: avg, color: color),
+      ),
+    );
   }
 
   static const _themes = {1: 'love', 2: 'career', 3: 'identity', 4: 'health'};
 
-    Widget _catRow(Map c) {
+  Widget _catRow(Map c) {
     final lvl = c['level']?.toString();
     final tid = _id(c['theme_id']);
     final score = c['score'] is num ? (c['score'] as num).toDouble() : 0.0;
-    final pr = c['percentile'] is num ? (c['percentile'] as num).toDouble() : null;
+    final pr = c['percentile'] is num
+        ? (c['percentile'] as num).toDouble()
+        : null;
     final p = pr == null ? score : (pr > 1 ? pr / 100 : pr);
     final color = _valenceColor(lvl);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(children: [
-        SizedBox(width: 90, child: Text(_t('theme.${_themes[tid] ?? tid}'))),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: p.clamp(0.04, 1.0),
-              color: color,
-              backgroundColor: Colors.white12,
-              minHeight: 6,
+      child: Row(
+        children: [
+          SizedBox(width: 90, child: Text(_t('theme.${_themes[tid] ?? tid}'))),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: p.clamp(0.04, 1.0),
+                color: color,
+                backgroundColor: Colors.white12,
+                minHeight: 6,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Icon(_valenceIcon(lvl), size: 16, color: color),
-        const SizedBox(width: 4),
-        SizedBox(
-          width: 56,
-          child: Text(_t('valence.${lvl ?? 'neutral'}'),
-              style: TextStyle(fontSize: 12, color: color)),
-        ),
-      ]),
+          const SizedBox(width: 8),
+          Icon(_valenceIcon(lvl), size: 16, color: color),
+          const SizedBox(width: 4),
+          SizedBox(
+            width: 56,
+            child: Text(
+              _t('valence.${lvl ?? 'neutral'}'),
+              style: TextStyle(fontSize: 12, color: color),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EnergyRing extends StatelessWidget {
+  final double value;
+  final Color color;
+  const _EnergyRing({required this.value, required this.color});
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 96,
+      height: 96,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          const SizedBox(
+            width: 96,
+            height: 96,
+            child: CircularProgressIndicator(
+              value: 1,
+              strokeWidth: 8,
+              color: Colors.white12,
+            ),
+          ),
+          SizedBox(
+            width: 96,
+            height: 96,
+            child: CircularProgressIndicator(
+              value: value.clamp(0.04, 1.0),
+              strokeWidth: 8,
+              color: color,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
