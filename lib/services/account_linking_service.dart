@@ -10,7 +10,10 @@ class AccountLinkingService {
     if (user == null) throw Exception('NO_SESSION');
 
     await supabase.auth.updateUser(
-      UserAttributes(email: email, password: password),
+      UserAttributes(
+        email: email,
+        password: password,
+      ),
     );
   }
 

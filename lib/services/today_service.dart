@@ -35,7 +35,7 @@ class TodayService {
               'profile_id': profileId,
               'date': day,
               'locale': locale,
-              if (tz != null) 'timezone': tz,
+                          'timezone': ?tz,
             }),
           )
           .timeout(const Duration(seconds: 20));
@@ -70,7 +70,7 @@ class TodayService {
       static Future<String?> _tz() async {
     try {
       final v = await FlutterTimezone.getLocalTimezone();
-      return v.toString().isEmpty ? null : v.toString();
+      return v.identifier.isEmpty ? null : v.identifier;
     } catch (e) {
       debugPrint('timezone: $e');
       return null;
