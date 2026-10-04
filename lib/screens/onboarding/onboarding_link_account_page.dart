@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../i18n/app_localizations.dart';
 import '../../services/account_linking_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -27,9 +26,9 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
     super.initState();
     // Google/Apple OAuth tarayıcı akışı dönünce (deep-link) buradan yakalanır.
     _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((state) {
-          if (!mounted) return;
-      final identities = state.session?.user.identities ?? [];
-      final hasOAuth = identities.any((i) => i.provider != 'anonymous');
+  if (!mounted) return;
+      final user = state.session?.user;
+      if (user == null || user.isAnonymous) return;
       _goHome();
     });
   }
@@ -46,7 +45,8 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
     void _goHome() {
       if (_navigated || !mounted) return;
       _navigated = true;
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+  Navigator.of(context, rootNavigator: true)
+    .pushNamedAndRemoveUntil('/home', (route) => false);
     }
 
   Future<void> _onSave() async {
@@ -60,7 +60,9 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
-        _emailAlreadyLinked = true;
+
+
+   _emailAlreadyLinked = true;
       } on AuthException catch (e) {
         if (!mounted) return;
         setState(() => _isSubmitting = false);
@@ -75,6 +77,8 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
           ),
         );
         return;
+
+
       } catch (_) {
         if (!mounted) return;
         setState(() => _isSubmitting = false);
