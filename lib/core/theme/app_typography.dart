@@ -22,7 +22,7 @@ class AppFonts {
   AppFonts._();
 
   static const String heading = 'Libre Caslon Condensed';
-  static const String body = 'Inter';
+   static const String body = 'Libre Caslon Condensed';
 }
 
 // ── Text styles ────────────────────────────────────────────────────────
@@ -241,8 +241,8 @@ class AppTextStyles {
       color: AppColors.textPrimary,
     ),
     titleLarge: TextStyle(
-      fontFamily: AppFonts.body,
-      fontSize: 17,
+      fontFamily: AppFonts.heading,
+      fontSize: 20,
       fontWeight: FontWeight.w600,
       color: AppColors.textPrimary,
     ),

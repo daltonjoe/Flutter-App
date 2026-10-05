@@ -23,6 +23,9 @@ class CosmicTheme {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: AppColors.bgDeep,
 
+   // Global font family (all text falls back to this)
+        fontFamily: AppFonts.heading,
+
         // Base color scheme mapping
         colorScheme: const ColorScheme.dark(
           primary: AppColors.violetPrimary,
