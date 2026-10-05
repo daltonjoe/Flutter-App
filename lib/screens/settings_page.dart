@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+﻿import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -10,7 +10,9 @@ import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../presentation/widgets/components/cosmic_card.dart';
 import '../presentation/widgets/components/cosmic_error_state.dart';
+import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
+import '../services/account_deletion_service.dart';
 import '../services/user_settings_service.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -21,8 +23,9 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _animController;
+  late final AnimationController _holdDelete;
 
   bool _isLoading = true;
   String? _loadError;
@@ -31,6 +34,10 @@ class _SettingsPageState extends State<SettingsPage>
 
   String? _appVersion;
 
+  bool _deleting = false;
+  bool _holdTriggered = false;
+  bool _showConfirmForA11y = false;
+
   @override
   void initState() {
     super.initState();
@@ -38,13 +45,72 @@ class _SettingsPageState extends State<SettingsPage>
       vsync: this,
       duration: const Duration(milliseconds: 650),
     );
+    _holdDelete = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+    _holdDelete.addListener(_onHoldTick);
     _loadAll();
   }
 
   @override
   void dispose() {
+    _holdDelete.removeListener(_onHoldTick);
     _animController.dispose();
+    _holdDelete.dispose();
     super.dispose();
+  }
+
+  void _onHoldTick() {
+    if (!_holdTriggered && _holdDelete.status == AnimationStatus.completed) {
+      _holdTriggered = true;
+      HapticFeedback.heavyImpact();
+      _runAccountDelete();
+    }
+  }
+
+  void _onHoldDown() {
+    if (_deleting) return;
+    _holdTriggered = false;
+    _holdDelete.forward();
+  }
+
+  void _onHoldUp() {
+    if (_holdDelete.status == AnimationStatus.completed) return;
+    _holdDelete.stop();
+    _holdDelete.animateBack(
+      0,
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+    );
+  }
+
+  Future<void> _runAccountDelete() async {
+    if (!mounted) return;
+    setState(() => _deleting = true);
+    try {
+      await AccountDeletionService.deleteAccount();
+      if (!mounted) return;
+      await context.read<ActiveProfileProvider>().clearActive();
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+        '/onboarding',
+        (route) => false,
+        arguments: {'isFirstProfile': true},
+      );
+    } catch (e) {
+      debugPrint('SettingsPage._runAccountDelete failed: $e');
+      if (!mounted) return;
+      setState(() {
+        _deleting = false;
+        _holdTriggered = false;
+        _showConfirmForA11y = false;
+      });
+      _holdDelete.value = 0;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(t(context, 'settings.danger.error'))),
+      );
+    }
   }
 
   Future<void> _loadAll() async {
@@ -61,7 +127,8 @@ class _SettingsPageState extends State<SettingsPage>
       if (!mounted) return;
       final disableAnimations = MediaQuery.of(context).disableAnimations;
       setState(() {
-        _settings = results[0] as UserSettings? ??
+        _settings =
+            results[0] as UserSettings? ??
             UserSettings(
               notificationTime: null,
               notificationsEnabled: false,
@@ -87,35 +154,25 @@ class _SettingsPageState extends State<SettingsPage>
     }
   }
 
-  Widget _sectionLabel(String key) {
+  Widget _sectionLabel(String key, {Color? color}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
       child: Text(
         t(context, key).toUpperCase(),
-        style: AppTextStyles.fieldLabel(color: AppColors.textMuted),
+        style: AppTextStyles.fieldLabel(color: color ?? AppColors.textMuted),
       ),
     );
   }
 
   Widget _wrapSectionEntrance({required int index, required Widget child}) {
-    final curves = [0.0, 0.10, 0.22, 0.35];
+    final curves = [0.0, 0.10, 0.22, 0.35, 0.45];
     final start = curves[index.clamp(0, curves.length - 1)];
     final end = (start + 0.50).clamp(0.0, 1.0);
     final Animation<double> fade = CurvedAnimation(
       parent: _animController,
       curve: Interval(start, end, curve: Curves.easeOut),
     );
-    final Animation<Offset> slide = Tween<Offset>(
-      begin: const Offset(0, 12),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animController,
-      curve: Interval(start, end, curve: Curves.easeOutCubic),
-    ));
-    return FadeTransition(
-      opacity: fade,
-      child: SlideTransition(position: slide, child: child),
-    );
+ return FadeTransition(opacity: fade, child: child);
   }
 
   Widget _skeleton({double height = 56, double? width}) {
@@ -164,6 +221,11 @@ class _SettingsPageState extends State<SettingsPage>
           child: CosmicCard(child: _skeleton(height: 48)),
         ),
         _sectionLabel('settings.section.about'),
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+          child: CosmicCard(child: _skeleton(height: 48)),
+        ),
+        _sectionLabel('settings.danger.title', color: AppColors.errorRed),
         CosmicCard(child: _skeleton(height: 48)),
       ],
     );
@@ -216,11 +278,9 @@ class _SettingsPageState extends State<SettingsPage>
               child: Column(
                 children: [
                   _buildRow(
-                                      leading: Text(
+                    leading: Text(
                       t(context, 'settings.notifications.enabled'),
-                      style: AppTextStyles.bodyLg(
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -233,14 +293,11 @@ class _SettingsPageState extends State<SettingsPage>
                       inactiveTrackColor: AppColors.bgSurfaceLow,
                     ),
                   ),
-                  const Divider(
-                    height: 1,
-                    color: AppColors.borderSubtle,
-                  ),
+                  const Divider(height: 1, color: AppColors.borderSubtle),
                   _buildRow(
                     enabled: enabled,
                     onTap: enabled ? _pickTime : null,
-                     leading: Text(
+                    leading: Text(
                       t(context, 'settings.notifications.time'),
                       style: AppTextStyles.bodyLg(
                         color: enabled
@@ -339,7 +396,11 @@ class _SettingsPageState extends State<SettingsPage>
                       mode: CupertinoDatePickerMode.time,
                       use24hFormat: true,
                       initialDateTime: DateTime(
-                        2000, 1, 1, initial.hour, initial.minute,
+                        2000,
+                        1,
+                        1,
+                        initial.hour,
+                        initial.minute,
                       ),
                       backgroundColor: AppColors.bgCard,
                       onDateTimeChanged: (dt) {
@@ -431,10 +492,7 @@ class _SettingsPageState extends State<SettingsPage>
                       ),
                     ),
                     const SizedBox(width: AppSpacing.xs),
-                    const Icon(
-                      Icons.chevron_right,
-                      color: AppColors.textMuted,
-                    ),
+                    const Icon(Icons.chevron_right, color: AppColors.textMuted),
                   ],
                 ),
               ),
@@ -462,9 +520,7 @@ class _SettingsPageState extends State<SettingsPage>
       builder: (ctx) {
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: AppSpacing.md,
-            ),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: languagesWithoutArabic.map((lang) {
@@ -533,7 +589,7 @@ class _SettingsPageState extends State<SettingsPage>
             _sectionLabel('settings.section.account'),
             CosmicCard(
               child: _buildRow(
-                 leading: Text(
+                leading: Text(
                   statusText,
                   style: AppTextStyles.bodyMd(color: AppColors.textSecondary),
                   softWrap: true,
@@ -551,27 +607,215 @@ class _SettingsPageState extends State<SettingsPage>
   Widget _aboutSection() {
     return _wrapSectionEntrance(
       index: 3,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _sectionLabel('settings.section.about'),
+            CosmicCard(
+              child: _buildRow(
+                leading: Text(
+                  t(context, 'settings.about.version'),
+                  style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+                trailing: Text(
+                  _appVersion ?? '',
+                  style: AppTextStyles.bodyMd(color: AppColors.textMuted),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _dangerSection() {
+    final disableAnimations = MediaQuery.of(context).disableAnimations;
+    return _wrapSectionEntrance(
+      index: 4,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _sectionLabel('settings.section.about'),
+          _sectionLabel('settings.danger.title', color: AppColors.errorRed),
           CosmicCard(
-            child: _buildRow(
-              leading: Text(
-                t(context, 'settings.about.version'),
-                style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
-                softWrap: true,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-              trailing: Text(
-                _appVersion ?? '',
-                style: AppTextStyles.bodyMd(color: AppColors.textMuted),
-              ),
+            borderColor: AppColors.errorRed.withValues(alpha: 0.4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: Text(
+                    t(context, 'settings.danger.warning'),
+                    style: AppTextStyles.bodySm(color: AppColors.textSecondary),
+                    softWrap: true,
+                  ),
+                ),
+                if (disableAnimations)
+                  _buildA11yDeleteButtons()
+                else
+                  _buildHoldDeleteButton(),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildHoldDeleteButton() {
+    return IgnorePointer(
+      ignoring: _deleting,
+      child: Listener(
+        onPointerDown: (_) => _onHoldDown(),
+        onPointerUp: (_) => _onHoldUp(),
+        onPointerCancel: (_) => _onHoldUp(),
+        child: AnimatedBuilder(
+          animation: _holdDelete,
+          builder: (_, fillW) {
+            final progress = _holdDelete.value;
+            return SizedBox(
+              width: double.infinity,
+              height: AppSizes.ctaHeight,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.errorRed.withValues(alpha: 0.12),
+                        borderRadius: AppRadius.pillBr,
+                        border: Border.all(
+                          color: AppColors.errorRed.withValues(alpha: 0.4),
+                        ),
+                      ),
+                    ),
+                  ),
+ if (progress > 0)
+                    Positioned.fill(
+                      child: ClipRRect(
+                        borderRadius: AppRadius.pillBr,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: FractionallySizedBox(
+                            widthFactor: progress,
+                            heightFactor: 1,
+                            child: const ColoredBox(color: AppColors.errorRed),
+                          ),
+                        ),
+                      ),
+                    ),
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: _deleting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.textPrimary,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              t(context, 'settings.danger.hold'),
+                              style: AppTextStyles.ctaSecondary(
+                                color: Color.lerp(
+                                  AppColors.errorRed,
+                                  AppColors.textPrimary,
+                                  progress,
+                                )!,
+                              ).copyWith(fontWeight: FontWeight.w700),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildA11yDeleteButtons() {
+    return Column(
+      children: [
+        if (!_showConfirmForA11y)
+          SizedBox(
+            width: double.infinity,
+            height: AppSizes.ctaHeight,
+            child: OutlinedButton(
+              onPressed: _deleting
+                  ? null
+                  : () => setState(() => _showConfirmForA11y = true),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: AppColors.errorRed.withValues(alpha: 0.5),
+                ),
+                shape: RoundedRectangleBorder(borderRadius: AppRadius.pillBr),
+                disabledForegroundColor: AppColors.textDisabled,
+              ),
+              child: _deleting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.textPrimary,
+                        ),
+                      ),
+                    )
+                  : Text(
+                      t(context, 'settings.danger.delete_account'),
+                      style: AppTextStyles.ctaSecondary(
+                        color: AppColors.errorRed,
+                      ).copyWith(fontWeight: FontWeight.w700),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+            ),
+          ),
+        if (_showConfirmForA11y)
+          SizedBox(
+            width: double.infinity,
+            height: AppSizes.ctaHeight,
+            child: ElevatedButton(
+              onPressed: _deleting ? null : _runAccountDelete,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.errorRed,
+                disabledBackgroundColor: AppColors.bgSurface,
+                shape: RoundedRectangleBorder(borderRadius: AppRadius.pillBr),
+                elevation: 0,
+              ),
+              child: _deleting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.textPrimary,
+                        ),
+                      ),
+                    )
+                  : Text(
+                      t(context, 'settings.danger.confirm'),
+                      style: AppTextStyles.ctaPrimary,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -601,6 +845,7 @@ class _SettingsPageState extends State<SettingsPage>
                 _languageSection(),
                 _accountSection(),
                 _aboutSection(),
+                _dangerSection(),
               ],
             ),
     );
