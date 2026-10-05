@@ -1,11 +1,18 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../core/theme/app_colors.dart';
+import '../core/theme/app_decorations.dart';
+import '../core/theme/app_dimensions.dart';
+import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/reference_names_service.dart';
+import '../services/user_settings_service.dart';
 import '../services/today_service.dart';
 import '../widgets/feedback_vote.dart';
 import 'edit_birth_time_page.dart';
@@ -29,6 +36,11 @@ class _TodayPageState extends State<TodayPage> {
     DateTime.now().day,
   );
   final Map<String, Map<String, dynamic>> _week = {};
+  static const String _kRitualDismissed = 'today_ritual_dismissed';
+  bool _ritualDismissed = false;
+  bool _notificationsFlagEnabled = false;
+  UserSettings? _ritualSettings;
+  bool _ritualLoading = true;
 
   String _t(String k) => AppLocalizations.of(context)?.translate(k) ?? k;
 
@@ -42,6 +54,158 @@ class _TodayPageState extends State<TodayPage> {
   List<DateTime> _weekDates() {
     final today = _stripTime(DateTime.now());
     return List.generate(7, (i) => today.add(Duration(days: i)));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_loadRitualState());
+  }
+
+  Future<void> _loadRitualState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final dismissed = prefs.getBool(_kRitualDismissed) ?? false;
+      final flag = await UserSettingsService.isFlagEnabled(
+        'settings_notifications',
+      );
+      UserSettings? settings;
+      if (flag && !dismissed) {
+        settings = await UserSettingsService.load();
+      }
+      if (!mounted) return;
+      setState(() {
+        _ritualDismissed = dismissed;
+        _notificationsFlagEnabled = flag;
+        _ritualSettings = settings;
+        _ritualLoading = false;
+      });
+    } catch (e) {
+      debugPrint('ritual init failed: $e');
+      if (mounted) setState(() => _ritualLoading = false);
+    }
+  }
+
+  Future<void> _dismissRitual() async {
+    HapticFeedback.selectionClick();
+    setState(() => _ritualDismissed = true);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_kRitualDismissed, true);
+    } catch (e) {
+      debugPrint('ritual dismiss persist failed: $e');
+    }
+  }
+
+  Future<void> _pickRitualTime() async {
+    final initialParts = (_ritualSettings?.notificationTime ?? '09:00').split(
+      ':',
+    );
+    final initial = TimeOfDay(
+      hour: int.tryParse(initialParts[0]) ?? 9,
+      minute: int.tryParse(initialParts[1]) ?? 0,
+    );
+    TimeOfDay? picked = initial;
+
+    final confirmed = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: AppColors.bgCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              AppSpacing.sm,
+              AppSpacing.md,
+              AppSpacing.md,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: 180,
+                  child: CupertinoTheme(
+                    data: const CupertinoThemeData(
+                      brightness: Brightness.dark,
+                      textTheme: CupertinoTextThemeData(
+                        dateTimePickerTextStyle: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                    child: CupertinoDatePicker(
+                      mode: CupertinoDatePickerMode.time,
+                      use24hFormat: true,
+                      initialDateTime: DateTime(
+                        2000,
+                        1,
+                        1,
+                        initial.hour,
+                        initial.minute,
+                      ),
+                      backgroundColor: AppColors.bgCard,
+                      onDateTimeChanged: (dt) {
+                        picked = TimeOfDay(hour: dt.hour, minute: dt.minute);
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                SizedBox(
+                  width: double.infinity,
+                  height: AppSizes.ctaHeight,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.violetPrimary,
+                      borderRadius: AppRadius.mdBr,
+                    ),
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: Text(
+                                              t(context, 'settings.save'),
+                        style: AppTextStyles.ctaPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (confirmed != true || picked == null || !mounted) return;
+    HapticFeedback.selectionClick();
+    final hh = picked!.hour.toString().padLeft(2, '0');
+    final mm = picked!.minute.toString().padLeft(2, '0');
+    final newTime = '$hh:$mm';
+    final prevSettings = _ritualSettings;
+    setState(() {
+      _ritualSettings =
+          (prevSettings ??
+                  UserSettings(
+                    notificationsEnabled: true,
+                    notificationTime: null,
+                  ))
+              .copyWith(notificationTime: newTime);
+    });
+    try {
+      await UserSettingsService.save(notificationTime: newTime);
+    } catch (e) {
+      debugPrint('ritual save notificationTime failed: $e');
+      if (!mounted) return;
+      setState(() {
+        _ritualSettings = prevSettings;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(t(context, 'settings.error.save'))),
+      );
+    }
   }
 
   @override
@@ -80,7 +244,7 @@ class _TodayPageState extends State<TodayPage> {
         );
         if (!mounted) return;
         if (_key != expectedKey) return;
- setState(() => _week[k] = r);
+        setState(() => _week[k] = r);
       } catch (e) {
         debugPrint('week fetch $k error: $e');
       }
@@ -97,9 +261,8 @@ class _TodayPageState extends State<TodayPage> {
       final d = await TodayService.fetch(profileId: pid, locale: loc);
       if (!mounted) return;
       setState(() {
-         _data = d;
+        _data = d;
         _cachedAt = null;
-   
       });
       unawaited(_loadWeekBackground(pid, loc, expectedKey!));
     } catch (e) {
@@ -208,7 +371,7 @@ class _TodayPageState extends State<TodayPage> {
             width: selected ? 2 : 1,
           ),
           color: selected
-                   ? AppColors.violetPrimary.withValues(alpha: 0.12)
+              ? AppColors.violetPrimary.withValues(alpha: 0.12)
               : Colors.transparent,
         ),
         child: Column(
@@ -355,6 +518,19 @@ class _TodayPageState extends State<TodayPage> {
           ),
           const SizedBox(height: 12),
         ],
+        _RitualCard(
+          loading: _ritualLoading,
+          visible: !_ritualDismissed && _notificationsFlagEnabled,
+          settings: _ritualSettings,
+            headline: (isToday && head != null)
+                ? Map<String, dynamic>.from(head)
+                : null,
+          locale: loc,
+          onDismiss: _dismissRitual,
+          onPickTime: _pickRitualTime,
+        ),
+        if (!_ritualDismissed && _notificationsFlagEnabled && !_ritualLoading)
+          const SizedBox(height: 12),
         if (head != null) ...[
           Text(
             _label(
@@ -366,21 +542,21 @@ class _TodayPageState extends State<TodayPage> {
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
- if (text != null && text.isNotEmpty) ...[
+          if (text != null && text.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(text),
             if (_id(head['template_id']) != null &&
-                context.read<ActiveProfileProvider>().activeProfileId !=
-                    null)
+                context.read<ActiveProfileProvider>().activeProfileId != null)
               FeedbackVote(
                 key: ValueKey(
                   '${context.read<ActiveProfileProvider>().activeProfileId}|'
                   '${_dkey(_selected)}|${_id(head['template_id'])}',
                 ),
-                profileId:
-                    context.read<ActiveProfileProvider>().activeProfileId!,
+                profileId: context
+                    .read<ActiveProfileProvider>()
+                    .activeProfileId!,
                 day: _dkey(_selected),
-               templateId: _id(head['template_id'])!,
+                templateId: _id(head['template_id'])!,
                 // Snippet şu an yalnız EN+TR; diğer dillerde metin en'e düşüyor.
                 locale: (loc == 'tr' || loc == 'en') ? loc : 'en',
               ),
@@ -402,7 +578,7 @@ class _TodayPageState extends State<TodayPage> {
         if (events.isNotEmpty) ...[
           const SizedBox(height: 20),
           Text(
-              isToday
+            isToday
                 ? _t('today.events')
                 : AppLocalizations.of(context)!.translate(
                     'today.events_on',
@@ -445,7 +621,7 @@ class _TodayPageState extends State<TodayPage> {
                   : null,
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                builder: (_) => TransitDetailPage(
+                  builder: (_) => TransitDetailPage(
                     profileId: context
                         .read<ActiveProfileProvider>()
                         .activeProfileId,
@@ -520,7 +696,7 @@ class _TodayPageState extends State<TodayPage> {
     }
     if (ps.isEmpty) return const SizedBox.shrink();
     final avg = ps.reduce((a, b) => a + b) / ps.length;
-  final color = avg > 0.7 ? AppColors.tealSuccess : AppColors.textMuted;
+    final color = avg > 0.7 ? AppColors.tealSuccess : AppColors.textMuted;
     final valenceKey = avg > 0.7 ? 'valence.power' : 'valence.neutral';
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -574,6 +750,190 @@ class _TodayPageState extends State<TodayPage> {
               style: TextStyle(fontSize: 12, color: color),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RitualCard extends StatelessWidget {
+  final bool loading;
+  final bool visible;
+  final UserSettings? settings;
+  final Map<String, dynamic>? headline;
+  final String locale;
+  final Future<void> Function() onDismiss;
+  final Future<void> Function() onPickTime;
+
+  const _RitualCard({
+    required this.loading,
+    required this.visible,
+    required this.settings,
+    required this.headline,
+    required this.locale,
+    required this.onDismiss,
+    required this.onPickTime,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (!visible) return const SizedBox.shrink();
+    return _card(context);
+  }
+
+  Widget _card(BuildContext context) {
+    final hasTime = settings?.notificationTime != null;
+    String? previewText;
+    if (locale == 'en' || locale == 'tr') {
+      final Map<String, dynamic>? hl = headline;
+      if (hl != null) {
+        final Object? n = hl['notification'];
+        if (n is String && n.trim().isNotEmpty) {
+          previewText = n;
+        }
+      }
+    }
+    final bool showPreview =
+        previewText != null && previewText.trim().isNotEmpty;
+
+    return Container(
+      decoration: AppDecorations.cosmicCard(),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.md,
+        AppSpacing.xs,
+        AppSpacing.md,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            t(context, 'today.ritual.title'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.h2(),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            t(context, 'today.ritual.body'),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.bodySm(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: AppSpacing.xxl,
+                height: AppSpacing.xxl,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(Icons.close, size: 20),
+                  color: AppColors.textMuted,
+                  onPressed: loading ? null : onDismiss,
+                  tooltip: t(context, 'today.ritual.dismiss'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: AppSizes.ctaHeight,
+                  child: loading
+                      ? const Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : DecoratedBox(
+                          decoration: hasTime
+                              ? AppDecorations.secondaryCta()
+                              : AppDecorations.primaryCta(),
+                          child: TextButton(
+                            onPressed: onPickTime,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    hasTime
+                                        ? '${settings!.notificationTime!}  •  ${t(context, 'today.ritual.change_time')}'
+                                        : t(context, 'today.ritual.set_time'),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: hasTime
+                                        ? AppTextStyles.ctaSecondary()
+                                        : AppTextStyles.ctaPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
+          if (showPreview) ...[
+            const SizedBox(height: AppSpacing.md),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: AppColors.bgSurface,
+                borderRadius: AppRadius.mdBr,
+                border: Border.all(color: AppColors.borderSubtle),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    t(context, 'today.ritual.preview_label'),
+                    style: AppTextStyles.fieldLabel(),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          previewText,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.bodyMd(
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
