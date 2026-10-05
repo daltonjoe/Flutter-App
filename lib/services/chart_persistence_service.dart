@@ -145,7 +145,9 @@ class ChartPersistenceService {
       timezone: timezone,
       locale: locale,
     );
-
+  if (!chart.isSuccess) {
+      throw Exception(chart.message ?? 'unknown_error');
+    }
     final planets = chart.planets;
     final houses = chart.houses;
     final aspects = chart.aspects;
