@@ -217,5 +217,9 @@
   "birth_time.pick": "Saat seç",
   "birth_time.save": "Kaydet",
   "birth_time.error": "Kaydedilemedi. Tekrar dene.",
-  "today.events_on": "{date} olayları"
+  "today.events_on": "{date} olayları",
+  "feedback.prompt": "Bu sana uydu mu?",
+  "feedback.helpful": "Doğru geldi",
+  "feedback.not_helpful": "Uymadı",
+  "feedback.error": "Oyun kaydedilemedi."
 }

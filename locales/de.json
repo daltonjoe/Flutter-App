@@ -217,5 +217,9 @@
   "birth_time.pick": "Zeit wählen",
   "birth_time.save": "Speichern",
   "birth_time.error": "Konnte nicht speichern. Erneut versuchen.",
-  "today.events_on": "Ereignisse am {date}"
+  "today.events_on": "Ereignisse am {date}",
+  "feedback.prompt": "Hat das für dich gestimmt?",
+  "feedback.helpful": "Stimmt",
+  "feedback.not_helpful": "Passt nicht",
+  "feedback.error": "Bewertung konnte nicht gespeichert werden."
 }

@@ -217,5 +217,9 @@
   "birth_time.pick": "Pick time",
   "birth_time.save": "Save",
   "birth_time.error": "Couldn't save. Try again.",
-  "today.events_on": "Events on {date}"
+  "today.events_on": "Events on {date}",
+  "feedback.prompt": "Did this ring true?",
+  "feedback.helpful": "Rings true",
+  "feedback.not_helpful": "Doesn't fit",
+  "feedback.error": "Couldn't save your vote."
 }

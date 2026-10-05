@@ -217,5 +217,9 @@
   "birth_time.pick": "Seleccionar hora",
   "birth_time.save": "Guardar",
   "birth_time.error": "No se pudo guardar. Inténtalo de nuevo.",
-  "today.events_on": "Eventos del {date}"
+  "today.events_on": "Eventos del {date}",
+  "feedback.prompt": "¿Te suena cierto?",
+  "feedback.helpful": "Me suena cierto",
+  "feedback.not_helpful": "No me suena",
+  "feedback.error": "No se pudo guardar tu voto."
 }

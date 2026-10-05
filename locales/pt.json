@@ -217,5 +217,9 @@
   "birth_time.pick": "Escolher hora",
   "birth_time.save": "Salvar",
   "birth_time.error": "Não foi possível salvar. Tente novamente.",
-  "today.events_on": "Eventos de {date}"
+  "today.events_on": "Eventos de {date}",
+  "feedback.prompt": "Isso faz sentido para você?",
+  "feedback.helpful": "Faz sentido",
+  "feedback.not_helpful": "Não faz sentido",
+  "feedback.error": "Não foi possível salvar seu voto."
 }

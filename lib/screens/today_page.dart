@@ -429,7 +429,11 @@ class _TodayPageState extends State<TodayPage> {
                   : null,
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) => TransitDetailPage(
+                builder: (_) => TransitDetailPage(
+                    profileId: context
+                        .read<ActiveProfileProvider>()
+                        .activeProfileId,
+                    day: _dkey(_selected),
                     event: Map<String, dynamic>.from(e),
                     locale: context
                         .read<LanguageProvider>()

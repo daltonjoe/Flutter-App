@@ -217,5 +217,9 @@
   "birth_time.pick": "Choisir l'heure",
   "birth_time.save": "Enregistrer",
   "birth_time.error": "Impossible d'enregistrer. Réessayer.",
-  "today.events_on": "Événements du {date}"
+  "today.events_on": "Événements du {date}",
+  "feedback.prompt": "Est-ce que ça te parle ?",
+  "feedback.helpful": "Ça me parle",
+  "feedback.not_helpful": "Ça ne me parle pas",
+  "feedback.error": "Impossible d'enregistrer ton vote."
 }
