@@ -19,7 +19,7 @@ const List<_LangOption> _languages = [
   _LangOption('es', 'Spanish', 'Español', Color(0xFFFBC02D)),
   _LangOption('fr', 'French', 'Français', Color(0xFF3F51B5)),
   _LangOption('pt', 'Portuguese', 'Português', Color(0xFF2E7D32)),
-  _LangOption('ar', 'Arabic', 'العربية', Color(0xFF009688)),
+  _LangOption('it', 'Italian', 'Italiano', Color(0xFF009688)),
 ];
 
 const Map<String, String> _continueLabels = {
@@ -29,7 +29,7 @@ const Map<String, String> _continueLabels = {
   'es': 'Continuar con Español',
   'fr': 'Continuer en Français',
   'pt': 'Continuar em Português',
-  'ar': 'المتابعة بالعربية',
+  'it': 'Continua in Italiano',
 };
 
 class OnboardingLanguagePage extends StatefulWidget {
