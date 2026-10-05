@@ -266,9 +266,7 @@ class _TodayPageState extends State<TodayPage> {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                final pid = context
-                    .read<ActiveProfileProvider>()
-                    .activeProfileId;
+                final pid = context.read<ActiveProfileProvider>().activeProfileId;
                 if (pid == null) return;
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -283,10 +281,7 @@ class _TodayPageState extends State<TodayPage> {
                     Expanded(
                       child: Text(
                         _t('today.unknown_time_hint'),
-                        style: const TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: 12,
-                        ),
+                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
                       ),
                     ),
                     const Icon(

@@ -15,7 +15,13 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends State<MainShell>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _fade = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 220),
+    value: 1,
+  );
   int _index = 1; // Today hazır olana kadar varsayılan: Harita
   final _keys = List.generate(3, (_) => GlobalKey<NavigatorState>());
 
@@ -35,12 +41,18 @@ class _MainShellState extends State<MainShell> {
   void dispose() {
     shellTab.removeListener(_onTab);
     mapPopToRoot.removeListener(_onPopMap);
+    _fade.dispose();
     super.dispose();
   }
 
   void _onTab() {
     if (!mounted || _index == shellTab.value) return;
-    setState(() => _index = shellTab.value);
+ setState(() => _index = shellTab.value);
+    if (MediaQuery.of(context).disableAnimations) {
+      _fade.value = 1;
+    } else {
+      _fade.forward(from: 0);
+    }
   }
 
   void _onPopMap() {
@@ -76,14 +88,17 @@ class _MainShellState extends State<MainShell> {
         if (nav.canPop()) nav.pop();
       },
       child: Scaffold(
-        body: IndexedStack(
-          index: _index,
-          children: List.generate(3, (i) {
-            return Navigator(
-              key: _keys[i],
-              onGenerateRoute: (s) => _onRoute(i, s),
-            );
-          }),
+    body: FadeTransition(
+          opacity: _fade,
+          child: IndexedStack(
+            index: _index,
+            children: List.generate(3, (i) {
+              return Navigator(
+                key: _keys[i],
+                onGenerateRoute: (s) => _onRoute(i, s),
+              );
+            }),
+          ),
         ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: _index,

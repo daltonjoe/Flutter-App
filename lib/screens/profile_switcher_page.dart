@@ -202,13 +202,14 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
                             IconButton(
                               icon: const Icon(Icons.access_time),
                               tooltip: t(context, 'birth_time.add'),
-                              onPressed: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => EditBirthTimePage(
-                                    profileId: profile['id'] as String,
+                              onPressed: () =>
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => EditBirthTimePage(
+                                        profileId: profile['id'] as String,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
                             ),
                           IconButton(
                             icon: const Icon(Icons.delete_outline),
