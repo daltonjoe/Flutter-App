@@ -21,8 +21,8 @@ import 'app_colors.dart';
 class AppFonts {
   AppFonts._();
 
-  static const String heading = 'Playfair Display';
-  static const String body    = 'Inter';
+  static const String heading = 'Libre Caslon Condensed';
+  static const String body = 'Inter';
 }
 
 // ── Text styles ────────────────────────────────────────────────────────

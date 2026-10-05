@@ -70,26 +70,17 @@ flutter:
     - locales/
 
   fonts:
-    - family: Playfair Display
+    - family: Libre Caslon Condensed
       fonts:
-        - asset: assets/fonts/PlayfairDisplay-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/PlayfairDisplay-Bold.ttf
-          weight: 700
-        - asset: assets/fonts/PlayfairDisplay-ExtraBold.ttf
-          weight: 800
-        - asset: assets/fonts/PlayfairDisplay-Black.ttf
-          weight: 900
-    - family: Inter
-      fonts:
-        - asset: assets/fonts/Inter_18pt-Regular.ttf
+        - asset: assets/fonts/LibreCaslonCondensed-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Inter_18pt-SemiBold.ttf
+        - asset: assets/fonts/LibreCaslonCondensed-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/LibreCaslonCondensed-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Inter_18pt-Bold.ttf
+        - asset: assets/fonts/LibreCaslonCondensed-Bold.ttf
           weight: 700
-        - asset: assets/fonts/Inter_18pt-ExtraBold.ttf
-          weight: 800
+          
 
     
 
