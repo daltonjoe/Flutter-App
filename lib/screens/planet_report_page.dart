@@ -101,24 +101,29 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
       final rows = await query
           .eq('locale', locale)
           .eq('is_active', true);
-      if (rows.isEmpty) {
+        if (!mounted) return;
+        if (rows.isEmpty) {
         // Fallback: Supabase'de içerik yoksa eski AI akışına düş
         final r = await AstroService.generatePlanetReport(
           planetName: widget.planetName,
           chartData: widget.chartData.toChartPayload(),
           locale: locale,
         );
-        setState(() { _report = r; _isFallback = true; _isLoading = false; });
+          if (!mounted) return;
+          setState(() { _report = r; _isFallback = true; _isLoading = false; });
       } else {
         setState(() {
           _sections = List<Map<String, dynamic>>.from(rows);
           _isLoading = false;
         });
       }
-    } on AstroServiceException catch (e) {
-      setState(() { _error = e.message; _isLoading = false; });
-    } catch (_) {
-      setState(() {
+ } on AstroServiceException catch (e) {
+        if (!mounted) return;
+        setState(() { _error = e.message; _isLoading = false; });
+    } catch (e) {
+        debugPrint('planet_report fetch error: $e');
+        if (!mounted) return;
+        setState(() {
         _error = t(context, 'planet_report.unexpected_error');
         _isLoading = false;
       });
