@@ -423,11 +423,15 @@ class _ErrorView extends StatelessWidget {
                       size: 16,
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      t(context, 'natal_report.retry'),
-                      style: const TextStyle(
-                        color: AppTheme.violet,
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        t(context, 'natal_report.retry'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppTheme.violet,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
