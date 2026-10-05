@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import '../../i18n/app_localizations.dart';
 import '../../services/account_linking_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import 'dart:async';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 
 class OnboardingLinkAccountPage extends StatefulWidget {
 const OnboardingLinkAccountPage({super.key});
@@ -125,7 +126,7 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
                 children: [
                   Text(
                     t(context, 'onboarding.link_account.description'),
-                    style: const TextStyle(fontSize: 14),
+                                                 style: AppTextStyles.bodyMd(color: AppColors.textPrimary),
                   ),
                   const SizedBox(height: 24),
                   TextFormField(
@@ -171,10 +172,13 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
                   ElevatedButton(
                     onPressed: _isSubmitting ? null : _onSave,
                     child: _isSubmitting
-                        ? const SizedBox(
+                                 ? SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.textPrimary,
+                            ),
                           )
                         : Text(t(context, 'onboarding.link_account.save_button')),
                   ),

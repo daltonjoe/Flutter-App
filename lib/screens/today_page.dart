@@ -665,7 +665,8 @@ class _TodayPageState extends State<TodayPage> {
                     .activeProfileId!,
                 day: _dkey(_selected),
                 templateId: _id(head['template_id'])!,
-                // Snippet şu an yalnız EN+TR; diğer dillerde metin en'e düşüyor.
+                // K15 geçici: snippet yalnız EN+TR; diğer dillerde metin en'e düşüyor,
+                // oy gösterilen metnin diliyle kaydedilir. Transcreation sonrası `loc`.
                 locale: (loc == 'tr' || loc == 'en') ? loc : 'en',
               ),
           ],
