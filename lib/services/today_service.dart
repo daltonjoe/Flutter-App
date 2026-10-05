@@ -13,6 +13,7 @@ class TodayService {
     required String profileId,
     required String locale,
     DateTime? date,
+    bool persist = true,
   }) async {
     final jwt = Supabase.instance.client.auth.currentSession?.accessToken;
     if (jwt == null) {
@@ -50,7 +51,8 @@ class TodayService {
           code: 'HTTP_${r.statusCode}', message: 'Sunucu hatası: ${r.statusCode}');
     }
     final out = Map<String, dynamic>.from(jsonDecode(utf8.decode(r.bodyBytes)) as Map);
-    await _save(profileId, locale, out);
+    if (persist) {
+      await _save(profileId, locale, out);
         if (tz != null) {
       try {
         final uid = Supabase.instance.client.auth.currentUser?.id;
@@ -64,6 +66,7 @@ class TodayService {
       } catch (e) {
         debugPrint('user_settings upsert: $e');
       }
+    }
     }
     return out;
   }

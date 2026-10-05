@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/theme/app_colors.dart';
@@ -21,8 +22,26 @@ class _TodayPageState extends State<TodayPage> {
   bool _loading = false;
   String? _key;
   DateTime? _cachedAt;
+  DateTime _selected = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
+  final Map<String, Map<String, dynamic>> _week = {};
 
   String _t(String k) => AppLocalizations.of(context)?.translate(k) ?? k;
+
+  static String _dkey(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
+
+  static DateTime _stripTime(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  List<DateTime> _weekDates() {
+    final today = _stripTime(DateTime.now());
+    return List.generate(7, (i) => today.add(Duration(days: i)));
+  }
 
   @override
   void didChangeDependencies() {
@@ -35,7 +54,35 @@ class _TodayPageState extends State<TodayPage> {
       _key = key;
       _data = null;
       _cachedAt = null;
+      _week.clear();
+      _selected = _stripTime(DateTime.now());
       _load(pid, loc);
+    }
+  }
+
+  Future<void> _loadWeekBackground(
+    String pid,
+    String loc,
+    String expectedKey,
+  ) async {
+    final dates = _weekDates();
+    for (var i = 1; i < dates.length; i++) {
+      final d = dates[i];
+      final k = _dkey(d);
+      if (_week.containsKey(k)) continue;
+      try {
+        final r = await TodayService.fetch(
+          profileId: pid,
+          locale: loc,
+          date: d,
+          persist: false,
+        );
+        if (!mounted) return;
+        if (_key != expectedKey) return;
+ setState(() => _week[k] = r);
+      } catch (e) {
+        debugPrint('week fetch $k error: $e');
+      }
     }
   }
 
@@ -44,13 +91,16 @@ class _TodayPageState extends State<TodayPage> {
       _loading = true;
       _error = null;
     });
+    final expectedKey = _key;
     try {
       final d = await TodayService.fetch(profileId: pid, locale: loc);
       if (!mounted) return;
       setState(() {
-        _data = d;
+         _data = d;
         _cachedAt = null;
+   
       });
+      unawaited(_loadWeekBackground(pid, loc, expectedKey!));
     } catch (e) {
       final c = _data == null ? await TodayService.cached(pid, loc) : null;
       if (!mounted) return;
@@ -106,11 +156,128 @@ class _TodayPageState extends State<TodayPage> {
     return '${tb == null ? '?' : n.planet(tb)} · ${asp == null ? '?' : n.aspect(asp)} · ${nb == null ? '?' : n.planet(nb)}';
   }
 
+  Map<String, dynamic>? _selectedData() {
+    final today = _stripTime(DateTime.now());
+    if (_selected == today) return _data;
+    return _week[_dkey(_selected)];
+  }
+
+  Color _dotColorFor(Map<String, dynamic>? data) {
+    if (data == null) return AppColors.textMuted;
+    final cats = data['categories'] as List? ?? const [];
+    double? maxP;
+    String? maxLevel;
+    for (final c in cats) {
+      final m = c as Map;
+      final pr = m['percentile'];
+      final sc = m['score'];
+      double v = 0;
+      if (pr is num) {
+        v = pr.toDouble();
+        if (v > 1) v = v / 100;
+      } else if (sc is num) {
+        v = sc.toDouble();
+      }
+      if (maxP == null || v > maxP) {
+        maxP = v;
+        maxLevel = m['level']?.toString();
+      }
+    }
+    return _valenceColor(maxLevel);
+  }
+
+  Widget _dayChip(DateTime d, {required String wd, required String mloc}) {
+    final k = _dkey(d);
+    final selected = _selected == d;
+    final data = _stripTime(DateTime.now()) == d ? _data : _week[k];
+    final dotColor = _dotColorFor(data);
+    final today = _stripTime(DateTime.now()) == d;
+    return InkWell(
+      onTap: () {
+        setState(() => _selected = d);
+      },
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 54,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? AppColors.violetPrimary : Colors.transparent,
+            width: selected ? 2 : 1,
+          ),
+          color: selected
+                   ? AppColors.violetPrimary.withValues(alpha: 0.12)
+              : Colors.transparent,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              wd,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: today
+                    ? AppColors.violetPrimary
+                    : (selected
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary),
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              d.day.toString(),
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                color: today
+                    ? AppColors.violetPrimary
+                    : (selected
+                          ? AppColors.textPrimary
+                          : AppColors.textPrimary),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: dotColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _weekStrip(String mloc) {
+    final dates = _weekDates();
+    final wds = MaterialLocalizations.of(context).narrowWeekdays;
+    return SizedBox(
+      height: 84,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        itemCount: dates.length,
+        separatorBuilder: (_, i) => const SizedBox(width: 8),
+        itemBuilder: (_, i) {
+          final d = dates[i];
+          final idx = (d.weekday - 1) % 7;
+          return _dayChip(d, wd: wds[idx], mloc: mloc);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     context.watch<ReferenceNamesService>();
     final pid = context.watch<ActiveProfileProvider>().activeProfileId;
     final loc = context.read<LanguageProvider>().locale.languageCode;
+    final selectedData = _selectedData();
     Widget body;
     if (_loading && _data == null) {
       body = const Center(child: CircularProgressIndicator());
@@ -139,7 +306,7 @@ class _TodayPageState extends State<TodayPage> {
     } else {
       body = RefreshIndicator(
         onRefresh: () => pid == null ? Future.value() : _load(pid, loc),
-        child: _content(_data!),
+        child: _content(selectedData, loc),
       );
     }
     return Scaffold(
@@ -156,19 +323,29 @@ class _TodayPageState extends State<TodayPage> {
     );
   }
 
-  Widget _content(Map<String, dynamic> d) {
+  Widget _content(Map<String, dynamic>? d, String loc) {
+    final isToday = _selected == _stripTime(DateTime.now());
+    if (d == null) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [_weekStrip(loc)],
+      );
+    }
     final head = d['headline'] as Map?;
     final tag = head?['tag'] as Map?;
     final text = head?['text']?.toString();
     final cats = (d['categories'] as List?) ?? const [];
     final events = (d['events'] as List?) ?? const [];
     final rate = (d['rarity'] as Map?)?['event_rate_pct'];
-    final known = d['time_known'] != false;
+    final known = (_data ?? d)['time_known'] != false;
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       children: [
-        if (_cachedAt != null) ...[
+        _weekStrip(loc),
+        const SizedBox(height: 8),
+        if (isToday && _cachedAt != null) ...[
           Text(
             AppLocalizations.of(
               context,
@@ -260,13 +437,15 @@ class _TodayPageState extends State<TodayPage> {
               ),
             ),
         ],
-        if (!known) ...[
+        if (isToday && !known) ...[
           const SizedBox(height: 20),
           Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                final pid = context.read<ActiveProfileProvider>().activeProfileId;
+                final pid = context
+                    .read<ActiveProfileProvider>()
+                    .activeProfileId;
                 if (pid == null) return;
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -281,7 +460,10 @@ class _TodayPageState extends State<TodayPage> {
                     Expanded(
                       child: Text(
                         _t('today.unknown_time_hint'),
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                        style: const TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                     const Icon(
