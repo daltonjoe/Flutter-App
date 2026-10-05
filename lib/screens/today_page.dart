@@ -7,6 +7,7 @@ import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/reference_names_service.dart';
 import '../services/today_service.dart';
+import '../widgets/feedback_vote.dart';
 import 'edit_birth_time_page.dart';
 import 'transit_detail_page.dart';
 
@@ -365,9 +366,24 @@ class _TodayPageState extends State<TodayPage> {
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
-          if (text != null && text.isNotEmpty) ...[
+ if (text != null && text.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(text),
+            if (_id(head['template_id']) != null &&
+                context.read<ActiveProfileProvider>().activeProfileId !=
+                    null)
+              FeedbackVote(
+                key: ValueKey(
+                  '${context.read<ActiveProfileProvider>().activeProfileId}|'
+                  '${_dkey(_selected)}|${_id(head['template_id'])}',
+                ),
+                profileId:
+                    context.read<ActiveProfileProvider>().activeProfileId!,
+                day: _dkey(_selected),
+               templateId: _id(head['template_id'])!,
+                // Snippet şu an yalnız EN+TR; diğer dillerde metin en'e düşüyor.
+                locale: (loc == 'tr' || loc == 'en') ? loc : 'en',
+              ),
           ],
           if (rate is num) ...[
             const SizedBox(height: 8),
