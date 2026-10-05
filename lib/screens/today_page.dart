@@ -520,12 +520,8 @@ class _TodayPageState extends State<TodayPage> {
     }
     if (ps.isEmpty) return const SizedBox.shrink();
     final avg = ps.reduce((a, b) => a + b) / ps.length;
-    final color = avg > 0.7
-        ? AppColors.tealSuccess
-        : (avg < 0.3 ? AppColors.amberTransit : AppColors.textMuted);
-    final valenceKey = avg > 0.7
-        ? 'valence.power'
-        : (avg < 0.3 ? 'valence.pressure' : 'valence.neutral');
+  final color = avg > 0.7 ? AppColors.tealSuccess : AppColors.textMuted;
+    final valenceKey = avg > 0.7 ? 'valence.power' : 'valence.neutral';
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Center(
