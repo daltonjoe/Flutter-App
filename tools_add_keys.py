@@ -4,8 +4,6 @@ import json, io, os
 LANGS = ["tr", "en", "de", "fr", "es", "pt", "it"]
 KEYS = [
  # key, tr, en, de, fr, es, pt, it
- ("nav.today", "Bugün", "Today", "Heute", "Aujourd'hui", "Hoy", "Hoje", "Oggi"),
-  ("today.events_on", "{date} olayları", "Events on {date}", "Ereignisse am {date}", "Événements du {date}", "Eventos del {date}", "Eventos de {date}", "Eventi del {date}"),
 ]
 
 def load(p):
