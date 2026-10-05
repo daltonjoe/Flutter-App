@@ -216,5 +216,6 @@
   "birth_time.hint": "Ton thème sera recalculé. Lune, Ascendant et maisons se débloquent.",
   "birth_time.pick": "Choisir l'heure",
   "birth_time.save": "Enregistrer",
-  "birth_time.error": "Impossible d'enregistrer. Réessayer."
+  "birth_time.error": "Impossible d'enregistrer. Réessayer.",
+  "today.events_on": "Événements du {date}"
 }

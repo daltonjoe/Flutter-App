@@ -216,5 +216,6 @@
   "birth_time.hint": "Your chart will be recalculated. Moon, Ascendant and houses unlock.",
   "birth_time.pick": "Pick time",
   "birth_time.save": "Save",
-  "birth_time.error": "Couldn't save. Try again."
+  "birth_time.error": "Couldn't save. Try again.",
+  "today.events_on": "Events on {date}"
 }

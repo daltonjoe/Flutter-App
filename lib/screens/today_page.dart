@@ -386,7 +386,15 @@ class _TodayPageState extends State<TodayPage> {
         if (events.isNotEmpty) ...[
           const SizedBox(height: 20),
           Text(
-            _t('today.events'),
+              isToday
+                ? _t('today.events')
+                : AppLocalizations.of(context)!.translate(
+                    'today.events_on',
+                    args: {
+                      'date':
+                          '${_selected.day.toString().padLeft(2, '0')}.${_selected.month.toString().padLeft(2, '0')}',
+                    },
+                  ),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),

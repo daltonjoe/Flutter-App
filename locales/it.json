@@ -216,5 +216,6 @@
   "birth_time.hint": "Il tuo tema verrà ricalcolato. Luna, Ascendente e case si sbloccano.",
   "birth_time.pick": "Scegli ora",
   "birth_time.save": "Salva",
-  "birth_time.error": "Impossibile salvare. Riprova."
+  "birth_time.error": "Impossibile salvare. Riprova.",
+  "today.events_on": "Eventi del {date}"
 }

@@ -216,5 +216,6 @@
   "birth_time.hint": "Haritan yeni saatle yeniden hesaplanacak. Ay, Yükselen ve evler açılır.",
   "birth_time.pick": "Saat seç",
   "birth_time.save": "Kaydet",
-  "birth_time.error": "Kaydedilemedi. Tekrar dene."
+  "birth_time.error": "Kaydedilemedi. Tekrar dene.",
+  "today.events_on": "{date} olayları"
 }

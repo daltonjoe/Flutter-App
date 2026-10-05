@@ -216,5 +216,6 @@
   "birth_time.hint": "Seu mapa será recalculado. Lua, Ascendente e casas se desbloqueiam.",
   "birth_time.pick": "Escolher hora",
   "birth_time.save": "Salvar",
-  "birth_time.error": "Não foi possível salvar. Tente novamente."
+  "birth_time.error": "Não foi possível salvar. Tente novamente.",
+  "today.events_on": "Eventos de {date}"
 }

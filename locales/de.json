@@ -216,5 +216,6 @@
   "birth_time.hint": "Dein Horoskop wird neu berechnet. Mond, Aszendent und Häuser werden freigeschaltet.",
   "birth_time.pick": "Zeit wählen",
   "birth_time.save": "Speichern",
-  "birth_time.error": "Konnte nicht speichern. Erneut versuchen."
+  "birth_time.error": "Konnte nicht speichern. Erneut versuchen.",
+  "today.events_on": "Ereignisse am {date}"
 }
