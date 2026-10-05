@@ -57,9 +57,9 @@ class CosmicErrorState extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Center(
+                child: Center(
                   child: Icon(
-                    Icons.error_outline_rounded,
+                    icon,
                     color: AppColors.errorRed,
                     size: 32,
                   ),
