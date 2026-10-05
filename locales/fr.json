@@ -272,5 +272,18 @@
   "streak.error.save": "Échec de l'enregistrement. Réessaie.",
   "streak.detail.title": "Ton rythme",
   "streak.detail.last30": "30 derniers jours",
-  "streak.detail.empty": "Aucun check-in pour l'instant."
+  "streak.detail.empty": "Aucun check-in pour l'instant.",
+  "nav.match": "Affinité",
+  "match.title": "Compatibilité",
+  "match.pick_a": "Premier profil",
+  "match.pick_b": "Deuxième profil",
+  "match.pick_hint": "Choisis deux de tes profils pour comparer leurs cartes.",
+  "match.empty": "Ajoute un deuxième profil pour comparer les cartes.",
+  "match.need_two": "Choisis les deux profils pour voir les aspects entre eux.",
+  "match.no_aspects": "Aucun aspect serré entre ces cartes.",
+  "match.error": "Impossible de charger la comparaison.",
+  "match.retry": "Réessayer",
+  "match.time_unknown_note": "Un profil n'a pas d'heure de naissance ; la Lune est donc exclue.",
+  "match.aspects_title": "Aspects entre les cartes",
+  "match.orb": "Orbe {value}°"
 }

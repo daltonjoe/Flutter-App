@@ -272,5 +272,18 @@
   "streak.error.save": "Salvataggio non riuscito. Riprova.",
   "streak.detail.title": "Il tuo ritmo",
   "streak.detail.last30": "Ultimi 30 giorni",
-  "streak.detail.empty": "Ancora nessun check-in."
+  "streak.detail.empty": "Ancora nessun check-in.",
+  "nav.match": "Affinità",
+  "match.title": "Compatibilità",
+  "match.pick_a": "Primo profilo",
+  "match.pick_b": "Secondo profilo",
+  "match.pick_hint": "Scegli due dei tuoi profili per confrontare le loro carte.",
+  "match.empty": "Aggiungi un secondo profilo per confrontare le carte.",
+  "match.need_two": "Scegli entrambi i profili per vedere gli aspetti tra loro.",
+  "match.no_aspects": "Nessun aspetto stretto tra queste carte.",
+  "match.error": "Impossibile caricare il confronto.",
+  "match.retry": "Riprova",
+  "match.time_unknown_note": "Un profilo non ha l'ora di nascita, quindi la Luna è esclusa.",
+  "match.aspects_title": "Aspetti tra le carte",
+  "match.orb": "Orbita {value}°"
 }

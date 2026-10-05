@@ -272,5 +272,18 @@
   "streak.error.save": "Kaydedilemedi. Tekrar dene.",
   "streak.detail.title": "Ritmin",
   "streak.detail.last30": "Son 30 gün",
-  "streak.detail.empty": "Henüz işaret yok."
+  "streak.detail.empty": "Henüz işaret yok.",
+  "nav.match": "Uyum",
+  "match.title": "Uyum",
+  "match.pick_a": "Birinci profil",
+  "match.pick_b": "İkinci profil",
+  "match.pick_hint": "Haritalarını karşılaştırmak için iki profilini seç.",
+  "match.empty": "Haritaları karşılaştırmak için ikinci bir profil ekle.",
+  "match.need_two": "Aralarındaki açıları görmek için iki profili de seç.",
+  "match.no_aspects": "Bu haritalar arasında yakın açı yok.",
+  "match.error": "Karşılaştırma yüklenemedi.",
+  "match.retry": "Tekrar dene",
+  "match.time_unknown_note": "Bir profilde doğum saati yok, bu yüzden Ay hesaba katılmadı.",
+  "match.aspects_title": "Haritalar arası açılar",
+  "match.orb": "Orb {value}°"
 }

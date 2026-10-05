@@ -272,5 +272,18 @@
   "streak.error.save": "No se pudo guardar. Inténtalo de nuevo.",
   "streak.detail.title": "Tu ritmo",
   "streak.detail.last30": "Últimos 30 días",
-  "streak.detail.empty": "Aún no hay registros."
+  "streak.detail.empty": "Aún no hay registros.",
+  "nav.match": "Afinidad",
+  "match.title": "Compatibilidad",
+  "match.pick_a": "Primer perfil",
+  "match.pick_b": "Segundo perfil",
+  "match.pick_hint": "Elige dos de tus perfiles para comparar sus cartas.",
+  "match.empty": "Añade un segundo perfil para comparar cartas.",
+  "match.need_two": "Elige ambos perfiles para ver los aspectos entre ellos.",
+  "match.no_aspects": "No hay aspectos cercanos entre estas cartas.",
+  "match.error": "No se pudo cargar la comparación.",
+  "match.retry": "Reintentar",
+  "match.time_unknown_note": "Un perfil no tiene hora de nacimiento, así que se omite la Luna.",
+  "match.aspects_title": "Aspectos entre cartas",
+  "match.orb": "Orbe {value}°"
 }

@@ -272,5 +272,18 @@
   "streak.error.save": "Não foi possível salvar. Tente novamente.",
   "streak.detail.title": "Seu ritmo",
   "streak.detail.last30": "Últimos 30 dias",
-  "streak.detail.empty": "Ainda sem registros."
+  "streak.detail.empty": "Ainda sem registros.",
+  "nav.match": "Afinidade",
+  "match.title": "Compatibilidade",
+  "match.pick_a": "Primeiro perfil",
+  "match.pick_b": "Segundo perfil",
+  "match.pick_hint": "Escolha dois dos seus perfis para comparar os mapas.",
+  "match.empty": "Adicione um segundo perfil para comparar mapas.",
+  "match.need_two": "Escolha os dois perfis para ver os aspectos entre eles.",
+  "match.no_aspects": "Não há aspectos próximos entre estes mapas.",
+  "match.error": "Não foi possível carregar a comparação.",
+  "match.retry": "Tentar novamente",
+  "match.time_unknown_note": "Um perfil não tem hora de nascimento, por isso a Lua fica de fora.",
+  "match.aspects_title": "Aspectos entre mapas",
+  "match.orb": "Orbe {value}°"
 }

@@ -272,5 +272,18 @@
   "streak.error.save": "Couldn't save. Try again.",
   "streak.detail.title": "Your rhythm",
   "streak.detail.last30": "Last 30 days",
-  "streak.detail.empty": "No check-ins yet."
+  "streak.detail.empty": "No check-ins yet.",
+  "nav.match": "Match",
+  "match.title": "Compatibility",
+  "match.pick_a": "First profile",
+  "match.pick_b": "Second profile",
+  "match.pick_hint": "Choose two of your profiles to compare their charts.",
+  "match.empty": "Add a second profile to compare charts.",
+  "match.need_two": "Pick both profiles to see the aspects between them.",
+  "match.no_aspects": "No close aspects between these charts.",
+  "match.error": "Couldn't load the comparison.",
+  "match.retry": "Try again",
+  "match.time_unknown_note": "One profile has no birth time, so its Moon is left out.",
+  "match.aspects_title": "Aspects between charts",
+  "match.orb": "Orb {value}°"
 }

@@ -272,5 +272,18 @@
   "streak.error.save": "Speichern fehlgeschlagen. Versuch es erneut.",
   "streak.detail.title": "Dein Rhythmus",
   "streak.detail.last30": "Letzte 30 Tage",
-  "streak.detail.empty": "Noch keine Einträge."
+  "streak.detail.empty": "Noch keine Einträge.",
+  "nav.match": "Match",
+  "match.title": "Kompatibilität",
+  "match.pick_a": "Erstes Profil",
+  "match.pick_b": "Zweites Profil",
+  "match.pick_hint": "Wähle zwei deiner Profile, um ihre Karten zu vergleichen.",
+  "match.empty": "Füge ein zweites Profil hinzu, um Karten zu vergleichen.",
+  "match.need_two": "Wähle beide Profile, um die Aspekte zwischen ihnen zu sehen.",
+  "match.no_aspects": "Keine engen Aspekte zwischen diesen Karten.",
+  "match.error": "Der Vergleich konnte nicht geladen werden.",
+  "match.retry": "Erneut versuchen",
+  "match.time_unknown_note": "Bei einem Profil fehlt die Geburtszeit, daher bleibt der Mond unberücksichtigt.",
+  "match.aspects_title": "Aspekte zwischen den Karten",
+  "match.orb": "Orbis {value}°"
 }
