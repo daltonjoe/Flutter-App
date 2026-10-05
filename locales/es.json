@@ -210,5 +210,11 @@
   "transit.orb": "Orbe",
   "transit.applying": "Acercándose",
   "transit.separating": "Alejándose",
-  "transit.no_text": "Aún no hay descripción para este evento."
+  "transit.no_text": "Aún no hay descripción para este evento.",
+  "birth_time.add": "Añadir hora de nacimiento",
+  "birth_time.title": "Hora de nacimiento",
+  "birth_time.hint": "Tu carta se recalculará. Se desbloquean Luna, Ascendente y casas.",
+  "birth_time.pick": "Seleccionar hora",
+  "birth_time.save": "Guardar",
+  "birth_time.error": "No se pudo guardar. Inténtalo de nuevo."
 }

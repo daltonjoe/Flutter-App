@@ -8,6 +8,7 @@ import '../presentation/widgets/components/cosmic_error_state.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
 import '../providers/active_profile_provider.dart';
 import '../services/account_deletion_service.dart';
+import 'edit_birth_time_page.dart';
 import 'main_shell.dart' show shellTab, mapPopToRoot;
 
 class ProfileSwitcherPage extends StatefulWidget {
@@ -47,7 +48,7 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
     try {
       final rows = await Supabase.instance.client
           .from('user_profiles')
-          .select('id, display_name, birth_date, sun_sign_id')
+          .select('id, display_name, birth_date, sun_sign_id, birth_time_known')
           .eq('user_id', user.id)
           .order('created_at');
       if (!mounted) return;
@@ -139,10 +140,10 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
       if (!mounted) return;
       await context.read<ActiveProfileProvider>().clearActive();
       if (!mounted) return;
-Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-  '/onboarding',
-  (route) => false,
-  arguments: {'isFirstProfile': true},
+      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+        '/onboarding',
+        (route) => false,
+        arguments: {'isFirstProfile': true},
       );
     } catch (_) {
       if (!mounted) return;
@@ -196,7 +197,19 @@ Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
                             ),
                           ),
                           if (profile['id'] == activeProfileId)
-                            const Icon(Icons.check_circle), 
+                            const Icon(Icons.check_circle),
+                          if (profile['birth_time_known'] != true)
+                            IconButton(
+                              icon: const Icon(Icons.access_time),
+                              tooltip: t(context, 'birth_time.add'),
+                              onPressed: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => EditBirthTimePage(
+                                    profileId: profile['id'] as String,
+                                  ),
+                                ),
+                              ),
+                            ),
                           IconButton(
                             icon: const Icon(Icons.delete_outline),
                             onPressed: () =>
@@ -210,10 +223,11 @@ Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
                 const SizedBox(height: 12),
                 CosmicCtaButton(
                   label: t(context, 'profile_switcher.add'),
-                  onTap: () => Navigator.of(context, rootNavigator: true).pushNamed(
-                    '/onboarding',
-                    arguments: {'isFirstProfile': false},
-                  ),
+                  onTap: () =>
+                      Navigator.of(context, rootNavigator: true).pushNamed(
+                        '/onboarding',
+                        arguments: {'isFirstProfile': false},
+                      ),
                 ),
                 TextButton(
                   onPressed: _deleteAccount,

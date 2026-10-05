@@ -6,6 +6,7 @@ import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/reference_names_service.dart';
 import '../services/today_service.dart';
+import 'edit_birth_time_page.dart';
 import 'transit_detail_page.dart';
 
 class TodayPage extends StatefulWidget {
@@ -26,9 +27,10 @@ class _TodayPageState extends State<TodayPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final pid = context.watch<ActiveProfileProvider>().activeProfileId;
+    final provider = context.watch<ActiveProfileProvider>();
+    final pid = provider.activeProfileId;
     final loc = context.watch<LanguageProvider>().locale.languageCode;
-    final key = '$pid|$loc';
+    final key = '$pid|$loc|${provider.revision}';
     if (pid != null && key != _key) {
       _key = key;
       _data = null;
@@ -237,14 +239,17 @@ class _TodayPageState extends State<TodayPage> {
                           ? Icons.north_east
                           : Icons.south_east,
                       size: 16,
-     color: AppColors.textSecondary,
+                      color: AppColors.textSecondary,
                     )
                   : null,
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => TransitDetailPage(
-                   event: Map<String, dynamic>.from(e),
-                    locale: context.read<LanguageProvider>().locale.languageCode,
+                    event: Map<String, dynamic>.from(e),
+                    locale: context
+                        .read<LanguageProvider>()
+                        .locale
+                        .languageCode,
                     title: _label(
                       _id(e['transit_body_id']),
                       _id(e['aspect_type_id']),
@@ -257,9 +262,42 @@ class _TodayPageState extends State<TodayPage> {
         ],
         if (!known) ...[
           const SizedBox(height: 20),
-          Text(
-            _t('today.unknown_time_hint'),
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                final pid = context
+                    .read<ActiveProfileProvider>()
+                    .activeProfileId;
+                if (pid == null) return;
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => EditBirthTimePage(profileId: pid),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _t('today.unknown_time_hint'),
+                        style: const TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    const Icon(
+                      Icons.chevron_right,
+                      size: 16,
+                      color: AppColors.textMuted,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ],
@@ -291,10 +329,7 @@ class _TodayPageState extends State<TodayPage> {
           children: [
             _EnergyRing(value: avg, color: color),
             const SizedBox(height: 6),
-            Text(
-              _t(valenceKey),
-              style: TextStyle(fontSize: 12, color: color),
-            ),
+            Text(_t(valenceKey), style: TextStyle(fontSize: 12, color: color)),
           ],
         ),
       ),

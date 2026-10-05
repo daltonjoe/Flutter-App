@@ -210,5 +210,11 @@
   "transit.orb": "Orb",
   "transit.applying": "Applying",
   "transit.separating": "Separating",
-  "transit.no_text": "No description for this event yet."
+  "transit.no_text": "No description for this event yet.",
+  "birth_time.add": "Add birth time",
+  "birth_time.title": "Birth time",
+  "birth_time.hint": "Your chart will be recalculated. Moon, Ascendant and houses unlock.",
+  "birth_time.pick": "Pick time",
+  "birth_time.save": "Save",
+  "birth_time.error": "Couldn't save. Try again."
 }

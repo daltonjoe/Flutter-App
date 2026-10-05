@@ -23,12 +23,14 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
   String? _error;
   ({NatalChartResponse chart, String name})? _result;
   bool _redirectedToOnboarding = false;
+  int _lastRevision = -1;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final provider = context.watch<ActiveProfileProvider>();
     final profileId = provider.activeProfileId;
+    final revision = provider.revision;
 
     if (profileId == null) {
       if (!_redirectedToOnboarding) {
@@ -37,7 +39,11 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
       return;
     }
 
-    if (profileId != _requestedProfileId && profileId != _loadedProfileId) {
+    final revisionChanged = revision != _lastRevision;
+    final profileChanged =
+        profileId != _requestedProfileId && profileId != _loadedProfileId;
+    if (profileChanged || revisionChanged) {
+      _lastRevision = revision;
       _requestedProfileId = profileId;
       _load(profileId);
     }

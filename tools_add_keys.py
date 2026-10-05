@@ -27,6 +27,12 @@ KEYS = [
  ("transit.applying", "Yaklaşıyor", "Applying", "Sich nähernd", "En approche", "Acercándose", "Aproximando-se", "In avvicinamento"),
  ("transit.separating", "Uzaklaşıyor", "Separating", "Sich entfernend", "En éloignement", "Alejándose", "Afastando-se", "In allontanamento"),
  ("transit.no_text", "Bu olay için henüz açıklama yok.", "No description for this event yet.", "Für dieses Ereignis gibt es noch keine Beschreibung.", "Pas encore de description pour cet événement.", "Aún no hay descripción para este evento.", "Ainda não há descrição para este evento.", "Nessuna descrizione per questo evento ancora."),
+ ("birth_time.add", "Doğum saati ekle", "Add birth time", "Geburtszeit hinzufügen", "Ajouter l'heure de naissance", "Añadir hora de nacimiento", "Adicionar hora de nascimento", "Aggiungi ora di nascita"),
+ ("birth_time.title", "Doğum saati", "Birth time", "Geburtszeit", "Heure de naissance", "Hora de nacimiento", "Hora de nascimento", "Ora di nascita"),
+ ("birth_time.hint", "Haritan yeni saatle yeniden hesaplanacak. Ay, Yükselen ve evler açılır.", "Your chart will be recalculated. Moon, Ascendant and houses unlock.", "Dein Horoskop wird neu berechnet. Mond, Aszendent und Häuser werden freigeschaltet.", "Ton thème sera recalculé. Lune, Ascendant et maisons se débloquent.", "Tu carta se recalculará. Se desbloquean Luna, Ascendente y casas.", "Seu mapa será recalculado. Lua, Ascendente e casas se desbloqueiam.", "Il tuo tema verrà ricalcolato. Luna, Ascendente e case si sbloccano."),
+ ("birth_time.pick", "Saat seç", "Pick time", "Zeit wählen", "Choisir l'heure", "Seleccionar hora", "Escolher hora", "Scegli ora"),
+ ("birth_time.save", "Kaydet", "Save", "Speichern", "Enregistrer", "Guardar", "Salvar", "Salva"),
+ ("birth_time.error", "Kaydedilemedi. Tekrar dene.", "Couldn't save. Try again.", "Konnte nicht speichern. Erneut versuchen.", "Impossible d'enregistrer. Réessayer.", "No se pudo guardar. Inténtalo de nuevo.", "Não foi possível salvar. Tente novamente.", "Impossibile salvare. Riprova."),
 ]
 
 def load(p):

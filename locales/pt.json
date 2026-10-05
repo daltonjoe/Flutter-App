@@ -210,5 +210,11 @@
   "transit.orb": "Orbe",
   "transit.applying": "Aproximando-se",
   "transit.separating": "Afastando-se",
-  "transit.no_text": "Ainda não há descrição para este evento."
+  "transit.no_text": "Ainda não há descrição para este evento.",
+  "birth_time.add": "Adicionar hora de nascimento",
+  "birth_time.title": "Hora de nascimento",
+  "birth_time.hint": "Seu mapa será recalculado. Lua, Ascendente e casas se desbloqueiam.",
+  "birth_time.pick": "Escolher hora",
+  "birth_time.save": "Salvar",
+  "birth_time.error": "Não foi possível salvar. Tente novamente."
 }

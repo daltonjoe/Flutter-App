@@ -210,5 +210,11 @@
   "transit.orb": "Orbis",
   "transit.applying": "Sich nähernd",
   "transit.separating": "Sich entfernend",
-  "transit.no_text": "Für dieses Ereignis gibt es noch keine Beschreibung."
+  "transit.no_text": "Für dieses Ereignis gibt es noch keine Beschreibung.",
+  "birth_time.add": "Geburtszeit hinzufügen",
+  "birth_time.title": "Geburtszeit",
+  "birth_time.hint": "Dein Horoskop wird neu berechnet. Mond, Aszendent und Häuser werden freigeschaltet.",
+  "birth_time.pick": "Zeit wählen",
+  "birth_time.save": "Speichern",
+  "birth_time.error": "Konnte nicht speichern. Erneut versuchen."
 }

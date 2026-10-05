@@ -210,5 +210,11 @@
   "transit.orb": "Orbe",
   "transit.applying": "In avvicinamento",
   "transit.separating": "In allontanamento",
-  "transit.no_text": "Nessuna descrizione per questo evento ancora."
+  "transit.no_text": "Nessuna descrizione per questo evento ancora.",
+  "birth_time.add": "Aggiungi ora di nascita",
+  "birth_time.title": "Ora di nascita",
+  "birth_time.hint": "Il tuo tema verrà ricalcolato. Luna, Ascendente e case si sbloccano.",
+  "birth_time.pick": "Scegli ora",
+  "birth_time.save": "Salva",
+  "birth_time.error": "Impossibile salvare. Riprova."
 }
