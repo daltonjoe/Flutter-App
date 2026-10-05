@@ -221,5 +221,21 @@
   "feedback.prompt": "Did this ring true?",
   "feedback.helpful": "Rings true",
   "feedback.not_helpful": "Doesn't fit",
-  "feedback.error": "Couldn't save your vote."
+  "feedback.error": "Couldn't save your vote.",
+  "settings.title": "Settings",
+  "settings.section.notifications": "Notifications",
+  "settings.section.language": "Language",
+  "settings.section.account": "Account",
+  "settings.section.about": "About",
+  "settings.notifications.enabled": "Daily reading",
+  "settings.notifications.time": "Delivery time",
+  "settings.notifications.note": "Saved as your preference. Notifications start in a later update.",
+  "settings.language.title": "App language",
+  "settings.account.anonymous": "Account not linked",
+  "settings.account.linked": "Account linked",
+  "settings.about.version": "Version",
+  "settings.save": "Save",
+  "settings.error.save": "Could not save. Try again.",
+  "settings.error.load": "Settings could not be loaded.",
+  "settings.retry": "Try again"
 }

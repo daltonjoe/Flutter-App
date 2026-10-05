@@ -221,5 +221,21 @@
   "feedback.prompt": "Isso faz sentido para você?",
   "feedback.helpful": "Faz sentido",
   "feedback.not_helpful": "Não faz sentido",
-  "feedback.error": "Não foi possível salvar seu voto."
+  "feedback.error": "Não foi possível salvar seu voto.",
+  "settings.title": "Configurações",
+  "settings.section.notifications": "Notificações",
+  "settings.section.language": "Idioma",
+  "settings.section.account": "Conta",
+  "settings.section.about": "Sobre",
+  "settings.notifications.enabled": "Leitura diária",
+  "settings.notifications.time": "Horário de envio",
+  "settings.notifications.note": "Salvo como preferência. As notificações começam em uma atualização futura.",
+  "settings.language.title": "Idioma do app",
+  "settings.account.anonymous": "Conta não vinculada",
+  "settings.account.linked": "Conta vinculada",
+  "settings.about.version": "Versão",
+  "settings.save": "Salvar",
+  "settings.error.save": "Não foi possível salvar. Tente de novo.",
+  "settings.error.load": "Não foi possível carregar as configurações.",
+  "settings.retry": "Tentar de novo"
 }

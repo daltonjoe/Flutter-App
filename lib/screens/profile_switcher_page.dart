@@ -165,7 +165,16 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(t(context, 'profile_switcher.title'))),
+      appBar: AppBar(
+        title: Text(t(context, 'profile_switcher.title')),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: t(context, 'settings.title'),
+            onPressed: () => Navigator.of(context).pushNamed('/settings'),
+          ),
+        ],
+      ),
       body: _isLoading
           ? const CosmicLoader()
           : _error != null

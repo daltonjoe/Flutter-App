@@ -221,5 +221,21 @@
   "feedback.prompt": "Bu sana uydu mu?",
   "feedback.helpful": "Doğru geldi",
   "feedback.not_helpful": "Uymadı",
-  "feedback.error": "Oyun kaydedilemedi."
+  "feedback.error": "Oyun kaydedilemedi.",
+  "settings.title": "Ayarlar",
+  "settings.section.notifications": "Bildirimler",
+  "settings.section.language": "Dil",
+  "settings.section.account": "Hesap",
+  "settings.section.about": "Hakkında",
+  "settings.notifications.enabled": "Günlük okuma",
+  "settings.notifications.time": "Gönderim saati",
+  "settings.notifications.note": "Tercihin kaydedilir. Bildirimler sonraki bir güncellemede başlar.",
+  "settings.language.title": "Uygulama dili",
+  "settings.account.anonymous": "Hesap bağlı değil",
+  "settings.account.linked": "Hesap bağlı",
+  "settings.about.version": "Sürüm",
+  "settings.save": "Kaydet",
+  "settings.error.save": "Kaydedilemedi. Tekrar dene.",
+  "settings.error.load": "Ayarlar yüklenemedi.",
+  "settings.retry": "Tekrar dene"
 }

@@ -221,5 +221,21 @@
   "feedback.prompt": "Hat das für dich gestimmt?",
   "feedback.helpful": "Stimmt",
   "feedback.not_helpful": "Passt nicht",
-  "feedback.error": "Bewertung konnte nicht gespeichert werden."
+  "feedback.error": "Bewertung konnte nicht gespeichert werden.",
+  "settings.title": "Einstellungen",
+  "settings.section.notifications": "Benachrichtigungen",
+  "settings.section.language": "Sprache",
+  "settings.section.account": "Konto",
+  "settings.section.about": "Info",
+  "settings.notifications.enabled": "Tägliche Deutung",
+  "settings.notifications.time": "Zustellzeit",
+  "settings.notifications.note": "Wird als Einstellung gespeichert. Benachrichtigungen starten in einem späteren Update.",
+  "settings.language.title": "App-Sprache",
+  "settings.account.anonymous": "Konto nicht verknüpft",
+  "settings.account.linked": "Konto verknüpft",
+  "settings.about.version": "Version",
+  "settings.save": "Speichern",
+  "settings.error.save": "Speichern fehlgeschlagen. Versuch es erneut.",
+  "settings.error.load": "Einstellungen konnten nicht geladen werden.",
+  "settings.retry": "Erneut versuchen"
 }

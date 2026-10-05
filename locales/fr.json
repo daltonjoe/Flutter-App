@@ -221,5 +221,21 @@
   "feedback.prompt": "Est-ce que ça te parle ?",
   "feedback.helpful": "Ça me parle",
   "feedback.not_helpful": "Ça ne me parle pas",
-  "feedback.error": "Impossible d'enregistrer ton vote."
+  "feedback.error": "Impossible d'enregistrer ton vote.",
+  "settings.title": "Paramètres",
+  "settings.section.notifications": "Notifications",
+  "settings.section.language": "Langue",
+  "settings.section.account": "Compte",
+  "settings.section.about": "À propos",
+  "settings.notifications.enabled": "Lecture quotidienne",
+  "settings.notifications.time": "Heure d'envoi",
+  "settings.notifications.note": "Enregistré comme préférence. Les notifications arriveront dans une prochaine mise à jour.",
+  "settings.language.title": "Langue de l'app",
+  "settings.account.anonymous": "Compte non lié",
+  "settings.account.linked": "Compte lié",
+  "settings.about.version": "Version",
+  "settings.save": "Enregistrer",
+  "settings.error.save": "Échec de l'enregistrement. Réessaie.",
+  "settings.error.load": "Impossible de charger les paramètres.",
+  "settings.retry": "Réessayer"
 }

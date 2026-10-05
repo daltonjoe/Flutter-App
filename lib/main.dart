@@ -18,6 +18,7 @@ import 'screens/onboarding/onboarding_link_account_page.dart';
 import 'screens/onboarding/onboarding_calculating_page.dart';
 import 'screens/onboarding/onboarding_first_result_page.dart';
 import 'screens/main_shell.dart';
+import 'screens/settings_page.dart';
 import 'services/account_deletion_service.dart';
 
 
@@ -157,6 +158,12 @@ final isFirstProfile = args?['isFirstProfile'] as bool? ?? true;
         chartData: args['chartData'] as NatalChartResponse,
         userName: args['userName'] as String,
       ),
+    );
+  }
+  if (settings.name == '/settings') {
+    return MaterialPageRoute(
+      builder: (_) => const SettingsPage(),
+      settings: settings,
     );
   }
   return null;

@@ -221,5 +221,21 @@
   "feedback.prompt": "Ti rispecchia?",
   "feedback.helpful": "Mi rispecchia",
   "feedback.not_helpful": "Non mi rispecchia",
-  "feedback.error": "Impossibile salvare il voto."
+  "feedback.error": "Impossibile salvare il voto.",
+  "settings.title": "Impostazioni",
+  "settings.section.notifications": "Notifiche",
+  "settings.section.language": "Lingua",
+  "settings.section.account": "Account",
+  "settings.section.about": "Info",
+  "settings.notifications.enabled": "Lettura quotidiana",
+  "settings.notifications.time": "Orario di invio",
+  "settings.notifications.note": "Salvato come preferenza. Le notifiche arriveranno in un prossimo aggiornamento.",
+  "settings.language.title": "Lingua dell'app",
+  "settings.account.anonymous": "Account non collegato",
+  "settings.account.linked": "Account collegato",
+  "settings.about.version": "Versione",
+  "settings.save": "Salva",
+  "settings.error.save": "Impossibile salvare. Riprova.",
+  "settings.error.load": "Impossibile caricare le impostazioni.",
+  "settings.retry": "Riprova"
 }
