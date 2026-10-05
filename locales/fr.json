@@ -257,5 +257,20 @@
   "today.ritual.change_time": "Changer l'heure",
   "today.ritual.dismiss": "Fermer",
   "today.ritual.preview_label": "Aperçu",
-  "today.ritual.saved": "Heure enregistrée"
+  "today.ritual.saved": "Heure enregistrée",
+  "streak.checkin.title": "Comment te sens-tu aujourd'hui ?",
+  "streak.checkin.body": "Un geste, une fois par jour.",
+  "streak.mood.1": "Épuisé",
+  "streak.mood.2": "Bas",
+  "streak.mood.3": "Stable",
+  "streak.mood.4": "Bien",
+  "streak.mood.5": "Rayonnant",
+  "streak.checked_in": "Noté aujourd'hui",
+  "streak.change": "Modifier",
+  "streak.days": "jours d'affilée",
+  "streak.best": "Record",
+  "streak.error.save": "Échec de l'enregistrement. Réessaie.",
+  "streak.detail.title": "Ton rythme",
+  "streak.detail.last30": "30 derniers jours",
+  "streak.detail.empty": "Aucun check-in pour l'instant."
 }

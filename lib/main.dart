@@ -19,8 +19,8 @@ import 'screens/onboarding/onboarding_calculating_page.dart';
 import 'screens/onboarding/onboarding_first_result_page.dart';
 import 'screens/main_shell.dart';
 import 'screens/settings_page.dart';
+import 'screens/streak_page.dart';
 import 'services/account_deletion_service.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +57,7 @@ void main() async {
     }
   }
 
-await activeProfileProvider.load();
+  await activeProfileProvider.load();
   runApp(
     MultiProvider(
       providers: [
@@ -110,7 +110,7 @@ class SoulBoundApp extends StatelessWidget {
           ),
         );
       },
-          home: context.watch<ActiveProfileProvider>().activeProfileId != null
+      home: context.watch<ActiveProfileProvider>().activeProfileId != null
           ? const MainShell()
           : const OnboardingFlowPage(isFirstProfile: true),
       onGenerateRoute: appOnGenerateRoute,
@@ -121,7 +121,7 @@ class SoulBoundApp extends StatelessWidget {
 Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
   if (settings.name == '/onboarding') {
     final args = settings.arguments as Map<String, dynamic>?;
-final isFirstProfile = args?['isFirstProfile'] as bool? ?? true;
+    final isFirstProfile = args?['isFirstProfile'] as bool? ?? true;
     return MaterialPageRoute(
       builder: (_) => OnboardingFlowPage(isFirstProfile: isFirstProfile),
     );
@@ -163,6 +163,12 @@ final isFirstProfile = args?['isFirstProfile'] as bool? ?? true;
   if (settings.name == '/settings') {
     return MaterialPageRoute(
       builder: (_) => const SettingsPage(),
+      settings: settings,
+    );
+  }
+  if (settings.name == '/streak') {
+    return MaterialPageRoute(
+      builder: (_) => StreakPage(profileId: settings.arguments as String),
       settings: settings,
     );
   }

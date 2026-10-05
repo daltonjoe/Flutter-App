@@ -257,5 +257,20 @@
   "today.ritual.change_time": "Alterar hora",
   "today.ritual.dismiss": "Fechar",
   "today.ritual.preview_label": "Prévia",
-  "today.ritual.saved": "Hora salva"
+  "today.ritual.saved": "Hora salva",
+  "streak.checkin.title": "Como você está hoje?",
+  "streak.checkin.body": "Um toque, uma vez por dia.",
+  "streak.mood.1": "Esgotado",
+  "streak.mood.2": "Baixo",
+  "streak.mood.3": "Estável",
+  "streak.mood.4": "Bem",
+  "streak.mood.5": "Radiante",
+  "streak.checked_in": "Registrado hoje",
+  "streak.change": "Alterar",
+  "streak.days": "dias seguidos",
+  "streak.best": "Recorde",
+  "streak.error.save": "Não foi possível salvar. Tente novamente.",
+  "streak.detail.title": "Seu ritmo",
+  "streak.detail.last30": "Últimos 30 dias",
+  "streak.detail.empty": "Ainda sem registros."
 }

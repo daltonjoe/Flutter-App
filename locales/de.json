@@ -257,5 +257,20 @@
   "today.ritual.change_time": "Zeit ändern",
   "today.ritual.dismiss": "Schließen",
   "today.ritual.preview_label": "Vorschau",
-  "today.ritual.saved": "Zeit gespeichert"
+  "today.ritual.saved": "Zeit gespeichert",
+  "streak.checkin.title": "Wie geht's dir heute?",
+  "streak.checkin.body": "Ein Tipp, einmal am Tag.",
+  "streak.mood.1": "Erschöpft",
+  "streak.mood.2": "Gedrückt",
+  "streak.mood.3": "Ausgeglichen",
+  "streak.mood.4": "Gut",
+  "streak.mood.5": "Strahlend",
+  "streak.checked_in": "Heute eingetragen",
+  "streak.change": "Ändern",
+  "streak.days": "Tage in Folge",
+  "streak.best": "Rekord",
+  "streak.error.save": "Speichern fehlgeschlagen. Versuch es erneut.",
+  "streak.detail.title": "Dein Rhythmus",
+  "streak.detail.last30": "Letzte 30 Tage",
+  "streak.detail.empty": "Noch keine Einträge."
 }

@@ -257,5 +257,20 @@
   "today.ritual.change_time": "Saati değiştir",
   "today.ritual.dismiss": "Kapat",
   "today.ritual.preview_label": "Önizleme",
-  "today.ritual.saved": "Saat kaydedildi"
+  "today.ritual.saved": "Saat kaydedildi",
+  "streak.checkin.title": "Bugün nasılsın?",
+  "streak.checkin.body": "Günde bir dokunuş.",
+  "streak.mood.1": "Bitkin",
+  "streak.mood.2": "Düşük",
+  "streak.mood.3": "Dengeli",
+  "streak.mood.4": "İyi",
+  "streak.mood.5": "Parlak",
+  "streak.checked_in": "Bugün işaretlendi",
+  "streak.change": "Değiştir",
+  "streak.days": "günlük seri",
+  "streak.best": "En uzun",
+  "streak.error.save": "Kaydedilemedi. Tekrar dene.",
+  "streak.detail.title": "Ritmin",
+  "streak.detail.last30": "Son 30 gün",
+  "streak.detail.empty": "Henüz işaret yok."
 }

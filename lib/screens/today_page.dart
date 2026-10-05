@@ -11,6 +11,7 @@ import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
+import '../services/checkin_service.dart';
 import '../services/reference_names_service.dart';
 import '../services/user_settings_service.dart';
 import '../services/today_service.dart';
@@ -41,6 +42,12 @@ class _TodayPageState extends State<TodayPage> {
   bool _notificationsFlagEnabled = false;
   UserSettings? _ritualSettings;
   bool _ritualLoading = true;
+  bool _streakFlagEnabled = false;
+  bool _streakFlagLoading = true;
+  final Map<String, int> _checkinsByDay = {};
+  int? _checkinLoadSerial;
+  bool _checkinSaving = false;
+  bool _checkinChangeMode = false;
 
   String _t(String k) => AppLocalizations.of(context)?.translate(k) ?? k;
 
@@ -60,6 +67,74 @@ class _TodayPageState extends State<TodayPage> {
   void initState() {
     super.initState();
     unawaited(_loadRitualState());
+    unawaited(_loadStreakFlag());
+  }
+
+  Future<void> _loadStreakFlag() async {
+    try {
+      final v = await UserSettingsService.isFlagEnabled('streak');
+      if (!mounted) return;
+      setState(() {
+        _streakFlagEnabled = v;
+        _streakFlagLoading = false;
+      });
+    } catch (e) {
+      debugPrint('streak flag init failed: $e');
+      if (mounted) {
+        setState(() {
+          _streakFlagEnabled = false;
+          _streakFlagLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadCheckins(String pid, int serial) async {
+    try {
+      final list = await CheckinService.loadRecent(pid, days: 60);
+      if (!mounted) return;
+      if (serial != _checkinLoadSerial) return;
+      final map = <String, int>{};
+      for (final c in list) {
+        map[c.day] = c.mood;
+      }
+      setState(() {
+        _checkinsByDay
+          ..clear()
+          ..addAll(map);
+      });
+    } catch (e) {
+      debugPrint('checkins load failed: $e');
+    }
+  }
+
+  Future<void> _saveMood(String pid, String day, int mood) async {
+    if (_checkinSaving) return;
+    final prev = _checkinsByDay[day];
+    HapticFeedback.selectionClick();
+    setState(() {
+      _checkinSaving = true;
+      _checkinsByDay[day] = mood;
+      _checkinChangeMode = false;
+    });
+    try {
+      await CheckinService.setMood(profileId: pid, day: day, mood: mood);
+    } catch (e) {
+      debugPrint('checkins save failed: $e');
+      if (!mounted) return;
+      setState(() {
+        if (prev == null) {
+          _checkinsByDay.remove(day);
+        } else {
+          _checkinsByDay[day] = prev;
+        }
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(t(context, 'streak.error.save'))));
+    } finally {
+      if (mounted) setState(() => _checkinSaving = false);
+    }
   }
 
   Future<void> _loadRitualState() async {
@@ -166,7 +241,7 @@ class _TodayPageState extends State<TodayPage> {
                     child: TextButton(
                       onPressed: () => Navigator.pop(ctx, true),
                       child: Text(
-                                              t(context, 'settings.save'),
+                        t(context, 'settings.save'),
                         style: AppTextStyles.ctaPrimary,
                       ),
                     ),
@@ -221,6 +296,11 @@ class _TodayPageState extends State<TodayPage> {
       _cachedAt = null;
       _week.clear();
       _selected = _stripTime(DateTime.now());
+      _checkinsByDay.clear();
+      _checkinChangeMode = false;
+      final serial = (_checkinLoadSerial ?? 0) + 1;
+      _checkinLoadSerial = serial;
+      unawaited(_loadCheckins(pid, serial));
       _load(pid, loc);
     }
   }
@@ -522,14 +602,42 @@ class _TodayPageState extends State<TodayPage> {
           loading: _ritualLoading,
           visible: !_ritualDismissed && _notificationsFlagEnabled,
           settings: _ritualSettings,
-            headline: (isToday && head != null)
-                ? Map<String, dynamic>.from(head)
-                : null,
+          headline: (isToday && head != null)
+              ? Map<String, dynamic>.from(head)
+              : null,
           locale: loc,
           onDismiss: _dismissRitual,
           onPickTime: _pickRitualTime,
         ),
         if (!_ritualDismissed && _notificationsFlagEnabled && !_ritualLoading)
+          const SizedBox(height: 12),
+        _CheckinCard(
+          flagEnabled: _streakFlagEnabled,
+          flagLoading: _streakFlagLoading,
+          isToday: isToday,
+          profileId: context.watch<ActiveProfileProvider>().activeProfileId,
+          checkinsByDay: _checkinsByDay,
+          saving: _checkinSaving,
+          changeMode: _checkinChangeMode,
+          onToggleChangeMode: () {
+            setState(() => _checkinChangeMode = !_checkinChangeMode);
+          },
+          onPickMood: (m) {
+            final pid = context.read<ActiveProfileProvider>().activeProfileId;
+            if (pid == null) return;
+            final day = CheckinService.dayKey(DateTime.now());
+            unawaited(_saveMood(pid, day, m));
+          },
+          onOpenStreak: () {
+            final pid = context.read<ActiveProfileProvider>().activeProfileId;
+            if (pid == null) return;
+            Navigator.of(context).pushNamed('/streak', arguments: pid);
+          },
+        ),
+        if (isToday &&
+            _streakFlagEnabled &&
+            !_streakFlagLoading &&
+            context.watch<ActiveProfileProvider>().activeProfileId != null)
           const SizedBox(height: 12),
         if (head != null) ...[
           Text(
@@ -749,6 +857,238 @@ class _TodayPageState extends State<TodayPage> {
               _t('valence.${lvl ?? 'neutral'}'),
               style: TextStyle(fontSize: 12, color: color),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CheckinCard extends StatelessWidget {
+  final bool flagEnabled;
+  final bool flagLoading;
+  final bool isToday;
+  final String? profileId;
+  final Map<String, int> checkinsByDay;
+  final bool saving;
+  final bool changeMode;
+  final VoidCallback onToggleChangeMode;
+  final void Function(int mood) onPickMood;
+  final VoidCallback onOpenStreak;
+
+  const _CheckinCard({
+    required this.flagEnabled,
+    required this.flagLoading,
+    required this.isToday,
+    required this.profileId,
+    required this.checkinsByDay,
+    required this.saving,
+    required this.changeMode,
+    required this.onToggleChangeMode,
+    required this.onPickMood,
+    required this.onOpenStreak,
+  });
+
+  static const List<IconData> _icons = [
+    Icons.sentiment_very_dissatisfied,
+    Icons.sentiment_dissatisfied,
+    Icons.sentiment_neutral,
+    Icons.sentiment_satisfied,
+    Icons.sentiment_very_satisfied,
+  ];
+
+  static const Map<int, Color> _moodColors = {
+    1: AppColors.roseAccent,
+    2: AppColors.amberTransit,
+    3: AppColors.textMuted,
+    4: AppColors.tealSuccess,
+    5: AppColors.goldAccent,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    if (flagLoading || !flagEnabled || !isToday || profileId == null) {
+      return const SizedBox.shrink();
+    }
+    final todayKey = CheckinService.dayKey(DateTime.now());
+    final todayMood = checkinsByDay[todayKey];
+    final checkedIn = todayMood != null;
+    final showPicker = !checkedIn || changeMode;
+    if (showPicker) {
+      return _pickerCard(context, todayMood);
+    }
+    final streak = CheckinService.currentStreak(
+      checkinsByDay.keys.toSet(),
+      DateTime.now(),
+    );
+    final color = _moodColors[todayMood] ?? AppColors.textMuted;
+    return Container(
+      key: const ValueKey('checkin-checked'),
+      decoration: AppDecorations.cosmicCard(),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Row(
+        children: [
+          SizedBox(
+            width: AppSpacing.xxl,
+            height: AppSpacing.xxl,
+            child: Center(
+               child: Icon(_icons[todayMood - 1], size: 28, color: color),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        t(context, 'streak.checked_in'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.h3(),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: AppRadius.mdBr,
+                          onTap: onOpenStreak,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.xs,
+                              horizontal: AppSpacing.xs,
+                            ),
+                            child: Text(
+                              t(
+                                context,
+                                'streak.days',
+                                args: {'n': streak.toString()},
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.bodyMd(
+                                color: streak > 0
+                                    ? AppColors.violetPrimary
+                                    : AppColors.textMuted,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          SizedBox(
+            height: AppSizes.ctaHeight,
+            child: TextButton(
+              onPressed: saving ? null : onToggleChangeMode,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      t(context, 'streak.change'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.ctaSecondary(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pickerCard(BuildContext context, int? selected) {
+    return Container(
+      key: const ValueKey('checkin-picker'),
+      decoration: AppDecorations.cosmicCard(),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Flexible(
+                child: Text(
+                  t(context, 'streak.checkin.title'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.h2(),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Row(
+            children: [
+              Flexible(
+                child: Text(
+                  t(context, 'streak.checkin.body'),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bodySm(),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: List.generate(5, (i) {
+              final mood = i + 1;
+              final isSel = selected == mood;
+              final color = _moodColors[mood]!;
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(right: i == 4 ? 0 : AppSpacing.xs),
+                  child: SizedBox(
+                    height: AppSpacing.xxl,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          color: isSel
+                              ? color.withValues(alpha: 0.18)
+                              : AppColors.bgSurface,
+                          borderRadius: AppRadius.mdBr,
+                          border: Border.all(
+                            color: isSel ? color : AppColors.borderSubtle,
+                            width: isSel ? 1.5 : 1.0,
+                          ),
+                        ),
+                        child: InkWell(
+                          borderRadius: AppRadius.mdBr,
+             onTap: saving ? null : () => onPickMood(mood),
+                          child: Center(
+                            child: Icon(
+                              _icons[i],
+                              semanticLabel: t(context, 'streak.mood.$mood'),
+                              size: 24,
+                              color: isSel ? color : AppColors.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
         ],
       ),

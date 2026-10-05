@@ -257,5 +257,20 @@
   "today.ritual.change_time": "Change time",
   "today.ritual.dismiss": "Dismiss",
   "today.ritual.preview_label": "Preview",
-  "today.ritual.saved": "Time saved"
+  "today.ritual.saved": "Time saved",
+  "streak.checkin.title": "How are you today?",
+  "streak.checkin.body": "One tap, once a day.",
+  "streak.mood.1": "Drained",
+  "streak.mood.2": "Low",
+  "streak.mood.3": "Steady",
+  "streak.mood.4": "Good",
+  "streak.mood.5": "Radiant",
+  "streak.checked_in": "Checked in today",
+  "streak.change": "Change",
+  "streak.days": "day streak",
+  "streak.best": "Best",
+  "streak.error.save": "Couldn't save. Try again.",
+  "streak.detail.title": "Your rhythm",
+  "streak.detail.last30": "Last 30 days",
+  "streak.detail.empty": "No check-ins yet."
 }
