@@ -76,12 +76,30 @@ class _MainShellState extends State<MainShell> {
         if (nav.canPop()) nav.pop();
       },
       child: Scaffold(
-        body: IndexedStack(
-          index: _index,
+  body: Stack(
           children: List.generate(3, (i) {
-            return Navigator(
-              key: _keys[i],
-              onGenerateRoute: (s) => _onRoute(i, s),
+            final active = i == _index;
+            final reduce = MediaQuery.of(context).disableAnimations;
+            return Positioned.fill(
+              child: IgnorePointer(
+                ignoring: !active,
+                child: ExcludeFocus(
+                  excluding: !active,
+                  child: TickerMode(
+                    enabled: active,
+                    child: AnimatedOpacity(
+                      opacity: active ? 1 : 0,
+                      duration: reduce
+                          ? Duration.zero
+                          : const Duration(milliseconds: 220),
+                      child: Navigator(
+                        key: _keys[i],
+                        onGenerateRoute: (s) => _onRoute(i, s),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             );
           }),
         ),

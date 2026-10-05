@@ -192,10 +192,8 @@ class ChartPersistenceService {
       'moon_sign_id': RefIds.signId(moon.signIndex),
        'updated_at': DateTime.now().toUtc().toIso8601String(),
     };
-    if (mcLongitude != null) {
-      updatePayload['mc_degree'] = mcLongitude;
-      updatePayload['mc_sign_id'] = RefIds.signId((mcLongitude / 30).floor());
-    }
+ updatePayload['mc_degree'] = mcLongitude;
+    updatePayload['mc_sign_id'] = RefIds.signId((mcLongitude / 30).floor());
     await client
         .from('user_profiles')
         .update(updatePayload)
