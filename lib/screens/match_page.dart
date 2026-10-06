@@ -9,6 +9,7 @@ import '../core/theme/app_dimensions.dart';
 import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../providers/active_profile_provider.dart';
+import '../providers/language_provider.dart';
 import '../services/match_service.dart';
 import '../services/reference_names_service.dart';
 
@@ -42,6 +43,8 @@ class _MatchPageState extends State<MatchPage> {
   Object? _resultError;
   MatchResult? _result;
   final Map<String, MatchResult> _cache = {};
+  final Map<String, Map<String, String>> _textCache = {};
+  Map<String, String> _texts = const {};
 
   @override
   void initState() {
@@ -115,22 +118,28 @@ class _MatchPageState extends State<MatchPage> {
     if (cached != null) {
       setState(() {
         _result = cached;
+        _texts = _textCache[key] ?? const {};
         _resultError = null;
         _resultLoading = false;
       });
       return;
     }
+      final loc = context.read<LanguageProvider>().locale.languageCode;
     setState(() {
       _resultLoading = true;
       _resultError = null;
       _result = null;
+      _texts = const {};
     });
     try {
       final r = await MatchService.fetch(a, b);
+      final tx = await MatchService.fetchTexts(r.aspects.take(40).toList(), loc);
       if (!mounted) return;
       _cache[key] = r;
+      _textCache[key] = tx;
       setState(() {
         _result = r;
+        _texts = tx;
         _resultLoading = false;
       });
     } catch (e, st) {
@@ -477,7 +486,12 @@ class _MatchPageState extends State<MatchPage> {
             child: Column(
               children: List.generate(aspects.length, (i) {
                 final a = aspects[i];
-                return _aspectRow(a, i == aspects.length - 1);
+                return _aspectRow(
+                  a,
+                  i == aspects.length - 1,
+                  _texts[MatchService.textKey(
+                      a.bodyAId, a.bodyBId, a.aspectTypeId)],
+                );
               }),
             ),
           ),
@@ -542,7 +556,7 @@ class _MatchPageState extends State<MatchPage> {
     );
   }
 
-  Widget _aspectRow(MatchAspect a, bool isLast) {
+  Widget _aspectRow(MatchAspect a, bool isLast, String? text) {
     final svc = ReferenceNamesService.instance;
     final bA = svc.planet(a.bodyAId);
     final bB = svc.planet(a.bodyBId);
@@ -551,65 +565,84 @@ class _MatchPageState extends State<MatchPage> {
     final accent = tight ? AppColors.goldAccent : AppColors.textPrimary;
     final muted = tight ? AppColors.goldAccent : AppColors.textSecondary;
     final orbStr = a.orb.toStringAsFixed(1);
+    final hasText = text != null && text.isNotEmpty;
     return Padding(
       padding: EdgeInsets.only(
         top: AppSpacing.xs,
         bottom: isLast ? AppSpacing.xs : 0,
       ),
-      child: SizedBox(
-        height: AppSpacing.xxl,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-          child: Row(
-            children: [
-             Flexible(
-               flex: 4,
-                fit: FlexFit.tight,
-                child: Text(
-                  bA,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.bodyMd(color: accent),
-                ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: AppSpacing.xxl,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+              child: Row(
+                children: [
+                  Flexible(
+                    flex: 4,
+                    fit: FlexFit.tight,
+                    child: Text(
+                      bA,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodyMd(color: accent),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Flexible(
+                    flex: 5,
+                    fit: FlexFit.tight,
+                    child: Text(
+                      asp,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodyLg(color: muted),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Flexible(
+                    flex: 4,
+                    fit: FlexFit.tight,
+                    child: Text(
+                      bB,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: AppTextStyles.bodyMd(color: accent),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  SizedBox(
+                    width: 72,
+                    child: Text(
+                      t(context, 'match.orb', args: {'value': orbStr}),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: AppTextStyles.bodyXs(color: muted),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: AppSpacing.xs),
-              Flexible(
-                flex: 5,
-                fit: FlexFit.tight,
-                child: Text(
-                  asp,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.bodyLg(color: muted),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              Flexible(
-                flex: 4,
-                fit: FlexFit.tight,
-                child: Text(
-                  bB,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.end,
-                  style: AppTextStyles.bodyMd(color: accent),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              SizedBox(
-                width: 72,
-                child: Text(
-                  t(context, 'match.orb', args: {'value': orbStr}),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.end,
-                  style: AppTextStyles.bodyXs(color: muted),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          if (hasText)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.xs,
+                0,
+                AppSpacing.xs,
+                AppSpacing.sm,
+              ),
+              child: Text(
+                text,
+                style: AppTextStyles.bodySm(color: AppColors.textSecondary),
+              ),
+            ),
+        ],
       ),
     );
   }

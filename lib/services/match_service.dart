@@ -35,6 +35,61 @@ class MatchResult {
 class MatchService {
   MatchService._();
 
+  // Anahtar: 'minId-maxId-aspectTypeId' -> aktif dil (yoksa en) metni.
+  static String textKey(int a, int b, int aspectTypeId) {
+    final lo = a < b ? a : b;
+    final hi = a < b ? b : a;
+    return '$lo-$hi-$aspectTypeId';
+  }
+
+  /// Yönsüz sinastri metinleri. Hata/boş -> boş map (etiket-only).
+  static Future<Map<String, String>> fetchTexts(
+    List<MatchAspect> aspects,
+    String locale,
+  ) async {
+    if (aspects.isEmpty) return {};
+    try {
+      final ids = <int>{};
+      for (final a in aspects) {
+        ids.add(a.bodyAId);
+        ids.add(a.bodyBId);
+      }
+      final idList = ids.toList();
+      final rows = await Supabase.instance.client
+          .from('snippet_templates')
+          .select(
+              'transit_body_id,natal_body_id,aspect_type_id,snippet_translations(locale,body)')
+          .eq('kind', 'synastry')
+          .inFilter('transit_body_id', idList)
+          .inFilter('natal_body_id', idList)
+          .limit(1000);
+      final out = <String, String>{};
+      for (final row in rows as List) {
+        if (row is! Map) continue;
+        final lo = _toInt(row['transit_body_id']);
+        final hi = _toInt(row['natal_body_id']);
+        final at = _toInt(row['aspect_type_id']);
+        final trs = row['snippet_translations'];
+        if (trs is! List) continue;
+        String? pick;
+        String? en;
+        for (final t in trs) {
+          if (t is! Map) continue;
+          final body = (t['body'] as String?)?.trim();
+          if (body == null || body.isEmpty) continue;
+          if (t['locale'] == locale) pick = body;
+          if (t['locale'] == 'en') en = body;
+        }
+        final text = pick ?? en;
+        if (text != null) out[textKey(lo, hi, at)] = text;
+      }
+      return out;
+    } catch (e, st) {
+      debugPrint('synastry texts error: $e\n$st');
+      return {};
+    }
+  }
+
   static double _toDouble(Object? o, {double fallback = 0.0}) {
     if (o is num) return o.toDouble();
     if (o is String) {
