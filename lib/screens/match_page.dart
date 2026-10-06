@@ -456,7 +456,14 @@ class _MatchPageState extends State<MatchPage> {
       return const SizedBox.shrink();
     }
     final note = !r.timeKnownA || !r.timeKnownB;
-    final aspects = r.aspects.take(40).toList();
+      // Yönsüz metin: A.x-B.y ve A.y-B.x aynı anahtar; küçük orb olanı tut.
+    final dedup = <String, MatchAspect>{};
+    for (final x in r.aspects) {
+      final k = MatchService.textKey(x.bodyAId, x.bodyBId, x.aspectTypeId);
+      final prev = dedup[k];
+      if (prev == null || x.orb < prev.orb) dedup[k] = x;
+    }
+    final aspects = dedup.values.take(40).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
