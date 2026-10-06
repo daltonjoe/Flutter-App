@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/theme/app_colors.dart';
 import '../i18n/app_localizations.dart';
+import '../models/ask_context.dart';
+import '../widgets/ask_add.dart';
 import '../widgets/feedback_vote.dart';
 
 /// Argümanlar: event (daily-events events[] elemanı), locale, title (today_page'in
@@ -171,6 +173,26 @@ class _TransitDetailPageState extends State<TransitDetailPage> {
                         : AppColors.textPrimary,
                   ),
                 ),
+               if (widget.profileId != null && widget.day != null) ...[
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: AskAddButton(
+                      onPressed: () {
+                        final ok = addToAsk(
+                          context,
+                          AskContext.todayEvent(
+                            profileId: widget.profileId!,
+                            day: widget.day!,
+                            event: widget.event,
+                            label: widget.title,
+                          ),
+                        );
+                        if (ok) Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
                 if (_canVote) ...[
                   const SizedBox(height: 24),
                   FeedbackVote(

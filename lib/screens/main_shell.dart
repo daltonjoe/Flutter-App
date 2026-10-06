@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../main.dart' show appOnGenerateRoute;
+import '../providers/ask_context_provider.dart';
 import 'active_chart_page.dart';
+import 'ask_page.dart';
 import 'match_page.dart';
 import 'profile_switcher_page.dart';
 import 'today_page.dart';
@@ -27,20 +29,28 @@ class _MainShellState extends State<MainShell>
     value: 1,
   );
   int _index = 1; // Today hazır olana kadar varsayılan: Harita
-  final _keys = List.generate(4, (_) => GlobalKey<NavigatorState>());
+  final _keys = List.generate(5, (_) => GlobalKey<NavigatorState>());
   bool _matchTabEnabled = false;
   bool _matchTabLoaded = false;
+
+  bool get _askOn => askEnabled.value;
+  bool get _matchOn => _matchTabLoaded && _matchTabEnabled;
+
+  /// Görünen sekmelerin shellTab indeksleri (alt çubuk sırası).
+  List<int> get _visible => [0, 1, if (_askOn) kAskTab, if (_matchOn) 3, 2];
 
   @override
   void initState() {
     super.initState();
     _index = 1;
     shellTab.addListener(_onTab);
+    askEnabled.addListener(_onAskFlag);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (shellTab.value != 1) shellTab.value = 1;
     });
     mapPopToRoot.addListener(_onPopMap);
     unawaited(_loadMatchFlag());
+    unawaited(_loadAskFlag());
   }
 
   Future<void> _loadMatchFlag() async {
@@ -62,9 +72,23 @@ class _MainShellState extends State<MainShell>
     }
   }
 
+  Future<void> _loadAskFlag() async {
+    try {
+      askEnabled.value = await UserSettingsService.isFlagEnabled('tab_ai');
+    } catch (e) {
+      debugPrint('ask flag load failed: $e');
+      askEnabled.value = false;
+    }
+  }
+
+  void _onAskFlag() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
     shellTab.removeListener(_onTab);
+    askEnabled.removeListener(_onAskFlag);
     mapPopToRoot.removeListener(_onPopMap);
     _fade.dispose();
     super.dispose();
@@ -73,9 +97,8 @@ class _MainShellState extends State<MainShell>
   void _onTab() {
     if (!mounted || _index == shellTab.value) return;
     final target = shellTab.value;
-    final max = _matchTabEnabled ? 3 : 2;
-    final clamped = target > max ? max : target;
-    setState(() => _index = clamped);
+    if (!_visible.contains(target)) return;
+    setState(() => _index = target);
     if (MediaQuery.of(context).disableAnimations) {
       _fade.value = 1;
     } else {
@@ -95,8 +118,10 @@ class _MainShellState extends State<MainShell>
         return const ActiveChartPage();
       case 2:
         return const ProfileSwitcherPage();
-      default:
+      case 3:
         return const MatchPage();
+      default:
+        return const AskPage();
     }
   }
 
@@ -107,41 +132,51 @@ class _MainShellState extends State<MainShell>
     return appOnGenerateRoute(s);
   }
 
-  @override
-  Widget build(BuildContext context) {
+  NavigationDestination _dest(int tab, BuildContext context) {
     final l = AppLocalizations.of(context);
-    final showMatch = _matchTabLoaded && _matchTabEnabled;
-    final destinations = <NavigationDestination>[
-      NavigationDestination(
-        icon: const Icon(Icons.wb_sunny_outlined),
-        label: l?.translate('nav.today') ?? 'nav.today',
-      ),
-      NavigationDestination(
-        icon: const Icon(Icons.public),
-        label: l?.translate('nav.chart') ?? 'nav.chart',
-      ),
-      NavigationDestination(
-        icon: const Icon(Icons.person_outline),
-        label: l?.translate('nav.profile') ?? 'nav.profile',
-      ),
-      if (showMatch)
-        NavigationDestination(
+    switch (tab) {
+      case 0:
+        return NavigationDestination(
+          icon: const Icon(Icons.wb_sunny_outlined),
+          label: l?.translate('nav.today') ?? 'nav.today',
+        );
+      case 1:
+        return NavigationDestination(
+          icon: const Icon(Icons.public),
+          label: l?.translate('nav.chart') ?? 'nav.chart',
+        );
+      case 2:
+        return NavigationDestination(
+          icon: const Icon(Icons.person_outline),
+          label: l?.translate('nav.profile') ?? 'nav.profile',
+        );
+      case 3:
+        return NavigationDestination(
           icon: const Icon(Icons.favorite_border),
           label: l?.translate('nav.match') ?? 'nav.match',
-        ),
-    ];
-    final stackChildren = List.generate(4, (i) {
+        );
+      default:
+        return NavigationDestination(
+          icon: const Icon(Icons.auto_awesome_outlined),
+          label: l?.translate('nav.ask') ?? 'nav.ask',
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final visible = _visible;
+    final idx = visible.contains(_index) ? _index : 1;
+    final stackChildren = List.generate(5, (i) {
+      if (!visible.contains(i)) return const SizedBox.shrink();
       return Navigator(key: _keys[i], onGenerateRoute: (s) => _onRoute(i, s));
     });
-    final maxIdx = showMatch ? 3 : 2;
-    var idx = _index;
-    if (idx > maxIdx) idx = maxIdx;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
-        final nav = _keys[idx].currentState!;
-        if (nav.canPop()) nav.pop();
+        final nav = _keys[idx].currentState;
+        if (nav != null && nav.canPop()) nav.pop();
       },
       child: Scaffold(
         body: FadeTransition(
@@ -149,12 +184,11 @@ class _MainShellState extends State<MainShell>
           child: IndexedStack(index: idx, children: stackChildren),
         ),
         bottomNavigationBar: NavigationBar(
-          selectedIndex: idx,
+          selectedIndex: visible.indexOf(idx),
           onDestinationSelected: (i) {
-            final clamped = i > maxIdx ? maxIdx : i;
-            shellTab.value = clamped;
+            shellTab.value = visible[i];
           },
-          destinations: destinations,
+          destinations: [for (final v in visible) _dest(v, context)],
         ),
       ),
     );

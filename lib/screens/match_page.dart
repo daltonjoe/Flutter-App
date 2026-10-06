@@ -12,6 +12,9 @@ import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/match_service.dart';
 import '../services/reference_names_service.dart';
+import '../models/ask_context.dart';
+import '../providers/ask_context_provider.dart' show askEnabled;
+import '../widgets/ask_add.dart' show addToAsk;
 
 
 class _ProfileEntry {
@@ -606,6 +609,24 @@ class _MatchPageState extends State<MatchPage> {
       ),
     );
   }
+    void _addAspect(MatchAspect a) {
+    final pa = _profileA;
+    final pb = _profileB;
+    if (pa == null || pb == null) return;
+    final s = ReferenceNamesService.instance;
+    addToAsk(
+      context,
+      AskContext.synastry(
+        profileA: pa,
+        profileB: pb,
+        bodyA: a.bodyAId,
+        bodyB: a.bodyBId,
+        aspectTypeId: a.aspectTypeId,
+        label:
+            '${s.planet(a.bodyAId)} · ${s.aspect(a.aspectTypeId)} · ${s.planet(a.bodyBId)}',
+      ),
+    );
+  }
 
   Widget _aspectRow(MatchAspect a, bool isLast, String? text) {
     final svc = ReferenceNamesService.instance;
@@ -675,6 +696,18 @@ class _MatchPageState extends State<MatchPage> {
                       textAlign: TextAlign.end,
                       style: AppTextStyles.bodyXs(color: muted),
                     ),
+                  ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: askEnabled,
+                    builder: (ctx, on, _) => on
+                        ? IconButton(
+                            tooltip: t(ctx, 'ask.add'),
+                            visualDensity: VisualDensity.compact,
+                            icon: const Icon(Icons.auto_awesome_outlined,
+                                size: 18, color: AppColors.violetPrimary),
+                            onPressed: () => _addAspect(a),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ],
               ),

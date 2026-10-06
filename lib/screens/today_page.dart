@@ -18,6 +18,9 @@ import '../services/today_service.dart';
 import '../widgets/feedback_vote.dart';
 import 'edit_birth_time_page.dart';
 import 'transit_detail_page.dart';
+import '../models/ask_context.dart';
+import '../providers/ask_context_provider.dart';
+import '../widgets/ask_add.dart';
 
 class TodayPage extends StatefulWidget {
   const TodayPage({super.key});
@@ -395,6 +398,43 @@ class _TodayPageState extends State<TodayPage> {
     }
   }
 
+  void _addEvent(Map e) {
+    final pid = context.read<ActiveProfileProvider>().activeProfileId;
+    if (pid == null) return;
+    addToAsk(
+      context,
+      AskContext.todayEvent(
+        profileId: pid,
+        day: _dkey(_selected),
+        event: e,
+        label: _label(
+          _id(e['transit_body_id']),
+          _id(e['aspect_type_id']),
+          _id(e['natal_body_id']),
+        ),
+      ),
+    );
+  }
+
+    void _addHeadline(Map head) {
+    final pid = context.read<ActiveProfileProvider>().activeProfileId;
+    if (pid == null) return;
+    final tag = head['tag'] as Map?;
+    addToAsk(
+      context,
+      AskContext.todayHeadline(
+        profileId: pid,
+        day: _dkey(_selected),
+        tag: tag,
+        label: _label(
+          _id(tag?['transit']),
+          _id(tag?['aspect']),
+          _id(tag?['natal']),
+        ),
+      ),
+    );
+  }
+
   String _label(int? tb, int? asp, int? nb) {
     final n = ReferenceNamesService.instance;
     return '${tb == null ? '?' : n.planet(tb)} · ${asp == null ? '?' : n.aspect(asp)} · ${nb == null ? '?' : n.planet(nb)}';
@@ -650,6 +690,11 @@ class _TodayPageState extends State<TodayPage> {
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
+            if (context.read<ActiveProfileProvider>().activeProfileId != null)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: AskAddButton(onPressed: () => _addHeadline(head)),
+            ),
           if (text != null && text.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(text),
@@ -719,15 +764,29 @@ class _TodayPageState extends State<TodayPage> {
                       ),
                     )
                   : null,
-              trailing: e['applying'] is bool
-                  ? Icon(
-                      (e['applying'] as bool)
-                          ? Icons.north_east
-                          : Icons.south_east,
-                      size: 16,
-                      color: AppColors.textSecondary,
-                    )
-                  : null,
+             trailing: ValueListenableBuilder<bool>(
+                valueListenable: askEnabled,
+                builder: (ctx, on, _) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (on)
+                      IconButton(
+                        tooltip: t(ctx, 'ask.add'),
+                        icon: const Icon(Icons.auto_awesome_outlined,
+                            size: 18, color: AppColors.violetPrimary),
+                        onPressed: () => _addEvent(e),
+                      ),
+                    if (e['applying'] is bool)
+                      Icon(
+                        (e['applying'] as bool)
+                            ? Icons.north_east
+                            : Icons.south_east,
+                        size: 16,
+                        color: AppColors.textSecondary,
+                      ),
+                  ],
+                ),
+              ),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => TransitDetailPage(
