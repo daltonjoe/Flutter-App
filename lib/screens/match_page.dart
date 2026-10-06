@@ -44,6 +44,7 @@ class _MatchPageState extends State<MatchPage> {
   MatchResult? _result;
   final Map<String, MatchResult> _cache = {};
   final Map<String, Map<String, String>> _textCache = {};
+  String? _loc;
   Map<String, String> _texts = const {};
 
   @override
@@ -116,15 +117,19 @@ class _MatchPageState extends State<MatchPage> {
     final key = _pk(a, b);
     final cached = _cache[key];
     if (cached != null) {
+      final locC = context.read<LanguageProvider>().locale.languageCode;
       setState(() {
         _result = cached;
-        _texts = _textCache[key] ?? const {};
+        _texts = _textCache['$key|$locC'] ?? const {};
         _resultError = null;
         _resultLoading = false;
       });
+      if (_textCache['$key|$locC'] == null) {
+        unawaited(_loadTexts(key, cached, locC));
+      }
       return;
     }
-      final loc = context.read<LanguageProvider>().locale.languageCode;
+    final loc = context.read<LanguageProvider>().locale.languageCode;
     setState(() {
       _resultLoading = true;
       _resultError = null;
@@ -136,18 +141,56 @@ class _MatchPageState extends State<MatchPage> {
       final tx = await MatchService.fetchTexts(r.aspects.take(40).toList(), loc);
       if (!mounted) return;
       _cache[key] = r;
-      _textCache[key] = tx;
+      _textCache['$key|$loc'] = tx;
+      final curLoc = context.read<LanguageProvider>().locale.languageCode;
       setState(() {
         _result = r;
-        _texts = tx;
+        _texts = curLoc == loc ? tx : const {};
         _resultLoading = false;
       });
+      if (curLoc != loc) unawaited(_loadTexts(key, r, curLoc));
     } catch (e, st) {
       debugPrint('match fetch failed: $e\n$st');
       if (!mounted) return;
       setState(() {
         _resultError = e;
         _resultLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadTexts(String key, MatchResult r, String loc) async {
+    final tk = '$key|$loc';
+    final c = _textCache[tk];
+     if (c != null) {
+      if (mounted) setState(() => _texts = c);
+      return;
+    }
+    if (mounted) setState(() => _texts = const {});
+    try {
+      final tx = await MatchService.fetchTexts(r.aspects.take(40).toList(), loc);
+      if (!mounted) return;
+      _textCache[tk] = tx;
+      if (_loc == loc && identical(_result, r)) {
+        setState(() => _texts = tx);
+      }
+    } catch (e, st) {
+      debugPrint('match texts reload failed: $e\n$st');
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final loc = Provider.of<LanguageProvider>(context).locale.languageCode;
+    final prev = _loc;
+    _loc = loc;
+    final r = _result;
+    final a = _profileA;
+    final b = _profileB;
+    if (prev != null && prev != loc && r != null && a != null && b != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_loadTexts(_pk(a, b), r, loc));
       });
     }
   }
@@ -333,7 +376,8 @@ class _MatchPageState extends State<MatchPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+   Widget build(BuildContext context) {
+    context.watch<ReferenceNamesService>();
     final noAnim = MediaQuery.disableAnimationsOf(context);
     final l = AppLocalizations.of(context);
     return Scaffold(

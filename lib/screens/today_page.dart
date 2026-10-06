@@ -509,7 +509,7 @@ class _TodayPageState extends State<TodayPage> {
         separatorBuilder: (_, i) => const SizedBox(width: 8),
         itemBuilder: (_, i) {
           final d = dates[i];
-          final idx = (d.weekday - 1) % 7;
+          final idx = d.weekday % 7;
           return _dayChip(d, wd: wds[idx], mloc: mloc);
         },
       ),
