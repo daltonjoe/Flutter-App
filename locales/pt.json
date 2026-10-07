@@ -305,5 +305,9 @@
   "ask.error": "Não foi possível obter uma resposta.",
   "ask.retry": "Tentar novamente",
   "ask.disclaimer": "Apenas para entretenimento e autorreflexão; não é aconselhamento de saúde, jurídico ou financeiro.",
-  "ask.dev_reply": "Apenas prévia: o assistente ainda não está conectado."
+  "ask.dev_reply": "Apenas prévia: o assistente ainda não está conectado.",
+  "ask.safety.crisis": "Sinto muito que você esteja passando por isso. Fale agora com alguém de confiança ou ligue para o número de emergência ou uma linha de apoio da sua região. Você não precisa carregar isso sozinho.",
+  "ask.safety.redirect": "Isso vai além do que a astrologia pode dizer. Para questões de saúde, jurídicas, dinheiro ou segurança, fale com um profissional qualificado.",
+  "ask.safety.fallback": "Não consigo responder isso com segurança. Reformule ou adicione algo de Hoje ou Afinidade.",
+  "ask.error.rate": "Muitas perguntas. Aguarde um minuto e tente novamente."
 }

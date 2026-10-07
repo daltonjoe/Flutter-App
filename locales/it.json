@@ -305,5 +305,9 @@
   "ask.error": "Impossibile ottenere una risposta.",
   "ask.retry": "Riprova",
   "ask.disclaimer": "Solo per intrattenimento e riflessione personale; non è un consiglio su salute, diritto o finanze.",
-  "ask.dev_reply": "Solo anteprima: l'assistente non è ancora collegato."
+  "ask.dev_reply": "Solo anteprima: l'assistente non è ancora collegato.",
+  "ask.safety.crisis": "Mi dispiace molto che tu stia vivendo questo. Parla subito con una persona di fiducia o chiama il numero di emergenza o una linea di ascolto della tua zona. Non devi portarlo da solo.",
+  "ask.safety.redirect": "Questo va oltre ciò che l'astrologia può dire. Per salute, legge, denaro o sicurezza, rivolgiti a un professionista qualificato.",
+  "ask.safety.fallback": "Non posso rispondere in modo affidabile. Riformula, oppure aggiungi qualcosa da Oggi o Affinità.",
+  "ask.error.rate": "Troppe domande. Aspetta un minuto e riprova."
 }

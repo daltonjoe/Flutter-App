@@ -8,6 +8,9 @@ import '../core/theme/app_decorations.dart';
 import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../providers/ask_context_provider.dart';
+import '../providers/language_provider.dart';
+import '../services/ask_service.dart';
+import '../services/astro_service.dart';
 
 class _Msg {
   final bool mine;
@@ -27,6 +30,7 @@ class _AskPageState extends State<AskPage> {
   bool _waiting = false;
   bool _failed = false;
   String _lastText = '';
+  String _errKey = 'ask.error';
 
   @override
   void dispose() {
@@ -34,11 +38,32 @@ class _AskPageState extends State<AskPage> {
     super.dispose();
   }
 
-  /// ASK-0: yerel sahte yanıt. ASK-1'de AskService.send ile değişir.
-  Future<String> _reply(String text) async {
-    final s = t(context, 'ask.dev_reply');
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-    return s;
+Future<String> _reply(String text) async {
+    // context'i await'ten önce kullan (lint)
+    final loc = context.read<LanguageProvider>().locale.languageCode;
+    final safe = {
+      'crisis': t(context, 'ask.safety.crisis'),
+      'redirect': t(context, 'ask.safety.redirect'),
+      'fallback': t(context, 'ask.safety.fallback'),
+    };
+    final prev = _messages.length > 1
+        ? _messages.sublist(0, _messages.length - 1)
+        : <_Msg>[];
+    final last = prev.length > 6 ? prev.sublist(prev.length - 6) : prev;
+    final res = await AskService.send(
+      message: text,
+      contexts: askContext.items.map((e) => e.toServer()).toList(),
+      locale: loc,
+      history: [
+        for (final m in last)
+          {'role': m.mine ? 'user' : 'assistant', 'text': m.text}
+      ],
+    );
+    final s = res.safety;
+    if (s != null) return res.reply ?? (safe[s] ?? safe['fallback']!);
+    final rp = res.reply;
+    if (rp == null || rp.trim().isEmpty) return safe['fallback']!;
+    return rp;
   }
 
   Future<void> _send([String? override]) async {
@@ -63,12 +88,15 @@ class _AskPageState extends State<AskPage> {
         _waiting = false;
       });
     } catch (e) {
-      debugPrint('AskPage reply failed: $e');
+    debugPrint('AskPage reply failed: $e');
       if (!mounted) return;
       setState(() {
         _waiting = false;
         _failed = true;
         _lastText = text;
+        _errKey = (e is AstroServiceException && e.code == 'RATE_LIMITED')
+            ? 'ask.error.rate'
+            : 'ask.error';
       });
     }
   }
@@ -246,7 +274,7 @@ class _AskPageState extends State<AskPage> {
                   children: [
                     Expanded(
                       child: Text(
-                        t(context, 'ask.error'),
+                           t(context, _errKey),
                         style: AppTextStyles.bodySm(color: AppColors.errorRed),
                       ),
                     ),

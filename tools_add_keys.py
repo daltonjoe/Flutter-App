@@ -4,26 +4,38 @@ LOCALES_DIR = "locales"
 LANGS = ["en", "tr", "de", "fr", "es", "pt", "it"]
 
 KEYS = {
- "nav.ask": ("Ask", "Sor", "Fragen", "Demander", "Preguntar", "Perguntar", "Chiedi"),
- "ask.title": ("Ask", "Sor", "Fragen", "Demander", "Preguntar", "Perguntar", "Chiedi"),
- "ask.placeholder": ("Ask about your day or a match…", "Gününü ya da bir uyumu sor…", "Frag nach deinem Tag oder einem Match …", "Pose une question sur ta journée ou une affinité…", "Pregunta sobre tu día o una afinidad…", "Pergunte sobre o seu dia ou uma afinidade…", "Chiedi del tuo giorno o di un'affinità…"),
- "ask.send": ("Send", "Gönder", "Senden", "Envoyer", "Enviar", "Enviar", "Invia"),
- "ask.add": ("Add to chat", "Sohbete ekle", "Zum Chat hinzufügen", "Ajouter au chat", "Añadir al chat", "Adicionar ao chat", "Aggiungi alla chat"),
- "ask.empty_title": ("Talk it through", "Birlikte konuşalım", "Sprich darüber", "Parlons-en", "Hablémoslo", "Vamos conversar", "Parliamone"),
- "ask.empty_body": ("Add something from Today or Match, or ask your own question.", "Bugün ya da Uyum'dan bir şey ekle, ya da kendi sorunu sor.", "Füge etwas aus Heute oder Match hinzu oder stell deine eigene Frage.", "Ajoute un élément d'Aujourd'hui ou d'Affinité, ou pose ta propre question.", "Añade algo de Hoy o Afinidad, o haz tu propia pregunta.", "Adicione algo de Hoje ou Afinidade, ou faça sua própria pergunta.", "Aggiungi qualcosa da Oggi o Affinità, oppure fai la tua domanda."),
- "ask.suggest_1": ("What does this mean for me?", "Bu benim için ne anlama geliyor?", "Was bedeutet das für mich?", "Qu'est-ce que cela signifie pour moi ?", "¿Qué significa esto para mí?", "O que isso significa para mim?", "Cosa significa per me?"),
- "ask.suggest_2": ("Explain it in simple words.", "Sade bir dille anlat.", "Erkläre es einfach.", "Explique-le simplement.", "Explícalo con palabras sencillas.", "Explique com palavras simples.", "Spiegalo con parole semplici."),
- "ask.suggest_3": ("How could I work with this?", "Bununla nasıl çalışabilirim?", "Wie kann ich damit umgehen?", "Comment puis-je composer avec ça ?", "¿Cómo puedo trabajar con esto?", "Como posso lidar com isso?", "Come posso lavorarci?"),
- "ask.context.today_headline": ("Today's headline", "Bugünün başlığı", "Schlagzeile des Tages", "Titre du jour", "Titular de hoy", "Manchete de hoje", "Titolo di oggi"),
- "ask.context.today_event": ("Today's event", "Bugünün olayı", "Ereignis des Tages", "Événement du jour", "Evento de hoy", "Evento de hoje", "Evento di oggi"),
- "ask.context.synastry": ("Chart match", "Harita uyumu", "Kartenvergleich", "Comparaison de cartes", "Comparación de cartas", "Comparação de mapas", "Confronto tra carte"),
- "ask.context.remove": ("Remove", "Kaldır", "Entfernen", "Retirer", "Quitar", "Remover", "Rimuovi"),
- "ask.context.limit": ("You can attach up to 5 items.", "En fazla 5 öğe ekleyebilirsin.", "Du kannst bis zu 5 Elemente anhängen.", "Tu peux joindre jusqu'à 5 éléments.", "Puedes adjuntar hasta 5 elementos.", "Você pode anexar até 5 itens.", "Puoi allegare fino a 5 elementi."),
- "ask.typing": ("Writing…", "Yazıyor…", "Schreibt …", "Écrit…", "Escribiendo…", "Escrevendo…", "Sta scrivendo…"),
- "ask.error": ("Couldn't get a reply.", "Yanıt alınamadı.", "Keine Antwort erhalten.", "Impossible d'obtenir une réponse.", "No se pudo obtener una respuesta.", "Não foi possível obter uma resposta.", "Impossibile ottenere una risposta."),
- "ask.retry": ("Try again", "Tekrar dene", "Erneut versuchen", "Réessayer", "Reintentar", "Tentar novamente", "Riprova"),
- "ask.disclaimer": ("For entertainment and self-reflection only; not health, legal or financial advice.", "Eğlence ve öz-düşünme amaçlıdır; sağlık, hukuk, finans tavsiyesi değildir.", "Nur zur Unterhaltung und Selbstreflexion; keine Gesundheits-, Rechts- oder Finanzberatung.", "À but de divertissement et de réflexion personnelle ; pas un conseil de santé, juridique ou financier.", "Solo para entretenimiento y autorreflexión; no es consejo de salud, legal ni financiero.", "Apenas para entretenimento e autorreflexão; não é aconselhamento de saúde, jurídico ou financeiro.", "Solo per intrattenimento e riflessione personale; non è un consiglio su salute, diritto o finanze."),
- "ask.dev_reply": ("Preview only: the assistant isn't connected yet.", "Yalnız önizleme: asistan henüz bağlı değil.", "Nur Vorschau: Der Assistent ist noch nicht verbunden.", "Aperçu uniquement : l'assistant n'est pas encore connecté.", "Solo vista previa: el asistente aún no está conectado.", "Apenas prévia: o assistente ainda não está conectado.", "Solo anteprima: l'assistente non è ancora collegato."),
+ "ask.safety.crisis": (
+  "I'm really sorry you're going through this. Please reach out to someone you trust or your local emergency number or crisis line right now. You don't have to carry this alone.",
+  "Bunu yaşadığına çok üzüldüm. Lütfen şimdi güvendiğin biriyle ya da bulunduğun yerdeki acil durum numarası veya kriz hattıyla iletişime geç. Bunu tek başına taşımak zorunda değilsin.",
+  "Es tut mir sehr leid, dass du das durchmachst. Bitte wende dich jetzt an eine Vertrauensperson oder an den Notruf bzw. eine Krisenhotline in deiner Nähe. Du musst das nicht allein tragen.",
+  "Je suis vraiment désolé que tu traverses cela. Parle dès maintenant à une personne de confiance ou contacte les urgences ou une ligne d'écoute près de chez toi. Tu n'as pas à porter ça seul.",
+  "Lamento mucho que estés pasando por esto. Habla ahora con alguien de confianza o llama al número de emergencias o a una línea de crisis de tu zona. No tienes que cargar con esto solo.",
+  "Sinto muito que você esteja passando por isso. Fale agora com alguém de confiança ou ligue para o número de emergência ou uma linha de apoio da sua região. Você não precisa carregar isso sozinho.",
+  "Mi dispiace molto che tu stia vivendo questo. Parla subito con una persona di fiducia o chiama il numero di emergenza o una linea di ascolto della tua zona. Non devi portarlo da solo."),
+ "ask.safety.redirect": (
+  "This is beyond what astrology can speak to. For health, legal, money or safety questions, please talk to a qualified professional.",
+  "Bu konu astrolojinin alanı dışında. Sağlık, hukuk, para ya da güvenlik soruları için lütfen uzman bir kişiye danış.",
+  "Dazu kann Astrologie nichts sagen. Bei Fragen zu Gesundheit, Recht, Geld oder Sicherheit wende dich bitte an eine Fachperson.",
+  "Cela dépasse ce que l'astrologie peut dire. Pour la santé, le droit, l'argent ou la sécurité, parle à un professionnel qualifié.",
+  "Esto va más allá de lo que puede decir la astrología. Para temas de salud, legales, dinero o seguridad, habla con un profesional cualificado.",
+  "Isso vai além do que a astrologia pode dizer. Para questões de saúde, jurídicas, dinheiro ou segurança, fale com um profissional qualificado.",
+  "Questo va oltre ciò che l'astrologia può dire. Per salute, legge, denaro o sicurezza, rivolgiti a un professionista qualificato."),
+ "ask.safety.fallback": (
+  "I can't answer that reliably. Try rephrasing, or add something from Today or Match.",
+  "Buna güvenilir bir yanıt veremiyorum. Soruyu farklı sor ya da Bugün veya Uyum'dan bir şey ekle.",
+  "Dazu kann ich keine verlässliche Antwort geben. Formuliere es anders oder füge etwas aus Heute oder Match hinzu.",
+  "Je ne peux pas répondre de façon fiable. Reformule, ou ajoute un élément d'Aujourd'hui ou d'Affinité.",
+  "No puedo responder eso con fiabilidad. Reformula o añade algo de Hoy o Afinidad.",
+  "Não consigo responder isso com segurança. Reformule ou adicione algo de Hoje ou Afinidade.",
+  "Non posso rispondere in modo affidabile. Riformula, oppure aggiungi qualcosa da Oggi o Affinità."),
+ "ask.error.rate": (
+  "Too many questions. Wait a minute and try again.",
+  "Çok fazla soru. Bir dakika bekleyip tekrar dene.",
+  "Zu viele Fragen. Warte eine Minute und versuche es erneut.",
+  "Trop de questions. Attends une minute puis réessaie.",
+  "Demasiadas preguntas. Espera un minuto e inténtalo de nuevo.",
+  "Muitas perguntas. Aguarde um minuto e tente novamente.",
+  "Troppe domande. Aspetta un minuto e riprova."),
 }
 
 for i, lang in enumerate(LANGS):

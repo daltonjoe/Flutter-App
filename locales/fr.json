@@ -305,5 +305,9 @@
   "ask.error": "Impossible d'obtenir une réponse.",
   "ask.retry": "Réessayer",
   "ask.disclaimer": "À but de divertissement et de réflexion personnelle ; pas un conseil de santé, juridique ou financier.",
-  "ask.dev_reply": "Aperçu uniquement : l'assistant n'est pas encore connecté."
+  "ask.dev_reply": "Aperçu uniquement : l'assistant n'est pas encore connecté.",
+  "ask.safety.crisis": "Je suis vraiment désolé que tu traverses cela. Parle dès maintenant à une personne de confiance ou contacte les urgences ou une ligne d'écoute près de chez toi. Tu n'as pas à porter ça seul.",
+  "ask.safety.redirect": "Cela dépasse ce que l'astrologie peut dire. Pour la santé, le droit, l'argent ou la sécurité, parle à un professionnel qualifié.",
+  "ask.safety.fallback": "Je ne peux pas répondre de façon fiable. Reformule, ou ajoute un élément d'Aujourd'hui ou d'Affinité.",
+  "ask.error.rate": "Trop de questions. Attends une minute puis réessaie."
 }

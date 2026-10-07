@@ -305,5 +305,9 @@
   "ask.error": "Couldn't get a reply.",
   "ask.retry": "Try again",
   "ask.disclaimer": "For entertainment and self-reflection only; not health, legal or financial advice.",
-  "ask.dev_reply": "Preview only: the assistant isn't connected yet."
+  "ask.dev_reply": "Preview only: the assistant isn't connected yet.",
+  "ask.safety.crisis": "I'm really sorry you're going through this. Please reach out to someone you trust or your local emergency number or crisis line right now. You don't have to carry this alone.",
+  "ask.safety.redirect": "This is beyond what astrology can speak to. For health, legal, money or safety questions, please talk to a qualified professional.",
+  "ask.safety.fallback": "I can't answer that reliably. Try rephrasing, or add something from Today or Match.",
+  "ask.error.rate": "Too many questions. Wait a minute and try again."
 }
