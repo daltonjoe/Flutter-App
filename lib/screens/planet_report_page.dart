@@ -17,6 +17,8 @@ import '../core/content_theme_colors.dart';
 import '../core/reference_ids.dart';
 import '../services/reference_names_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../providers/ask_context_provider.dart';
+import '../widgets/ask_add.dart';
 
 
 class PlanetReportPage extends StatefulWidget {
@@ -199,11 +201,37 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
    final translatedSign =
         pd != null ? names.sign(RefIds.signId(pd.signIndex)) : '';
 
+    final known = widget.chartData.input?.birthTimeKnown == true;
+    final askQ = (pd == null || pid == null)
+        ? null
+        : t(context, known && pd.house > 0
+                ? 'ask.about.placement'
+                : 'ask.about.nohouse',
+            args: {
+              'planet': planetLabel,
+              'sign': translatedSign,
+              'house': known && pd.house > 0 ? names.house(pd.house) : '',
+            });
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 60),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (askQ != null)
+            ValueListenableBuilder<bool>(
+              valueListenable: askEnabled,
+              builder: (_, on, _) => !on
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: FilledButton.icon(
+                        onPressed: () => askAbout(askQ),
+                        icon: const Icon(Icons.auto_awesome_outlined, size: 18),
+                        label: Text(t(context, 'ask.about.button')),
+                      ),
+                    ),
+            ),
           // ── Background Animation ──────────────────────────────
           Center(
             child: Opacity(
