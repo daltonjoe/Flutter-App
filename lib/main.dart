@@ -58,6 +58,7 @@ void main() async {
   }
 
   await activeProfileProvider.load();
+debugPrint('TOKEN=${Supabase.instance.client.auth.currentSession?.accessToken}');
   runApp(
     MultiProvider(
       providers: [

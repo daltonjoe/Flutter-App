@@ -309,5 +309,6 @@
   "ask.safety.crisis": "Mi dispiace molto che tu stia vivendo questo. Parla subito con una persona di fiducia o chiama il numero di emergenza o una linea di ascolto della tua zona. Non devi portarlo da solo.",
   "ask.safety.redirect": "Questo va oltre ciò che l'astrologia può dire. Per salute, legge, denaro o sicurezza, rivolgiti a un professionista qualificato.",
   "ask.safety.fallback": "Non posso rispondere in modo affidabile. Riformula, oppure aggiungi qualcosa da Oggi o Affinità.",
-  "ask.error.rate": "Troppe domande. Aspetta un minuto e riprova."
+  "ask.error.rate": "Troppe domande. Aspetta un minuto e riprova.",
+  "ask.lang_reset": "La lingua è cambiata, quindi la chat è stata azzerata."
 }

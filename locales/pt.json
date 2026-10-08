@@ -309,5 +309,6 @@
   "ask.safety.crisis": "Sinto muito que você esteja passando por isso. Fale agora com alguém de confiança ou ligue para o número de emergência ou uma linha de apoio da sua região. Você não precisa carregar isso sozinho.",
   "ask.safety.redirect": "Isso vai além do que a astrologia pode dizer. Para questões de saúde, jurídicas, dinheiro ou segurança, fale com um profissional qualificado.",
   "ask.safety.fallback": "Não consigo responder isso com segurança. Reformule ou adicione algo de Hoje ou Afinidade.",
-  "ask.error.rate": "Muitas perguntas. Aguarde um minuto e tente novamente."
+  "ask.error.rate": "Muitas perguntas. Aguarde um minuto e tente novamente.",
+  "ask.lang_reset": "O idioma mudou, então o chat foi reiniciado."
 }

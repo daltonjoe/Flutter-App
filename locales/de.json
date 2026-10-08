@@ -309,5 +309,6 @@
   "ask.safety.crisis": "Es tut mir sehr leid, dass du das durchmachst. Bitte wende dich jetzt an eine Vertrauensperson oder an den Notruf bzw. eine Krisenhotline in deiner Nähe. Du musst das nicht allein tragen.",
   "ask.safety.redirect": "Dazu kann Astrologie nichts sagen. Bei Fragen zu Gesundheit, Recht, Geld oder Sicherheit wende dich bitte an eine Fachperson.",
   "ask.safety.fallback": "Dazu kann ich keine verlässliche Antwort geben. Formuliere es anders oder füge etwas aus Heute oder Match hinzu.",
-  "ask.error.rate": "Zu viele Fragen. Warte eine Minute und versuche es erneut."
+  "ask.error.rate": "Zu viele Fragen. Warte eine Minute und versuche es erneut.",
+  "ask.lang_reset": "Die Sprache wurde geändert, der Chat wurde zurückgesetzt."
 }

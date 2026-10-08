@@ -15,7 +15,8 @@ class AskService {
     required String message,
     required List<Map<String, dynamic>> contexts,
     required String locale,
-    required List<Map<String, String>> history,
+   required List<Map<String, String>> history,
+    String? profileId,
   }) async {
     final jwt = Supabase.instance.client.auth.currentSession?.accessToken;
     if (jwt == null) {
@@ -34,7 +35,8 @@ class AskService {
               'message': message,
               'contexts': contexts,
               'locale': locale,
-              'history': history,
+               'history': history,
+              'profile_id': ?profileId,
             }),
           )
           .timeout(const Duration(seconds: 60));

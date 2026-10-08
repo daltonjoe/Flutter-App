@@ -309,5 +309,6 @@
   "ask.safety.crisis": "Bunu yaşadığına çok üzüldüm. Lütfen şimdi güvendiğin biriyle ya da bulunduğun yerdeki acil durum numarası veya kriz hattıyla iletişime geç. Bunu tek başına taşımak zorunda değilsin.",
   "ask.safety.redirect": "Bu konu astrolojinin alanı dışında. Sağlık, hukuk, para ya da güvenlik soruları için lütfen uzman bir kişiye danış.",
   "ask.safety.fallback": "Buna güvenilir bir yanıt veremiyorum. Soruyu farklı sor ya da Bugün veya Uyum'dan bir şey ekle.",
-  "ask.error.rate": "Çok fazla soru. Bir dakika bekleyip tekrar dene."
+  "ask.error.rate": "Çok fazla soru. Bir dakika bekleyip tekrar dene.",
+  "ask.lang_reset": "Dil değiştiği için sohbet sıfırlandı."
 }

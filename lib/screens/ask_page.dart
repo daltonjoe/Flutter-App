@@ -11,6 +11,7 @@ import '../providers/ask_context_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/ask_service.dart';
 import '../services/astro_service.dart';
+import '../providers/active_profile_provider.dart';
 
 class _Msg {
   final bool mine;
@@ -31,6 +32,24 @@ class _AskPageState extends State<AskPage> {
   bool _failed = false;
   String _lastText = '';
   String _errKey = 'ask.error';
+  String? _loc;
+  bool _langReset = false;
+  int _gen = 0;
+
+ @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final loc =
+        Provider.of<LanguageProvider>(context).locale.languageCode;
+    if (_loc != null && _loc != loc) {
+      _gen++;
+      _messages.clear();
+      _waiting = false;
+      _failed = false;
+      _langReset = true;
+    }
+    _loc = loc;
+  }
 
   @override
   void dispose() {
@@ -58,6 +77,7 @@ Future<String> _reply(String text) async {
         for (final m in last)
           {'role': m.mine ? 'user' : 'assistant', 'text': m.text}
       ],
+      profileId: context.read<ActiveProfileProvider>().activeProfileId,
     );
     final s = res.safety;
     if (s != null) return res.reply ?? (safe[s] ?? safe['fallback']!);
@@ -71,25 +91,24 @@ Future<String> _reply(String text) async {
     if (text.isEmpty || _waiting) return;
     HapticFeedback.selectionClick();
     _ctl.clear();
-    setState(() => _messages.add(_Msg(true, text)));
-    await _ask(text);
-  }
-
-  Future<void> _ask(String text) async {
+ final gen = _gen;
+    final retry = override != null && _failed;
     setState(() {
+      if (!retry) _messages.add(_Msg(true, text));
       _waiting = true;
       _failed = false;
+      _langReset = false;
     });
     try {
       final r = await _reply(text);
-      if (!mounted) return;
+      if (!mounted || gen != _gen) return;
       setState(() {
         _messages.add(_Msg(false, r));
         _waiting = false;
       });
     } catch (e) {
-    debugPrint('AskPage reply failed: $e');
-      if (!mounted) return;
+      debugPrint('AskPage reply failed: $e');
+      if (!mounted || gen != _gen) return;
       setState(() {
         _waiting = false;
         _failed = true;
@@ -279,10 +298,19 @@ Future<String> _reply(String text) async {
                       ),
                     ),
                     TextButton(
-                      onPressed: () => _ask(_lastText),
+                      onPressed: () => _send(_lastText),
                       child: Text(t(context, 'ask.retry')),
                     ),
                   ],
+                ),
+              ),
+              if (_langReset)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                child: Text(
+                  t(context, 'ask.lang_reset'),
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodySm(),
                 ),
               ),
             _contextStrip(context),
