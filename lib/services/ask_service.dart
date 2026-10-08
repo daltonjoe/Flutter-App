@@ -16,8 +16,9 @@ class AskService {
     required List<Map<String, dynamic>> contexts,
     required String locale,
    required List<Map<String, String>> history,
-    String? profileId,
-  }) async {
+  String? profileId,
+      String? mode,
+    }) async {
     final jwt = Supabase.instance.client.auth.currentSession?.accessToken;
     if (jwt == null) {
       throw AstroServiceException(code: 'NO_SESSION', message: 'Oturum yok.');
@@ -37,6 +38,7 @@ class AskService {
               'locale': locale,
                'history': history,
               'profile_id': ?profileId,
+              'mode': ?mode,
             }),
           )
           .timeout(const Duration(seconds: 60));

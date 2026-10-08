@@ -36,6 +36,7 @@ class _AskPageState extends State<AskPage> {
   String? _loc;
   bool _langReset = false;
   int _gen = 0;
+  String _mode = 'natal';
 
   @override
   void initState() {
@@ -94,7 +95,8 @@ Future<String> _reply(String text) async {
         for (final m in last)
           {'role': m.mine ? 'user' : 'assistant', 'text': m.text}
       ],
-      profileId: context.read<ActiveProfileProvider>().activeProfileId,
+       profileId: context.read<ActiveProfileProvider>().activeProfileId,
+      mode: _mode,
     );
     final s = res.safety;
     if (s != null) return res.reply ?? (safe[s] ?? safe['fallback']!);
@@ -290,6 +292,21 @@ Future<String> _reply(String text) async {
         top: false,
         child: Column(
           children: [
+             Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: SegmentedButton<String>(
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(
+                      value: 'natal', label: Text(t(context, 'ask.mode.natal'))),
+                  ButtonSegment(
+                      value: 'forecast',
+                      label: Text(t(context, 'ask.mode.forecast'))),
+                ],
+                selected: {_mode},
+             onSelectionChanged: (s) => setState(() => _mode = s.first),
+              ),
+            ),
             Expanded(
               child: (_messages.isEmpty && !_waiting)
                   ? _empty(context)

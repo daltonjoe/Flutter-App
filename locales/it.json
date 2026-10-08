@@ -314,5 +314,7 @@
   "ask.about.button": "Chiedi i dettagli all'AI",
   "ask.about.placement": "{planet} è in {sign}, {house}. Come dovrei usare questa posizione nella mia vita?",
   "ask.about.nohouse": "{planet} è in {sign}. Come dovrei usare questa posizione nella mia vita?",
-  "ask.about.asc": "Il mio ascendente è {sign}. Come dovrei usare questa energia nella mia vita?"
+  "ask.about.asc": "Il mio ascendente è {sign}. Come dovrei usare questa energia nella mia vita?",
+  "ask.mode.natal": "Il mio tema",
+  "ask.mode.forecast": "Previsione"
 }

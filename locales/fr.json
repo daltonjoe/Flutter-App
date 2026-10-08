@@ -314,5 +314,7 @@
   "ask.about.button": "Demander les détails à l'AI",
   "ask.about.placement": "{planet} est en {sign}, {house}. Comment utiliser cette position dans ma vie ?",
   "ask.about.nohouse": "{planet} est en {sign}. Comment utiliser cette position dans ma vie ?",
-  "ask.about.asc": "Mon ascendant est {sign}. Comment utiliser cette énergie dans ma vie ?"
+  "ask.about.asc": "Mon ascendant est {sign}. Comment utiliser cette énergie dans ma vie ?",
+  "ask.mode.natal": "Mon thème",
+  "ask.mode.forecast": "Prévision"
 }

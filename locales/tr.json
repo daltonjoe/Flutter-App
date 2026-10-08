@@ -314,5 +314,7 @@
   "ask.about.button": "Detayları AI'ya sor",
   "ask.about.placement": "{planet} {sign} burcunda, {house} konumunda. Bu konumu hayatımda nasıl kullanmalıyım?",
   "ask.about.nohouse": "{planet} {sign} burcunda. Bu konumu hayatımda nasıl kullanmalıyım?",
-  "ask.about.asc": "Yükselenim {sign}. Bu enerjiyi hayatımda nasıl kullanmalıyım?"
+  "ask.about.asc": "Yükselenim {sign}. Bu enerjiyi hayatımda nasıl kullanmalıyım?",
+  "ask.mode.natal": "Haritam",
+  "ask.mode.forecast": "Öngörü"
 }

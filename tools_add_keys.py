@@ -8,6 +8,10 @@ KEYS = {
 "ask.about.placement": ["My {planet} is in {sign}, {house}. How should I use this placement in my life?","{planet} {sign} burcunda, {house} konumunda. Bu konumu hayatımda nasıl kullanmalıyım?","{planet} steht in {sign}, {house}. Wie sollte ich diese Position in meinem Leben nutzen?","{planet} est en {sign}, {house}. Comment utiliser cette position dans ma vie ?","{planet} está en {sign}, {house}. ¿Cómo debo usar esta posición en mi vida?","{planet} está em {sign}, {house}. Como devo usar esta posição na minha vida?","{planet} è in {sign}, {house}. Come dovrei usare questa posizione nella mia vita?"],
 "ask.about.nohouse": ["My {planet} is in {sign}. How should I use this placement in my life?","{planet} {sign} burcunda. Bu konumu hayatımda nasıl kullanmalıyım?","{planet} steht in {sign}. Wie sollte ich diese Position in meinem Leben nutzen?","{planet} est en {sign}. Comment utiliser cette position dans ma vie ?","{planet} está en {sign}. ¿Cómo debo usar esta posición en mi vida?","{planet} está em {sign}. Como devo usar esta posição na minha vida?","{planet} è in {sign}. Come dovrei usare questa posizione nella mia vita?"],
 "ask.about.asc": ["My ascendant is {sign}. How should I use this energy in my life?","Yükselenim {sign}. Bu enerjiyi hayatımda nasıl kullanmalıyım?","Mein Aszendent ist {sign}. Wie sollte ich diese Energie in meinem Leben nutzen?","Mon ascendant est {sign}. Comment utiliser cette énergie dans ma vie ?","Mi ascendente es {sign}. ¿Cómo debo usar esta energía en mi vida?","Meu ascendente é {sign}. Como devo usar essa energia na minha vida?","Il mio ascendente è {sign}. Come dovrei usare questa energia nella mia vita?"],
+"ask.mode.natal": ["My chart","Haritam","Mein Horoskop","Mon thème","Mi carta","Meu mapa","Il mio tema"],
+"ask.mode.forecast": ["Outlook","Öngörü","Ausblick","Prévision","Pronóstico","Previsão","Previsione"],
+"ask.mode.natal": ["My chart","Haritam","Mein Horoskop","Mon thème","Mi carta","Meu mapa","Il mio tema"],
+"ask.mode.forecast": ["Outlook","Öngörü","Ausblick","Prévision","Pronóstico","Previsão","Previsione"],
 }
 
 for i, lang in enumerate(LANGS):
