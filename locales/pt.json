@@ -316,5 +316,17 @@
   "ask.about.nohouse": "{planet} está em {sign}. Como devo usar esta posição na minha vida?",
   "ask.about.asc": "Meu ascendente é {sign}. Como devo usar essa energia na minha vida?",
   "ask.mode.natal": "Meu mapa",
-  "ask.mode.forecast": "Previsão"
+  "ask.mode.forecast": "Previsão",
+  "ask.empty_title.natal": "Pergunte sobre seu mapa natal",
+  "ask.empty_body.natal": "Planetas, signos, casas e aspectos do seu mapa. Escolha uma pergunta ou escreva a sua.",
+  "ask.empty_title.forecast": "Pergunte sobre um mês",
+  "ask.empty_body.forecast": "Escolha primeiro mês e ano (MM-AAAA). A previsão usa os planetas lentos (Marte a Plutão) ativos no seu mapa nesse mês.",
+  "ask.suggest.natal.1": "O que significam meu signo solar, casa e grau?",
+  "ask.suggest.natal.2": "Como a Lua e Vênus moldam o amor para mim?",
+  "ask.suggest.natal.3": "Quais aspectos do meu mapa mais se destacam?",
+  "ask.suggest.forecast.1": "Como esse mês se apresenta para minha carreira?",
+  "ask.suggest.forecast.2": "Quais temas marcam o amor neste mês?",
+  "ask.suggest.forecast.3": "Qual trânsito mais importa neste mês?",
+  "ask.forecast.pick": "Escolher mês e ano",
+  "ask.forecast.for": "Previsão para"
 }

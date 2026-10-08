@@ -316,5 +316,17 @@
   "ask.about.nohouse": "My {planet} is in {sign}. How should I use this placement in my life?",
   "ask.about.asc": "My ascendant is {sign}. How should I use this energy in my life?",
   "ask.mode.natal": "My chart",
-  "ask.mode.forecast": "Outlook"
+  "ask.mode.forecast": "Outlook",
+  "ask.empty_title.natal": "Ask about your birth chart",
+  "ask.empty_body.natal": "Planets, signs, houses and aspects in your chart. Pick a question or write your own.",
+  "ask.empty_title.forecast": "Ask about a month ahead",
+  "ask.empty_body.forecast": "First choose month and year (MM-YYYY). The outlook uses slow planets (Mars to Pluto) active in your chart that month.",
+  "ask.suggest.natal.1": "What do my Sun sign, house and degree mean?",
+  "ask.suggest.natal.2": "How do my Moon and Venus shape love?",
+  "ask.suggest.natal.3": "Which aspects in my chart stand out most?",
+  "ask.suggest.forecast.1": "How does this month look for my career?",
+  "ask.suggest.forecast.2": "Which themes shape love this month?",
+  "ask.suggest.forecast.3": "Which transit matters most this month?",
+  "ask.forecast.pick": "Choose month and year",
+  "ask.forecast.for": "Outlook for"
 }

@@ -13,6 +13,7 @@ import '../services/ask_service.dart';
 import '../services/astro_service.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/ask_draft.dart';
+import 'package:flutter/cupertino.dart';
 
 class _Msg {
   final bool mine;
@@ -37,6 +38,7 @@ class _AskPageState extends State<AskPage> {
   bool _langReset = false;
   int _gen = 0;
   String _mode = 'natal';
+  String? _fMonth; // YYYY-MM
 
   @override
   void initState() {
@@ -96,7 +98,8 @@ Future<String> _reply(String text) async {
           {'role': m.mine ? 'user' : 'assistant', 'text': m.text}
       ],
        profileId: context.read<ActiveProfileProvider>().activeProfileId,
-      mode: _mode,
+       mode: _mode,
+       forecastMonth: _mode == 'forecast' ? _fMonth : null,
     );
     final s = res.safety;
     if (s != null) return res.reply ?? (safe[s] ?? safe['fallback']!);
@@ -107,7 +110,11 @@ Future<String> _reply(String text) async {
 
   Future<void> _send([String? override]) async {
     final text = (override ?? _ctl.text).trim();
-    if (text.isEmpty || _waiting) return;
+        if (text.isEmpty || _waiting) return;
+    if (_mode == 'forecast' && _fMonth == null) {
+      _pickMonth();
+      return;
+    }
     HapticFeedback.selectionClick();
     _ctl.clear();
  final gen = _gen;
@@ -139,11 +146,91 @@ Future<String> _reply(String text) async {
     }
   }
 
+    Future<void> _pickMonth() async {
+    final now = DateTime.now();
+    var m = _fMonth == null ? now.month : int.parse(_fMonth!.substring(5));
+    var y = _fMonth == null ? now.year : int.parse(_fMonth!.substring(0, 4));
+    const y0 = 2020, y1 = 2099;
+    final mc = FixedExtentScrollController(initialItem: m - 1);
+    final yc = FixedExtentScrollController(initialItem: y - y0);
+    final ok = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      builder: (ctx) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 200,
+            child: Row(children: [
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: mc,
+                  itemExtent: 40,
+                  onSelectedItemChanged: (i) {
+                    m = i + 1;
+                    HapticFeedback.selectionClick();
+                  },
+                  children: [
+                    for (var i = 1; i <= 12; i++)
+                      Center(
+                          child: Text(i.toString().padLeft(2, '0'),
+                              style: AppTextStyles.bodyLg(
+                                  color: AppColors.textPrimary)))
+                  ],
+                ),
+              ),
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: yc,
+                  itemExtent: 40,
+                  onSelectedItemChanged: (i) {
+                    y = y0 + i;
+                    HapticFeedback.selectionClick();
+                  },
+                  children: [
+                    for (var i = y0; i <= y1; i++)
+                      Center(
+                          child: Text('$i',
+                              style: AppTextStyles.bodyLg(
+                                  color: AppColors.textPrimary)))
+                  ],
+                ),
+              ),
+            ]),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(t(ctx, 'settings.save')),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+    mc.dispose();
+    yc.dispose();
+    if (ok != true || !mounted) return;
+    final v = '$y-${m.toString().padLeft(2, '0')}';
+    if (v == _fMonth) return;
+    setState(() {
+      _fMonth = v;
+      _gen++;
+      _messages.clear();
+      _waiting = false;
+      _failed = false;
+    });
+  }
+
   Widget _empty(BuildContext context) {
     final sugg = [
-      t(context, 'ask.suggest_1'),
-      t(context, 'ask.suggest_2'),
-      t(context, 'ask.suggest_3'),
+      t(context, 'ask.suggest.$_mode.1'),
+      t(context, 'ask.suggest.$_mode.2'),
+      t(context, 'ask.suggest.$_mode.3'),
     ];
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -153,13 +240,13 @@ Future<String> _reply(String text) async {
             size: 40, color: AppColors.violetPrimary),
         const SizedBox(height: 16),
         Text(
-          t(context, 'ask.empty_title'),
+          t(context, 'ask.empty_title.$_mode'),
           textAlign: TextAlign.center,
           style: AppTextStyles.h3(),
         ),
         const SizedBox(height: 8),
         Text(
-          t(context, 'ask.empty_body'),
+          t(context, 'ask.empty_body.$_mode'),
           textAlign: TextAlign.center,
           style: AppTextStyles.bodyMd(),
         ),
@@ -304,9 +391,33 @@ Future<String> _reply(String text) async {
                       label: Text(t(context, 'ask.mode.forecast'))),
                 ],
                 selected: {_mode},
-             onSelectionChanged: (s) => setState(() => _mode = s.first),
+                          onSelectionChanged: (s) {
+                if (s.first == _mode) return;
+                setState(() {
+                  _gen++;
+                  _mode = s.first;
+                  _fMonth = null;
+                  _messages.clear();
+                  _waiting = false;
+                  _failed = false;
+                  _langReset = false;
+                  _lastText = '';
+                });
+              },
               ),
             ),
+            if (_mode == 'forecast')
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: ActionChip(
+                  avatar:
+                      const Icon(Icons.calendar_month_outlined, size: 18),
+                  label: Text(_fMonth == null
+                      ? t(context, 'ask.forecast.pick')
+                      : '${t(context, 'ask.forecast.for')}: ${_fMonth!.substring(5)}-${_fMonth!.substring(0, 4)}'),
+                  onPressed: _pickMonth,
+                ),
+              ),
             Expanded(
               child: (_messages.isEmpty && !_waiting)
                   ? _empty(context)

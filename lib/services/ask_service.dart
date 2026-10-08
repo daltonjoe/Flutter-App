@@ -18,6 +18,7 @@ class AskService {
    required List<Map<String, String>> history,
   String? profileId,
       String? mode,
+      String? forecastMonth,
     }) async {
     final jwt = Supabase.instance.client.auth.currentSession?.accessToken;
     if (jwt == null) {
@@ -39,6 +40,7 @@ class AskService {
                'history': history,
               'profile_id': ?profileId,
               'mode': ?mode,
+              'forecast_month': ?forecastMonth,
             }),
           )
           .timeout(const Duration(seconds: 60));

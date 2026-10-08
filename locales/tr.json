@@ -316,5 +316,17 @@
   "ask.about.nohouse": "{planet} {sign} burcunda. Bu konumu hayatımda nasıl kullanmalıyım?",
   "ask.about.asc": "Yükselenim {sign}. Bu enerjiyi hayatımda nasıl kullanmalıyım?",
   "ask.mode.natal": "Haritam",
-  "ask.mode.forecast": "Öngörü"
+  "ask.mode.forecast": "Öngörü",
+  "ask.empty_title.natal": "Haritanı sor",
+  "ask.empty_body.natal": "Haritandaki gezegen, burç, ev ve açılar. Bir soru seç ya da kendin yaz.",
+  "ask.empty_title.forecast": "Bir ayı sor",
+  "ask.empty_body.forecast": "Önce ay ve yılı seç (AA-YYYY). Öngörü, o ay haritanda etkin olan yavaş gezegenlere (Mars–Plüton) dayanır.",
+  "ask.suggest.natal.1": "Güneşim burç, ev ve derece olarak ne anlama geliyor?",
+  "ask.suggest.natal.2": "Ay ve Venüs aşkı nasıl şekillendiriyor?",
+  "ask.suggest.natal.3": "Haritamda en belirgin açılar hangileri?",
+  "ask.suggest.forecast.1": "Bu ay kariyerim için nasıl görünüyor?",
+  "ask.suggest.forecast.2": "Bu ay aşkta hangi temalar öne çıkıyor?",
+  "ask.suggest.forecast.3": "Bu ay en önemli transit hangisi?",
+  "ask.forecast.pick": "Ay ve yıl seç",
+  "ask.forecast.for": "Öngörü ayı"
 }
