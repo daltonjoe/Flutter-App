@@ -310,5 +310,9 @@
   "ask.safety.redirect": "Esto va más allá de lo que puede decir la astrología. Para temas de salud, legales, dinero o seguridad, habla con un profesional cualificado.",
   "ask.safety.fallback": "No puedo responder eso con fiabilidad. Reformula o añade algo de Hoy o Afinidad.",
   "ask.error.rate": "Demasiadas preguntas. Espera un minuto e inténtalo de nuevo.",
-  "ask.lang_reset": "Cambió el idioma, así que se reinició el chat."
+  "ask.lang_reset": "Cambió el idioma, así que se reinició el chat.",
+  "ask.about.button": "Preguntar detalles a la AI",
+  "ask.about.placement": "{planet} está en {sign}, {house}. ¿Cómo debo usar esta posición en mi vida?",
+  "ask.about.nohouse": "{planet} está en {sign}. ¿Cómo debo usar esta posición en mi vida?",
+  "ask.about.asc": "Mi ascendente es {sign}. ¿Cómo debo usar esta energía en mi vida?"
 }

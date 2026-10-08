@@ -310,5 +310,9 @@
   "ask.safety.redirect": "Bu konu astrolojinin alanı dışında. Sağlık, hukuk, para ya da güvenlik soruları için lütfen uzman bir kişiye danış.",
   "ask.safety.fallback": "Buna güvenilir bir yanıt veremiyorum. Soruyu farklı sor ya da Bugün veya Uyum'dan bir şey ekle.",
   "ask.error.rate": "Çok fazla soru. Bir dakika bekleyip tekrar dene.",
-  "ask.lang_reset": "Dil değiştiği için sohbet sıfırlandı."
+  "ask.lang_reset": "Dil değiştiği için sohbet sıfırlandı.",
+  "ask.about.button": "Detayları AI'ya sor",
+  "ask.about.placement": "{planet} {sign} burcunda, {house} konumunda. Bu konumu hayatımda nasıl kullanmalıyım?",
+  "ask.about.nohouse": "{planet} {sign} burcunda. Bu konumu hayatımda nasıl kullanmalıyım?",
+  "ask.about.asc": "Yükselenim {sign}. Bu enerjiyi hayatımda nasıl kullanmalıyım?"
 }

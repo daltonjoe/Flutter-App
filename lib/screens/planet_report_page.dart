@@ -14,6 +14,8 @@ import '../presentation/widgets/components/analysis_section_card.dart';
 import '../widgets/analysis/floating_analysis_icon.dart';
 import '../widgets/animations/zodiac_orbital_animation.dart';
 import '../core/content_theme_colors.dart';
+import '../core/reference_ids.dart';
+import '../services/reference_names_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 
@@ -39,6 +41,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
   bool _isFallback = false;
   String? _report;
   String? _error;
+  String? _loc;
 
   static const Map<String, Map<String, dynamic>> _meta = {
     'Sun': {'emoji': '☀️', 'color': Color(0xFFFFB347)},
@@ -71,11 +74,19 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
     _fetch();
   }
 
+    @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final loc = context.watch<LanguageProvider>().locale.languageCode;
+    if (_loc != null && _loc != loc) _fetch();
+  }
+
   Future<void> _fetch() async {
     setState(() { _isLoading = true; _error = null; _isFallback = false; });
 
     final locale = Provider.of<LanguageProvider>(context, listen: false)
         .locale.languageCode;
+    _loc = locale;
     final pd = widget.chartData.planets?[widget.planetName];
     final birthTimeKnown = widget.chartData.input?.birthTimeKnown == true;
     final house = pd?.house ?? 0;
@@ -136,6 +147,10 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
     final color = (m?['color'] as Color?) ?? AppTheme.violet;
     final emoji = m?['emoji'] as String? ?? '✦';
     final pd = widget.chartData.planets?[widget.planetName];
+    final names = context.watch<ReferenceNamesService>();
+    final pid = RefIds.planets[widget.planetName];
+    final planetLabel =
+        pid != null ? names.planet(pid) : widget.planetNameTR;
 
     return Scaffold(
       backgroundColor: AppTheme.bgDeep,
@@ -146,7 +161,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
           t(
             context,
             'planet_report.title',
-            args: {'name': widget.planetNameTR},
+              args: {'name': planetLabel},
           ),
           style: const TextStyle(
             color: AppTheme.textPrimary,
@@ -175,9 +190,14 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
     );
   }
 
-  Widget _buildContent(Color color, String emoji, PlanetData? pd) {
+    Widget _buildContent(Color color, String emoji, PlanetData? pd) {
+    final names = context.watch<ReferenceNamesService>();
+    final pid = RefIds.planets[widget.planetName];
+    final planetLabel =
+        pid != null ? names.planet(pid) : widget.planetNameTR;
     // ── FIX: Translate sign name from backend (always Turkish) ───────
-    final translatedSign = pd != null ? _translateSign(pd.sign) : '';
+   final translatedSign =
+        pd != null ? names.sign(RefIds.signId(pd.signIndex)) : '';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 60),
@@ -217,7 +237,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.planetNameTR,
+                       planetLabel,
                         style: TextStyle(
                           color: color,
                           fontSize: 22,
@@ -316,8 +336,6 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
   }
 
   /// Translates a backend sign name (always Turkish) to active locale.
-  String _translateSign(String sign) => sign;
-
   String? _getIconForTitle(String title) {
     final t = title.toLowerCase();
     if (t.contains('ev') || t.contains('house')) return '🏠';

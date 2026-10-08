@@ -310,5 +310,9 @@
   "ask.safety.redirect": "This is beyond what astrology can speak to. For health, legal, money or safety questions, please talk to a qualified professional.",
   "ask.safety.fallback": "I can't answer that reliably. Try rephrasing, or add something from Today or Match.",
   "ask.error.rate": "Too many questions. Wait a minute and try again.",
-  "ask.lang_reset": "Language changed, so the chat was reset."
+  "ask.lang_reset": "Language changed, so the chat was reset.",
+  "ask.about.button": "Ask AI about details",
+  "ask.about.placement": "My {planet} is in {sign}, {house}. How should I use this placement in my life?",
+  "ask.about.nohouse": "My {planet} is in {sign}. How should I use this placement in my life?",
+  "ask.about.asc": "My ascendant is {sign}. How should I use this energy in my life?"
 }

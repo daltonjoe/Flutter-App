@@ -7,10 +7,14 @@ import '../theme/app_theme.dart';
 import '../i18n/app_localizations.dart';
 import '../core/content_theme_colors.dart';
 import '../core/reference_ids.dart';
+import '../services/reference_names_service.dart';
+import '../widgets/ask_add.dart';
+import '../providers/ask_context_provider.dart';
 
 class PlacementContentPage extends StatefulWidget {
   final NatalChartResponse chartData;
-  const PlacementContentPage({super.key, required this.chartData});
+  final String? initialKey;
+  const PlacementContentPage({super.key, required this.chartData, this.initialKey});
 
   @override
   State<PlacementContentPage> createState() => _PlacementContentPageState();
@@ -26,6 +30,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
   late final bool _birthTimeKnown;
   late final List<(String, String)> _tabs;
 
+ String? _loc;
   bool _loading = true;
   bool _error = false;
   Map<String, List<PlacementContent>> _data = {};
@@ -40,9 +45,23 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
     _load();
   }
 
+    @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final loc = context.watch<LanguageProvider>().locale.languageCode;
+    if (_loc != null && _loc != loc) {
+      setState(() {
+        _loading = true;
+        _error = false;
+      });
+      _load();
+    }
+  }
+
   Future<void> _load() async {
     final c = widget.chartData;
-    final locale = context.read<LanguageProvider>().locale.languageCode;
+   final locale = context.read<LanguageProvider>().locale.languageCode;
+    _loc = locale;
     String code(int? i) => i == null ? '' : (RefIds.signCode(i) ?? '');
     try {
       final placements = <String, String>{
@@ -73,8 +92,10 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
 
   @override
   Widget build(BuildContext context) {
+   final idx = _tabs.indexWhere((t) => t.$1 == widget.initialKey);
     return DefaultTabController(
       length: _tabs.length,
+      initialIndex: idx < 0 ? 0 : idx,
       child: Scaffold(
         backgroundColor: AppTheme.bgDeep,
         appBar: AppBar(
@@ -121,7 +142,52 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
       );
     }
     return TabBarView(
-      children: [for (final tab in _tabs) _list(_data[tab.$1] ?? [])],
+      children: [
+        for (final tab in _tabs)
+          Column(children: [
+            _askBtn(tab.$1),
+            Expanded(child: _list(_data[tab.$1] ?? [])),
+          ]),
+      ],
+    );
+  }
+
+  Widget _askBtn(String key) {
+    final c = widget.chartData;
+    final n = context.read<ReferenceNamesService>();
+    
+    final pl = c.planets?[key == 'sun' ? 'Sun' : key == 'moon' ? 'Moon' : ''];
+    String q;
+    if (key == 'ascendant') {
+      final s = c.houses?['house_1']?.signIndex;
+      if (s == null) return const SizedBox.shrink();
+      q = t(context, 'ask.about.asc', args: {'sign': n.sign(s + 1)});
+    } else {
+      if (pl == null) return const SizedBox.shrink();
+      final id = RefIds.planets[key == 'sun' ? 'Sun' : 'Moon'] ?? 0;
+      final args = {
+        'planet': n.planet(id),
+        'sign': n.sign(pl.signIndex + 1),
+        'house': n.house(pl.house),
+      };
+      q = t(context, _birthTimeKnown ? 'ask.about.placement' : 'ask.about.nohouse',
+          args: args);
+    }
+    return ValueListenableBuilder<bool>(
+      valueListenable: askEnabled,
+      builder: (_, on, _) => !on
+          ? const SizedBox.shrink()
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: FilledButton.icon(
+                  onPressed: () => askAbout(q),
+                  icon: const Icon(Icons.auto_awesome_outlined, size: 18),
+                  label: Text(t(context, 'ask.about.button')),
+                ),
+              ),
+            ),
     );
   }
 

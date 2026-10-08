@@ -212,18 +212,6 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                     const SizedBox(height: 32),
 
                     // ── CTA butonlar ───────────────────────
-                    _outlineBtn(
-                      label: t(context, 'placement.button'),
-                      icon: Icons.stars_rounded,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              PlacementContentPage(chartData: widget.chartData),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
                     _buildForecastBtn(),
                     const SizedBox(height: 12),
                     _buildAnalysisBtn(),
@@ -428,6 +416,14 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     ),
   );
 
+  void _openPlacement(String k) => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PlacementContentPage(
+              chartData: widget.chartData, initialKey: k),
+        ),
+      );
+
   // ── Üçlü rozet ────────────────────────────────────────────────────
   Widget _buildTrioBadges(
     ChartSummary? summary,
@@ -455,11 +451,14 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
         : '-';
     return Row(
       children: [
-        _trioItem(t(context, 'chart.sun'), sunSign, '☀️'),
+       _trioItem(t(context, 'chart.sun'), sunSign, '☀️',
+            onTap: () => _openPlacement('sun')),
         const SizedBox(width: 8),
-        _trioItem(t(context, 'chart.moon'), moonSign, '🌙'),
+        _trioItem(t(context, 'chart.moon'), moonSign, '🌙',
+            onTap: timeKnown ? () => _openPlacement('moon') : null),
         const SizedBox(width: 8),
-        _trioItem(t(context, 'chart.ascendant'), ascSign, '⬆️'),
+        _trioItem(t(context, 'chart.ascendant'), ascSign, '⬆️',
+            onTap: timeKnown ? () => _openPlacement('ascendant') : null),
       ],
     );
   }
@@ -476,11 +475,15 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
         : translated;
   }
 
-  Widget _trioItem(String label, String? sign, String icon) {
+  Widget _trioItem(String label, String? sign, String icon,
+      {VoidCallback? onTap}) {
     final translatedSign = sign ?? '-';
 
     return Expanded(
-      child: Container(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: cosmicCard(),
         child: Column(
@@ -502,6 +505,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
             ),
           ],
         ),
+      ),
       ),
     );
   }

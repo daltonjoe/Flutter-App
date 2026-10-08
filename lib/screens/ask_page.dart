@@ -12,6 +12,7 @@ import '../providers/language_provider.dart';
 import '../services/ask_service.dart';
 import '../services/astro_service.dart';
 import '../providers/active_profile_provider.dart';
+import '../providers/ask_draft.dart';
 
 class _Msg {
   final bool mine;
@@ -36,7 +37,22 @@ class _AskPageState extends State<AskPage> {
   bool _langReset = false;
   int _gen = 0;
 
- @override
+  @override
+  void initState() {
+    super.initState();
+    askDraft.addListener(_onDraft);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onDraft());
+  }
+
+  void _onDraft() {
+    final d = askDraft.value;
+    if (d == null || !mounted) return;
+    _ctl.text = d;
+    _ctl.selection = TextSelection.collapsed(offset: d.length);
+    askDraft.value = null;
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final loc =
@@ -53,6 +69,7 @@ class _AskPageState extends State<AskPage> {
 
   @override
   void dispose() {
+    askDraft.removeListener(_onDraft);
     _ctl.dispose();
     super.dispose();
   }
