@@ -110,7 +110,10 @@ class AskContext {
     if (a == null || b == null || asp == null) return label;
     return '${p(a)} · ${n.aspect(asp)} · ${p(b)}';
   }
-
+  /// K32: natal = Haritam, forecast = Öngörü.
+  String get mode => (type == 'today_event' || type == 'today_headline')
+      ? 'forecast'
+      : 'natal';
   String get id {
     final keys = refs.keys.toList()..sort();
     return '$type|${keys.map((k) => '$k=${refs[k]}').join(',')}';

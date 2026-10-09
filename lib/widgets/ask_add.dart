@@ -24,6 +24,7 @@ bool addToAsk(BuildContext context, AskContext c) {
 
 /// Soruyu composer'a yazar (göndermez) ve Ask sekmesine geçer.
 void askAbout(String question) {
+  askMode.value = 'natal'; // K32: "Detayları AI'ya sor" Haritam modudur
   askDraft.value = question;
   HapticFeedback.selectionClick();
   shellTab.value = kAskTab;

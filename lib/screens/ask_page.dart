@@ -18,7 +18,8 @@ import 'package:flutter/cupertino.dart';
 class _Msg {
   final bool mine;
   final String text;
-  const _Msg(this.mine, this.text);
+  bool animate; // K34: yalnız yeni gelen yanıt, bitince false
+  _Msg(this.mine, this.text, {this.animate = false});
 }
 
 class AskPage extends StatefulWidget {
@@ -37,14 +38,30 @@ class _AskPageState extends State<AskPage> {
   String? _loc;
   bool _langReset = false;
   int _gen = 0;
-  String _mode = 'natal';
+   String _mode = askMode.value;
   String? _fMonth; // YYYY-MM
 
   @override
   void initState() {
     super.initState();
     askDraft.addListener(_onDraft);
+    askMode.addListener(_onMode);
     WidgetsBinding.instance.addPostFrameCallback((_) => _onDraft());
+  }
+
+    void _onMode() {
+    final m = askMode.value;
+    if (!mounted || m == _mode) return;
+    setState(() {
+      _gen++;
+      _mode = m;
+      _fMonth = null;
+      _messages.clear();
+      _waiting = false;
+      _failed = false;
+      _langReset = false;
+      _lastText = '';
+    });
   }
 
   void _onDraft() {
@@ -73,6 +90,7 @@ class _AskPageState extends State<AskPage> {
   @override
   void dispose() {
     askDraft.removeListener(_onDraft);
+    askMode.removeListener(_onMode);
     _ctl.dispose();
     super.dispose();
   }
@@ -91,7 +109,8 @@ Future<String> _reply(String text) async {
     final last = prev.length > 6 ? prev.sublist(prev.length - 6) : prev;
     final res = await AskService.send(
       message: text,
-      contexts: askContext.items.map((e) => e.toServer()).toList(),
+      contexts:
+          askContext.itemsFor(_mode).map((e) => e.toServer()).toList(),
       locale: loc,
       history: [
         for (final m in last)
@@ -129,7 +148,7 @@ Future<String> _reply(String text) async {
       final r = await _reply(text);
       if (!mounted || gen != _gen) return;
       setState(() {
-        _messages.add(_Msg(false, r));
+        _messages.add(_Msg(false, r, animate: true));
         _waiting = false;
       });
     } catch (e) {
@@ -281,10 +300,19 @@ Future<String> _reply(String text) async {
                 borderRadius: BorderRadius.circular(16),
               )
             : AppDecorations.cosmicCard(),
-        child: Text(
-          m.text,
-          style: m.mine ? AppTextStyles.bodyLg() : AppTextStyles.bodyMd(),
-        ),
+                  child: (!m.mine && m.animate)
+              ? _Typewriter(
+                  key: ObjectKey(m),
+                  text: m.text,
+                  style: AppTextStyles.bodyMd(),
+                  onDone: () => m.animate = false,
+                )
+              : Text(
+                  m.text,
+                  style: m.mine
+                      ? AppTextStyles.bodyLg()
+                      : AppTextStyles.bodyMd(),
+                ),
       ),
     );
   }
@@ -301,9 +329,9 @@ Future<String> _reply(String text) async {
 
   Widget _contextStrip(BuildContext context) {
     return ListenableBuilder(
-      listenable: askContext,
+      listenable: Listenable.merge([askContext, askMode]),
       builder: (context, _) {
-        final items = askContext.items;
+        final items = askContext.itemsFor(askMode.value);
         if (items.isEmpty) return const SizedBox.shrink();
         return SizedBox(
           height: 48,
@@ -392,17 +420,7 @@ Future<String> _reply(String text) async {
                 ],
                 selected: {_mode},
                           onSelectionChanged: (s) {
-                if (s.first == _mode) return;
-                setState(() {
-                  _gen++;
-                  _mode = s.first;
-                  _fMonth = null;
-                  _messages.clear();
-                  _waiting = false;
-                  _failed = false;
-                  _langReset = false;
-                  _lastText = '';
-                });
+                askMode.value = s.first; // sıfırlama _onMode'da
               },
               ),
             ),
@@ -471,6 +489,69 @@ Future<String> _reply(String text) async {
           ],
         ),
       ),
+    );
+  }
+}
+/// K34: harf harf görünür; dokununca tamamlanır; reduce-motion'da anında.
+class _Typewriter extends StatefulWidget {
+  final String text;
+  final TextStyle? style;
+  final VoidCallback onDone;
+  const _Typewriter(
+      {super.key, required this.text, this.style, required this.onDone});
+
+  @override
+  State<_Typewriter> createState() => _TypewriterState();
+}
+
+class _TypewriterState extends State<_Typewriter> {
+  Timer? _timer;
+  int _n = 0;
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    if (MediaQuery.of(context).disableAnimations || widget.text.isEmpty) {
+      _n = widget.text.length;
+      WidgetsBinding.instance.addPostFrameCallback((_) => widget.onDone());
+      return;
+    }
+     _timer = Timer.periodic(const Duration(milliseconds: 30), (_) {
+      if (!mounted) return;
+      var next = _n + 2;
+      if (next >= widget.text.length) {
+        _finish();
+        return;
+      }
+      // surrogate çiftini (emoji) bölme
+      final c = widget.text.codeUnitAt(next - 1);
+      if (c >= 0xD800 && c <= 0xDBFF) next++;
+      setState(() => _n = next.clamp(0, widget.text.length));
+    });
+  }
+
+  void _finish() {
+    _timer?.cancel();
+    if (_n != widget.text.length) setState(() => _n = widget.text.length);
+    widget.onDone();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final done = _n >= widget.text.length;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: done ? null : _finish,
+      child: Text(widget.text.substring(0, _n), style: widget.style),
     );
   }
 }
