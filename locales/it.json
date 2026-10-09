@@ -328,5 +328,11 @@
   "ask.suggest.forecast.2": "Quali temi segnano l'amore questo mese?",
   "ask.suggest.forecast.3": "Quale transito conta di più questo mese?",
   "ask.forecast.pick": "Scegli mese e anno",
-  "ask.forecast.for": "Previsione per"
+  "ask.forecast.for": "Previsione per",
+  "birth_data.title": "Modifica i dati di nascita",
+  "birth_data.date": "Data di nascita",
+  "birth_data.city": "Città di nascita",
+  "birth_data.time": "Ora di nascita",
+  "birth_data.time_known": "So la mia ora di nascita",
+  "sen.edit_birth_data": "Modifica i dati di nascita"
 }

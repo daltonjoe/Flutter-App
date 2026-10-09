@@ -328,5 +328,11 @@
   "ask.suggest.forecast.2": "Bu ay aşkta hangi temalar öne çıkıyor?",
   "ask.suggest.forecast.3": "Bu ay en önemli transit hangisi?",
   "ask.forecast.pick": "Ay ve yıl seç",
-  "ask.forecast.for": "Öngörü ayı"
+  "ask.forecast.for": "Öngörü ayı",
+  "birth_data.title": "Doğum bilgilerini düzenle",
+  "birth_data.date": "Doğum tarihi",
+  "birth_data.city": "Doğum yeri",
+  "birth_data.time": "Doğum saati",
+  "birth_data.time_known": "Doğum saatimi biliyorum",
+  "sen.edit_birth_data": "Doğum bilgilerini düzenle"
 }

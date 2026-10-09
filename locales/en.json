@@ -328,5 +328,11 @@
   "ask.suggest.forecast.2": "Which themes shape love this month?",
   "ask.suggest.forecast.3": "Which transit matters most this month?",
   "ask.forecast.pick": "Choose month and year",
-  "ask.forecast.for": "Outlook for"
+  "ask.forecast.for": "Outlook for",
+  "birth_data.title": "Edit birth details",
+  "birth_data.date": "Birth date",
+  "birth_data.city": "Birth city",
+  "birth_data.time": "Birth time",
+  "birth_data.time_known": "I know my birth time",
+  "sen.edit_birth_data": "Edit birth details"
 }

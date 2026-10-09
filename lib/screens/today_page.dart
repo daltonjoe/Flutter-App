@@ -16,7 +16,7 @@ import '../services/reference_names_service.dart';
 import '../services/user_settings_service.dart';
 import '../services/today_service.dart';
 import '../widgets/feedback_vote.dart';
-import 'edit_birth_time_page.dart';
+import 'edit_birth_data_page.dart';
 import 'transit_detail_page.dart';
 import '../models/ask_context.dart';
 import '../providers/ask_context_provider.dart';
@@ -821,7 +821,7 @@ class _TodayPageState extends State<TodayPage> {
                 if (pid == null) return;
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => EditBirthTimePage(profileId: pid),
+                    builder: (_) => EditBirthDataPage(profileId: pid),
                   ),
                 );
               },

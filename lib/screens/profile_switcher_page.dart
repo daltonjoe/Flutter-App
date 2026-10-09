@@ -11,7 +11,7 @@ import '../presentation/widgets/components/cosmic_card.dart';
 import '../presentation/widgets/components/cosmic_error_state.dart';
 import '../providers/active_profile_provider.dart';
 import '../services/reference_names_service.dart';
-import 'edit_birth_time_page.dart';
+import 'edit_birth_data_page.dart';
 import 'main_shell.dart' show mapPopToRoot;
 
 class ProfileSwitcherPage extends StatefulWidget {
@@ -182,7 +182,7 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
   Future<void> _navigateEditBirthTime(String profileId) async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => EditBirthTimePage(profileId: profileId),
+        builder: (_) => EditBirthDataPage(profileId: profileId),
       ),
     );
     if (result == true && mounted) {
@@ -665,7 +665,7 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
                 child: _row(
                   leading: Expanded(
                     child: Text(
-                      t(context, 'sen.edit_birth_time'),
+                      t(context, 'sen.edit_birth_data'),
                       style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

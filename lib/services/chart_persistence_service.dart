@@ -4,6 +4,8 @@ import '../core/reference_ids.dart';
 import '../models/natal_chart_response.dart';
 import '../models/onboarding_data.dart';
 import 'astro_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/city_model.dart';
 
 class ChartPersistenceService {
   static Future<String> saveChart({
@@ -107,6 +109,95 @@ class ChartPersistenceService {
     }
 
     return profileId;
+  }
+    /// K33: tam yeniden hesap. Sıra: houses -> placements -> aspects -> user_profiles (EN SON).
+  /// Saatsize dönüşte (kural 10): ev satırları silinir, ASC/MC NULL, house_id NULL.
+  static Future<void> updateBirthData({
+    required String profileId,
+    required DateTime birthDate,
+    required TimeOfDay time,
+    required bool timeKnown,
+    required CityModel city,
+    required String locale,
+  }) async {
+    final client = Supabase.instance.client;
+    final timeStr = _formatTime(timeKnown ? time : const TimeOfDay(hour: 12, minute: 0));
+
+    final chart = await AstroService.generateNatalChart(
+      birthDate: _formatDate(birthDate),
+      birthTime: timeStr,
+      city: city.display,
+      latitude: city.latitude,
+      longitude: city.longitude,
+      timezone: city.timezone,
+      locale: locale,
+    );
+    if (!chart.isSuccess) {
+      throw Exception(chart.message ?? 'unknown_error');
+    }
+    final planets = chart.planets;
+    final houses = chart.houses;
+    final sun = planets?['Sun'];
+    final moon = planets?['Moon'];
+    final firstHouse = houses?['house_1'];
+    final mcLongitude = timeKnown ? _mcLongitude(chart.angles) : null;
+    if (planets == null ||
+        sun == null ||
+        moon == null ||
+        (timeKnown && (firstHouse == null || mcLongitude == null))) {
+      throw Exception('MISSING_RECALCULATED_CHART');
+    }
+
+    final houseRows = _buildHouseRows(profileId, houses, birthTimeKnown: timeKnown);
+    final placementRows =
+        _buildPlacementRows(profileId, planets, birthTimeKnown: timeKnown);
+    final aspectRows = _buildAspectRows(profileId, chart.aspects);
+
+    if (timeKnown) {
+      await client
+          .from('user_chart_houses')
+          .upsert(houseRows, onConflict: 'profile_id,house_id');
+    } else {
+      await client.from('user_chart_houses').delete().eq('profile_id', profileId);
+    }
+    await client
+        .from('user_chart_placements')
+        .upsert(placementRows, onConflict: 'profile_id,planet_id');
+    await client.from('user_chart_aspects').delete().eq('profile_id', profileId);
+    if (aspectRows.isNotEmpty) {
+      await client.from('user_chart_aspects').insert(aspectRows);
+    }
+
+    await client.from('user_profiles').update({
+      'birth_date': _formatDate(birthDate),
+      'birth_time': timeStr,
+      'birth_time_known': timeKnown,
+      'birth_city': city.city,
+      'latitude': city.latitude,
+      'longitude': city.longitude,
+      'timezone': city.timezone,
+      'sun_sign_id': RefIds.signId(sun.signIndex),
+      'moon_sign_id': RefIds.signId(moon.signIndex),
+      'ascendant_sign_id':
+          timeKnown ? RefIds.signId(firstHouse!.signIndex) : null,
+      'mc_degree': mcLongitude,
+      'mc_sign_id': mcLongitude == null
+          ? null
+          : RefIds.signId((mcLongitude / 30).floor()),
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    }).eq('id', profileId);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      for (final k in prefs
+          .getKeys()
+          .where((k) => k.startsWith('today_last_$profileId|'))
+          .toList()) {
+        await prefs.remove(k);
+      }
+    } catch (e) {
+      debugPrint('today cache clear failed: $e');
+    }
   }
 
   static Future<void> addBirthTime({
