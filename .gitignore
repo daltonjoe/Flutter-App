@@ -51,3 +51,5 @@ diff_output.txt
 test.riv
 supabase/.temp/
 run.log
+
+*.bak

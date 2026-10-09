@@ -51,6 +51,17 @@ class AskContext {
     return AskContext(type: 'today_headline', refs: refs, label: label);
   }
 
+  factory AskContext.natalPlacement({
+    required String profileId,
+    required int planetId,
+    required String label,
+  }) =>
+      AskContext(
+        type: 'natal_placement',
+        refs: {'profile_id': profileId, 'planet_id': planetId},
+        label: label,
+      );
+
   factory AskContext.synastry({
     required String profileA,
     required String profileB,
@@ -90,6 +101,9 @@ class AskContext {
       a = _i(refs['body_a']);
       b = _i(refs['body_b']);
       asp = _i(refs['aspect_type_id']);
+    } else if (type == 'natal_placement') {
+      final pid = _i(refs['planet_id']);
+      return pid == null ? label : n.planet(pid);
     } else {
       return label;
     }

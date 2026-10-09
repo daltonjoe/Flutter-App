@@ -18,6 +18,8 @@ import '../core/reference_ids.dart';
 import '../services/reference_names_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/ask_context_provider.dart';
+import '../providers/active_profile_provider.dart';
+import '../models/ask_context.dart';
 import '../widgets/ask_add.dart';
 
 
@@ -229,6 +231,33 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
                         onPressed: () => askAbout(askQ),
                         icon: const Icon(Icons.auto_awesome_outlined, size: 18),
                         label: Text(t(context, 'ask.about.button')),
+                      ),
+                    ),
+            ),
+          if (askQ != null && pid != null)
+            ValueListenableBuilder<bool>(
+              valueListenable: askEnabled,
+              builder: (_, on, _) => !on
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: TextButton.icon(
+                        onPressed: () {
+                          final p = context
+                              .read<ActiveProfileProvider>()
+                              .activeProfileId;
+                          if (p == null) return;
+                          addToAsk(
+                            context,
+                            AskContext.natalPlacement(
+                              profileId: p,
+                              planetId: pid,
+                              label: planetLabel,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.add, size: 18),
+                        label: Text(t(context, 'ask.add')),
                       ),
                     ),
             ),
