@@ -334,5 +334,16 @@
   "birth_data.city": "Ville de naissance",
   "birth_data.time": "Heure de naissance",
   "birth_data.time_known": "Je connais mon heure de naissance",
-  "sen.edit_birth_data": "Modifier les données de naissance"
+  "sen.edit_birth_data": "Modifier les données de naissance",
+  "match.hero.two": "{a} and {b}",
+  "match.theme.pull": "Pull",
+  "match.theme.feel": "Feeling",
+  "match.theme.talk": "Talk",
+  "match.theme.pace": "Pace",
+  "match.theme.grow": "Growth",
+  "match.top3_title": "Main themes",
+  "match.add_time": "Add birth time",
+  "match.filter.all": "All",
+  "match.filter.harmony": "Harmony",
+  "match.filter.tension": "Tension"
 }

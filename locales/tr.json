@@ -334,5 +334,16 @@
   "birth_data.city": "Doğum yeri",
   "birth_data.time": "Doğum saati",
   "birth_data.time_known": "Doğum saatimi biliyorum",
-  "sen.edit_birth_data": "Doğum bilgilerini düzenle"
+  "sen.edit_birth_data": "Doğum bilgilerini düzenle",
+  "match.hero.two": "{a} ve {b}",
+  "match.theme.pull": "Çekim",
+  "match.theme.feel": "Duygu",
+  "match.theme.talk": "İletişim",
+  "match.theme.pace": "Ritim",
+  "match.theme.grow": "Büyüme",
+  "match.top3_title": "Ana temalar",
+  "match.add_time": "Doğum saati ekle",
+  "match.filter.all": "Tümü",
+  "match.filter.harmony": "Uyum",
+  "match.filter.tension": "Gerilim"
 }

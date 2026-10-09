@@ -15,16 +15,23 @@ import '../services/reference_names_service.dart';
 import '../models/ask_context.dart';
 import '../providers/ask_context_provider.dart' show askEnabled;
 import '../widgets/ask_add.dart' show addToAsk;
+import '../services/user_settings_service.dart';
+import '../core/match_weights.dart';
+import 'edit_birth_data_page.dart';
 
 
 class _ProfileEntry {
   final String id;
   final String displayName;
   final bool timeKnown;
+  final int? sunId, moonId, ascId;
   const _ProfileEntry({
     required this.id,
     required this.displayName,
     required this.timeKnown,
+    this.sunId,
+    this.moonId,
+    this.ascId,
   });
 }
 
@@ -37,10 +44,12 @@ class MatchPage extends StatefulWidget {
 
 class _MatchPageState extends State<MatchPage> {
   List<_ProfileEntry> _profiles = const [];
+  String _filter = 'all'; // all | harmony | tension | pull|feel|talk|pace|grow
   bool _profilesLoading = true;
   Object? _profilesError;
   String? _profileA;
   String? _profileB;
+  bool _v2 = false;
 
   bool _resultLoading = false;
   Object? _resultError;
@@ -54,6 +63,9 @@ class _MatchPageState extends State<MatchPage> {
   void initState() {
     super.initState();
     _loadProfiles();
+    unawaited(UserSettingsService.isFlagEnabled('match_v2').then((v) {
+      if (mounted) setState(() => _v2 = v);
+    }));
   }
 
   static String _pk(String a, String b) {
@@ -73,7 +85,7 @@ class _MatchPageState extends State<MatchPage> {
       if (uid != null) {
         final r = await Supabase.instance.client
             .from('user_profiles')
-            .select('id,display_name,birth_time_known')
+            .select('id,display_name,birth_time_known,sun_sign_id,moon_sign_id,ascendant_sign_id')
             .eq('user_id', uid);
       rows = List<Map<String, dynamic>>.from(r);
       }
@@ -83,6 +95,9 @@ class _MatchPageState extends State<MatchPage> {
         if (id == null) continue;
         list.add(
           _ProfileEntry(
+            sunId: row['sun_sign_id'] as int?,
+            moonId: row['moon_sign_id'] as int?,
+            ascId: row['ascendant_sign_id'] as int?,
             id: id,
             displayName: row['display_name']?.toString() ?? '',
             timeKnown: (row['birth_time_known'] as bool?) ?? false,
@@ -114,7 +129,6 @@ class _MatchPageState extends State<MatchPage> {
       });
     }
   }
-
   Future<void> _maybeFetch(String? a, String? b) async {
     if (a == null || b == null) return;
     final key = _pk(a, b);
@@ -141,7 +155,7 @@ class _MatchPageState extends State<MatchPage> {
     });
     try {
       final r = await MatchService.fetch(a, b);
-      final tx = await MatchService.fetchTexts(r.aspects.take(40).toList(), loc);
+      final tx = await MatchService.fetchTexts(r.aspects.toList(), loc);
       if (!mounted) return;
       _cache[key] = r;
       _textCache['$key|$loc'] = tx;
@@ -171,7 +185,7 @@ class _MatchPageState extends State<MatchPage> {
     }
     if (mounted) setState(() => _texts = const {});
     try {
-      final tx = await MatchService.fetchTexts(r.aspects.take(40).toList(), loc);
+      final tx = await MatchService.fetchTexts(r.aspects.toList(), loc);
       if (!mounted) return;
       _textCache[tk] = tx;
       if (_loc == loc && identical(_result, r)) {
@@ -511,6 +525,7 @@ class _MatchPageState extends State<MatchPage> {
       if (prev == null || x.orb < prev.orb) dedup[k] = x;
     }
     final aspects = dedup.values.take(40).toList();
+    if (_v2) return _v2Body(r, dedup.values.toList(), note);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -728,6 +743,332 @@ class _MatchPageState extends State<MatchPage> {
             ),
         ],
       ),
+    );
+  }
+
+    List<WeightedAspect> _weighted(List<MatchAspect> l) {
+    final out = <WeightedAspect>[];
+    for (final x in l) {
+      final m = MatchService.meta[
+          MatchService.textKey(x.bodyAId, x.bodyBId, x.aspectTypeId)];
+      if (m == null) continue; // metinsiz: hesaba girmez
+      final lo = x.bodyAId < x.bodyBId ? x.bodyAId : x.bodyBId;
+      final hi = x.bodyAId < x.bodyBId ? x.bodyBId : x.bodyAId;
+      out.add(WeightedAspect(lo, hi, x.aspectTypeId,
+          aspectWeight(lo, hi, x.aspectTypeId, x.tightness, m.intensity),
+          themeOf(lo, hi)));
+    }
+    return out;
+  }
+
+  _ProfileEntry? _prof(String? id) {
+    for (final p in _profiles) {
+      if (p.id == id) return p;
+    }
+    return null;
+  }
+
+  Widget _signCell(int? id, bool show, String? pid) {
+    if (show && id != null) {
+      return Text(ReferenceNamesService.instance.sign(id),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTextStyles.bodyMd(color: AppColors.textPrimary));
+    }
+    return InkWell(
+      onTap: pid == null
+          ? null
+          : () async {
+              final ok = await Navigator.of(context, rootNavigator: true)
+                  .push<bool>(MaterialPageRoute(
+                      builder: (_) => EditBirthDataPage(profileId: pid)));
+              if (ok != true || !mounted) return;
+              _cache.clear();
+              _textCache.clear();
+              await _loadProfiles();
+              unawaited(_maybeFetch(_profileA, _profileB));
+            },
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 44),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(t(context, 'match.add_time'),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.bodySm(color: AppColors.goldAccent)),
+        ),
+      ),
+    );
+  }
+
+  Widget _v2Body(MatchResult r, List<MatchAspect> all, bool note) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _v2Top(r, all, note),
+          const SizedBox(height: AppSpacing.lg),
+          _v2List(all),
+        ],
+      );
+
+  String _heroLine(List<WeightedAspect> top) {
+    if (top.isEmpty) return '';
+    final s =
+        _texts[MatchService.textKey(top.first.a, top.first.b, top.first.asp)] ??
+            '';
+    final m = RegExp(r'[.!?](\s|$)').firstMatch(s);
+    return (m == null ? s : s.substring(0, m.start + 1)).trim();
+  }
+
+  Color _valColor(String v) {
+    switch (v) {
+      case 'power':
+        return AppColors.tealSuccess;
+      case 'pressure':
+        return AppColors.amberTransit;
+      case 'trouble':
+        return AppColors.roseAccent;
+      default:
+        return AppColors.goldAccent;
+    }
+  }
+
+  Widget _v2List(List<MatchAspect> all) {
+    final svc = ReferenceNamesService.instance;
+    final byKey = <String, MatchAspect>{};
+    for (final x in all) {
+      byKey[MatchService.textKey(x.bodyAId, x.bodyBId, x.aspectTypeId)] = x;
+    }
+    String keyOf(WeightedAspect x) => MatchService.textKey(x.a, x.b, x.asp);
+    String vOf(WeightedAspect x) =>
+        MatchService.meta[keyOf(x)]?.valence ?? 'neutral';
+    bool pass(WeightedAspect x) {
+      final v = vOf(x);
+      switch (_filter) {
+        case 'all':
+          return true;
+        case 'harmony':
+          return v == 'power';
+        case 'tension':
+          return v == 'pressure' || v == 'trouble';
+        default:
+          return x.theme == _filter;
+      }
+    }
+
+    final ranked = rankAspects(_weighted(all));
+    const themeOrder = ['pull', 'feel', 'talk', 'pace', 'grow'];
+    const chipKeys = ['all', 'harmony', 'tension', ...themeOrder];
+    String chipLabel(String k) => (k == 'all' || k == 'harmony' || k == 'tension')
+        ? t(context, 'match.filter.$k')
+        : t(context, 'match.theme.$k');
+
+    final chips = SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (final k in chipKeys)
+            Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.xs),
+              child: ChoiceChip(
+                label: Text(chipLabel(k),
+                    style:
+                        AppTextStyles.bodySm(color: AppColors.textPrimary)),
+                selected: _filter == k,
+                selectedColor: AppColors.violetPrimary,
+                onSelected: (_) {
+                  HapticFeedback.selectionClick();
+                  setState(() => _filter = k);
+                },
+              ),
+            ),
+        ],
+      ),
+    );
+
+    Widget card(WeightedAspect x) {
+      final asp = byKey[keyOf(x)];
+      final col = _valColor(vOf(x));
+      final bar = asp == null ? 0.0 : (1 - asp.tightness).clamp(0.0, 1.0);
+      return Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+        child: Container(
+          decoration: AppDecorations.cosmicCard(),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              tilePadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm, vertical: 2),
+              childrenPadding: const EdgeInsets.fromLTRB(
+                  AppSpacing.sm, 0, AppSpacing.sm, AppSpacing.sm),
+              expandedCrossAxisAlignment: CrossAxisAlignment.start,
+              title: Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration:
+                        BoxDecoration(color: col, shape: BoxShape.circle),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      '${svc.planet(x.a)} ${svc.aspect(x.asp)} ${svc.planet(x.b)}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodyMd(color: AppColors.textPrimary),
+                    ),
+                  ),
+                ],
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.xs),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: LinearProgressIndicator(
+                    value: bar,
+                    minHeight: 4,
+                    backgroundColor: Colors.white12,
+                    valueColor: AlwaysStoppedAnimation<Color>(col),
+                  ),
+                ),
+              ),
+              children: [
+                Text(_texts[keyOf(x)] ?? '',
+                    style:
+                        AppTextStyles.bodyMd(color: AppColors.textSecondary)),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final groups = <Widget>[];
+    for (final th in themeOrder) {
+      final items = ranked.where((x) => x.theme == th && pass(x)).toList();
+      if (items.isEmpty) continue;
+      groups.add(Padding(
+        padding: const EdgeInsets.only(top: AppSpacing.sm, bottom: AppSpacing.xs),
+        child: Text(t(context, 'match.theme.$th'),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.h3()),
+      ));
+      groups.addAll(items.map(card));
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        chips,
+        if (groups.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
+            child: _infoCard(context, t(context, 'match.no_aspects')),
+          )
+        else
+          ...groups,
+      ],
+    );
+  }
+
+  Widget _v2Top(MatchResult r, List<MatchAspect> all, bool note) {
+    final w = _weighted(all);
+    final themes = topThemes(w);
+    final top = top3(w);
+    final a = _prof(_profileA), b = _prof(_profileB);
+    Widget col(_ProfileEntry? p, bool known) => Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(p?.displayName ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.h3()),
+              const SizedBox(height: AppSpacing.xs),
+              _signCell(p?.sunId, true, p?.id),
+              const SizedBox(height: AppSpacing.xs),
+              _signCell(p?.moonId, known, p?.id),
+              const SizedBox(height: AppSpacing.xs),
+              _signCell(p?.ascId, known, p?.id),
+            ],
+          ),
+        );
+    final svc = ReferenceNamesService.instance;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (note) ...[
+          _infoCard(context, t(context, 'match.time_unknown_note')),
+          const SizedBox(height: AppSpacing.md),
+        ],
+        if (themes.isNotEmpty) ...[
+          Text(
+            themes.length == 2
+                ? t(context, 'match.hero.two', args: {
+                    'a': t(context, 'match.theme.${themes[0]}'),
+                    'b': t(context, 'match.theme.${themes[1]}'),
+                  })
+                : t(context, 'match.theme.${themes[0]}'),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.h1(),
+          ),
+          if (_heroLine(top).isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(_heroLine(top),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style:
+                    AppTextStyles.bodyMd(color: AppColors.textSecondary)),
+          ],
+          const SizedBox(height: AppSpacing.md),
+        ],
+        Container(
+          decoration: AppDecorations.cosmicCard(),
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              col(a, r.timeKnownA),
+              const SizedBox(width: AppSpacing.sm),
+              col(b, r.timeKnownB),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Text(t(context, 'match.top3_title'),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.h3()),
+        const SizedBox(height: AppSpacing.sm),
+        if (top.isEmpty)
+          _infoCard(context, t(context, 'match.no_aspects'))
+        else
+          for (final x in top)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: Container(
+                decoration: AppDecorations.cosmicCard(),
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        '${svc.planet(x.a)} ${svc.aspect(x.asp)} ${svc.planet(x.b)}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.bodyLg(
+                            color: AppColors.goldAccent)),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                        _texts[MatchService.textKey(x.a, x.b, x.asp)] ?? '',
+                        style: AppTextStyles.bodyMd(
+                            color: AppColors.textSecondary)),
+                  ],
+                ),
+              ),
+            ),
+      ],
     );
   }
 }
