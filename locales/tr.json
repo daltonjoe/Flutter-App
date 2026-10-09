@@ -345,5 +345,9 @@
   "match.add_time": "Doğum saati ekle",
   "match.filter.all": "Tümü",
   "match.filter.harmony": "Uyum",
-  "match.filter.tension": "Gerilim"
+  "match.filter.tension": "Gerilim",
+  "match.ask.cta": "AI'ya sor",
+  "match.ask.q1": "Bu aramızda nasıl hissettirir?",
+  "match.ask.q2": "Bu nerede sürtüşme yaratabilir?",
+  "match.ask.q3": "Bununla nasıl çalışabiliriz?"
 }

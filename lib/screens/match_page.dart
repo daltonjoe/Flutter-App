@@ -14,7 +14,7 @@ import '../services/match_service.dart';
 import '../services/reference_names_service.dart';
 import '../models/ask_context.dart';
 import '../providers/ask_context_provider.dart' show askEnabled;
-import '../widgets/ask_add.dart' show addToAsk;
+import '../widgets/ask_add.dart' show addToAsk, askAbout;
 import '../services/user_settings_service.dart';
 import '../core/match_weights.dart';
 import 'edit_birth_data_page.dart';
@@ -832,6 +832,78 @@ class _MatchPageState extends State<MatchPage> {
     }
   }
 
+  // M3: bağlamı ekler, soruyu taslağa yazar (gönderilmez).
+  void _askSyn(WeightedAspect x, String qKey) {
+    final pa = _profileA, pb = _profileB;
+    if (pa == null || pb == null) return;
+    final s = ReferenceNamesService.instance;
+    final ok = addToAsk(
+      context,
+      AskContext.synastry(
+        profileA: pa,
+        profileB: pb,
+        bodyA: x.a,
+        bodyB: x.b,
+        aspectTypeId: x.asp,
+        label: '${s.planet(x.a)} ${s.aspect(x.asp)} ${s.planet(x.b)}',
+      ),
+    );
+    if (ok) askAbout(t(context, qKey));
+  }
+
+  Widget _askBlock(WeightedAspect x) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: askEnabled,
+      builder: (ctx, on, _) {
+        if (!on) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.sm),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.auto_awesome_outlined,
+                      size: 16, color: AppColors.violetPrimary),
+                  const SizedBox(width: AppSpacing.xs),
+                  Expanded(
+                    child: Text(t(ctx, 'match.ask.cta'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.bodySm(
+                            color: AppColors.violetPrimary)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Wrap(
+                spacing: AppSpacing.xs,
+                runSpacing: AppSpacing.xs,
+                children: [
+                  for (final q in const [
+                    'match.ask.q1',
+                    'match.ask.q2',
+                    'match.ask.q3'
+                  ])
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      child: ActionChip(
+                        label: Text(t(ctx, q),
+                            softWrap: true,
+                            style: AppTextStyles.bodySm(
+                                color: AppColors.textPrimary)),
+                        onPressed: () => _askSyn(x, q),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _v2List(List<MatchAspect> all) {
     final svc = ReferenceNamesService.instance;
     final byKey = <String, MatchAspect>{};
@@ -936,6 +1008,7 @@ class _MatchPageState extends State<MatchPage> {
                 Text(_texts[keyOf(x)] ?? '',
                     style:
                         AppTextStyles.bodyMd(color: AppColors.textSecondary)),
+                _askBlock(x),
               ],
             ),
           ),

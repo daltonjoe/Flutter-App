@@ -345,5 +345,9 @@
   "match.add_time": "Add birth time",
   "match.filter.all": "All",
   "match.filter.harmony": "Harmony",
-  "match.filter.tension": "Tension"
+  "match.filter.tension": "Tension",
+  "match.ask.cta": "Ask AI",
+  "match.ask.q1": "How does this feel between us?",
+  "match.ask.q2": "Where could this create friction?",
+  "match.ask.q3": "How can we work with this?"
 }
