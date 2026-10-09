@@ -172,7 +172,10 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
       );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      PopScope(canPop: !_saving, child: _scaffold(context));
+
+  Widget _scaffold(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
