@@ -259,12 +259,14 @@ class ChartAngles {
   final double ascDegree;
   final String mcSign;
   final double mcDegree;
+  final int mcSignIndex;
 
   ChartAngles({
     required this.ascSign,
     required this.ascDegree,
     required this.mcSign,
     required this.mcDegree,
+    this.mcSignIndex = -1,
   });
 
   factory ChartAngles.fromJson(Map<String, dynamic> json) => ChartAngles(
@@ -272,6 +274,7 @@ class ChartAngles {
         ascDegree:
             (json['ascendant']?['degree_in_sign'] as num?)?.toDouble() ?? 0.0,
         mcSign: json['midheaven']?['sign'] ?? '',
+        mcSignIndex: (json['midheaven']?['sign_index'] as num?)?.toInt() ?? -1,
         mcDegree:
             (json['midheaven']?['degree_in_sign'] as num?)?.toDouble() ?? 0.0,
       );

@@ -376,22 +376,7 @@ class ChartPersistenceService {
 
   static double? _mcLongitude(ChartAngles? angles) {
     if (angles == null) return null;
-    const signs = [
-      'Koç',
-      'Boğa',
-      'İkizler',
-      'Yengeç',
-      'Aslan',
-      'Başak',
-      'Terazi',
-      'Akrep',
-      'Yay',
-      'Oğlak',
-      'Kova',
-      'Balık',
-    ];
-    final signIndex = signs.indexOf(angles.mcSign);
-    if (signIndex < 0) return null;
-    return signIndex * 30 + angles.mcDegree;
+    if (angles.mcSignIndex < 0 || angles.mcSignIndex > 11) return null;
+    return angles.mcSignIndex * 30 + angles.mcDegree;
   }
 }

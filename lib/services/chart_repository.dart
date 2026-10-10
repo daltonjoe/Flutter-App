@@ -143,6 +143,7 @@ class ChartRepository {
             ascDegree: firstHouse.degreeInSign,
             mcSign: names.sign(RefIds.signId(_signIndex(profile['mc_sign_id']))),
             mcDegree: mcDegree % 30,
+            mcSignIndex: _signIndex(profile['mc_sign_id']),
           );
     final chart = NatalChartResponse(
       status: 'success',
