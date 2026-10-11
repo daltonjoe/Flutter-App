@@ -14,12 +14,17 @@ import '../services/astro_service.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/ask_draft.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
+import '../services/ai_consent_service.dart';
+import '../services/user_settings_service.dart';
+import 'notes_page.dart';
 
 class _Msg {
   final bool mine;
   final String text;
   bool animate; // K34: yalnız yeni gelen yanıt, bitince false
-  _Msg(this.mine, this.text, {this.animate = false});
+  final List<String>? bubbles; // AV: balon dizisi
+  _Msg(this.mine, this.text, {this.animate = false, this.bubbles});
 }
 
 class AskPage extends StatefulWidget {
@@ -40,18 +45,32 @@ class _AskPageState extends State<AskPage> {
   int _gen = 0;
    String _mode = askMode.value;
   String? _fMonth; // YYYY-MM
+  bool _av = false; // feature_flags.ask_avatars
+  String? _partnerId;
+  String? _partnerName;
+  List<Map<String, dynamic>> _partners = [];
+  bool _partnersLoaded = false;
 
   @override
   void initState() {
     super.initState();
     askDraft.addListener(_onDraft);
     askMode.addListener(_onMode);
+    UserSettingsService.isFlagEnabled('ask_avatars').then((v) {
+      if (!mounted) return;
+      askAvatarsEnabled.value = v;
+      setState(() => _av = v);
+      if (v && _mode == 'synastry') _autoPartner();
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) => _onDraft());
   }
 
     void _onMode() {
     final m = askMode.value;
     if (!mounted || m == _mode) return;
+    if (m == 'synastry') {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _autoPartner());
+    }
     setState(() {
       _gen++;
       _mode = m;
@@ -95,7 +114,7 @@ class _AskPageState extends State<AskPage> {
     super.dispose();
   }
 
-Future<String> _reply(String text) async {
+Future<_Msg> _reply(String text) async {
     // context'i await'ten önce kullan (lint)
     final loc = context.read<LanguageProvider>().locale.languageCode;
     final safe = {
@@ -109,9 +128,20 @@ Future<String> _reply(String text) async {
     final last = prev.length > 6 ? prev.sublist(prev.length - 6) : prev;
     final res = await AskService.send(
       message: text,
-      contexts:
-          askContext.itemsFor(_mode).map((e) => e.toServer()).toList(),
+      contexts: _mode == 'synastry'
+          ? <Map<String, dynamic>>[
+              {
+                'type': 'synastry_pair',
+                'refs': {
+                  'profile_a':
+                      context.read<ActiveProfileProvider>().activeProfileId,
+                  'profile_b': _partnerId,
+                },
+              }
+            ]
+          : askContext.itemsFor(_mode).map((e) => e.toServer()).toList(),
       locale: loc,
+      bubbles: _av,
       history: [
         for (final m in last)
           {'role': m.mine ? 'user' : 'assistant', 'text': m.text}
@@ -121,10 +151,18 @@ Future<String> _reply(String text) async {
        forecastMonth: _mode == 'forecast' ? _fMonth : null,
     );
     final s = res.safety;
-    if (s != null) return res.reply ?? (safe[s] ?? safe['fallback']!);
+    if (s != null) {
+      return _Msg(false, res.reply ?? (safe[s] ?? safe['fallback']!),
+          animate: true);
+    }
     final rp = res.reply;
-    if (rp == null || rp.trim().isEmpty) return safe['fallback']!;
-    return rp;
+    if (rp == null || rp.trim().isEmpty) {
+      return _Msg(false, safe['fallback']!, animate: true);
+    }
+    final bl = res.bubbles;
+    return _Msg(false, rp,
+        animate: true,
+        bubbles: (_av && bl != null && bl.isNotEmpty) ? bl : null);
   }
 
   Future<void> _send([String? override]) async {
@@ -132,6 +170,10 @@ Future<String> _reply(String text) async {
         if (text.isEmpty || _waiting) return;
     if (_mode == 'forecast' && _fMonth == null) {
       _pickMonth();
+      return;
+    }
+    if (_mode == 'synastry' && !_pairOk()) {
+      _pickPartner();
       return;
     }
     HapticFeedback.selectionClick();
@@ -148,7 +190,7 @@ Future<String> _reply(String text) async {
       final r = await _reply(text);
       if (!mounted || gen != _gen) return;
       setState(() {
-        _messages.add(_Msg(false, r, animate: true));
+        _messages.add(r);
         _waiting = false;
       });
     } catch (e) {
@@ -160,7 +202,9 @@ Future<String> _reply(String text) async {
         _lastText = text;
         _errKey = (e is AstroServiceException && e.code == 'RATE_LIMITED')
             ? 'ask.error.rate'
-            : 'ask.error';
+            : (e is AstroServiceException && e.code == 'QUOTA')
+                ? 'ask.error.quota'
+                : 'ask.error';
       });
     }
   }
@@ -287,6 +331,20 @@ Future<String> _reply(String text) async {
   }
 
   Widget _bubble(BuildContext context, _Msg m) {
+    if (!m.mine && m.bubbles != null && m.bubbles!.isNotEmpty) {
+      return _bubbleSeq(context, m);
+    }
+    if (m.mine && _av) {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onLongPress: () => _remember(m.text),
+        child: _bubbleBase(context, m),
+      );
+    }
+    return _bubbleBase(context, m);
+  }
+
+  Widget _bubbleBase(BuildContext context, _Msg m) {
     final maxW = MediaQuery.of(context).size.width * 0.82;
     return Align(
       alignment: m.mine ? Alignment.centerRight : Alignment.centerLeft,
@@ -315,6 +373,172 @@ Future<String> _reply(String text) async {
                 ),
       ),
     );
+  }
+
+  Widget _bubbleSeq(BuildContext context, _Msg m) {
+    return _BubbleSeq(
+      key: ObjectKey(m),
+      texts: m.bubbles!,
+      animate: m.animate,
+      onAllDone: () => m.animate = false,
+      item: (txt, anim, done, k) => _box(context, txt, anim, done, k),
+    );
+  }
+
+  Widget _box(BuildContext context, String text, bool animate,
+      VoidCallback onDone, Key k) {
+    final maxW = MediaQuery.of(context).size.width * 0.82;
+    return Align(
+      key: k,
+      alignment: Alignment.centerLeft,
+      child: Container(
+        constraints: BoxConstraints(maxWidth: maxW),
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: AppDecorations.cosmicCard(),
+        child: animate
+            ? _Typewriter(
+                text: text, style: AppTextStyles.bodyMd(), onDone: onDone)
+            : Text(text, style: AppTextStyles.bodyMd()),
+      ),
+    );
+  }
+
+  bool _pairOk() {
+    final act = context.read<ActiveProfileProvider>().activeProfileId;
+    return _partnerId != null && act != null && _partnerId != act;
+  }
+
+  Future<List<Map<String, dynamic>>> _loadPartners() async {
+    final act = context.read<ActiveProfileProvider>().activeProfileId;
+    try {
+      final rows = await Supabase.instance.client
+          .from('user_profiles')
+          .select('id,display_name');
+      final list = <Map<String, dynamic>>[];
+      for (final r in rows) {
+        final m = Map<String, dynamic>.from(r);
+        if ('${m['id']}' != act) list.add(m);
+      }
+      return list;
+    } catch (e) {
+      debugPrint('AskPage partners failed: $e');
+      return [];
+    }
+  }
+
+  void _setPartner(Map<String, dynamic> p) {
+    setState(() {
+      _partnerId = '${p['id']}';
+      _partnerName = '${p['display_name'] ?? ''}';
+      _gen++;
+      _messages.clear();
+      _waiting = false;
+      _failed = false;
+    });
+  }
+
+  Future<void> _autoPartner() async {
+    final l = await _loadPartners();
+    if (!mounted) return;
+    setState(() {
+      _partners = l;
+      _partnersLoaded = true;
+    });
+    if (l.length == 1 && !_pairOk()) _setPartner(l.first);
+  }
+
+  Future<void> _pickPartner() async {
+    final l = await _loadPartners();
+    if (!mounted) return;
+    setState(() {
+      _partners = l;
+      _partnersLoaded = true;
+    });
+    if (l.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(t(context, 'ask.avatar.synastry.need_profile'))),
+      );
+      return;
+    }
+    if (l.length == 1) {
+      _setPartner(l.first);
+      return;
+    }
+    final p = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      builder: (ctx) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (final x in l)
+              ListTile(
+                title: Text('${x['display_name'] ?? ''}'),
+                onTap: () => Navigator.pop(ctx, x),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (p != null && mounted) _setPartner(p);
+  }
+
+  Future<void> _remember(String raw) async {
+    final sm = ScaffoldMessenger.of(context);
+    final savedMsg = t(context, 'ask.remember.saved');
+    final ctl = TextEditingController(
+        text: raw.length > 200 ? raw.substring(0, 200) : raw);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t(ctx, 'ask.remember')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(t(ctx, 'ask.remember.hint'), style: AppTextStyles.bodySm()),
+            const SizedBox(height: 8),
+            TextField(controller: ctl, maxLength: 200, minLines: 1, maxLines: 4),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(t(ctx, 'notes.save')),
+          ),
+        ],
+      ),
+    );
+    final text = ctl.text.trim();
+    if (ok != true || text.isEmpty || !mounted) return;
+    try {
+      if (!await AiConsentService.hasAi()) {
+        if (!mounted) return;
+        final yes = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(t(ctx, 'ask.remember.consent_title')),
+            content: Text(t(ctx, 'ask.remember.consent_body')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(t(ctx, 'ask.remember.consent_accept')),
+              ),
+            ],
+          ),
+        );
+        if (yes != true || !await AiConsentService.grantAi()) return;
+      }
+      await AskService.memoryAdd(text);
+      sm.showSnackBar(SnackBar(content: Text(savedMsg)));
+    } catch (e) {
+      debugPrint('AskPage remember failed: $e');
+      if (!mounted) return;
+      sm.showSnackBar(
+          SnackBar(content: Text(t(context, AskService.memoryErrKey(e)))));
+    }
   }
 
   Widget _typing(BuildContext context) {
@@ -402,7 +626,19 @@ Future<String> _reply(String text) async {
     final msgs = _messages.reversed.toList();
     final extra = _waiting ? 1 : 0;
     return Scaffold(
-      appBar: AppBar(title: Text(t(context, 'ask.title'))),
+      appBar: AppBar(
+        title: Text(t(context, 'ask.title')),
+        actions: [
+          if (_av)
+            IconButton(
+              tooltip: t(context, 'notes.title'),
+              icon: const Icon(Icons.bookmark_border_rounded),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const NotesPage()),
+              ),
+            ),
+        ],
+      ),
       body: SafeArea(
         top: false,
         child: Column(
@@ -413,10 +649,19 @@ Future<String> _reply(String text) async {
                 showSelectedIcon: false,
                 segments: [
                   ButtonSegment(
-                      value: 'natal', label: Text(t(context, 'ask.mode.natal'))),
+                      value: 'natal',
+                      label: Text(_av
+                          ? t(context, 'ask.avatar.natal.name')
+                          : t(context, 'ask.mode.natal'))),
                   ButtonSegment(
                       value: 'forecast',
-                      label: Text(t(context, 'ask.mode.forecast'))),
+                      label: Text(_av
+                          ? t(context, 'ask.avatar.forecast.name')
+                          : t(context, 'ask.mode.forecast'))),
+                  if (_av)
+                    ButtonSegment(
+                        value: 'synastry',
+                        label: Text(t(context, 'ask.avatar.synastry.name'))),
                 ],
                 selected: {_mode},
                           onSelectionChanged: (s) {
@@ -435,6 +680,27 @@ Future<String> _reply(String text) async {
                       : '${t(context, 'ask.forecast.for')}: ${_fMonth!.substring(5)}-${_fMonth!.substring(0, 4)}'),
                   onPressed: _pickMonth,
                 ),
+              ),
+            if (_av)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+                child: Text(t(context, 'ask.avatar.$_mode.tag'),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.bodySm()),
+              ),
+            if (_av && _mode == 'synastry')
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: (_partnersLoaded && _partners.isEmpty)
+                    ? Text(t(context, 'ask.avatar.synastry.need_profile'),
+                        style: AppTextStyles.bodySm())
+                    : ActionChip(
+                        avatar: const Icon(Icons.people_outline, size: 18),
+                        label: Text(_partnerName == null
+                            ? t(context, 'ask.avatar.partner.pick')
+                            : '${t(context, 'ask.avatar.partner.for')}: $_partnerName'),
+                        onPressed: _pickPartner,
+                      ),
               ),
             Expanded(
               child: (_messages.isEmpty && !_waiting)
@@ -460,10 +726,11 @@ Future<String> _reply(String text) async {
                         style: AppTextStyles.bodySm(color: AppColors.errorRed),
                       ),
                     ),
-                    TextButton(
-                      onPressed: () => _send(_lastText),
-                      child: Text(t(context, 'ask.retry')),
-                    ),
+                    if (_errKey != 'ask.error.quota')
+                      TextButton(
+                        onPressed: () => _send(_lastText),
+                        child: Text(t(context, 'ask.retry')),
+                      ),
                   ],
                 ),
               ),
@@ -552,6 +819,75 @@ class _TypewriterState extends State<_Typewriter> {
       behavior: HitTestBehavior.opaque,
       onTap: done ? null : _finish,
       child: Text(widget.text.substring(0, _n), style: widget.style),
+    );
+  }
+}
+
+
+/// AV: balonlar sÄ±rayla (balon baÅŸÄ±na daktilo + 450 ms ara); reduce-motion'da anÄ±nda.
+class _BubbleSeq extends StatefulWidget {
+  final List<String> texts;
+  final bool animate;
+  final VoidCallback onAllDone;
+  final Widget Function(String text, bool animate, VoidCallback onDone, Key key)
+      item;
+  const _BubbleSeq({
+    super.key,
+    required this.texts,
+    required this.animate,
+    required this.onAllDone,
+    required this.item,
+  });
+
+  @override
+  State<_BubbleSeq> createState() => _BubbleSeqState();
+}
+
+class _BubbleSeqState extends State<_BubbleSeq> {
+  int _shown = 1;
+  Timer? _gap;
+  bool _init = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_init) return;
+    _init = true;
+    if (!widget.animate || MediaQuery.of(context).disableAnimations) {
+      _shown = widget.texts.length;
+      if (widget.animate) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => widget.onAllDone());
+      }
+    }
+  }
+
+  void _next() {
+    if (!mounted) return;
+    if (_shown >= widget.texts.length) {
+      widget.onAllDone();
+      return;
+    }
+    _gap?.cancel();
+    _gap = Timer(const Duration(milliseconds: 450), () {
+      if (mounted) setState(() => _shown++);
+    });
+  }
+
+  @override
+  void dispose() {
+    _gap?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < _shown && i < widget.texts.length; i++)
+          widget.item(widget.texts[i], widget.animate && i == _shown - 1, _next,
+              ValueKey(i)),
+      ],
     );
   }
 }

@@ -11,6 +11,9 @@ final ValueNotifier<bool> askEnabled = ValueNotifier<bool>(false);
 /// K32: aktif Ask modu ('natal' | 'forecast').
 final ValueNotifier<String> askMode = ValueNotifier<String>('natal');
 
+/// feature_flags.ask_avatars (AskPage yÃ¼kler). KapalÄ±yken Ask eskisiyle aynÄ±.
+final ValueNotifier<bool> askAvatarsEnabled = ValueNotifier<bool>(false);
+
 class AskContextProvider extends ChangeNotifier {
   static const int maxItems = 5;
   final List<AskContext> _items = [];
