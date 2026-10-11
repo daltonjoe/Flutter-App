@@ -25,6 +25,7 @@ class _NotesPageState extends State<NotesPage> {
   }
 
   Future<void> _load() async {
+    final sw = Stopwatch()..start();
     try {
       final r = await Supabase.instance.client
           .from('ask_memories')
@@ -36,8 +37,9 @@ class _NotesPageState extends State<NotesPage> {
         _loading = false;
         _err = false;
       });
+      debugPrint('NotesPage load ms=${sw.elapsedMilliseconds}');
     } catch (e) {
-      debugPrint('NotesPage load failed: $e');
+      debugPrint('NotesPage load failed after ms=${sw.elapsedMilliseconds}: $e');
       if (!mounted) return;
       setState(() {
         _loading = false;
