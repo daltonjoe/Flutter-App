@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'astro_service.dart';
+import '../core/match_weights.dart';
 
 class MatchAspect {
   final int bodyAId;
@@ -34,6 +35,8 @@ class MatchResult {
 
 class MatchService {
   MatchService._();
+  static final Map<String, MatchMeta> meta = {};
+  
 
   // Anahtar: 'minId-maxId-aspectTypeId' -> aktif dil (yoksa en) metni.
   static String textKey(int a, int b, int aspectTypeId) {
@@ -57,8 +60,7 @@ class MatchService {
       final idList = ids.toList();
       final rows = await Supabase.instance.client
           .from('snippet_templates')
-          .select(
-              'transit_body_id,natal_body_id,aspect_type_id,snippet_translations(locale,body)')
+          .select('transit_body_id,natal_body_id,aspect_type_id,valence,intensity,snippet_translations(locale,body)')
           .eq('kind', 'synastry')
           .inFilter('transit_body_id', idList)
           .inFilter('natal_body_id', idList)
@@ -81,7 +83,13 @@ class MatchService {
           if (t['locale'] == 'en') en = body;
         }
         final text = pick ?? en;
-        if (text != null) out[textKey(lo, hi, at)] = text;
+                if (text != null) {
+          final k = textKey(lo, hi, at);
+          out[k] = text;
+          meta[k] = MatchMeta(
+              (row['valence'] as String?) ?? 'neutral',
+              _toInt(row['intensity']));
+        }
       }
       return out;
     } catch (e, st) {
