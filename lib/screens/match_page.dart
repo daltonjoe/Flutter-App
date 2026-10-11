@@ -14,7 +14,7 @@ import '../services/match_service.dart';
 import '../services/reference_names_service.dart';
 import '../models/ask_context.dart';
 import '../providers/ask_context_provider.dart' show askEnabled;
-import '../widgets/ask_add.dart' show addToAsk, askAbout;
+import '../widgets/ask_add.dart' show addToAsk, askAbout, askBridge, askBridgeOn;
 import '../services/user_settings_service.dart';
 import '../core/match_weights.dart';
 import 'edit_birth_data_page.dart';
@@ -833,10 +833,17 @@ class _MatchPageState extends State<MatchPage> {
   }
 
   // M3: bağlamı ekler, soruyu taslağa yazar (gönderilmez).
-  void _askSyn(WeightedAspect x, String qKey) {
+  Future<void> _askSyn(WeightedAspect x, String qKey) async {
     final pa = _profileA, pb = _profileB;
     if (pa == null || pb == null) return;
     final s = ReferenceNamesService.instance;
+    final q = t(context, qKey);
+    if (await askBridgeOn()) {
+      if (!mounted) return;
+      askBridge(pa, pb, q);
+      return;
+    }
+    if (!mounted) return;
     final ok = addToAsk(
       context,
       AskContext.synastry(
@@ -848,7 +855,7 @@ class _MatchPageState extends State<MatchPage> {
         label: '${s.planet(x.a)} ${s.aspect(x.asp)} ${s.planet(x.b)}',
       ),
     );
-    if (ok) askAbout(t(context, qKey));
+    if (ok) askAbout(q);
   }
 
   Widget _askBlock(WeightedAspect x) {

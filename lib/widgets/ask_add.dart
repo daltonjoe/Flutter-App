@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../providers/ask_bridge.dart';
+import '../services/user_settings_service.dart';
 
 import '../core/theme/app_colors.dart';
 import '../i18n/app_localizations.dart';
@@ -26,6 +28,19 @@ bool addToAsk(BuildContext context, AskContext c) {
 void askAbout(String question) {
   askMode.value = 'natal'; // K32: "Detayları AI'ya sor" Haritam modudur
   askDraft.value = question;
+  HapticFeedback.selectionClick();
+  shellTab.value = kAskTab;
+}
+
+/// Uyum karti -> Kopru: ask_avatars acik mi (sayfa henuz yuklemediyse bayragi okur).
+Future<bool> askBridgeOn() async {
+  if (askAvatarsEnabled.value) return true;
+  return UserSettingsService.isFlagEnabled('ask_avatars');
+}
+
+/// Kopru avatarini iki profille acar, soruyu taslaga yazar (gonderilmez).
+void askBridge(String profileA, String profileB, String question) {
+  askBridgeReq.value = <String>[profileA, profileB, question];
   HapticFeedback.selectionClick();
   shellTab.value = kAskTab;
 }

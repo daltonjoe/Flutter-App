@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import '../providers/ask_bridge.dart';
 import 'package:flutter/services.dart';
 import '../services/reference_names_service.dart';
 import '../core/theme/app_colors.dart';
@@ -56,6 +57,8 @@ class _AskPageState extends State<AskPage> {
     super.initState();
     askDraft.addListener(_onDraft);
     askMode.addListener(_onMode);
+    askBridgeReq.addListener(_onBridge);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onBridge());
     UserSettingsService.isFlagEnabled('ask_avatars').then((v) {
       if (!mounted) return;
       askAvatarsEnabled.value = v;
@@ -65,7 +68,37 @@ class _AskPageState extends State<AskPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _onDraft());
   }
 
-    void _onMode() {
+    void _onBridge() {
+    final r = askBridgeReq.value;
+    if (r == null || r.length < 3 || !mounted) return;
+    askBridgeReq.value = null;
+    final act = context.read<ActiveProfileProvider>().activeProfileId;
+    if (act == null || act != r[0]) {
+      askMode.value = 'natal';
+      askDraft.value = r[2];
+      return;
+    }
+    askAvatarsEnabled.value = true;
+    if (!_av) setState(() => _av = true);
+    askMode.value = 'synastry';
+    () async {
+      final l = await _loadPartners();
+      if (!mounted) return;
+      setState(() {
+        _partners = l;
+        _partnersLoaded = true;
+      });
+      for (final p in l) {
+        if ('${p['id']}' == r[1]) {
+          _setPartner(p);
+          break;
+        }
+      }
+      askDraft.value = r[2];
+    }();
+  }
+
+  void _onMode() {
     final m = askMode.value;
     if (!mounted || m == _mode) return;
     if (m == 'synastry') {
@@ -110,6 +143,7 @@ class _AskPageState extends State<AskPage> {
   void dispose() {
     askDraft.removeListener(_onDraft);
     askMode.removeListener(_onMode);
+    askBridgeReq.removeListener(_onBridge);
     _ctl.dispose();
     super.dispose();
   }
