@@ -1,5 +1,6 @@
 // lib/main.dart
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -58,7 +59,9 @@ void main() async {
   }
 
   await activeProfileProvider.load();
-debugPrint('TOKEN=${Supabase.instance.client.auth.currentSession?.accessToken}');
+if (kDebugMode) {
+  debugPrint('TOKEN=${Supabase.instance.client.auth.currentSession?.accessToken}');
+}
   runApp(
     MultiProvider(
       providers: [
