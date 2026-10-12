@@ -371,7 +371,7 @@
   "ask.remember.consent_title": "Save notes?",
   "ask.remember.consent_body": "Short notes you choose are stored so every guide can use them. You can view, edit and delete them anytime.",
   "ask.remember.consent_accept": "Agree",
-  "ask.remember.hint": "Short, up to 200 characters. No health, money, legal or crisis details.",
+  "ask.remember.hint": "Short, up to 150 characters. No health, money, legal or crisis details.",
   "notes.title": "My notes",
   "notes.empty": "No notes yet. Long-press one of your messages to save it.",
   "notes.limit": "You can keep up to 10 notes.",

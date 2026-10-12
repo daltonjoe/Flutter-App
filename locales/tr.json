@@ -371,7 +371,7 @@
   "ask.remember.consent_title": "Notlar kaydedilsin mi?",
   "ask.remember.consent_body": "Seçtiğin kısa notlar saklanır ve tüm rehberler kullanır. İstediğin zaman görür, düzenler, silersin.",
   "ask.remember.consent_accept": "Kabul et",
-  "ask.remember.hint": "Kısa, en çok 200 karakter. Sağlık, para, hukuk veya kriz bilgisi yazma.",
+  "ask.remember.hint": "Kısa, en çok 150 karakter. Sağlık, para, hukuk veya kriz bilgisi yazma.",
   "notes.title": "Notlarım",
   "notes.empty": "Henüz not yok. Bir mesajına uzun basıp kaydedebilirsin.",
   "notes.limit": "En çok 10 not tutabilirsin.",
