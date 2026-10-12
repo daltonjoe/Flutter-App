@@ -85,7 +85,7 @@ class SoulBoundApp extends StatelessWidget {
     final languageProvider = Provider.of<LanguageProvider>(context);
 
     return MaterialApp(
-      title: 'SoulBound',
+      title: 'Ephemerai',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
       locale: languageProvider.locale,
