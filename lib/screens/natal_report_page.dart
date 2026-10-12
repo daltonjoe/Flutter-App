@@ -363,7 +363,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
         ),
         const SizedBox(height: 8),
         const Text(
-          'SoulBound · AI Astrology',
+          'Ephemerai · AI Astrology',
           style: TextStyle(
             color: Color(0x808B5CF6),
             fontSize: 10,
