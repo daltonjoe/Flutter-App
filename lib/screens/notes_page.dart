@@ -67,13 +67,13 @@ class _NotesPageState extends State<NotesPage> {
     final sm = ScaffoldMessenger.of(context);
     final raw = '${row['body'] ?? ''}';
     final ctl = TextEditingController(
-        text: raw.length > 200 ? raw.substring(0, 200) : raw);
+        text: raw.length > 150 ? raw.substring(0, 150) : raw);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(t(ctx, 'notes.edit')),
         content: TextField(
-            controller: ctl, maxLength: 200, minLines: 1, maxLines: 4),
+            controller: ctl, maxLength: 150, minLines: 1, maxLines: 4),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),

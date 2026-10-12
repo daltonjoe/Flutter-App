@@ -36,6 +36,7 @@ class AskPage extends StatefulWidget {
 
 class _AskPageState extends State<AskPage> {
   final TextEditingController _ctl = TextEditingController();
+  late final FocusNode _inputFocus = FocusNode(onKeyEvent: _onInputKey);
   final List<_Msg> _messages = [];
   bool _waiting = false;
   bool _failed = false;
@@ -145,6 +146,7 @@ class _AskPageState extends State<AskPage> {
     askMode.removeListener(_onMode);
     askBridgeReq.removeListener(_onBridge);
     _ctl.dispose();
+    _inputFocus.dispose();
     super.dispose();
   }
 
@@ -199,7 +201,16 @@ Future<_Msg> _reply(String text) async {
         bubbles: (_av && bl != null && bl.isNotEmpty) ? bl : null);
   }
 
-  Future<void> _send([String? override]) async {
+    KeyEventResult _onInputKey(FocusNode node, KeyEvent e) {
+    final enter = e.logicalKey == LogicalKeyboardKey.enter ||
+        e.logicalKey == LogicalKeyboardKey.numpadEnter;
+    if (e is KeyDownEvent && enter && !HardwareKeyboard.instance.isShiftPressed) {
+      _send();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+Future<void> _send([String? override]) async {
     final text = (override ?? _ctl.text).trim();
         if (text.isEmpty || _waiting) return;
     if (_mode == 'forecast' && _fMonth == null) {
@@ -523,7 +534,7 @@ Future<_Msg> _reply(String text) async {
     final sm = ScaffoldMessenger.of(context);
     final savedMsg = t(context, 'ask.remember.saved');
     final ctl = TextEditingController(
-        text: raw.length > 200 ? raw.substring(0, 200) : raw);
+        text: raw.length > 150 ? raw.substring(0, 150) : raw);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -534,7 +545,7 @@ Future<_Msg> _reply(String text) async {
           children: [
             Text(t(ctx, 'ask.remember.hint'), style: AppTextStyles.bodySm()),
             const SizedBox(height: 8),
-            TextField(controller: ctl, maxLength: 200, minLines: 1, maxLines: 4),
+            TextField(controller: ctl, maxLength: 150, minLines: 1, maxLines: 4),
           ],
         ),
         actions: [
@@ -631,7 +642,9 @@ Future<_Msg> _reply(String text) async {
               minLines: 1,
               maxLines: 5,
               textCapitalization: TextCapitalization.sentences,
-              textInputAction: TextInputAction.newline,
+              textInputAction: TextInputAction.send,
+              focusNode: _inputFocus,
+              onSubmitted: (_) => _send(),
               style: AppTextStyles.bodyLg(),
               decoration: InputDecoration(
                 hintText: t(context, 'ask.placeholder'),
