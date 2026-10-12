@@ -382,5 +382,21 @@
   "notes.clear_all_body": "Kayıtlı tüm notların silinsin mi? Bu geri alınamaz.",
   "notes.withdraw": "Rızayı geri çek",
   "notes.withdraw_body": "Tüm notların silinir ve yeniden onaylayana kadar yeni not kaydedilmez.",
-  "notes.cancel": "Vazgeç"
+  "notes.cancel": "Vazgeç",
+  "paywall.trial.title": "7 gün ücretsiz dene",
+  "paywall.trial.body": "Deneme süresince günde toplam 10 soru sorabilirsin; üç rehber bu hakkı birlikte kullanır.",
+  "paywall.trial.ends": "Deneme {date} tarihinde biter.",
+  "paywall.trial.nocharge": "Ödeme gerekmez. Kendiliğinden yenilenmez.",
+  "paywall.trial.cancel": "İptal edilecek bir şey yok; deneme kendiliğinden biter.",
+  "paywall.trial.cta": "Denemeyi başlat",
+  "paywall.trial.skip": "Şimdi değil",
+  "paywall.error.generic": "Deneme başlatılamadı.",
+  "paywall.error.retry": "Yeniden dene",
+  "paywall.settings.row": "Abonelik",
+  "paywall.settings.trial_active": "Deneme {date} tarihinde biter",
+  "paywall.settings.none": "Etkin plan yok",
+  "paywall.settings.expired": "Deneme {date} tarihinde bitti",
+  "paywall.quota.title": "Günlük soru sınırına ulaştın",
+  "paywall.quota.body": "Bugünkü 10 sorunu kullandın. Sınır yarın sıfırlanır.",
+  "paywall.quota.close": "Kapat"
 }

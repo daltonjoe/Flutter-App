@@ -382,5 +382,21 @@
   "notes.clear_all_body": "Delete all your saved notes? This can't be undone.",
   "notes.withdraw": "Withdraw consent",
   "notes.withdraw_body": "This deletes all your notes and stops saving new ones until you agree again.",
-  "notes.cancel": "Cancel"
+  "notes.cancel": "Cancel",
+  "paywall.trial.title": "Prova gratis per 7 giorni",
+  "paywall.trial.body": "Durante la prova puoi fare 10 domande al giorno in totale, condivise tra le tre guide.",
+  "paywall.trial.ends": "La prova termina il {date}.",
+  "paywall.trial.nocharge": "Nessun pagamento richiesto. Niente si rinnova automaticamente.",
+  "paywall.trial.cancel": "Non c'è nulla da annullare; la prova finisce da sola.",
+  "paywall.trial.cta": "Inizia la prova",
+  "paywall.trial.skip": "Ora no",
+  "paywall.error.generic": "Impossibile avviare la prova.",
+  "paywall.error.retry": "Riprova",
+  "paywall.settings.row": "Abbonamento",
+  "paywall.settings.trial_active": "La prova termina il {date}",
+  "paywall.settings.none": "Nessun piano attivo",
+  "paywall.settings.expired": "La prova è terminata il {date}",
+  "paywall.quota.title": "Limite giornaliero di domande raggiunto",
+  "paywall.quota.body": "Hai usato le 10 domande di oggi. Il limite si azzera domani.",
+  "paywall.quota.close": "Chiudi"
 }

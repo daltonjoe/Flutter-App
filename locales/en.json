@@ -382,5 +382,21 @@
   "notes.clear_all_body": "Delete all your saved notes? This can't be undone.",
   "notes.withdraw": "Withdraw consent",
   "notes.withdraw_body": "This deletes all your notes and stops saving new ones until you agree again.",
-  "notes.cancel": "Cancel"
+  "notes.cancel": "Cancel",
+  "paywall.trial.title": "Try free for 7 days",
+  "paywall.trial.body": "During the trial you can ask 10 questions a day in total, shared across all three guides.",
+  "paywall.trial.ends": "Trial ends on {date}.",
+  "paywall.trial.nocharge": "No payment needed. Nothing renews automatically.",
+  "paywall.trial.cancel": "There is nothing to cancel; the trial ends by itself.",
+  "paywall.trial.cta": "Start trial",
+  "paywall.trial.skip": "Not now",
+  "paywall.error.generic": "Could not start the trial.",
+  "paywall.error.retry": "Try again",
+  "paywall.settings.row": "Subscription",
+  "paywall.settings.trial_active": "Trial ends on {date}",
+  "paywall.settings.none": "No active plan",
+  "paywall.settings.expired": "Trial ended on {date}",
+  "paywall.quota.title": "Daily question limit reached",
+  "paywall.quota.body": "You have used today's 10 questions. The limit resets tomorrow.",
+  "paywall.quota.close": "Close"
 }

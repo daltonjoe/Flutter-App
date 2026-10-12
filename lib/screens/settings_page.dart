@@ -1,4 +1,5 @@
-﻿import 'package:flutter/cupertino.dart';
+import 'package:flutter_application/paywall/subscription_settings_row.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -613,6 +614,7 @@ class _SettingsPageState extends State<SettingsPage>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _sectionLabel('settings.section.about'),
+            const SubscriptionSettingsRow(),
             CosmicCard(
               child: _buildRow(
                 leading: Text(

@@ -382,5 +382,21 @@
   "notes.clear_all_body": "Delete all your saved notes? This can't be undone.",
   "notes.withdraw": "Withdraw consent",
   "notes.withdraw_body": "This deletes all your notes and stops saving new ones until you agree again.",
-  "notes.cancel": "Cancel"
+  "notes.cancel": "Cancel",
+  "paywall.trial.title": "Experimente grátis por 7 dias",
+  "paywall.trial.body": "Durante o teste você pode fazer 10 perguntas por dia no total, compartilhadas entre os três guias.",
+  "paywall.trial.ends": "O teste termina em {date}.",
+  "paywall.trial.nocharge": "Nenhum pagamento necessário. Nada renova automaticamente.",
+  "paywall.trial.cancel": "Não há nada para cancelar; o teste termina sozinho.",
+  "paywall.trial.cta": "Começar o teste",
+  "paywall.trial.skip": "Agora não",
+  "paywall.error.generic": "Não foi possível iniciar o teste.",
+  "paywall.error.retry": "Tentar novamente",
+  "paywall.settings.row": "Assinatura",
+  "paywall.settings.trial_active": "O teste termina em {date}",
+  "paywall.settings.none": "Nenhum plano ativo",
+  "paywall.settings.expired": "O teste terminou em {date}",
+  "paywall.quota.title": "Limite diário de perguntas atingido",
+  "paywall.quota.body": "Você usou as 10 perguntas de hoje. O limite é reiniciado amanhã.",
+  "paywall.quota.close": "Fechar"
 }

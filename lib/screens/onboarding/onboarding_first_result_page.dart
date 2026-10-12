@@ -1,3 +1,4 @@
+import 'package:flutter_application/paywall/paywall_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -40,7 +41,7 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage> {
       Navigator.of(context, rootNavigator: true)
     .pushNamedAndRemoveUntil('/home', (r) => false);
     } else {
-      Navigator.pushReplacementNamed(context, '/onboarding/link-account');
+      Navigator.pushReplacement(context, MaterialPageRoute<void>(builder: (_) => const PaywallPage(source: PaywallSource.onboarding, next: '/onboarding/link-account')));
     }
   }
 

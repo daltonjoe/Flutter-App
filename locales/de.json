@@ -382,5 +382,21 @@
   "notes.clear_all_body": "Delete all your saved notes? This can't be undone.",
   "notes.withdraw": "Withdraw consent",
   "notes.withdraw_body": "This deletes all your notes and stops saving new ones until you agree again.",
-  "notes.cancel": "Cancel"
+  "notes.cancel": "Cancel",
+  "paywall.trial.title": "7 Tage kostenlos testen",
+  "paywall.trial.body": "Während der Testphase kannst du täglich insgesamt 10 Fragen stellen, geteilt über alle drei Begleiter.",
+  "paywall.trial.ends": "Die Testphase endet am {date}.",
+  "paywall.trial.nocharge": "Keine Zahlung nötig. Nichts verlängert sich automatisch.",
+  "paywall.trial.cancel": "Es gibt nichts zu kündigen; die Testphase endet von selbst.",
+  "paywall.trial.cta": "Test starten",
+  "paywall.trial.skip": "Jetzt nicht",
+  "paywall.error.generic": "Die Testphase konnte nicht gestartet werden.",
+  "paywall.error.retry": "Erneut versuchen",
+  "paywall.settings.row": "Abo",
+  "paywall.settings.trial_active": "Testphase endet am {date}",
+  "paywall.settings.none": "Kein aktiver Plan",
+  "paywall.settings.expired": "Testphase endete am {date}",
+  "paywall.quota.title": "Tageslimit für Fragen erreicht",
+  "paywall.quota.body": "Du hast heute alle 10 Fragen genutzt. Das Limit wird morgen zurückgesetzt.",
+  "paywall.quota.close": "Schließen"
 }
