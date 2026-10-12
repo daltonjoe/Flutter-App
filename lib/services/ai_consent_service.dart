@@ -18,6 +18,22 @@ class AiConsentService {
     }
   }
 
+  static Future<bool> revokeAi() async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await Supabase.instance.client
+          .from('user_consents')
+          .delete()
+          .eq('user_id', uid)
+          .eq('kind', 'ai');
+      return !(await hasAi());
+    } catch (e) {
+      debugPrint('AiConsentService.revokeAi failed: $e');
+      return false;
+    }
+  }
+
   static Future<bool> grantAi() async {
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (uid == null) return false;

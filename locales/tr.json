@@ -377,5 +377,10 @@
   "notes.limit": "En çok 10 not tutabilirsin.",
   "notes.edit": "Düzenle",
   "notes.delete": "Sil",
-  "notes.save": "Kaydet"
+  "notes.save": "Kaydet",
+  "notes.clear_all": "Tüm notları sil",
+  "notes.clear_all_body": "Kayıtlı tüm notların silinsin mi? Bu geri alınamaz.",
+  "notes.withdraw": "Rızayı geri çek",
+  "notes.withdraw_body": "Tüm notların silinir ve yeniden onaylayana kadar yeni not kaydedilmez.",
+  "notes.cancel": "Vazgeç"
 }

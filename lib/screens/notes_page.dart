@@ -5,6 +5,7 @@ import '../core/theme/app_decorations.dart';
 import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../services/ask_service.dart';
+import '../services/ai_consent_service.dart';
 
 /// NotlarÄ±m: ask_memories (RLS ile okuma/silme), dÃ¼zenleme PATCH /memory/{id}.
 class NotesPage extends StatefulWidget {
@@ -95,6 +96,66 @@ class _NotesPageState extends State<NotesPage> {
     }
   }
 
+  Future<bool> _confirm(String titleKey, String bodyKey) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t(ctx, titleKey)),
+        content: Text(t(ctx, bodyKey)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(t(ctx, 'notes.cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(t(ctx, 'notes.delete')),
+          ),
+        ],
+      ),
+    );
+    return ok == true;
+  }
+
+  Future<bool> _wipe() async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await Supabase.instance.client
+          .from('ask_memories')
+          .delete()
+          .eq('user_id', uid);
+      return true;
+    } catch (e) {
+      debugPrint('NotesPage wipe failed: $e');
+      return false;
+    }
+  }
+
+  Future<void> _clearAll() async {
+    final sm = ScaffoldMessenger.of(context);
+    if (!await _confirm('notes.clear_all', 'notes.clear_all_body')) return;
+    if (!mounted) return;
+    final ok = await _wipe();
+    if (!mounted) return;
+    if (!ok) {
+      sm.showSnackBar(SnackBar(content: Text(t(context, 'ask.error'))));
+      return;
+    }
+    await _load();
+  }
+
+  Future<void> _withdraw() async {
+    final sm = ScaffoldMessenger.of(context);
+    if (!await _confirm('notes.withdraw', 'notes.withdraw_body')) return;
+    if (!mounted) return;
+    final ok = await _wipe() && await AiConsentService.revokeAi();
+    if (!mounted) return;
+    if (!ok) {
+      sm.showSnackBar(SnackBar(content: Text(t(context, 'ask.error'))));
+    }
+    await _load();
+  }
   @override
   Widget build(BuildContext context) {
     Widget body;
@@ -144,7 +205,38 @@ class _NotesPageState extends State<NotesPage> {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: Text(t(context, 'notes.title'))),
+      appBar: AppBar(
+        title: Text(t(context, 'notes.title')),
+        actions: [
+          if (!_loading && !_err)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: Center(
+                child: Text('${_rows.length}/10', style: AppTextStyles.bodyMd()),
+              ),
+            ),
+          PopupMenuButton<String>(
+            onSelected: (v) {
+              if (v == 'clear') {
+                _clearAll();
+              } else {
+                _withdraw();
+              }
+            },
+            itemBuilder: (c) => [
+              if (_rows.isNotEmpty)
+                PopupMenuItem<String>(
+                  value: 'clear',
+                  child: Text(t(c, 'notes.clear_all')),
+                ),
+              PopupMenuItem<String>(
+                value: 'withdraw',
+                child: Text(t(c, 'notes.withdraw')),
+              ),
+            ],
+          ),
+        ],
+      ),
       body: SafeArea(child: body),
     );
   }

@@ -377,5 +377,10 @@
   "notes.limit": "You can keep up to 10 notes.",
   "notes.edit": "Edit",
   "notes.delete": "Delete",
-  "notes.save": "Save"
+  "notes.save": "Save",
+  "notes.clear_all": "Delete all notes",
+  "notes.clear_all_body": "Delete all your saved notes? This can't be undone.",
+  "notes.withdraw": "Withdraw consent",
+  "notes.withdraw_body": "This deletes all your notes and stops saving new ones until you agree again.",
+  "notes.cancel": "Cancel"
 }
