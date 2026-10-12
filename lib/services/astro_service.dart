@@ -2,6 +2,7 @@
 //
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/natal_chart_response.dart';
 
 // Backend adresi. Varsayılan: lokal. Emülatör için:
@@ -13,21 +14,14 @@ const _kBaseUrl = String.fromEnvironment(
   defaultValue: 'http://127.0.0.1:8000',
 );
 
-String? _authToken;
-
 Future<String> _getToken() async {
-  if (_authToken != null) return _authToken!;
-  final uri = Uri.parse('$_kBaseUrl/app-token');
-  final response = await http.get(uri).timeout(const Duration(seconds: 10));
-  if (response.statusCode == 200) {
-    final json = jsonDecode(response.body);
-    _authToken = json['token'] as String;
-    return _authToken!;
-  }
+  // Supabase oturum JWT'si (anonim dahil); backend get_user_id ile dogrular.
+  final token = Supabase.instance.client.auth.currentSession?.accessToken;
+  if (token != null && token.isNotEmpty) return token;
   throw AstroServiceException(
     code: 'AUTH_ERROR',
-    message: 'Token alınamadı (URL: $_kBaseUrl)',
-    suggestion: 'URL doğru mu? Backend ayakta mı?',
+    message: 'Oturum bulunamadi',
+    suggestion: 'Uygulamayi yeniden baslat.',
   );
 }
 
