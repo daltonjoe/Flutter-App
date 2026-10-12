@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../paywall/paywall_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import '../providers/ask_bridge.dart';
@@ -251,6 +252,14 @@ Future<void> _send([String? override]) async {
                 ? 'ask.error.quota'
                 : 'ask.error';
       });
+      if (e is AstroServiceException && e.code == 'QUOTA') {
+        UserSettingsService.isFlagEnabled('paywall').then((on) {
+          if (on && mounted) {
+            Navigator.of(context, rootNavigator: true).push(MaterialPageRoute<void>(
+                builder: (_) => const PaywallPage(source: PaywallSource.quota)));
+          }
+        });
+      }
     }
   }
 
