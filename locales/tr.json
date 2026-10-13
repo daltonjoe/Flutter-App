@@ -408,5 +408,8 @@
   "ask.report.inaccurate": "Yanlış",
   "ask.report.inappropriate": "Uygunsuz",
   "ask.report.other": "Diğer",
-  "ask.report.sent": "Teşekkürler, inceleyeceğiz."
+  "ask.report.sent": "Teşekkürler, inceleyeceğiz.",
+  "settings.section.privacy": "Veri ve gizlilik",
+  "settings.privacy.policy": "Gizlilik Politikası",
+  "settings.privacy.terms": "Kullanım Koşulları"
 }

@@ -8,6 +8,28 @@ import '../services/ask_service.dart';
 import '../services/ai_consent_service.dart';
 
 /// NotlarÄ±m: ask_memories (RLS ile okuma/silme), dÃ¼zenleme PATCH /memory/{id}.
+/// Deletes all ask_memories rows of the current user.
+Future<bool> wipeAskMemories() async {
+  final uid = Supabase.instance.client.auth.currentUser?.id;
+  if (uid == null) return false;
+  try {
+    await Supabase.instance.client
+        .from('ask_memories')
+        .delete()
+        .eq('user_id', uid);
+    return true;
+  } catch (e) {
+    debugPrint('NotesPage wipe failed');
+    debugPrint(e.toString());
+    return false;
+  }
+}
+
+/// Withdraws AI consent: notes first, then the consent row.
+Future<bool> withdrawAiConsentAndNotes() async {
+  return await wipeAskMemories() && await AiConsentService.revokeAi();
+}
+
 class NotesPage extends StatefulWidget {
   const NotesPage({super.key});
   @override
@@ -117,20 +139,7 @@ class _NotesPageState extends State<NotesPage> {
     return ok == true;
   }
 
-  Future<bool> _wipe() async {
-    final uid = Supabase.instance.client.auth.currentUser?.id;
-    if (uid == null) return false;
-    try {
-      await Supabase.instance.client
-          .from('ask_memories')
-          .delete()
-          .eq('user_id', uid);
-      return true;
-    } catch (e) {
-      debugPrint('NotesPage wipe failed: $e');
-      return false;
-    }
-  }
+  Future<bool> _wipe() => wipeAskMemories();
 
   Future<void> _clearAll() async {
     final sm = ScaffoldMessenger.of(context);
@@ -149,7 +158,7 @@ class _NotesPageState extends State<NotesPage> {
     final sm = ScaffoldMessenger.of(context);
     if (!await _confirm('notes.withdraw', 'notes.withdraw_body')) return;
     if (!mounted) return;
-    final ok = await _wipe() && await AiConsentService.revokeAi();
+    final ok = await withdrawAiConsentAndNotes();
     if (!mounted) return;
     if (!ok) {
       sm.showSnackBar(SnackBar(content: Text(t(context, 'ask.error'))));

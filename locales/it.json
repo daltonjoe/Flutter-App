@@ -408,5 +408,8 @@
   "ask.report.inaccurate": "Inaccurate",
   "ask.report.inappropriate": "Inappropriate",
   "ask.report.other": "Other",
-  "ask.report.sent": "Thanks, we'll review it."
+  "ask.report.sent": "Thanks, we'll review it.",
+  "settings.section.privacy": "Data & privacy",
+  "settings.privacy.policy": "Privacy Policy",
+  "settings.privacy.terms": "Terms of Use"
 }
