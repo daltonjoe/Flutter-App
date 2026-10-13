@@ -428,6 +428,72 @@ Future<bool> _askConsent() async {
   }
 
   Widget _bubble(BuildContext context, _Msg m) {
+    final core = _bubbleCore(context, m);
+    if (m.mine || m.text.trim().isEmpty) return core;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [core, _reportLink(context, m)],
+    );
+  }
+
+  Widget _reportLink(BuildContext context, _Msg m) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton(
+        onPressed: () => _reportReply(m),
+        style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+        child: Text(t(context, 'ask.report'), style: AppTextStyles.bodySm()),
+      ),
+    );
+  }
+
+  Future<void> _reportReply(_Msg m) async {
+    final reason = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(t(ctx, 'ask.report'), style: AppTextStyles.bodyLg()),
+            ),
+            for (final r in const ['harmful', 'inaccurate', 'inappropriate', 'other'])
+              ListTile(
+                title: Text(t(ctx, 'ask.report.$r')),
+                onTap: () => Navigator.pop(ctx, r),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (reason == null || !mounted) return;
+    final av = _mode == 'forecast'
+        ? 'forecast'
+        : (_mode == 'synastry' ? 'synastry' : 'natal');
+    try {
+      final uid = Supabase.instance.client.auth.currentUser?.id;
+      if (uid == null) throw StateError('no user');
+      var ex = m.text.trim();
+      if (ex.length > 600) ex = ex.substring(0, 600);
+      await Supabase.instance.client.from('ai_reports').insert({
+        'user_id': uid,
+        'avatar': av,
+        'reason': reason,
+        'reply_excerpt': ex,
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t(context, 'ask.report.sent'))));
+    } catch (e) {
+      debugPrint('AskPage report failed: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t(context, 'ask.error'))));
+    }
+  }
+
+  Widget _bubbleCore(BuildContext context, _Msg m) {
     if (!m.mine && m.bubbles != null && m.bubbles!.isNotEmpty) {
       return _bubbleSeq(context, m);
     }
