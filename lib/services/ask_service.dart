@@ -69,6 +69,9 @@ class AskService {
       }
       throw AstroServiceException(code: 'RATE_LIMITED', message: 'Ã‡ok fazla istek.');
     }
+    if (r.statusCode == 403 && _detail(r) == 'consent') {
+      throw AstroServiceException(code: 'CONSENT', message: 'consent required');
+    }
     if (r.statusCode != 200) {
       throw AstroServiceException(
           code: 'HTTP_${r.statusCode}', message: 'Sunucu hatasÄ±: ${r.statusCode}');
