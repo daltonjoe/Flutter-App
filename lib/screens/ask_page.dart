@@ -211,7 +211,30 @@ Future<_Msg> _reply(String text) async {
     }
     return KeyEventResult.ignored;
   }
-Future<void> _send([String? override]) async {
+Future<bool> _askConsent() async {
+    final yes = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text(t(ctx, 'consent.ai.title')),
+        content: Text(t(ctx, 'consent.ai.body')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(t(ctx, 'consent.ai.decline')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(t(ctx, 'consent.ai.accept')),
+          ),
+        ],
+      ),
+    );
+    if (yes != true) return false;
+    return AiConsentService.grantAi();
+  }
+
+  Future<void> _send([String? override]) async {
     final text = (override ?? _ctl.text).trim();
         if (text.isEmpty || _waiting) return;
     if (_mode == 'forecast' && _fMonth == null) {
@@ -240,6 +263,26 @@ Future<void> _send([String? override]) async {
         _waiting = false;
       });
     } catch (e) {
+      if (e is AstroServiceException && e.code == 'CONSENT' && !await AiConsentService.hasAi()) {
+        if (!mounted || gen != _gen) return;
+        final ok = await _askConsent();
+        if (!mounted || gen != _gen) return;
+        if (ok) {
+          setState(() {
+            _waiting = false;
+            _failed = true;
+          });
+          await _send(text);
+        } else {
+          setState(() {
+            _waiting = false;
+            _failed = false;
+            if (_messages.isNotEmpty && _messages.last.mine) _messages.removeLast();
+            _ctl.text = text;
+          });
+        }
+        return;
+      }
       debugPrint('AskPage reply failed: $e');
       if (!mounted || gen != _gen) return;
       setState(() {
