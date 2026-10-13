@@ -398,5 +398,15 @@
   "paywall.settings.expired": "L'essai s'est terminé le {date}",
   "paywall.quota.title": "Limite quotidienne de questions atteinte",
   "paywall.quota.body": "Tu as utilisé tes 10 questions du jour. La limite est réinitialisée demain.",
-  "paywall.quota.close": "Fermer"
+  "paywall.quota.close": "Fermer",
+  "consent.ai.title": "Before you chat",
+  "consent.ai.body": "To reply, Ephemerai sends your message and a summary of your birth chart to third-party AI providers. Replies are AI-generated, for entertainment and self-reflection only, and are not medical, legal, financial or emergency advice. Avoid sharing sensitive details such as health information. You can withdraw consent anytime in Settings.",
+  "consent.ai.accept": "Agree and continue",
+  "consent.ai.decline": "Not now",
+  "ask.report": "Report this reply",
+  "ask.report.harmful": "Harmful",
+  "ask.report.inaccurate": "Inaccurate",
+  "ask.report.inappropriate": "Inappropriate",
+  "ask.report.other": "Other",
+  "ask.report.sent": "Thanks, we'll review it."
 }

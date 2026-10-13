@@ -398,5 +398,15 @@
   "paywall.settings.expired": "Deneme {date} tarihinde bitti",
   "paywall.quota.title": "Günlük soru sınırına ulaştın",
   "paywall.quota.body": "Bugünkü 10 sorunu kullandın. Sınır yarın sıfırlanır.",
-  "paywall.quota.close": "Kapat"
+  "paywall.quota.close": "Kapat",
+  "consent.ai.title": "Sohbetten önce",
+  "consent.ai.body": "Cevap verebilmek için mesajın ve doğum haritanın özeti üçüncü taraf yapay zekâ sağlayıcılarına gönderilir. Cevaplar yapay zekâ tarafından üretilir, yalnızca eğlence ve öz-düşünme içindir; tıbbi, hukuki, finansal veya acil durum tavsiyesi değildir. Sağlık gibi hassas ayrıntıları paylaşmaktan kaçın. Rızanı istediğin an Ayarlar'dan geri çekebilirsin.",
+  "consent.ai.accept": "Onaylıyorum",
+  "consent.ai.decline": "Şimdi değil",
+  "ask.report": "Bu cevabı bildir",
+  "ask.report.harmful": "Zararlı",
+  "ask.report.inaccurate": "Yanlış",
+  "ask.report.inappropriate": "Uygunsuz",
+  "ask.report.other": "Diğer",
+  "ask.report.sent": "Teşekkürler, inceleyeceğiz."
 }
