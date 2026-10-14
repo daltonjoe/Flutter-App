@@ -1,7 +1,16 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import "package:flutter_application/diag68.dart";
 
 class AccountDeletionService {
+  /// Yeni anonim uid acildiktan sonra eski uid'e ait aktif profili sil.
+  static Future<void> _clearActive69() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.remove("active_profile_id");
+    } catch (_) {}
+  }
+
   static Future<void> deleteAccount() async {
     final response = await Supabase.instance.client.functions.invoke(
       'delete-account',
@@ -18,6 +27,8 @@ class AccountDeletionService {
       await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
     } catch (_) {}
     await Supabase.instance.client.auth.signInAnonymously();
+    await _clearActive69();
+    diag68("delete after-anon");
   }
 
     /// Oturum sunucuda hâlâ geçerli mi? Silinmiş kullanıcıysa yerel oturumu
@@ -37,6 +48,7 @@ class AccountDeletionService {
         await auth.signOut(scope: SignOutScope.local);
       } catch (_) {}
       await auth.signInAnonymously();
+      await _clearActive69();
       diag68("ensure after-anon");
     }
   }
