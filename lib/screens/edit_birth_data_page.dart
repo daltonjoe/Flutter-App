@@ -12,7 +12,7 @@ import '../presentation/widgets/components/cosmic_input_field.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/chart_persistence_service.dart';
-import 'package:lottie/lottie.dart';
+import '../../widgets/animations/zodiac_orbital_animation.dart';
 
 /// K33: doğum tarihi + yeri + saati tek ekran, tam yeniden hesap.
 class EditBirthDataPage extends StatefulWidget {
@@ -302,10 +302,7 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
                     SizedBox(
                       width: 240,
                       height: 240,
-                      child: Lottie.asset(
-                        'assets/animations/Astrology.json',
-                        animate: !MediaQuery.of(context).disableAnimations,
-                      ),
+                      child: ZodiacOrbitalAnimation(size: 240),
                     ),
                     const SizedBox(height: 16),
                     Text(

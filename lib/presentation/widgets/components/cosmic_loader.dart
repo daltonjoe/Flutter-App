@@ -7,21 +7,17 @@
 
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_loader.dart';
 import '../../../widgets/animations/zodiac_orbital_animation.dart';
 
 /// Inline loading widget. Place wherever a screen section is pending.
 ///
-/// [useLottie] — use the Lottie AppLoader animation instead of ZodiacOrbitalAnimation.
 class CosmicLoader extends StatefulWidget {
   const CosmicLoader({
     super.key,
     this.message,
-    this.useLottie = false,
   });
 
   final String? message;
-  final bool useLottie;
 
   @override
   State<CosmicLoader> createState() => _CosmicLoaderState();
@@ -43,9 +39,7 @@ class _CosmicLoaderState extends State<CosmicLoader> {
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: FittedBox(
                     fit: BoxFit.contain,
-                    child: widget.useLottie
-                        ? const AppLoader()
-                        : const ZodiacOrbitalAnimation(size: 400),
+                    child: const ZodiacOrbitalAnimation(size: 400),
                   ),
                 ),
               ),
@@ -87,15 +81,13 @@ class CosmicLoadingScreen extends StatelessWidget {
   const CosmicLoadingScreen({
     super.key,
     this.message,
-    this.useLottie = false,
   });
 
   final String? message;
-  final bool useLottie;
 
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.bgDeep,
-        body: CosmicLoader(message: message, useLottie: useLottie),
+        body: CosmicLoader(message: message),
       );
 }

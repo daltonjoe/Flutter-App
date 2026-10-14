@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
+import '../../../widgets/animations/zodiac_orbital_animation.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_error_state.dart';
 
@@ -52,7 +52,6 @@ class _OnboardingCalculatingPageState extends State<OnboardingCalculatingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final reduce = MediaQuery.of(context).disableAnimations;
     return PopScope(
       canPop: _failed,
       child: Scaffold(
@@ -78,10 +77,7 @@ class _OnboardingCalculatingPageState extends State<OnboardingCalculatingPage> {
                           SizedBox(
                             width: 240,
                             height: 240,
-                            child: Lottie.asset(
-                              'assets/animations/Astrology.json',
-                              animate: !reduce,
-                            ),
+                            child: ZodiacOrbitalAnimation(size: 240),
                           ),
                           const SizedBox(height: 16),
                           Text(
