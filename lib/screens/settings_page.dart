@@ -566,6 +566,45 @@ class _SettingsPageState extends State<SettingsPage>
     );
   }
 
+  Future<void> _signOut() async {
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t(ctx, "settings.account.signout")),
+        content: Text(t(ctx, "settings.account.signout_body")),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(t(ctx, "notes.cancel")),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(t(ctx, "settings.account.signout")),
+          ),
+        ],
+      ),
+    );
+    if (yes != true || !mounted) return;
+    final nav = Navigator.of(context, rootNavigator: true);
+    final prov = context.read<ActiveProfileProvider>();
+    try {
+      await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
+      await Supabase.instance.client.auth.signInAnonymously();
+      await prov.clearActive();
+      nav.pushNamedAndRemoveUntil(
+        "/onboarding",
+        (route) => false,
+        arguments: {"isFirstProfile": true},
+      );
+    } catch (e) {
+      debugPrint("SettingsPage._signOut failed: $e");
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(t(context, "ask.error"))),
+      );
+    }
+  }
+
   Widget _accountSection() {
     final user = Supabase.instance.client.auth.currentUser;
     final isAnonymous = user?.isAnonymous ?? true;
@@ -590,14 +629,29 @@ class _SettingsPageState extends State<SettingsPage>
           children: [
             _sectionLabel('settings.section.account'),
             CosmicCard(
-              child: _buildRow(
-                leading: Text(
-                  statusText,
-                  style: AppTextStyles.bodyMd(color: AppColors.textSecondary),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 3,
-                ),
+              child: Column(
+                children: [
+                  _buildRow(
+                    leading: Text(
+                      statusText,
+                      style: AppTextStyles.bodyMd(color: AppColors.textSecondary),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                    ),
+                  ),
+                  if (!isAnonymous)
+                    _buildRow(
+                      leading: Text(
+                        t(context, "settings.account.signout"),
+                        style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                      onTap: _signOut,
+                    ),
+                ],
               ),
             ),
           ],

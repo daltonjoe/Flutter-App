@@ -453,5 +453,7 @@
   "paywall.unavailable": "Satın alma henüz kullanılamıyor.",
   "paywall.error.purchase": "Satın alma tamamlanamadı.",
   "paywall.restore": "Geri yükle",
-  "paywall.restore.none": "Geri yüklenecek satın alma yok."
+  "paywall.restore.none": "Geri yüklenecek satın alma yok.",
+  "settings.account.signout": "Çıkış yap",
+  "settings.account.signout_body": "Bu cihazdan çıkış yapılır. Profillerine dönmek için tekrar giriş yap."
 }

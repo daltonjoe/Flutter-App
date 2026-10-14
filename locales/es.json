@@ -453,5 +453,7 @@
   "paywall.unavailable": "Purchases are not available yet.",
   "paywall.error.purchase": "Could not complete the purchase.",
   "paywall.restore": "Restore",
-  "paywall.restore.none": "No purchases to restore."
+  "paywall.restore.none": "No purchases to restore.",
+  "settings.account.signout": "Sign out",
+  "settings.account.signout_body": "You will be signed out on this device. Sign in again to get your profiles back."
 }
