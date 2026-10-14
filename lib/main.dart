@@ -226,14 +226,20 @@ class _WebErr67State extends State<_WebErr67> {
   void initState() {
     super.initState();
     if (!_webExists67) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final sp67 = await SharedPreferences.getInstance();
-      final u67 = Uri.base.toString();
-      if (sp67.getString("web_exists_url") == u67) return;
-      await sp67.setString("web_exists_url", u67);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_webExists67) return;
+      _webExists67 = false;
       if (!mounted) return;
+      final nav70 = Navigator.of(context);
+      diag68("web exists snackbar", "shown");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(t(context, "onboarding.register.exists"))),
+        SnackBar(
+          content: Text(t(context, "onboarding.register.exists")),
+          action: SnackBarAction(
+            label: t(context, "onboarding.register.signin"),
+            onPressed: () => nav70.pushNamed("/signin"),
+          ),
+        ),
       );
       SystemNavigator.routeInformationUpdated(uri: Uri.parse("/"), replace: true);
     });
