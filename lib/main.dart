@@ -1,6 +1,6 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -42,6 +42,7 @@ void main() async {
     ),
   );
 
+  _readWebError67();
   await Supabase.initialize(
     url: SupabaseConfig.url,
     publishableKey: SupabaseConfig.anonKey,
@@ -119,11 +120,11 @@ class SoulBoundApp extends StatelessWidget {
           ),
         );
       },
-      home: _startConsent67
+      home: _WebErr67(child: _startConsent67
           ? const OnboardingConsentPage()
           : context.watch<ActiveProfileProvider>().activeProfileId != null
           ? const MainShell()
-          : const OnboardingFlowPage(isFirstProfile: true),
+          : const OnboardingFlowPage(isFirstProfile: true)),
       onGenerateRoute: appOnGenerateRoute,
     );
   }
@@ -196,6 +197,43 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
 }
 
 bool _startConsent67 = false;
+
+bool _webExists67 = false;
+
+void _readWebError67() {
+  if (!kIsWeb) return;
+  try {
+    final q = Uri.base.queryParameters;
+    if (q["error_code"] == "identity_already_exists") _webExists67 = true;
+  } catch (e) {
+    debugPrint("web error parse failed: $e");
+  }
+}
+
+class _WebErr67 extends StatefulWidget {
+  const _WebErr67({required this.child});
+  final Widget child;
+  @override
+  State<_WebErr67> createState() => _WebErr67State();
+}
+
+class _WebErr67State extends State<_WebErr67> {
+  @override
+  void initState() {
+    super.initState();
+    if (!_webExists67) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(t(context, "onboarding.register.exists"))),
+      );
+      SystemNavigator.routeInformationUpdated(uri: Uri.parse("/"), replace: true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
 
 Future<void> _restoreAccount67(ActiveProfileProvider prov) async {
   try {
