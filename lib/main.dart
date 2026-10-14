@@ -203,6 +203,7 @@ bool _startConsent67 = false;
 void clearStartConsent67() => _startConsent67 = false;
 
 bool _webExists67 = false;
+bool _notFound70 = false;
 
 void _readWebError67() {
   if (!kIsWeb) return;
@@ -225,6 +226,13 @@ class _WebErr67State extends State<_WebErr67> {
   @override
   void initState() {
     super.initState();
+    if (_notFound70) {
+      _notFound70 = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        showNotFound70(context);
+      });
+    }
     if (!_webExists67) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_webExists67) return;
@@ -249,18 +257,71 @@ class _WebErr67State extends State<_WebErr67> {
   Widget build(BuildContext context) => widget.child;
 }
 
+Future<void> showNotFound70(BuildContext context) async {
+  diag68("notfound shown");
+  final yes = await showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) => AlertDialog(
+      title: Text(t(ctx, "auth.signin.notfound.title")),
+      content: Text(t(ctx, "auth.signin.notfound.body")),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: Text(t(ctx, "auth.signin.notfound.no")),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(t(ctx, "auth.signin.notfound.yes")),
+        ),
+      ],
+    ),
+  );
+  if (!context.mounted) return;
+  final nav = Navigator.of(context, rootNavigator: true);
+  if (yes == true) {
+    diag68("notfound yes");
+    _startConsent67 = true;
+    nav.pushNamedAndRemoveUntil("/onboarding/consent", (r) => false);
+    return;
+  }
+  diag68("notfound no");
+  final prov = context.read<ActiveProfileProvider>();
+  try {
+    final c = Supabase.instance.client;
+    await c.auth.signOut(scope: SignOutScope.local);
+    await c.auth.signInAnonymously();
+    await prov.clearActive();
+  } catch (e) {
+    debugPrint("notfound no failed: $e");
+  }
+  nav.pushNamedAndRemoveUntil("/onboarding", (r) => false,
+      arguments: {"isFirstProfile": true});
+}
+
 Future<void> _restoreAccount67(ActiveProfileProvider prov) async {
   try {
     final c = Supabase.instance.client;
     final u = c.auth.currentUser;
-    if (u == null || u.isAnonymous) return;
+    final sp70 = await SharedPreferences.getInstance();
+    final intent70 = sp70.getString("auth_intent") == "signin";
+    if (u == null || u.isAnonymous) {
+      await sp70.remove("auth_intent");
+      return;
+    }
     final rows = await c.from("user_profiles").select("id").order("created_at");
     final ids = rows.map((r) => r["id"] as String).toList();
     diag68("restore ids", "n=${ids.length} pid=${s68(prov.activeProfileId)}");
     if (ids.isEmpty) {
+      if (intent70) {
+        final cons70 = await c.from("user_consents").select("kind").limit(1);
+        await sp70.remove("auth_intent");
+        if (cons70.isEmpty) _notFound70 = true;
+      }
       await prov.clearActive();
       return;
     }
+    if (intent70) await sp70.remove("auth_intent");
     if (prov.activeProfileId == null || !ids.contains(prov.activeProfileId)) {
       await prov.setActive(ids.first);
     }

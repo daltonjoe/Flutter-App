@@ -9,6 +9,8 @@ import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
 import "../../providers/active_profile_provider.dart";
 import "package:flutter_application/diag68.dart";
+import "package:shared_preferences/shared_preferences.dart";
+import "../../main.dart" show showNotFound70;
 
 class OnboardingSignInPage extends StatefulWidget {
   const OnboardingSignInPage({super.key});
@@ -58,8 +60,32 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
       if (rows.isNotEmpty) pid = rows.first["id"] as String;
     } catch (e) {
       debugPrint("signin profile lookup failed: $e");
+      _done = false;
+      if (mounted) setState(() => _err = true);
+      return;
     }
     diag68("signin after", "pid=${s68(pid)}");
+    if (pid == null) {
+      var empty70 = true;
+      try {
+        final cons70 = await Supabase.instance.client
+            .from("user_consents")
+            .select("kind")
+            .limit(1);
+        empty70 = cons70.isEmpty;
+      } catch (e) {
+        debugPrint("signin consent lookup failed: $e");
+        _done = false;
+        if (mounted) setState(() => _err = true);
+        return;
+      }
+      if (empty70) {
+        await prov.clearActive();
+        if (!mounted) return;
+        await showNotFound70(context);
+        return;
+      }
+    }
     if (pid != null) {
       await prov.setActive(pid);
     } else {
@@ -99,6 +125,8 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
   }
 
   Future<void> _oauth(OAuthProvider p) async {
+    final sp70 = await SharedPreferences.getInstance();
+    await sp70.setString("auth_intent", "signin");
     await Supabase.instance.client.auth
         .signInWithOAuth(p, redirectTo: kAuthRedirectUrl);
   }
