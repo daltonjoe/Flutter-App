@@ -51,7 +51,7 @@ class _OnboardingRegisterPageState extends State<OnboardingRegisterPage> {
       debugPrint("register oauth failed: $e");
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(t(context, "ask.error"))));
+            .showSnackBar(SnackBar(content: Text(t(context, (e is AuthException && (e.message.toLowerCase().contains("already linked") || e.message.contains("identity_already_exists"))) ? "onboarding.register.exists" : "ask.error"))));
       }
     }
     if (mounted) setState(() => _busy = false);

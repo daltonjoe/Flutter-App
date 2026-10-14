@@ -418,6 +418,7 @@
   "onboarding.register.google": "Sign up with Google",
   "onboarding.register.apple": "Sign up with Apple",
   "onboarding.register.guest": "Continue as guest",
+  "onboarding.register.exists": "This account is already registered. Use Sign in.",
   "onboarding.register.have_account": "Already have an account?",
   "onboarding.register.signin": "Sign in",
   "onboarding.register.trouble": "Having trouble signing up?",

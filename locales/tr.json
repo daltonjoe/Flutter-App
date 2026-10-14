@@ -418,6 +418,7 @@
   "onboarding.register.google": "Google ile kayıt ol",
   "onboarding.register.apple": "Apple ile kayıt ol",
   "onboarding.register.guest": "Misafir olarak devam et",
+  "onboarding.register.exists": "Bu hesap zaten kayıtlı. Giriş yap'ı kullan.",
   "onboarding.register.have_account": "Hesabın var mı?",
   "onboarding.register.signin": "Giriş yap",
   "onboarding.register.trouble": "Kayıt olurken sorun mu yaşıyorsun?",

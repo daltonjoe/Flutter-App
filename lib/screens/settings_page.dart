@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_application/paywall/subscription_settings_row.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +40,7 @@ class _SettingsPageState extends State<SettingsPage>
   bool _deleting = false;
   bool _holdTriggered = false;
   bool _showConfirmForA11y = false;
+  StreamSubscription<AuthState>? _authSub66;
 
   @override
   void initState() {
@@ -52,11 +54,15 @@ class _SettingsPageState extends State<SettingsPage>
       duration: const Duration(milliseconds: 2000),
     );
     _holdDelete.addListener(_onHoldTick);
+    _authSub66 = Supabase.instance.client.auth.onAuthStateChange.listen((_) {
+      if (mounted) setState(() {});
+    });
     _loadAll();
   }
 
   @override
   void dispose() {
+    _authSub66?.cancel();
     _holdDelete.removeListener(_onHoldTick);
     _animController.dispose();
     _holdDelete.dispose();
