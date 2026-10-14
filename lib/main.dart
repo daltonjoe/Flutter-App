@@ -25,6 +25,7 @@ import 'screens/main_shell.dart';
 import 'screens/settings_page.dart';
 import 'screens/streak_page.dart';
 import 'services/account_deletion_service.dart';
+import "package:flutter_application/paywall/paywall_service.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,6 +63,7 @@ void main() async {
   }
 
   await activeProfileProvider.load();
+  await _restoreAccount67(activeProfileProvider);
 if (kDebugMode) {
   debugPrint('TOKEN=${Supabase.instance.client.auth.currentSession?.accessToken}');
 }
@@ -117,7 +119,9 @@ class SoulBoundApp extends StatelessWidget {
           ),
         );
       },
-      home: context.watch<ActiveProfileProvider>().activeProfileId != null
+      home: _startConsent67
+          ? const OnboardingConsentPage()
+          : context.watch<ActiveProfileProvider>().activeProfileId != null
           ? const MainShell()
           : const OnboardingFlowPage(isFirstProfile: true),
       onGenerateRoute: appOnGenerateRoute,
@@ -189,4 +193,36 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
     );
   }
   return null;
+}
+
+bool _startConsent67 = false;
+
+Future<void> _restoreAccount67(ActiveProfileProvider prov) async {
+  try {
+    final c = Supabase.instance.client;
+    final u = c.auth.currentUser;
+    if (u == null || u.isAnonymous) return;
+    final rows = await c.from("user_profiles").select("id").order("created_at");
+    final ids = rows.map((r) => r["id"] as String).toList();
+    if (ids.isEmpty) {
+      await prov.clearActive();
+      return;
+    }
+    if (prov.activeProfileId == null || !ids.contains(prov.activeProfileId)) {
+      await prov.setActive(ids.first);
+    }
+    try {
+      await PaywallService.init();
+    } catch (e) {
+      debugPrint("paywall init failed: $e");
+    }
+    final cons = await c
+        .from("user_consents")
+        .select("kind")
+        .inFilter("kind", ["privacy", "terms", "ai"]);
+    final k = cons.map((r) => r["kind"]).toSet();
+    _startConsent67 = !(k.contains("privacy") && k.contains("terms") && k.contains("ai"));
+  } catch (e) {
+    debugPrint("restore account failed: $e");
+  }
 }
