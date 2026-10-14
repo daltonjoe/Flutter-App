@@ -5,6 +5,7 @@ import "../../core/constants/legal_links.dart";
 import "../../core/theme/app_colors.dart";
 import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
+import '../../presentation/widgets/components/cosmic_loader.dart';
 
 class OnboardingConsentPage extends StatefulWidget {
   const OnboardingConsentPage({super.key});
@@ -121,7 +122,7 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
   @override
   Widget build(BuildContext context) {
     if (_checking) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const CosmicLoadingScreen();
     }
     return PopScope(
       canPop: false,

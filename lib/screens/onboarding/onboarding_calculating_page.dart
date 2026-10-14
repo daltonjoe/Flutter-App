@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../widgets/animations/zodiac_orbital_animation.dart';
+import '../../presentation/widgets/components/cosmic_loader.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_error_state.dart';
 
@@ -70,24 +70,7 @@ class _OnboardingCalculatingPageState extends State<OnboardingCalculatingPage> {
                       retryLabel: t(context, 'profile_switcher.retry'),
                       onRetry: _retry,
                     )
-                  : Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: 240,
-                            height: 240,
-                            child: ZodiacOrbitalAnimation(size: 240),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            t(context, 'onboarding.calculating.title'),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ],
-                      ),
-                    ),
+                  : const CosmicLoader(),
             ),
           ],
         ),

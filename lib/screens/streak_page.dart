@@ -5,6 +5,7 @@ import '../core/theme/app_typography.dart';
 import '../core/theme/app_decorations.dart';
 import '../i18n/app_localizations.dart';
 import '../services/checkin_service.dart';
+import '../presentation/widgets/components/cosmic_loader.dart';
 
 class StreakPage extends StatefulWidget {
   final String profileId;
@@ -91,7 +92,7 @@ class _StreakPageState extends State<StreakPage> {
 
   Widget _body(BuildContext context) {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const CosmicLoader();
     }
     if (_error != null) {
       return Center(

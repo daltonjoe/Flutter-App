@@ -6,6 +6,7 @@ import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../services/ask_service.dart';
 import '../services/ai_consent_service.dart';
+import '../presentation/widgets/components/cosmic_loader.dart';
 
 /// NotlarÄ±m: ask_memories (RLS ile okuma/silme), dÃ¼zenleme PATCH /memory/{id}.
 /// Deletes all ask_memories rows of the current user.
@@ -158,7 +159,7 @@ class _NotesPageState extends State<NotesPage> {
   Widget build(BuildContext context) {
     Widget body;
     if (_loading) {
-      body = const Center(child: CircularProgressIndicator());
+      body = const CosmicLoader();
     } else if (_err) {
       body = Center(
           child: Text(t(context, 'ask.error'), style: AppTextStyles.bodyMd()));

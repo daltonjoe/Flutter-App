@@ -6,6 +6,7 @@ import '../i18n/app_localizations.dart';
 import '../models/ask_context.dart';
 import '../widgets/ask_add.dart';
 import '../widgets/feedback_vote.dart';
+import '../presentation/widgets/components/cosmic_loader.dart';
 
 /// Argümanlar: event (daily-events events[] elemanı), locale, title (today_page'in
 /// zaten çözdüğü "Transit · açı · natal" etiketi; isim çözümü burada tekrarlanmaz).
@@ -127,7 +128,7 @@ class _TransitDetailPageState extends State<TransitDetailPage> {
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const CosmicLoader()
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [

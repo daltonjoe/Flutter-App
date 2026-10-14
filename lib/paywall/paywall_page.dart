@@ -5,6 +5,7 @@ import "package:flutter_application/i18n/app_localizations.dart";
 import "package:flutter_application/screens/legal_agreements_page.dart";
 import "package:flutter_application/services/user_settings_service.dart";
 import "paywall_service.dart";
+import '../presentation/widgets/components/cosmic_loader.dart';
 
 enum PaywallSource { onboarding, quota, settings }
 
@@ -223,7 +224,7 @@ class _PaywallPageState extends State<PaywallPage> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const CosmicLoadingScreen();
     }
     final y = _offer?.yearly;
     final m = _offer?.monthly;

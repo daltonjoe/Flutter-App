@@ -21,6 +21,7 @@ import 'transit_detail_page.dart';
 import '../models/ask_context.dart';
 import '../providers/ask_context_provider.dart';
 import '../widgets/ask_add.dart';
+import '../presentation/widgets/components/cosmic_loader.dart';
 
 class TodayPage extends StatefulWidget {
   const TodayPage({super.key});
@@ -564,7 +565,7 @@ class _TodayPageState extends State<TodayPage> {
     final selectedData = _selectedData();
     Widget body;
     if (_loading && _data == null) {
-      body = const Center(child: CircularProgressIndicator());
+      body = const CosmicLoader();
     } else if (_error != null && _data == null) {
       body = Center(
         child: Column(

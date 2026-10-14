@@ -10,6 +10,7 @@ import '../core/reference_ids.dart';
 import '../services/reference_names_service.dart';
 import '../widgets/ask_add.dart';
 import '../providers/ask_context_provider.dart';
+import '../presentation/widgets/components/cosmic_loader.dart';
 
 class PlacementContentPage extends StatefulWidget {
   final NatalChartResponse chartData;
@@ -120,7 +121,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
 
   Widget _body() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const CosmicLoader();
     }
     if (_error) {
       return Center(

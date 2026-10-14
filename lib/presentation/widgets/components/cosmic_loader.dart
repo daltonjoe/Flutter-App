@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../widgets/animations/zodiac_orbital_animation.dart';
+import '../../../i18n/app_localizations.dart';
 
 /// Inline loading widget. Place wherever a screen section is pending.
 ///
@@ -52,6 +53,14 @@ class _CosmicLoaderState extends State<CosmicLoader> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Padding(
+  padding: const EdgeInsets.only(bottom: 16, left: 24, right: 24),
+  child: Text(
+    widget.message ?? t(context, 'onboarding.calculating.title'),
+    textAlign: TextAlign.center,
+    style: Theme.of(context).textTheme.titleLarge,
+  ),
+),
+Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 60),
                     child: ClipRRect(
