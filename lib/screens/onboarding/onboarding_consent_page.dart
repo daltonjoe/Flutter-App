@@ -36,9 +36,9 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
       final rows = await Supabase.instance.client
           .from("user_consents")
           .select("kind")
-          .inFilter("kind", ["privacy", "terms"]);
+          .inFilter("kind", ["privacy", "terms", "ai"]);
       final k = rows.map((r) => r["kind"]).toSet();
-      if (k.contains("privacy") && k.contains("terms")) {
+      if (k.contains("privacy") && k.contains("terms") && k.contains("ai")) {
         _home();
         return;
       }
@@ -71,7 +71,7 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (uid == null) return;
     setState(() => _saving = true);
-    final ok = await _ins(uid, "privacy") && await _ins(uid, "terms");
+    final ok = await _ins(uid, "privacy") && await _ins(uid, "terms") && await _ins(uid, "ai");
     if (!mounted) return;
     if (!ok) {
       setState(() => _saving = false);
