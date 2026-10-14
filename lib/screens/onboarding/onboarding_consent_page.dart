@@ -104,6 +104,7 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
     final nav = Navigator.of(context, rootNavigator: true);
     final prov = context.read<ActiveProfileProvider>();
     var out67 = false;
+    final uid69 = Supabase.instance.client.auth.currentUser?.id;
     try {
       final sp = await SharedPreferences.getInstance();
       await sp.remove("force_consent");
@@ -116,9 +117,17 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
     } catch (e) {
       debugPrint("consent back failed: $e");
     }
-    diag68("consent back before-push", "out=$out67");
-    nav.pushNamedAndRemoveUntil("/onboarding/register", (r) => false);
-    if (out67) await prov.clearActive();
+    final uidNow69 = Supabase.instance.client.auth.currentUser?.id;
+    final changed69 = uid69 != uidNow69;
+    diag68("consent back before-push", "out=$out67 changed=$changed69");
+    if (out67 || changed69) {
+      try {
+        await prov.clearActive();
+      } catch (e) {
+        debugPrint("consent back clear failed: $e");
+      }
+    }
+    nav.pushNamedAndRemoveUntil("/onboarding/link-account", (r) => false);
   }
 
   Future<void> _open(String url) async {
