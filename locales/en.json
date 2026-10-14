@@ -244,7 +244,7 @@
   "sen.delete_profile": "Delete profile",
   "settings.danger.title": "Danger zone",
   "settings.danger.delete_account": "Delete account",
-  "settings.danger.warning": "This permanently deletes your account, all profiles and charts. It cannot be undone.",
+  "settings.danger.warning": "This permanently deletes your account and all related data: profiles, charts, notes, consents and reports. It cannot be undone.",
   "settings.danger.hold": "Hold to delete",
   "settings.danger.confirm": "Yes, delete",
   "settings.danger.error": "Could not delete the account. Try again.",

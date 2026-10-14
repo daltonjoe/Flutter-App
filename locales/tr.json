@@ -244,7 +244,7 @@
   "sen.delete_profile": "Profili sil",
   "settings.danger.title": "Tehlikeli bölge",
   "settings.danger.delete_account": "Hesabı sil",
-  "settings.danger.warning": "Hesabın, tüm profillerin ve haritaların kalıcı olarak silinir. Geri alınamaz.",
+  "settings.danger.warning": "Hesabın ve ilgili tüm veriler (profiller, haritalar, notlar, rızalar, bildirimler) kalıcı olarak silinir. Bu geri alınamaz.",
   "settings.danger.hold": "Silmek için basılı tut",
   "settings.danger.confirm": "Evet, sil",
   "settings.danger.error": "Hesap silinemedi. Tekrar dene.",
