@@ -1,5 +1,8 @@
 import "package:flutter/material.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
+import "package:shared_preferences/shared_preferences.dart";
+import "package:provider/provider.dart";
+import "../../providers/active_profile_provider.dart";
 import "package:url_launcher/url_launcher.dart";
 import "../../core/constants/legal_links.dart";
 import "../../core/theme/app_colors.dart";
@@ -38,8 +41,10 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
           .from("user_consents")
           .select("kind")
           .inFilter("kind", ["privacy", "terms", "ai"]);
+      final sp = await SharedPreferences.getInstance();
+      final force = sp.getBool("force_consent") == true;
       final k = rows.map((r) => r["kind"]).toSet();
-      if (k.contains("privacy") && k.contains("terms") && k.contains("ai")) {
+      if (!force && k.contains("privacy") && k.contains("terms") && k.contains("ai")) {
         _home();
         return;
       }
@@ -80,7 +85,30 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
           .showSnackBar(SnackBar(content: Text(t(context, "ask.error"))));
       return;
     }
+    try {
+      final sp = await SharedPreferences.getInstance();
+      await sp.remove("force_consent");
+    } catch (e) {
+      debugPrint("force_consent clear failed: $e");
+    }
+    if (!mounted) return;
     _home();
+  }
+
+  Future<void> _back() async {
+    final nav = Navigator.of(context, rootNavigator: true);
+    final prov = context.read<ActiveProfileProvider>();
+    try {
+      final c = Supabase.instance.client;
+      if (c.auth.currentUser?.isAnonymous == false) {
+        await c.auth.signOut(scope: SignOutScope.local);
+        await c.auth.signInAnonymously();
+        await prov.clearActive();
+      }
+    } catch (e) {
+      debugPrint("consent back failed: $e");
+    }
+    nav.pushNamedAndRemoveUntil("/onboarding/register", (r) => false);
   }
 
   Future<void> _open(String url) async {
@@ -127,6 +155,14 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
     return PopScope(
       canPop: false,
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: _saving ? null : _back,
+          ),
+        ),
         body: SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(24),

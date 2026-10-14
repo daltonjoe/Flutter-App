@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_dimensions.dart';
 import '../core/theme/app_typography.dart';
@@ -597,11 +598,9 @@ class _SettingsPageState extends State<SettingsPage>
       await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
       await Supabase.instance.client.auth.signInAnonymously();
       await prov.clearActive();
-      nav.pushNamedAndRemoveUntil(
-        "/onboarding",
-        (route) => false,
-        arguments: {"isFirstProfile": true},
-      );
+      final sp = await SharedPreferences.getInstance();
+      await sp.setBool("force_consent", true);
+      nav.pushNamedAndRemoveUntil("/signin", (route) => false);
     } catch (e) {
       debugPrint("SettingsPage._signOut failed: $e");
       if (!mounted) return;

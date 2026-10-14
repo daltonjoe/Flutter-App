@@ -14,6 +14,7 @@ import 'i18n/app_localizations.dart';
 import 'screens/onboarding/onboarding_flow_page.dart';
 import 'screens/profile_switcher_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/config/supabase_config.dart';
 import 'screens/onboarding/onboarding_link_account_page.dart';
 import 'screens/onboarding/onboarding_register_page.dart';
@@ -260,6 +261,8 @@ Future<void> _restoreAccount67(ActiveProfileProvider prov) async {
         .inFilter("kind", ["privacy", "terms", "ai"]);
     final k = cons.map((r) => r["kind"]).toSet();
     _startConsent67 = !(k.contains("privacy") && k.contains("terms") && k.contains("ai"));
+    final sp67 = await SharedPreferences.getInstance();
+    if (sp67.getBool("force_consent") == true) _startConsent67 = true;
   } catch (e) {
     debugPrint("restore account failed: $e");
   }
