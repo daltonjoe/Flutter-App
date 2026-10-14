@@ -6,6 +6,7 @@ import '../presentation/widgets/components/cosmic_error_state.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/active_profile_provider.dart';
+import "package:flutter_application/diag68.dart";
 import '../services/chart_repository.dart';
 import 'chart_page.dart';
 
@@ -94,6 +95,7 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
   Future<void> _recoverMissingProfile() async {
     final provider = context.read<ActiveProfileProvider>();
     final user = Supabase.instance.client.auth.currentUser;
+    diag68("recover start", "pid=${s68(provider.activeProfileId)}");
     String? firstId;
     if (user != null) {
       final rows = await Supabase.instance.client
@@ -105,6 +107,7 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
       if (rows.isNotEmpty) firstId = rows.first['id'] as String;
     }
     if (!mounted) return;
+    diag68("recover found", "first=${s68(firstId)}");
     if (firstId != null) {
       await provider.setActive(firstId);
     } else {

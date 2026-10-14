@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import "package:flutter_application/diag68.dart";
 
 class AccountDeletionService {
   static Future<void> deleteAccount() async {
@@ -29,10 +30,12 @@ class AccountDeletionService {
  } on AuthRetryableFetchException {
       return; // ağ hatası: oturuma dokunma
     } on AuthException {
+      diag68("ensure before-signout");
       try {
         await auth.signOut(scope: SignOutScope.local);
       } catch (_) {}
       await auth.signInAnonymously();
+      diag68("ensure after-anon");
     }
   }
 }

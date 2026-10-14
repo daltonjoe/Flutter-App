@@ -8,6 +8,7 @@ import "../../core/theme/app_colors.dart";
 import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
 import "../../providers/active_profile_provider.dart";
+import "package:flutter_application/diag68.dart";
 
 class OnboardingSignInPage extends StatefulWidget {
   const OnboardingSignInPage({super.key});
@@ -58,6 +59,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
     } catch (e) {
       debugPrint("signin profile lookup failed: $e");
     }
+    diag68("signin after", "pid=${s68(pid)}");
     if (pid != null) {
       await prov.setActive(pid);
     } else {

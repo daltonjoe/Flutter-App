@@ -14,6 +14,7 @@ import '../i18n/app_localizations.dart';
 import '../presentation/widgets/components/cosmic_card.dart';
 import '../presentation/widgets/components/cosmic_error_state.dart';
 import '../providers/active_profile_provider.dart';
+import "package:flutter_application/diag68.dart";
 import 'legal_agreements_page.dart';
 import '../providers/language_provider.dart';
 import '../services/account_deletion_service.dart';
@@ -595,8 +596,10 @@ class _SettingsPageState extends State<SettingsPage>
     final nav = Navigator.of(context, rootNavigator: true);
     final prov = context.read<ActiveProfileProvider>();
     try {
+      diag68("signout before");
       await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
       await Supabase.instance.client.auth.signInAnonymously();
+      diag68("signout after-anon");
       final sp = await SharedPreferences.getInstance();
       await sp.setBool("force_consent", true);
       nav.pushNamedAndRemoveUntil("/signin", (route) => false);

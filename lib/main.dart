@@ -27,6 +27,7 @@ import 'screens/settings_page.dart';
 import 'screens/streak_page.dart';
 import 'services/account_deletion_service.dart';
 import "package:flutter_application/paywall/paywall_service.dart";
+import "package:flutter_application/diag68.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -249,6 +250,7 @@ Future<void> _restoreAccount67(ActiveProfileProvider prov) async {
     if (u == null || u.isAnonymous) return;
     final rows = await c.from("user_profiles").select("id").order("created_at");
     final ids = rows.map((r) => r["id"] as String).toList();
+    diag68("restore ids", "n=${ids.length} pid=${s68(prov.activeProfileId)}");
     if (ids.isEmpty) {
       await prov.clearActive();
       return;

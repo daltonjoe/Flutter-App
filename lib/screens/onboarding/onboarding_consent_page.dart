@@ -3,6 +3,7 @@ import "package:supabase_flutter/supabase_flutter.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:provider/provider.dart";
 import "../../providers/active_profile_provider.dart";
+import "package:flutter_application/diag68.dart";
 import "../../main.dart" show clearStartConsent67;
 import "package:url_launcher/url_launcher.dart";
 import "../../core/constants/legal_links.dart";
@@ -98,6 +99,7 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
 
   Future<void> _back() async {
     debugPrint("consent back start");
+    diag68("consent back start");
     clearStartConsent67();
     final nav = Navigator.of(context, rootNavigator: true);
     final prov = context.read<ActiveProfileProvider>();
@@ -114,6 +116,7 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
     } catch (e) {
       debugPrint("consent back failed: $e");
     }
+    diag68("consent back before-push", "out=$out67");
     nav.pushNamedAndRemoveUntil("/onboarding/register", (r) => false);
     if (out67) await prov.clearActive();
   }
