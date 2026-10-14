@@ -168,7 +168,7 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (_) => const OnboardingConsentPage());
     }
     if (settings.name == '/signin') {
-      return MaterialPageRoute(builder: (_) => const OnboardingSignInPage());
+      return MaterialPageRoute(settings: settings, builder: (_) => const OnboardingSignInPage());
   }
   if (settings.name == '/home') {
     return MaterialPageRoute(builder: (_) => const MainShell());
@@ -199,6 +199,8 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
 
 bool _startConsent67 = false;
 
+void clearStartConsent67() => _startConsent67 = false;
+
 bool _webExists67 = false;
 
 void _readWebError67() {
@@ -223,7 +225,11 @@ class _WebErr67State extends State<_WebErr67> {
   void initState() {
     super.initState();
     if (!_webExists67) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final sp67 = await SharedPreferences.getInstance();
+      final u67 = Uri.base.toString();
+      if (sp67.getString("web_exists_url") == u67) return;
+      await sp67.setString("web_exists_url", u67);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(t(context, "onboarding.register.exists"))),

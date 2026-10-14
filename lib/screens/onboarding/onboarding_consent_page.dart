@@ -3,6 +3,7 @@ import "package:supabase_flutter/supabase_flutter.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:provider/provider.dart";
 import "../../providers/active_profile_provider.dart";
+import "../../main.dart" show clearStartConsent67;
 import "package:url_launcher/url_launcher.dart";
 import "../../core/constants/legal_links.dart";
 import "../../core/theme/app_colors.dart";
@@ -96,19 +97,25 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
   }
 
   Future<void> _back() async {
+    debugPrint("consent back start");
+    clearStartConsent67();
     final nav = Navigator.of(context, rootNavigator: true);
     final prov = context.read<ActiveProfileProvider>();
+    var out67 = false;
     try {
+      final sp = await SharedPreferences.getInstance();
+      await sp.remove("force_consent");
       final c = Supabase.instance.client;
       if (c.auth.currentUser?.isAnonymous == false) {
         await c.auth.signOut(scope: SignOutScope.local);
         await c.auth.signInAnonymously();
-        await prov.clearActive();
+        out67 = true;
       }
     } catch (e) {
       debugPrint("consent back failed: $e");
     }
     nav.pushNamedAndRemoveUntil("/onboarding/register", (r) => false);
+    if (out67) await prov.clearActive();
   }
 
   Future<void> _open(String url) async {
