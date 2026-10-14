@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../presentation/widgets/components/cosmic_loader.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_error_state.dart';
+import '../../core/theme/app_colors.dart';
 
 class OnboardingCalculatingPage extends StatefulWidget {
   const OnboardingCalculatingPage({
@@ -55,14 +56,10 @@ class _OnboardingCalculatingPageState extends State<OnboardingCalculatingPage> {
     return PopScope(
       canPop: _failed,
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.bgDeep,
         body: Stack(
           fit: StackFit.expand,
           children: [
-            Positioned.fill(
-              child: Image.asset('assets/images/logo/background.png',
-                  fit: BoxFit.cover),
-            ),
             SafeArea(
               child: _failed
                   ? CosmicErrorState(

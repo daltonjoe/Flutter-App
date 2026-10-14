@@ -8,6 +8,7 @@ import '../core/theme/app_dimensions.dart';
 import '../i18n/app_localizations.dart';
 import '../models/city_model.dart';
 import '../presentation/widgets/components/cosmic_cta_button.dart';
+import '../presentation/widgets/components/cosmic_loader.dart';
 import '../presentation/widgets/components/cosmic_input_field.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
@@ -188,7 +189,7 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
       body: Stack(children: [
       SafeArea(
         child: _loading
-            ? const Center(child: CircularProgressIndicator())
+            ? const CosmicLoader()
             : _loadFailed
                 ? Center(child: Text(t(context, 'birth_time.error')))
                 : Column(
