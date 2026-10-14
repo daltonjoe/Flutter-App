@@ -1,0 +1,158 @@
+import "package:flutter/material.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
+import "package:url_launcher/url_launcher.dart";
+import "../../core/constants/legal_links.dart";
+import "../../core/theme/app_colors.dart";
+import "../../core/theme/app_typography.dart";
+import "../../i18n/app_localizations.dart";
+
+class OnboardingConsentPage extends StatefulWidget {
+  const OnboardingConsentPage({super.key});
+
+  @override
+  State<OnboardingConsentPage> createState() => _OnboardingConsentPageState();
+}
+
+class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
+  bool _checking = true;
+  bool _priv = false;
+  bool _terms = false;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _check();
+  }
+
+  void _home() {
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true)
+        .pushNamedAndRemoveUntil("/home", (r) => false);
+  }
+
+  Future<void> _check() async {
+    try {
+      final rows = await Supabase.instance.client
+          .from("user_consents")
+          .select("kind")
+          .inFilter("kind", ["privacy", "terms"]);
+      final k = rows.map((r) => r["kind"]).toSet();
+      if (k.contains("privacy") && k.contains("terms")) {
+        _home();
+        return;
+      }
+    } catch (e) {
+      debugPrint("consent check failed: $e");
+    }
+    if (mounted) setState(() => _checking = false);
+  }
+
+  Future<bool> _ins(String uid, String kind) async {
+    final vs = <Map<String, dynamic>>[
+      {"user_id": uid, "kind": kind, "version": 1},
+      {"user_id": uid, "kind": kind},
+    ];
+    for (final v in vs) {
+      try {
+        await Supabase.instance.client.from("user_consents").insert(v);
+        return true;
+      } on PostgrestException catch (e) {
+        if (e.code == "23505") return true;
+        debugPrint("consent insert failed: ${e.code}");
+      } catch (e) {
+        debugPrint("consent insert failed: $e");
+      }
+    }
+    return false;
+  }
+
+  Future<void> _go() async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) return;
+    setState(() => _saving = true);
+    final ok = await _ins(uid, "privacy") && await _ins(uid, "terms");
+    if (!mounted) return;
+    if (!ok) {
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(t(context, "ask.error"))));
+      return;
+    }
+    _home();
+  }
+
+  Future<void> _open(String url) async {
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint("open url failed: $e");
+    }
+  }
+
+  Widget _box(String linkKey, String checkKey, String url, bool v, ValueChanged<bool> on) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.textMuted),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: CheckboxListTile(
+        value: v,
+        onChanged: _saving ? null : (b) => on(b ?? false),
+        controlAffinity: ListTileControlAffinity.trailing,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: url.isEmpty ? null : () => _open(url),
+              child: Text(t(context, linkKey),
+                  style: AppTextStyles.bodyMd(color: AppColors.textPrimary).copyWith(
+                      decoration: TextDecoration.underline, fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 4),
+            Text(t(context, checkKey), style: AppTextStyles.bodyMd(color: AppColors.textMuted)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_checking) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(24),
+            children: [
+              const SizedBox(height: 48),
+              Text(t(context, "onboarding.consent.title"),
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodyLg(color: AppColors.textPrimary).copyWith(fontSize: 30)),
+              const SizedBox(height: 16),
+              Text(t(context, "onboarding.consent.body"),
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodyMd(color: AppColors.textMuted)),
+              const SizedBox(height: 32),
+              _box("onboarding.consent.privacy_link", "onboarding.consent.privacy_check",
+                  kPrivacyPolicyUrl, _priv, (b) => setState(() => _priv = b)),
+              _box("onboarding.consent.terms_link", "onboarding.consent.terms_check",
+                  kTermsUrl, _terms, (b) => setState(() => _terms = b)),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(56)),
+                onPressed: (_priv && _terms && !_saving) ? _go : null,
+                child: Text(t(context, "onboarding.consent.cta")),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

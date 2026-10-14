@@ -16,6 +16,9 @@ import 'screens/profile_switcher_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/supabase_config.dart';
 import 'screens/onboarding/onboarding_link_account_page.dart';
+import 'screens/onboarding/onboarding_register_page.dart';
+import 'screens/onboarding/onboarding_consent_page.dart';
+import 'screens/onboarding/onboarding_sign_in_page.dart';
 import 'screens/onboarding/onboarding_calculating_page.dart';
 import 'screens/onboarding/onboarding_first_result_page.dart';
 import 'screens/main_shell.dart';
@@ -150,7 +153,16 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
     );
   }
   if (settings.name == '/onboarding/link-account') {
-    return MaterialPageRoute(builder: (_) => const OnboardingLinkAccountPage());
+    return MaterialPageRoute(builder: (_) => const OnboardingRegisterPage());
+    }
+    if (settings.name == '/onboarding/email') {
+      return MaterialPageRoute(builder: (_) => const OnboardingLinkAccountPage());
+    }
+    if (settings.name == '/onboarding/consent') {
+      return MaterialPageRoute(builder: (_) => const OnboardingConsentPage());
+    }
+    if (settings.name == '/signin') {
+      return MaterialPageRoute(builder: (_) => const OnboardingSignInPage());
   }
   if (settings.name == '/home') {
     return MaterialPageRoute(builder: (_) => const MainShell());

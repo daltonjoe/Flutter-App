@@ -47,7 +47,7 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
       if (_navigated || !mounted) return;
       _navigated = true;
   Navigator.of(context, rootNavigator: true)
-    .pushNamedAndRemoveUntil('/home', (route) => false);
+    .pushNamedAndRemoveUntil('/onboarding/consent', (route) => false);
     }
 
   Future<void> _onSave() async {
