@@ -1,94 +1,68 @@
-// lib/presentation/widgets/components/cosmic_loader.dart
-// SoulBound Cosmic Sanctum — reusable loading state component
-//
-// Wraps the project's existing ZodiacOrbitalAnimation and AppLoader so the
-// loading state is consistent with the Cosmic Sanctum visual language.
-// Business logic and animation logic are untouched.
+import "package:flutter/material.dart";
+import "package:lottie/lottie.dart";
+import "../../../core/constants/app_animations.dart";
+import "../../../core/theme/app_colors.dart";
+import "../../../i18n/app_localizations.dart";
 
-import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_loader.dart';
-import '../../../widgets/animations/zodiac_orbital_animation.dart';
-
-/// Inline loading widget. Place wherever a screen section is pending.
-///
-/// [useLottie] — use the Lottie AppLoader animation instead of ZodiacOrbitalAnimation.
-class CosmicLoader extends StatefulWidget {
-  const CosmicLoader({
-    super.key,
-    this.message,
-    this.useLottie = false,
-  });
+/// Tek ortak yukleme gostergesi: Lottie + baslik + ilerleme cubugu.
+/// message ve useLottie eski cagirilar bozulmasin diye durur, yok sayilir.
+class CosmicLoader extends StatelessWidget {
+  const CosmicLoader({super.key, this.message, this.useLottie = true});
 
   final String? message;
   final bool useLottie;
 
   @override
-  State<CosmicLoader> createState() => _CosmicLoaderState();
-}
-
-class _CosmicLoaderState extends State<CosmicLoader> {
-  @override
   Widget build(BuildContext context) {
+    final reduce = MediaQuery.of(context).disableAnimations;
     return Container(
       color: AppColors.bgDeep,
       child: SafeArea(
-        child: Column(
-          children: [
-            // Animation region
-            Expanded(
-              flex: 7,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: widget.useLottie
-                        ? const AppLoader()
-                        : const ZodiacOrbitalAnimation(size: 400),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 240,
+                height: 240,
+                child: Lottie.asset(
+                  AppAnimations.astrologyLoading,
+                  animate: !reduce,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Text(
+                  t(context, "onboarding.calculating.title"),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 60),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    backgroundColor: AppColors.violetPrimary.withValues(alpha: 0.12),
+                    valueColor: const AlwaysStoppedAnimation(AppColors.violetPrimary),
+                    minHeight: 3,
                   ),
                 ),
               ),
-            ),
-
-            // Progress region
-            Expanded(
-              flex: 3,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 60),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        backgroundColor:
-                            AppColors.violetPrimary.withValues(alpha: 0.12),
-                        valueColor: const AlwaysStoppedAnimation(
-                            AppColors.violetPrimary),
-                        minHeight: 3,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-/// Full-screen loading scaffold. Wraps [CosmicLoader] in a [Scaffold] so it
-/// can be used as a screen body or a full-page replacement.
+/// Tam ekran yukleme iskeleti.
 class CosmicLoadingScreen extends StatelessWidget {
-  const CosmicLoadingScreen({
-    super.key,
-    this.message,
-    this.useLottie = false,
-  });
+  const CosmicLoadingScreen({super.key, this.message, this.useLottie = true});
 
   final String? message;
   final bool useLottie;

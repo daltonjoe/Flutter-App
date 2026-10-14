@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../models/natal_chart_response.dart';
 import '../core/reference_ids.dart';
-import '../widgets/animations/zodiac_orbital_animation.dart';
 import '../theme/app_theme.dart';
 import '../i18n/app_localizations.dart';
 import '../services/reference_names_service.dart';
@@ -306,15 +305,6 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
       child: Stack(
         children: [
           // ── Background Orbital Animation ──────────────────────────
-          Positioned(
-            top: -20,
-            right: -60,
-            child: Opacity(
-              opacity: 0.4,
-              child: ZodiacOrbitalAnimation(size: screenWidth * 0.6),
-            ),
-          ),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 88, 24, 16),
             child: Row(

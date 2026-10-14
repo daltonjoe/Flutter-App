@@ -7,12 +7,11 @@ import '../models/natal_chart_response.dart';
 import '../providers/language_provider.dart';
 import '../services/astro_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/cosmic_loader.dart';
+import '../presentation/widgets/components/cosmic_loader.dart';
 import '../i18n/app_localizations.dart';
 import '../core/utils/text_parser.dart';
 import '../presentation/widgets/components/analysis_section_card.dart';
 import '../widgets/analysis/floating_analysis_icon.dart';
-import '../widgets/animations/zodiac_orbital_animation.dart';
 import '../core/content_theme_colors.dart';
 import '../core/reference_ids.dart';
 import '../services/reference_names_service.dart';
@@ -262,15 +261,6 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
                     ),
             ),
           // ── Background Animation ──────────────────────────────
-          Center(
-            child: Opacity(
-              opacity: 0.3,
-              child: ZodiacOrbitalAnimation(
-                size: MediaQuery.of(context).size.width * 0.5,
-              ),
-            ),
-          ),
-
           const SizedBox(height: 8),
 
           // Planet header card

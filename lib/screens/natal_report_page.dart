@@ -4,7 +4,7 @@ import '../models/natal_chart_response.dart';
 import '../providers/language_provider.dart';
 import '../services/astro_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/cosmic_loader.dart';
+import '../presentation/widgets/components/cosmic_loader.dart';
 import '../i18n/app_localizations.dart';
 import '../core/utils/text_parser.dart';
 import '../widgets/analysis/analysis_section_card.dart';
