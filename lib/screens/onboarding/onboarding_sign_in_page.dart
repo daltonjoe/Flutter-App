@@ -3,6 +3,7 @@ import "package:flutter/material.dart";
 import "package:flutter_application/paywall/paywall_service.dart";
 import "package:provider/provider.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
+import '../../core/constants/auth_redirect.dart';
 import "../../core/theme/app_colors.dart";
 import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
@@ -97,7 +98,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
 
   Future<void> _oauth(OAuthProvider p) async {
     await Supabase.instance.client.auth
-        .signInWithOAuth(p, redirectTo: "soulbound://login-callback");
+        .signInWithOAuth(p, redirectTo: kAuthRedirectUrl);
   }
 
   @override

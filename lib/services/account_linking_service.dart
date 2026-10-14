@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/constants/auth_redirect.dart';
 
 class AccountLinkingService {
   static Future<void> linkEmail({
@@ -22,7 +23,7 @@ class AccountLinkingService {
     if (supabase.auth.currentUser == null) throw Exception('NO_SESSION');
     await supabase.auth.linkIdentity(
       OAuthProvider.google,
-      redirectTo: 'soulbound://login-callback',
+      redirectTo: kAuthRedirectUrl,
     );
   }
 
@@ -31,7 +32,7 @@ class AccountLinkingService {
     if (supabase.auth.currentUser == null) throw Exception('NO_SESSION');
     await supabase.auth.linkIdentity(
       OAuthProvider.apple,
-      redirectTo: 'soulbound://login-callback',
+      redirectTo: kAuthRedirectUrl,
     );
   }
 }
