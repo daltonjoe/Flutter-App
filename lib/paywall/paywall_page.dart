@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_application/i18n/app_localizations.dart';
-import 'package:flutter_application/services/user_settings_service.dart';
-import 'entitlement_service.dart';
+import "package:flutter/material.dart";
+import "package:purchases_flutter/purchases_flutter.dart";
+import "package:flutter_application/core/theme/app_colors.dart";
+import "package:flutter_application/i18n/app_localizations.dart";
+import "package:flutter_application/screens/legal_agreements_page.dart";
+import "package:flutter_application/services/user_settings_service.dart";
+import "paywall_service.dart";
 
 enum PaywallSource { onboarding, quota, settings }
 
@@ -17,9 +20,9 @@ class PaywallPage extends StatefulWidget {
 class _PaywallPageState extends State<PaywallPage> {
   bool _loading = true;
   bool _busy = false;
-  bool _error = false;
-  bool _loadFailed = false;
-  EntitlementState _ent = EntitlementState.none;
+  bool _yearlySel = true;
+  String? _errKey;
+  PaywallOffer? _offer;
 
   @override
   void initState() {
@@ -42,164 +45,332 @@ class _PaywallPageState extends State<PaywallPage> {
   Future<void> _init() async {
     var on = false;
     try {
-      on = await UserSettingsService.isFlagEnabled('paywall');
+      on = await UserSettingsService.isFlagEnabled("paywall");
     } catch (e) {
-      debugPrint('paywall flag error: $e');
+      debugPrint("paywall flag error: $e");
     }
     if (!mounted) return;
     if (!on) {
       _leave();
       return;
     }
+    var pro = false;
+    PaywallOffer? offer;
     try {
-      final s = await EntitlementService.load();
-      if (!mounted) return;
-      if (widget.source == PaywallSource.onboarding && s.hasRecord) {
-        _leave();
-        return;
-      }
-      setState(() {
-        _ent = s;
-        _loading = false;
-        _loadFailed = false;
-      });
+      pro = await PaywallService.hasPro();
+      if (!pro) offer = await PaywallService.loadOffer();
     } catch (e) {
-      debugPrint('paywall entitlement error: $e');
-      if (!mounted) return;
-      if (widget.source == PaywallSource.onboarding) {
-        _leave();
-        return;
-      }
-      setState(() {
-        _loading = false;
-        _loadFailed = true;
-      });
+      debugPrint("paywall load error: $e");
+    }
+    if (!mounted) return;
+    if (pro && widget.source == PaywallSource.onboarding) {
+      _leave();
+      return;
+    }
+    setState(() {
+      _offer = offer;
+      _loading = false;
+    });
+  }
+
+  int? _trialDays(Package? p) {
+    final ip = p?.storeProduct.introductoryPrice;
+    if (ip == null || ip.price != 0) return null;
+    final n = ip.periodNumberOfUnits;
+    switch (ip.periodUnit) {
+      case PeriodUnit.day:
+        return n;
+      case PeriodUnit.week:
+        return n * 7;
+      case PeriodUnit.month:
+        return n * 30;
+      default:
+        return null;
     }
   }
 
-  Future<void> _start() async {
+  Future<void> _buy() async {
+    final p = _yearlySel ? _offer?.yearly : _offer?.monthly;
+    if (p == null) {
+      setState(() => _errKey = "paywall.unavailable");
+      return;
+    }
     setState(() {
       _busy = true;
-      _error = false;
+      _errKey = null;
     });
     try {
-      await EntitlementService.startTrial();
+      final done = await PaywallService.buyPackage(p);
       if (!mounted) return;
-      if (widget.next != null) {
+      if (done) {
         _leave();
         return;
       }
-      final s = await EntitlementService.load();
-      if (!mounted) return;
-      setState(() {
-        _ent = s;
-        _busy = false;
-      });
+      setState(() => _busy = false);
     } catch (e) {
-      debugPrint('paywall start error: $e');
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _error = true;
+        _errKey = "paywall.error.purchase";
       });
     }
   }
 
-  Widget _p(String s, {TextStyle? style}) =>
-      Text(s, textAlign: TextAlign.center, style: style);
+  Future<void> _restore() async {
+    setState(() {
+      _busy = true;
+      _errKey = null;
+    });
+    try {
+      final ok = await PaywallService.restore();
+      if (!mounted) return;
+      if (ok) {
+        _leave();
+        return;
+      }
+      setState(() {
+        _busy = false;
+        _errKey = "paywall.restore.none";
+      });
+    } catch (e) {
+      debugPrint("paywall restore error: $e");
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _errKey = "paywall.unavailable";
+      });
+    }
+  }
 
-  Widget _shell(List<Widget> children) {
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: children,
+  void _legal(String titleKey, String bodyKey) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => LegalTextPage(titleKey: titleKey, bodyKey: bodyKey)),
+    );
+  }
+
+  Widget _card({
+    required bool sel,
+    required String label,
+    required String price,
+    required VoidCallback onTap,
+    String? sub,
+    bool best = false,
+  }) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Material(
+          color: AppColors.bgSurface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: sel ? AppColors.textPrimary : AppColors.borderMedium,
+              width: sel ? 2 : 1,
+            ),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: _busy ? null : onTap,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 72),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(label, style: const TextStyle(fontSize: 18, color: AppColors.textPrimary)),
+                        if (sub != null)
+                          Text(sub, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(
+                      price,
+                      textAlign: TextAlign.end,
+                      style: const TextStyle(fontSize: 16, color: AppColors.textPrimary),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
-      ),
+        if (best)
+          Positioned(
+            right: 12,
+            top: -12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.amberTransit,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                _t("paywall.plan.best"),
+                style: const TextStyle(fontSize: 13, color: AppColors.bgDeep),
+              ),
+            ),
+          ),
+      ],
     );
   }
-
-  bool get _canStart => !_ent.hasRecord;
 
   @override
   Widget build(BuildContext context) {
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    final theme = Theme.of(context);
+    final y = _offer?.yearly;
+    final m = _offer?.monthly;
+    final yd = _trialDays(y);
+    final md = _trialDays(m);
+    final sel = _yearlySel ? y : m;
+    final days = _yearlySel ? yd : md;
+    final yPrice = y?.storeProduct.priceString ?? "-";
+    final mPrice = m?.storeProduct.priceString ?? "-";
+    final best = y != null && m != null && y.storeProduct.price < m.storeProduct.price * 12;
     final quota = widget.source == PaywallSource.quota;
-    final canStart = _canStart;
-    final closeBtn = TextButton(
-      style: TextButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-      onPressed: _busy ? null : _leave,
-      child: Text(_t(quota || !canStart ? 'paywall.quota.close' : 'paywall.trial.skip')),
-    );
-
-    if (_loadFailed) {
-      return _shell([
-        _p(_t('paywall.error.generic'), style: TextStyle(color: theme.colorScheme.error)),
-        const SizedBox(height: 16),
-        FilledButton(
-          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-          onPressed: () {
-            setState(() => _loading = true);
-            _init();
-          },
-          child: Text(_t('paywall.error.retry')),
-        ),
-        TextButton(
-          style: TextButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-          onPressed: _leave,
-          child: Text(_t('paywall.quota.close')),
-        ),
-      ]);
-    }
-
-    final ends = _ent.expiresAt ?? DateTime.now().add(const Duration(days: 7));
-    final dateStr = MaterialLocalizations.of(context).formatMediumDate(ends);
-    final String title = quota
-        ? _t('paywall.quota.title')
-        : (canStart ? _t('paywall.trial.title') : _t('paywall.settings.row'));
-
-    final body = <Widget>[];
-    if (quota) body.add(_p(_t('paywall.quota.body')));
-    if (canStart) {
-      body.add(_p(_t('paywall.trial.body')));
-      body.add(_p(_t('paywall.trial.ends').replaceAll('{date}', dateStr)));
-      body.add(_p(_t('paywall.trial.nocharge')));
-      body.add(_p(_t('paywall.trial.cancel')));
+    String title;
+    if (days == null) {
+      title = _t("paywall.plan.title.none");
     } else {
-      final key = _ent.trialActive ? 'paywall.settings.trial_active' : 'paywall.settings.expired';
-      body.add(_p(_t(key).replaceAll('{date}', dateStr)));
-      if (_ent.trialActive) body.add(_p(_t('paywall.trial.body')));
+      title = _t(_yearlySel ? "paywall.plan.title.yearly" : "paywall.plan.title.monthly")
+          .replaceAll("{days}", "$days");
     }
-    if (_error) {
-      body.add(_p(_t('paywall.error.generic'), style: TextStyle(color: theme.colorScheme.error)));
+    String? commit;
+    if (sel != null) {
+      final price = sel.storeProduct.priceString;
+      final base = _yearlySel ? "paywall.commit.yearly" : "paywall.commit.monthly";
+      final key = days == null ? "${base}_paid" : base;
+      commit = _t(key).replaceAll("{days}", "${days ?? 0}").replaceAll("{price}", price);
     }
-
-    return _shell([
-      _p(title, style: theme.textTheme.headlineSmall),
-      const SizedBox(height: 16),
-      for (final w in body) Padding(padding: const EdgeInsets.only(bottom: 12), child: w),
-      const SizedBox(height: 12),
-      if (canStart)
-        FilledButton(
-          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-          onPressed: _busy ? null : _start,
-          child: _busy
-              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-              : Text(_t(_error ? 'paywall.error.retry' : 'paywall.trial.cta')),
+    return Scaffold(
+      backgroundColor: AppColors.bgDeep,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  height: 190,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [AppColors.violetDark, AppColors.bgDeep],
+                    ),
+                  ),
+                  child: SafeArea(
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        iconSize: 28,
+                        constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                        tooltip: _t("paywall.quota.close"),
+                        onPressed: _busy ? null : _leave,
+                        icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (quota)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            _t("paywall.quota.title"),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                          ),
+                        ),
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 28, color: AppColors.textPrimary),
+                      ),
+                      const SizedBox(height: 32),
+                      _card(
+                        sel: _yearlySel,
+                        label: _t("paywall.plan.yearly"),
+                        sub: yd == null ? null : _t("paywall.plan.free_days").replaceAll("{days}", "$yd"),
+                        price: _t("paywall.plan.per_year").replaceAll("{price}", yPrice),
+                        best: best,
+                        onTap: () => setState(() => _yearlySel = true),
+                      ),
+                      const SizedBox(height: 18),
+                      _card(
+                        sel: !_yearlySel,
+                        label: _t("paywall.plan.monthly"),
+                        sub: md == null ? null : _t("paywall.plan.free_days").replaceAll("{days}", "$md"),
+                        price: _t("paywall.plan.per_month").replaceAll("{price}", mPrice),
+                        onTap: () => setState(() => _yearlySel = false),
+                      ),
+                      const SizedBox(height: 24),
+                      FilledButton(
+                        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
+                        onPressed: _busy ? null : _buy,
+                        child: _busy
+                            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                            : Text(_t("paywall.cta.continue")),
+                      ),
+                      if (_errKey != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Text(
+                            _t(_errKey!),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: AppColors.errorRed),
+                          ),
+                        ),
+                      if (commit != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Text(
+                            commit,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                          ),
+                        ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        children: [
+                          TextButton(
+                            style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+                            onPressed: _busy ? null : _restore,
+                            child: Text(_t("paywall.restore")),
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+                            onPressed: () => _legal("settings.privacy.terms", "legal.terms.body"),
+                            child: Text(_t("settings.privacy.terms")),
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+                            onPressed: () => _legal("settings.privacy.policy", "legal.privacy.body"),
+                            child: Text(_t("settings.privacy.policy")),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-      closeBtn,
-    ]);
+      ),
+    );
   }
 }
