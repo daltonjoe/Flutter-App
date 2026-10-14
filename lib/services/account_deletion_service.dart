@@ -25,11 +25,13 @@ class AccountDeletionService {
   static Future<void> ensureValidSession() async {
     final auth = Supabase.instance.client.auth;
     if (auth.currentSession == null) return;
+    diag68("ensure pre", "exp_in_s=${(auth.currentSession?.expiresAt ?? 0) - DateTime.now().millisecondsSinceEpoch ~/ 1000}");
     try {
       await auth.getUser();
  } on AuthRetryableFetchException {
       return; // ağ hatası: oturuma dokunma
-    } on AuthException {
+    } on AuthException catch (e) {
+      diag68("ensure getUser FAIL", "type=${e.runtimeType} status=${e.statusCode} msg=${e.message} str=${e.toString()}");
       diag68("ensure before-signout");
       try {
         await auth.signOut(scope: SignOutScope.local);
