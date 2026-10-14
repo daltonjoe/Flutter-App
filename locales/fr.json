@@ -432,5 +432,8 @@
   "auth.signin.title": "Sign in",
   "auth.signin.description": "Sign in to an existing account to continue on this device.",
   "auth.signin.button": "Sign in",
-  "auth.signin.error": "Sign-in failed. Check your details and try again."
+  "auth.signin.error": "Sign-in failed. Check your details and try again.",
+  "settings.legal.row": "User Agreements",
+  "legal.privacy.body": "The Privacy Policy text will be published here.",
+  "legal.terms.body": "The Terms of Use text will be published here."
 }

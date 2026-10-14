@@ -154,17 +154,6 @@ class _NotesPageState extends State<NotesPage> {
     await _load();
   }
 
-  Future<void> _withdraw() async {
-    final sm = ScaffoldMessenger.of(context);
-    if (!await _confirm('notes.withdraw', 'notes.withdraw_body')) return;
-    if (!mounted) return;
-    final ok = await withdrawAiConsentAndNotes();
-    if (!mounted) return;
-    if (!ok) {
-      sm.showSnackBar(SnackBar(content: Text(t(context, 'ask.error'))));
-    }
-    await _load();
-  }
   @override
   Widget build(BuildContext context) {
     Widget body;
@@ -224,26 +213,18 @@ class _NotesPageState extends State<NotesPage> {
                 child: Text('${_rows.length}/10', style: AppTextStyles.bodyMd()),
               ),
             ),
-          PopupMenuButton<String>(
-            onSelected: (v) {
-              if (v == 'clear') {
-                _clearAll();
-              } else {
-                _withdraw();
-              }
-            },
-            itemBuilder: (c) => [
-              if (_rows.isNotEmpty)
+          if (_rows.isNotEmpty)
+            PopupMenuButton<String>(
+              onSelected: (v) {
+                if (v == 'clear') _clearAll();
+              },
+              itemBuilder: (c) => [
                 PopupMenuItem<String>(
                   value: 'clear',
                   child: Text(t(c, 'notes.clear_all')),
                 ),
-              PopupMenuItem<String>(
-                value: 'withdraw',
-                child: Text(t(c, 'notes.withdraw')),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
       body: SafeArea(child: body),

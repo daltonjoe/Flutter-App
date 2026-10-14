@@ -5,8 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../core/constants/legal_links.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_dimensions.dart';
 import '../core/theme/app_typography.dart';
@@ -14,7 +12,7 @@ import '../i18n/app_localizations.dart';
 import '../presentation/widgets/components/cosmic_card.dart';
 import '../presentation/widgets/components/cosmic_error_state.dart';
 import '../providers/active_profile_provider.dart';
-import 'notes_page.dart' show withdrawAiConsentAndNotes;
+import 'legal_agreements_page.dart';
 import '../providers/language_provider.dart';
 import '../services/account_deletion_service.dart';
 import '../services/user_settings_service.dart';
@@ -618,41 +616,17 @@ class _SettingsPageState extends State<SettingsPage>
           children: [
             _sectionLabel('settings.section.privacy'),
             CosmicCard(
-              child: Column(
-                children: [
-                  _buildRow(
-                    leading: Text(
-                      t(context, 'notes.withdraw'),
-                      style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                    onTap: _withdrawConsent,
-                  ),
-                  if (kPrivacyPolicyUrl.isNotEmpty)
-                    _buildRow(
-                      leading: Text(
-                        t(context, 'settings.privacy.policy'),
-                        style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ),
-                      onTap: () => _openUrl(kPrivacyPolicyUrl),
-                    ),
-                  if (kTermsUrl.isNotEmpty)
-                    _buildRow(
-                      leading: Text(
-                        t(context, 'settings.privacy.terms'),
-                        style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ),
-                      onTap: () => _openUrl(kTermsUrl),
-                    ),
-                ],
+              child: _buildRow(
+                leading: Text(
+                  t(context, 'settings.legal.row'),
+                  style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const LegalAgreementsPage()),
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -679,43 +653,7 @@ class _SettingsPageState extends State<SettingsPage>
     );
   }
 
-  Future<void> _withdrawConsent() async {
-    final sm = ScaffoldMessenger.of(context);
-    final yes = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(t(ctx, 'notes.withdraw')),
-        content: Text(t(ctx, 'notes.withdraw_body')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(t(ctx, 'notes.cancel')),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(t(ctx, 'notes.delete')),
-          ),
-        ],
-      ),
-    );
-    if (yes != true) return;
-    if (!mounted) return;
-    final ok = await withdrawAiConsentAndNotes();
-    if (!mounted) return;
-    if (!ok) {
-      sm.showSnackBar(SnackBar(content: Text(t(context, 'ask.error'))));
-    }
-  }
 
-  Future<void> _openUrl(String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) return;
-    try {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
 
   Widget _dangerSection() {
     final disableAnimations = MediaQuery.of(context).disableAnimations;
