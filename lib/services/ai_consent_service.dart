@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:supabase_flutter/supabase_flutter.dart'
     show Supabase, PostgrestException;
 
-/// user_consents kind 'ai' (kolonlar bilinmediÄŸi iÃ§in 3 ÅŸema varyasyonu denenir).
+/// user_consents kind 'ai' (kolonlar bilinmediği için 3 şema varyasyonu denenir).
 class AiConsentService {
   static Future<bool> hasAi() async {
     try {
