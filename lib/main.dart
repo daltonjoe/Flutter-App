@@ -27,6 +27,7 @@ import 'screens/streak_page.dart';
 import 'services/account_deletion_service.dart';
 import "package:flutter_application/paywall/paywall_service.dart";
 import "package:flutter_application/diag68.dart";
+import "package:shared_preferences/shared_preferences.dart";
 import "session/resolve_entry.dart";
 import "session/session_controller.dart";
 import "session/supabase_session_source.dart";
@@ -315,8 +316,23 @@ Future<void> _showNotFound80(BuildContext context) async {
   try {
     final c = Supabase.instance.client;
     await c.auth.signOut(scope: SignOutScope.local);
-    await c.auth.signInAnonymously();
-    await prov.clearActive();
+    final sp84 = await SharedPreferences.getInstance();
+    final tok84 = sp84.getString("guest_refresh");
+    await sp84.remove("guest_refresh");
+    var back84 = false;
+    if (tok84 != null) {
+      try {
+        await c.auth.setSession(tok84);
+        back84 = true;
+      } catch (e) {
+        debugPrint("guest restore failed: $e");
+      }
+    }
+    diag68("notfound guest", "restored=$back84");
+    if (!back84) {
+      await c.auth.signInAnonymously();
+      await prov.clearActive();
+    }
   } catch (e) {
     debugPrint("notfound no failed: $e");
   }

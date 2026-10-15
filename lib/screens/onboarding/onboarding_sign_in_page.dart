@@ -125,9 +125,24 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
     await _after();
   }
 
+  Future<void> _saveGuest84(SharedPreferences sp) async {
+    try {
+      final c = Supabase.instance.client;
+      final tok = c.auth.currentSession?.refreshToken;
+      if (c.auth.currentUser?.isAnonymous == true && tok != null) {
+        await sp.setString("guest_refresh", tok);
+      } else {
+        await sp.remove("guest_refresh");
+      }
+    } catch (e) {
+      debugPrint("guest save failed: $e");
+    }
+  }
+
   Future<void> _oauth(OAuthProvider p) async {
     final sp70 = await SharedPreferences.getInstance();
     await sp70.setString("auth_intent", "signin");
+    await _saveGuest84(sp70);
     await Supabase.instance.client.auth
         .signInWithOAuth(p, redirectTo: kAuthRedirectUrl);
   }
