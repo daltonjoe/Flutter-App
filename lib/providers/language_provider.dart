@@ -14,6 +14,7 @@ class LanguageProvider extends ChangeNotifier {
   ];
 
   Locale _locale = const Locale('tr');
+  bool _chosen = false;
   bool _isLoading = false;
   static const String _prefKey = 'selected_language';
 
@@ -22,12 +23,15 @@ class LanguageProvider extends ChangeNotifier {
   Locale get locale => _locale;
   bool get isLoading => _isLoading;
   bool get isRtl => _locale.languageCode == 'ar';
+  bool get chosen => _chosen;
 
   Future<void> loadSavedLocale() async {
     _isLoading = true;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    final langCode = prefs.getString(_prefKey) ?? 'tr';
+    final saved = prefs.getString(_prefKey);
+    _chosen = saved != null;
+    final langCode = saved ?? 'tr';
     _locale = Locale(langCode);
     _isLoading = false;
     notifyListeners();
@@ -39,6 +43,7 @@ class LanguageProvider extends ChangeNotifier {
     _locale = Locale(langCode);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_prefKey, langCode);
+    _chosen = true;
     _isLoading = false;
     notifyListeners();
   }
