@@ -38,6 +38,11 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
     super.initState();
     _step = _minStep;
     diag68("page: flow init");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final r = ModalRoute.of(context);
+      diag68("flow route", "name=${r?.settings.name} cur=${r?.isCurrent}");
+    });
     _controller = PageController(initialPage: _minStep);
     if (!widget.isFirstProfile) {
       data.languageCode = context.read<LanguageProvider>().locale.languageCode;

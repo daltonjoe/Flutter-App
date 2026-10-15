@@ -604,7 +604,7 @@ class _SettingsPageState extends State<SettingsPage>
       await prov.clearActive();
       diag68("signout post-clear");
       final sp = await SharedPreferences.getInstance();
-      await sp.setBool("force_consent", true);
+      await sp.remove("force_consent");
       nav.pushNamedAndRemoveUntil("/onboarding/link-account", (route) => false);
       debugPrint("signout: link-account pushed");
     } catch (e) {

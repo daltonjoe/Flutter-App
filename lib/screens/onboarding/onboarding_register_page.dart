@@ -25,6 +25,11 @@ class _OnboardingRegisterPageState extends State<OnboardingRegisterPage> {
   void initState() {
     super.initState();
     diag68("page: register init");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final r = ModalRoute.of(context);
+      diag68("register route", "name=${r?.settings.name} cur=${r?.isCurrent}");
+    });
     _sub = Supabase.instance.client.auth.onAuthStateChange.listen((s) {
       final u = s.session?.user;
       if (u == null || u.isAnonymous) return;
