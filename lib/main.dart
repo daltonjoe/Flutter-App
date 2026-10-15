@@ -14,7 +14,6 @@ import 'i18n/app_localizations.dart';
 import 'screens/onboarding/onboarding_flow_page.dart';
 import 'screens/profile_switcher_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'core/config/supabase_config.dart';
 import 'screens/onboarding/onboarding_link_account_page.dart';
 import 'screens/onboarding/onboarding_register_page.dart';
@@ -28,6 +27,11 @@ import 'screens/streak_page.dart';
 import 'services/account_deletion_service.dart';
 import "package:flutter_application/paywall/paywall_service.dart";
 import "package:flutter_application/diag68.dart";
+import "session/resolve_entry.dart";
+import "session/session_controller.dart";
+import "session/supabase_session_source.dart";
+import "presentation/widgets/components/cosmic_loader.dart";
+import "presentation/widgets/components/cosmic_error_state.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,7 +70,31 @@ void main() async {
   }
 
   await activeProfileProvider.load();
-  await _restoreAccount67(activeProfileProvider);
+  final sessionController = SessionController(
+    source: SupabaseSessionSource(),
+    profiles: activeProfileProvider,
+    language: languageProvider,
+  );
+  _ctl80 = sessionController;
+  try {
+    await sessionController.refresh();
+  } catch (e) {
+    debugPrint("session refresh failed: $e");
+  }
+  var lastUid80 = sessionController.uid;
+  Supabase.instance.client.auth.onAuthStateChange.listen((s) {
+    final id80 = s.session?.user.id;
+    if (id80 == lastUid80) return;
+    lastUid80 = id80;
+    sessionController.refresh().ignore();
+  });
+  if (Supabase.instance.client.auth.currentUser?.isAnonymous == false) {
+    try {
+      await PaywallService.init();
+    } catch (e) {
+      debugPrint("paywall init failed: $e");
+    }
+  }
 if (kDebugMode) {
   debugPrint('TOKEN=${Supabase.instance.client.auth.currentSession?.accessToken}');
 }
@@ -75,6 +103,7 @@ if (kDebugMode) {
       providers: [
         ChangeNotifierProvider.value(value: languageProvider),
         ChangeNotifierProvider.value(value: activeProfileProvider),
+        ChangeNotifierProvider.value(value: sessionController),
         ChangeNotifierProvider(
           lazy: false,
           create: (ctx) => ReferenceNamesService(ctx.read<LanguageProvider>()),
@@ -122,11 +151,7 @@ class SoulBoundApp extends StatelessWidget {
           ),
         );
       },
-      home: _WebErr67(child: _startConsent67
-          ? const OnboardingConsentPage()
-          : context.watch<ActiveProfileProvider>().activeProfileId != null
-          ? const MainShell()
-          : const OnboardingFlowPage(isFirstProfile: true)),
+      home: const _WebErr67(child: _Gate80()),
       onGenerateRoute: appOnGenerateRoute,
     );
   }
@@ -198,12 +223,9 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
   return null;
 }
 
-bool _startConsent67 = false;
-
-void clearStartConsent67() => _startConsent67 = false;
-
 bool _webExists67 = false;
-bool _notFound70 = false;
+bool _nfOpen80 = false;
+SessionController? _ctl80;
 
 void _readWebError67() {
   if (!kIsWeb) return;
@@ -226,13 +248,6 @@ class _WebErr67State extends State<_WebErr67> {
   @override
   void initState() {
     super.initState();
-    if (_notFound70) {
-      _notFound70 = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        showNotFound70(context);
-      });
-    }
     if (!_webExists67) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_webExists67) return;
@@ -258,6 +273,16 @@ class _WebErr67State extends State<_WebErr67> {
 }
 
 Future<void> showNotFound70(BuildContext context) async {
+  if (_nfOpen80) return;
+  _nfOpen80 = true;
+  try {
+    await _showNotFound80(context);
+  } finally {
+    _nfOpen80 = false;
+  }
+}
+
+Future<void> _showNotFound80(BuildContext context) async {
   diag68("notfound shown");
   final yes = await showDialog<bool>(
     context: context,
@@ -281,7 +306,7 @@ Future<void> showNotFound70(BuildContext context) async {
   final nav = Navigator.of(context, rootNavigator: true);
   if (yes == true) {
     diag68("notfound yes");
-    _startConsent67 = true;
+    await _ctl80?.resolveNotFound();
     nav.pushNamedAndRemoveUntil("/onboarding/consent", (r) => false);
     return;
   }
@@ -295,51 +320,44 @@ Future<void> showNotFound70(BuildContext context) async {
   } catch (e) {
     debugPrint("notfound no failed: $e");
   }
+  await _ctl80?.resolveNotFound();
   nav.pushNamedAndRemoveUntil("/onboarding", (r) => false,
       arguments: {"isFirstProfile": true});
 }
 
-Future<void> _restoreAccount67(ActiveProfileProvider prov) async {
-  try {
-    final c = Supabase.instance.client;
-    final u = c.auth.currentUser;
-    final sp70 = await SharedPreferences.getInstance();
-    final intent70 = sp70.getString("auth_intent") == "signin";
-    if (u == null || u.isAnonymous) {
-      await sp70.remove("auth_intent");
-      return;
+class _Gate80 extends StatefulWidget {
+  const _Gate80();
+  @override
+  State<_Gate80> createState() => _Gate80State();
+}
+
+class _Gate80State extends State<_Gate80> {
+  @override
+  Widget build(BuildContext context) {
+    final ctl = context.watch<SessionController>();
+    final r = ctl.route;
+    if (r == EntryRoute.notFound && !_nfOpen80) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        showNotFound70(context);
+      });
     }
-    final rows = await c.from("user_profiles").select("id").order("created_at");
-    final ids = rows.map((r) => r["id"] as String).toList();
-    diag68("restore ids", "n=${ids.length} pid=${s68(prov.activeProfileId)}");
-    if (ids.isEmpty) {
-      if (intent70) {
-        final cons70 = await c.from("user_consents").select("kind").limit(1);
-        await sp70.remove("auth_intent");
-        if (cons70.isEmpty) _notFound70 = true;
-      }
-      await prov.clearActive();
-      return;
-    }
-    if (intent70) await sp70.remove("auth_intent");
-    if (prov.activeProfileId == null || !ids.contains(prov.activeProfileId)) {
-      await prov.setActive(ids.first);
-    }
-    try {
-      await PaywallService.init();
-    } catch (e) {
-      debugPrint("paywall init failed: $e");
-    }
-    final cons = await c
-        .from("user_consents")
-        .select("kind")
-        .inFilter("kind", ["privacy", "terms", "ai"]);
-    final k = cons.map((r) => r["kind"]).toSet();
-    _startConsent67 = !(k.contains("privacy") && k.contains("terms") && k.contains("ai"));
-    final sp67 = await SharedPreferences.getInstance();
-    diag68("restore consent", "start=$_startConsent67 kinds=${k.length} force=${sp67.getBool("force_consent")}");
-    await sp67.remove("force_consent");
-  } catch (e) {
-    debugPrint("restore account failed: $e");
+    return switch (r) {
+      EntryRoute.home => const MainShell(),
+      EntryRoute.consent => const OnboardingConsentPage(),
+      EntryRoute.language ||
+      EntryRoute.name => const OnboardingFlowPage(isFirstProfile: true),
+      EntryRoute.signin => const OnboardingSignInPage(),
+      EntryRoute.retry => Scaffold(
+        body: Center(
+          child: CosmicErrorState(
+            message: t(context, "settings.error.load"),
+            retryLabel: t(context, "settings.retry"),
+            onRetry: () => ctl.refresh(),
+          ),
+        ),
+      ),
+      EntryRoute.loading || EntryRoute.notFound => const CosmicLoadingScreen(),
+    };
   }
 }

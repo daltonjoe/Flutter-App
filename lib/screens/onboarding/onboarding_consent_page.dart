@@ -4,7 +4,6 @@ import "package:shared_preferences/shared_preferences.dart";
 import "package:provider/provider.dart";
 import "../../providers/active_profile_provider.dart";
 import "package:flutter_application/diag68.dart";
-import "../../main.dart" show clearStartConsent67;
 import "package:url_launcher/url_launcher.dart";
 import "../../core/constants/legal_links.dart";
 import "../../core/theme/app_colors.dart";
@@ -103,7 +102,6 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
   Future<void> _back() async {
     debugPrint("consent back start");
     diag68("consent back start");
-    clearStartConsent67();
     final nav = Navigator.of(context, rootNavigator: true);
     final prov = context.read<ActiveProfileProvider>();
     var out67 = false;
