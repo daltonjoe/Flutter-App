@@ -4,11 +4,33 @@ import 'package:provider/provider.dart';
 import 'package:flutter_application/main.dart';
 import 'package:flutter_application/providers/language_provider.dart';
 import 'package:flutter_application/providers/active_profile_provider.dart';
+import 'package:flutter_application/session/resolve_entry.dart';
+import 'package:flutter_application/session/session_controller.dart';
+
+class _FakeSource implements SessionDataSource {
+  @override
+  SessionKind sessionKind() => SessionKind.none;
+  @override
+  String? uid() => null;
+  @override
+  Future<List<String>> profileIds() async => <String>[];
+  @override
+  Future<Set<String>> consentKinds() async => <String>{};
+  @override
+  Future<EntryIntent> authIntent() async => EntryIntent.none;
+  @override
+  Future<void> clearIntent() async {}
+}
 
 void main() {
   testWidgets('SoulBoundApp renders smoke test', (WidgetTester tester) async {
     final languageProvider = LanguageProvider();
     final activeProfileProvider = ActiveProfileProvider();
+    final sessionController = SessionController(
+      source: _FakeSource(),
+      profiles: activeProfileProvider,
+      language: languageProvider,
+    );
 
     await tester.pumpWidget(
       MultiProvider(
@@ -19,16 +41,17 @@ void main() {
           ChangeNotifierProvider<ActiveProfileProvider>.value(
             value: activeProfileProvider,
           ),
+          ChangeNotifierProvider<SessionController>.value(
+            value: sessionController,
+          ),
         ],
         child: const SoulBoundApp(),
       ),
     );
 
-    // Pump a few frames to let entrance animations run
     await tester.pump(const Duration(milliseconds: 100));
     await tester.pump(const Duration(milliseconds: 500));
 
-    // Verify app rendered successfully
     expect(find.byType(SoulBoundApp), findsOneWidget);
   });
 }

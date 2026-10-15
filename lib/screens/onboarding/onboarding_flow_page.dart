@@ -16,9 +16,10 @@ import "package:flutter_application/diag68.dart";
 
 
 class OnboardingFlowPage extends StatefulWidget {
-  const OnboardingFlowPage({super.key, required this.isFirstProfile});
+  const OnboardingFlowPage({super.key, required this.isFirstProfile, this.skipLanguage = false});
 
   final bool isFirstProfile;
+  final bool skipLanguage;
 
   @override
   State<OnboardingFlowPage> createState() => _OnboardingFlowPageState();
@@ -31,7 +32,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
 
   static const int totalSteps = 7;
 
-  int get _minStep => widget.isFirstProfile ? 0 : 1;
+  int get _minStep => (widget.isFirstProfile && !widget.skipLanguage) ? 0 : 1;
 
   @override
   void initState() {
@@ -44,7 +45,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
       diag68("flow route", "name=${r?.settings.name} cur=${r?.isCurrent}");
     });
     _controller = PageController(initialPage: _minStep);
-    if (!widget.isFirstProfile) {
+    if (!widget.isFirstProfile || widget.skipLanguage) {
       data.languageCode = context.read<LanguageProvider>().locale.languageCode;
     }
   }

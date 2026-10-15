@@ -82,6 +82,7 @@ class SessionController extends ChangeNotifier {
         await profiles.setActive(ids.first);
       }
     }
+    debugPrint("DIAG68 gate kind=${kind.name} ids=${ids?.length} kinds=${kinds?.length} intent=${intent.name} chosen=${language.chosen}");
     _set(resolveEntry(
       session: kind,
       profileCount: ids?.length,
@@ -98,6 +99,7 @@ class SessionController extends ChangeNotifier {
   }
 
   void _set(EntryRoute r) {
+    debugPrint("DIAG68 gate route ${r.name}");
     _route = r;
     notifyListeners();
   }

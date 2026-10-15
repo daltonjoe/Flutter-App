@@ -307,7 +307,7 @@ Future<void> _showNotFound80(BuildContext context) async {
   if (yes == true) {
     diag68("notfound yes");
     await _ctl80?.resolveNotFound();
-    nav.pushNamedAndRemoveUntil("/onboarding/consent", (r) => false);
+    nav.popUntil((r) => r.isFirst);
     return;
   }
   diag68("notfound no");
@@ -321,8 +321,7 @@ Future<void> _showNotFound80(BuildContext context) async {
     debugPrint("notfound no failed: $e");
   }
   await _ctl80?.resolveNotFound();
-  nav.pushNamedAndRemoveUntil("/onboarding", (r) => false,
-      arguments: {"isFirstProfile": true});
+  nav.popUntil((r) => r.isFirst);
 }
 
 class _Gate80 extends StatefulWidget {
@@ -345,8 +344,11 @@ class _Gate80State extends State<_Gate80> {
     return switch (r) {
       EntryRoute.home => const MainShell(),
       EntryRoute.consent => const OnboardingConsentPage(),
-      EntryRoute.language ||
-      EntryRoute.name => const OnboardingFlowPage(isFirstProfile: true),
+      EntryRoute.language => const OnboardingFlowPage(isFirstProfile: true),
+      EntryRoute.name => const OnboardingFlowPage(
+        isFirstProfile: true,
+        skipLanguage: true,
+      ),
       EntryRoute.signin => const OnboardingSignInPage(),
       EntryRoute.retry => Scaffold(
         body: Center(
@@ -357,7 +359,8 @@ class _Gate80State extends State<_Gate80> {
           ),
         ),
       ),
-      EntryRoute.loading || EntryRoute.notFound => const CosmicLoadingScreen(),
+      EntryRoute.loading => const CosmicLoadingScreen(),
+      EntryRoute.notFound => const Scaffold(backgroundColor: Colors.black),
     };
   }
 }
