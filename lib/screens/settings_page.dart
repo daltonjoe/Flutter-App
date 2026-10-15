@@ -600,13 +600,13 @@ class _SettingsPageState extends State<SettingsPage>
       await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
       await Supabase.instance.client.auth.signInAnonymously();
       diag68("signout after-anon");
-      final sp = await SharedPreferences.getInstance();
-      await sp.setBool("force_consent", true);
-      nav.pushNamedAndRemoveUntil("/signin", (route) => false);
-      debugPrint("signout: signin pushed");
       diag68("signout pre-clear");
       await prov.clearActive();
       diag68("signout post-clear");
+      final sp = await SharedPreferences.getInstance();
+      await sp.setBool("force_consent", true);
+      nav.pushNamedAndRemoveUntil("/onboarding/link-account", (route) => false);
+      debugPrint("signout: link-account pushed");
     } catch (e) {
       debugPrint("SettingsPage._signOut failed: $e");
       if (!mounted) return;
