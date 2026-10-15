@@ -9,6 +9,7 @@ import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../presentation/widgets/components/cosmic_card.dart';
 import '../presentation/widgets/components/cosmic_error_state.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 import '../providers/active_profile_provider.dart';
 import '../services/reference_names_service.dart';
 import 'edit_birth_data_page.dart';
@@ -295,7 +296,7 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
     return SliverAppBar(
       pinned: true,
       expandedHeight: 220,
-      backgroundColor: AppColors.bgDeep,
+      backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       flexibleSpace: LayoutBuilder(
         builder: (ctx, cons) {
@@ -432,7 +433,7 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                Color(0xFF3D2B7A),
+                                Color(0xFF1A4488),
                                 AppColors.violetPrimary,
                               ],
                             ),
@@ -862,57 +863,65 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
     final active = _resolveActive(activeId);
 
     if (_isLoading) {
-      return Scaffold(
-        backgroundColor: AppColors.bgDeep,
-        body: _buildSkeleton(),
+      return CosmicBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: _buildSkeleton(),
+        ),
       );
     }
 
     if (_error != null) {
-      return Scaffold(
-        backgroundColor: AppColors.bgDeep,
-        appBar: AppBar(
-          backgroundColor: AppColors.bgDeep,
-          title: Text(t(context, 'profile_switcher.title')),
-        ),
-        body: Center(
-          child: CosmicErrorState(
-            message: t(context, 'settings.error.load'),
-            onRetry: _loadProfiles,
-            retryLabel: t(context, 'settings.retry'),
+      return CosmicBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: Text(t(context, 'profile_switcher.title')),
           ),
-        ),
-      );
-    }
-
-    if (active == null) {
-      return Scaffold(
-        backgroundColor: AppColors.bgDeep,
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+          body: Center(
             child: CosmicErrorState(
-              message: t(context, 'profile_switcher.empty'),
+              message: t(context, 'settings.error.load'),
+              onRetry: _loadProfiles,
+              retryLabel: t(context, 'settings.retry'),
             ),
           ),
         ),
       );
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.bgDeep,
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(active),
-          SliverToBoxAdapter(
-            child: _buildProfileStrip(active['id'] as String?),
+    if (active == null) {
+      return CosmicBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: CosmicErrorState(
+                message: t(context, 'profile_switcher.empty'),
+              ),
+            ),
           ),
-          SliverToBoxAdapter(child: _buildIdentity(active)),
-          SliverToBoxAdapter(child: _buildShortcuts(active)),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: AppSpacing.contentBottom),
-          ),
-        ],
+        ),
+      );
+    }
+
+    return CosmicBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: CustomScrollView(
+          slivers: [
+            _buildAppBar(active),
+            SliverToBoxAdapter(
+              child: _buildProfileStrip(active['id'] as String?),
+            ),
+            SliverToBoxAdapter(child: _buildIdentity(active)),
+            SliverToBoxAdapter(child: _buildShortcuts(active)),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: AppSpacing.contentBottom),
+            ),
+          ],
+        ),
       ),
     );
   }

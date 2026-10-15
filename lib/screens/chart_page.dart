@@ -15,6 +15,7 @@ import 'natal_report_page.dart';
 import 'planet_report_page.dart';
 import 'forecast_selection_page.dart';
 import 'placement_content_page.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 
 class ChartPage extends StatefulWidget {
   final NatalChartResponse chartData;
@@ -110,118 +111,124 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     final birthTimeKnown = widget.chartData.input?.birthTimeKnown == true;
     final names = context.watch<ReferenceNamesService>();
 
-    return Scaffold(
-      backgroundColor: AppTheme.bgDeep,
-      body: Stack(
-        children: [
-          _buildBgOrbs(),
-          CustomScrollView(
-            slivers: [
-              // ── Hero header ──────────────────────────────────
-              SliverAppBar(
-                expandedHeight: 240,
-                pinned: true,
-                backgroundColor: AppTheme.bgDeep,
-                iconTheme: const IconThemeData(color: AppTheme.textPrimary),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: _buildHero(summary, angles, birthTimeKnown, names),
-                ),
-                title: Text(
-                  t(context, 'chart.title', args: {'name': widget.userName}),
-                  style: const TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                actions: [
-                ],
-              ),
-
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    // ── Üçlü rozet ─────────────────────────
-                    _buildTrioBadges(summary, names),
-                    const SizedBox(height: 28),
-
-                    // ── Gezegen başlığı ────────────────────
-                    _sectionHeader(
-                      t(context, 'chart.planet_positions'),
-                      t(
-                        context,
-                        'chart.planets_count',
-                                                args: {
-                          'count': planets.entries
-                              .where((e) => birthTimeKnown || e.key != 'Moon')
-                              .length
-                              .toString(),
-                        },
-                      ),
+    return CosmicBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+            _buildBgOrbs(),
+            CustomScrollView(
+              slivers: [
+                // ── Hero header ──────────────────────────────────
+                SliverAppBar(
+                  expandedHeight: 240,
+                  pinned: true,
+                  backgroundColor: Colors.transparent,
+                  iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: _buildHero(
+                      summary,
+                      angles,
+                      birthTimeKnown,
+                      names,
                     ),
-                    const SizedBox(height: 12),
+                  ),
+                  title: Text(
+                    t(context, 'chart.title', args: {'name': widget.userName}),
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  actions: [],
+                ),
 
-                    // ── Gezegen kartları ───────────────────
-                    ...planets.entries
-                        .where((e) => birthTimeKnown || e.key != 'Moon')
-                        .toList()
-                        .asMap()
-                        .entries
-                        .map((e) {
-                      final i = e.key;
-                      final key = e.value.key;
-                      final data = e.value.value;
-                      final anim = i < _cardAnims.length
-                          ? _cardAnims[i]
-                          : const AlwaysStoppedAnimation(1.0);
-                      return FadeTransition(
-                        opacity: anim,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0, 0.25),
-                            end: Offset.zero,
-                          ).animate(anim),
-                          child: _buildPlanetCard(key, data),
-                        ),
-                      );
-                    }),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      // ── Üçlü rozet ─────────────────────────
+                      _buildTrioBadges(summary, names),
+                      const SizedBox(height: 28),
 
-                    // ── Element dağılımı ───────────────────
-                    if (summary?.elementDistribution.isNotEmpty ?? false) ...[
-                      const SizedBox(height: 24),
+                      // ── Gezegen başlığı ────────────────────
                       _sectionHeader(
-                        t(context, 'chart.element_distribution'),
-                        '',
+                        t(context, 'chart.planet_positions'),
+                        t(
+                          context,
+                          'chart.planets_count',
+                          args: {
+                            'count': planets.entries
+                                .where((e) => birthTimeKnown || e.key != 'Moon')
+                                .length
+                                .toString(),
+                          },
+                        ),
                       ),
                       const SizedBox(height: 12),
-                      _buildElementChart(summary!.elementDistribution),
-                    ],
 
-                    // ── Retrograde ─────────────────────────
-                    if (summary?.retrogradePlanets.isNotEmpty ?? false) ...[
-                      const SizedBox(height: 24),
-                      _sectionHeader(
-                        t(context, 'chart.retrograde_planets'),
-                        '',
-                      ),
-                      const SizedBox(height: 10),
-                      _buildRetrogrades(summary!.retrogradePlanets),
-                    ],
+                      // ── Gezegen kartları ───────────────────
+                      ...planets.entries
+                          .where((e) => birthTimeKnown || e.key != 'Moon')
+                          .toList()
+                          .asMap()
+                          .entries
+                          .map((e) {
+                            final i = e.key;
+                            final key = e.value.key;
+                            final data = e.value.value;
+                            final anim = i < _cardAnims.length
+                                ? _cardAnims[i]
+                                : const AlwaysStoppedAnimation(1.0);
+                            return FadeTransition(
+                              opacity: anim,
+                              child: SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(0, 0.25),
+                                  end: Offset.zero,
+                                ).animate(anim),
+                                child: _buildPlanetCard(key, data),
+                              ),
+                            );
+                          }),
 
-                    const SizedBox(height: 32),
+                      // ── Element dağılımı ───────────────────
+                      if (summary?.elementDistribution.isNotEmpty ?? false) ...[
+                        const SizedBox(height: 24),
+                        _sectionHeader(
+                          t(context, 'chart.element_distribution'),
+                          '',
+                        ),
+                        const SizedBox(height: 12),
+                        _buildElementChart(summary!.elementDistribution),
+                      ],
 
-                    // ── CTA butonlar ───────────────────────
-                    _buildForecastBtn(),
-                    const SizedBox(height: 12),
-                    _buildAnalysisBtn(),
-                    const SizedBox(height: 48),
-                  ]),
+                      // ── Retrograde ─────────────────────────
+                      if (summary?.retrogradePlanets.isNotEmpty ?? false) ...[
+                        const SizedBox(height: 24),
+                        _sectionHeader(
+                          t(context, 'chart.retrograde_planets'),
+                          '',
+                        ),
+                        const SizedBox(height: 10),
+                        _buildRetrogrades(summary!.retrogradePlanets),
+                      ],
+
+                      const SizedBox(height: 32),
+
+                      // ── CTA butonlar ───────────────────────
+                      _buildForecastBtn(),
+                      const SizedBox(height: 12),
+                      _buildAnalysisBtn(),
+                      const SizedBox(height: 48),
+                    ]),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -296,13 +303,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     );
 
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF1A1240), AppTheme.bgDeep],
-        ),
-      ),
+      color: Colors.transparent,
       child: Stack(
         children: [
           // ── Background Orbital Animation ──────────────────────────
@@ -327,17 +328,17 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF3D2B7A), AppTheme.violet],
+                      colors: [Color(0xFF1A4488), AppTheme.violet],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
-                      BoxShadow(color: Color(0x808B5CF6), blurRadius: 20),
+                      BoxShadow(color: Color(0x802D7DF0), blurRadius: 20),
                     ],
                   ),
                   child: Center(
                     child: Image.asset(
-                        SoulBoundAssets.getZodiacByIndex(
+                      SoulBoundAssets.getZodiacByIndex(
                         widget.chartData.houses?['house_1']?.signIndex ?? 0,
                       ),
                       width: 32,
@@ -402,9 +403,9 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   Widget _miniTag(String label, String value) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     decoration: BoxDecoration(
-      color: Color(0x268B5CF6),
+      color: Color(0x262D7DF0),
       borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: Color(0x4D8B5CF6)),
+      border: Border.all(color: Color(0x4D2D7DF0)),
     ),
     child: Text(
       '$label · $value',
@@ -417,18 +418,15 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   );
 
   void _openPlacement(String k) => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => PlacementContentPage(
-              chartData: widget.chartData, initialKey: k),
-        ),
-      );
+    context,
+    MaterialPageRoute(
+      builder: (_) =>
+          PlacementContentPage(chartData: widget.chartData, initialKey: k),
+    ),
+  );
 
   // ── Üçlü rozet ────────────────────────────────────────────────────
-  Widget _buildTrioBadges(
-    ChartSummary? summary,
-    ReferenceNamesService names,
-  ) {
+  Widget _buildTrioBadges(ChartSummary? summary, ReferenceNamesService names) {
     final sunSign = _resolvedSign(
       names,
       widget.chartData.planets?['Sun']?.signIndex,
@@ -451,14 +449,26 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
         : '-';
     return Row(
       children: [
-       _trioItem(t(context, 'chart.sun'), sunSign, '☀️',
-            onTap: () => _openPlacement('sun')),
+        _trioItem(
+          t(context, 'chart.sun'),
+          sunSign,
+          '☀️',
+          onTap: () => _openPlacement('sun'),
+        ),
         const SizedBox(width: 8),
-        _trioItem(t(context, 'chart.moon'), moonSign, '🌙',
-            onTap: timeKnown ? () => _openPlacement('moon') : null),
+        _trioItem(
+          t(context, 'chart.moon'),
+          moonSign,
+          '🌙',
+          onTap: timeKnown ? () => _openPlacement('moon') : null,
+        ),
         const SizedBox(width: 8),
-        _trioItem(t(context, 'chart.ascendant'), ascSign, '⬆️',
-            onTap: timeKnown ? () => _openPlacement('ascendant') : null),
+        _trioItem(
+          t(context, 'chart.ascendant'),
+          ascSign,
+          '⬆️',
+          onTap: timeKnown ? () => _openPlacement('ascendant') : null,
+        ),
       ],
     );
   }
@@ -475,8 +485,12 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
         : translated;
   }
 
-  Widget _trioItem(String label, String? sign, String icon,
-      {VoidCallback? onTap}) {
+  Widget _trioItem(
+    String label,
+    String? sign,
+    String icon, {
+    VoidCallback? onTap,
+  }) {
     final translatedSign = sign ?? '-';
 
     return Expanded(
@@ -484,28 +498,28 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: cosmicCard(),
-        child: Column(
-          children: [
-            Text(icon, style: const TextStyle(fontSize: 22)),
-            const SizedBox(height: 6),
-            Text(
-              translatedSign,
-              style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: cosmicCard(),
+          child: Column(
+            children: [
+              Text(icon, style: const TextStyle(fontSize: 22)),
+              const SizedBox(height: 6),
+              Text(
+                translatedSign,
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: const TextStyle(color: AppTheme.textMuted, fontSize: 10),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: const TextStyle(color: AppTheme.textMuted, fontSize: 10),
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -580,7 +594,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                                 vertical: 1,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0x26EC4899),
+                                color: const Color(0x26C9A24A),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: const Text(
@@ -613,44 +627,44 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                 const SizedBox(width: 8),
 
                 // House badge
-                              if (widget.chartData.input?.birthTimeKnown == true)
+                if (widget.chartData.input?.birthTimeKnown == true)
                   Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Padding(
-                      padding: const EdgeInsets.all(2),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            houseName,
-                            maxLines: 1,
-                            style: TextStyle(
-                              color: color,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Padding(
+                        padding: const EdgeInsets.all(2),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              houseName,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: color,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
-                          ),
-                          Text(
-                            t(context, 'chart.house'),
-                            maxLines: 1,
-                            style: const TextStyle(
-                              color: AppTheme.textMuted,
-                              fontSize: 8,
+                            Text(
+                              t(context, 'chart.house'),
+                              maxLines: 1,
+                              style: const TextStyle(
+                                color: AppTheme.textMuted,
+                                fontSize: 8,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
                 const SizedBox(width: 8),
                 Builder(
                   builder: (context) {
@@ -740,9 +754,9 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0x14EC4899),
+            color: const Color(0x14C9A24A),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0x4DEC4899)),
+            border: Border.all(color: const Color(0x4DC9A24A)),
           ),
           child: Text(
             '$emoji $planetName ℞',
@@ -825,7 +839,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           color: AppTheme.bgCard,
-          border: Border.all(color: Color(0x598B5CF6)),
+          border: Border.all(color: Color(0x592D7DF0)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
