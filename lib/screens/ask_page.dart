@@ -18,6 +18,7 @@ import '../providers/ask_draft.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 import '../services/user_settings_service.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 import 'notes_page.dart';
 
 class _Msg {
@@ -45,7 +46,7 @@ class _AskPageState extends State<AskPage> {
   String? _loc;
   bool _langReset = false;
   int _gen = 0;
-   String _mode = askMode.value;
+  String _mode = askMode.value;
   String? _fMonth; // YYYY-MM
   bool _av = false; // feature_flags.ask_avatars
   String? _partnerId;
@@ -69,7 +70,7 @@ class _AskPageState extends State<AskPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _onDraft());
   }
 
-    void _onBridge() {
+  void _onBridge() {
     final r = askBridgeReq.value;
     if (r == null || r.length < 3 || !mounted) return;
     askBridgeReq.value = null;
@@ -128,8 +129,7 @@ class _AskPageState extends State<AskPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final loc =
-        Provider.of<LanguageProvider>(context).locale.languageCode;
+    final loc = Provider.of<LanguageProvider>(context).locale.languageCode;
     if (_loc != null && _loc != loc) {
       _gen++;
       _messages.clear();
@@ -150,7 +150,7 @@ class _AskPageState extends State<AskPage> {
     super.dispose();
   }
 
-Future<_Msg> _reply(String text) async {
+  Future<_Msg> _reply(String text) async {
     // context'i await'ten önce kullan (lint)
     final loc = context.read<LanguageProvider>().locale.languageCode;
     final safe = {
@@ -169,42 +169,52 @@ Future<_Msg> _reply(String text) async {
               {
                 'type': 'synastry_pair',
                 'refs': {
-                  'profile_a':
-                      context.read<ActiveProfileProvider>().activeProfileId,
+                  'profile_a': context
+                      .read<ActiveProfileProvider>()
+                      .activeProfileId,
                   'profile_b': _partnerId,
                 },
-              }
+              },
             ]
           : askContext.itemsFor(_mode).map((e) => e.toServer()).toList(),
       locale: loc,
       bubbles: _av,
       history: [
         for (final m in last)
-          {'role': m.mine ? 'user' : 'assistant', 'text': m.text}
+          {'role': m.mine ? 'user' : 'assistant', 'text': m.text},
       ],
-       profileId: context.read<ActiveProfileProvider>().activeProfileId,
-       mode: _mode,
-       forecastMonth: _mode == 'forecast' ? _fMonth : null,
+      profileId: context.read<ActiveProfileProvider>().activeProfileId,
+      mode: _mode,
+      forecastMonth: _mode == 'forecast' ? _fMonth : null,
     );
     final s = res.safety;
     if (s != null) {
-      return _Msg(false, res.reply ?? (safe[s] ?? safe['fallback']!),
-          animate: true);
+      return _Msg(
+        false,
+        res.reply ?? (safe[s] ?? safe['fallback']!),
+        animate: true,
+      );
     }
     final rp = res.reply;
     if (rp == null || rp.trim().isEmpty) {
       return _Msg(false, safe['fallback']!, animate: true);
     }
     final bl = res.bubbles;
-    return _Msg(false, rp,
-        animate: true,
-        bubbles: (_av && bl != null && bl.isNotEmpty) ? bl : null);
+    return _Msg(
+      false,
+      rp,
+      animate: true,
+      bubbles: (_av && bl != null && bl.isNotEmpty) ? bl : null,
+    );
   }
 
-    KeyEventResult _onInputKey(FocusNode node, KeyEvent e) {
-    final enter = e.logicalKey == LogicalKeyboardKey.enter ||
+  KeyEventResult _onInputKey(FocusNode node, KeyEvent e) {
+    final enter =
+        e.logicalKey == LogicalKeyboardKey.enter ||
         e.logicalKey == LogicalKeyboardKey.numpadEnter;
-    if (e is KeyDownEvent && enter && !HardwareKeyboard.instance.isShiftPressed) {
+    if (e is KeyDownEvent &&
+        enter &&
+        !HardwareKeyboard.instance.isShiftPressed) {
       _send();
       return KeyEventResult.handled;
     }
@@ -213,7 +223,7 @@ Future<_Msg> _reply(String text) async {
 
   Future<void> _send([String? override]) async {
     final text = (override ?? _ctl.text).trim();
-        if (text.isEmpty || _waiting) return;
+    if (text.isEmpty || _waiting) return;
     if (_mode == 'forecast' && _fMonth == null) {
       _pickMonth();
       return;
@@ -224,7 +234,7 @@ Future<_Msg> _reply(String text) async {
     }
     HapticFeedback.selectionClick();
     _ctl.clear();
- final gen = _gen;
+    final gen = _gen;
     final retry = override != null && _failed;
     setState(() {
       if (!retry) _messages.add(_Msg(true, text));
@@ -249,21 +259,24 @@ Future<_Msg> _reply(String text) async {
         _errKey = (e is AstroServiceException && e.code == 'RATE_LIMITED')
             ? 'ask.error.rate'
             : (e is AstroServiceException && e.code == 'QUOTA')
-                ? 'ask.error.quota'
-                : 'ask.error';
+            ? 'ask.error.quota'
+            : 'ask.error';
       });
       if (e is AstroServiceException && e.code == 'QUOTA') {
         UserSettingsService.isFlagEnabled('paywall').then((on) {
           if (on && mounted) {
-            Navigator.of(context, rootNavigator: true).push(MaterialPageRoute<void>(
-                builder: (_) => const PaywallPage(source: PaywallSource.quota)));
+            Navigator.of(context, rootNavigator: true).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const PaywallPage(source: PaywallSource.quota),
+              ),
+            );
           }
         });
       }
     }
   }
 
-    Future<void> _pickMonth() async {
+  Future<void> _pickMonth() async {
     final now = DateTime.now();
     var m = _fMonth == null ? now.month : int.parse(_fMonth!.substring(5));
     var y = _fMonth == null ? now.year : int.parse(_fMonth!.substring(0, 4));
@@ -274,59 +287,72 @@ Future<_Msg> _reply(String text) async {
       context: context,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       builder: (ctx) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 200,
-            child: Row(children: [
-              Expanded(
-                child: CupertinoPicker(
-                  scrollController: mc,
-                  itemExtent: 40,
-                  onSelectedItemChanged: (i) {
-                    m = i + 1;
-                    HapticFeedback.selectionClick();
-                  },
-                  children: [
-                    for (var i = 1; i <= 12; i++)
-                      Center(
-                          child: Text(i.toString().padLeft(2, '0'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 200,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CupertinoPicker(
+                      scrollController: mc,
+                      itemExtent: 40,
+                      onSelectedItemChanged: (i) {
+                        m = i + 1;
+                        HapticFeedback.selectionClick();
+                      },
+                      children: [
+                        for (var i = 1; i <= 12; i++)
+                          Center(
+                            child: Text(
+                              i.toString().padLeft(2, '0'),
                               style: AppTextStyles.bodyLg(
-                                  color: AppColors.textPrimary)))
-                  ],
-                ),
-              ),
-              Expanded(
-                child: CupertinoPicker(
-                  scrollController: yc,
-                  itemExtent: 40,
-                  onSelectedItemChanged: (i) {
-                    y = y0 + i;
-                    HapticFeedback.selectionClick();
-                  },
-                  children: [
-                    for (var i = y0; i <= y1; i++)
-                      Center(
-                          child: Text('$i',
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: CupertinoPicker(
+                      scrollController: yc,
+                      itemExtent: 40,
+                      onSelectedItemChanged: (i) {
+                        y = y0 + i;
+                        HapticFeedback.selectionClick();
+                      },
+                      children: [
+                        for (var i = y0; i <= y1; i++)
+                          Center(
+                            child: Text(
+                              '$i',
                               style: AppTextStyles.bodyLg(
-                                  color: AppColors.textPrimary)))
-                  ],
-                ),
-              ),
-            ]),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: FilledButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: Text(t(ctx, 'settings.save')),
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ]),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: FilledButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(t(ctx, 'settings.save')),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
     mc.dispose();
@@ -353,8 +379,11 @@ Future<_Msg> _reply(String text) async {
       padding: const EdgeInsets.all(24),
       children: [
         const SizedBox(height: 24),
-        const Icon(Icons.auto_awesome_outlined,
-            size: 40, color: AppColors.violetPrimary),
+        const Icon(
+          Icons.auto_awesome_outlined,
+          size: 40,
+          color: AppColors.violetPrimary,
+        ),
         const SizedBox(height: 16),
         Text(
           t(context, 'ask.empty_title.$_mode'),
@@ -415,7 +444,12 @@ Future<_Msg> _reply(String text) async {
               padding: const EdgeInsets.all(16),
               child: Text(t(ctx, 'ask.report'), style: AppTextStyles.bodyLg()),
             ),
-            for (final r in const ['harmful', 'inaccurate', 'inappropriate', 'other'])
+            for (final r in const [
+              'harmful',
+              'inaccurate',
+              'inappropriate',
+              'other',
+            ])
               ListTile(
                 title: Text(t(ctx, 'ask.report.$r')),
                 onTap: () => Navigator.pop(ctx, r),
@@ -440,13 +474,15 @@ Future<_Msg> _reply(String text) async {
         'reply_excerpt': ex,
       });
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(t(context, 'ask.report.sent'))));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(t(context, 'ask.report.sent'))));
     } catch (e) {
       debugPrint('AskPage report failed: $e');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(t(context, 'ask.error'))));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(t(context, 'ask.error'))));
     }
   }
 
@@ -478,19 +514,17 @@ Future<_Msg> _reply(String text) async {
                 borderRadius: BorderRadius.circular(16),
               )
             : AppDecorations.cosmicCard(),
-                  child: (!m.mine && m.animate)
-              ? _Typewriter(
-                  key: ObjectKey(m),
-                  text: m.text,
-                  style: AppTextStyles.bodyMd(),
-                  onDone: () => m.animate = false,
-                )
-              : Text(
-                  m.text,
-                  style: m.mine
-                      ? AppTextStyles.bodyLg()
-                      : AppTextStyles.bodyMd(),
-                ),
+        child: (!m.mine && m.animate)
+            ? _Typewriter(
+                key: ObjectKey(m),
+                text: m.text,
+                style: AppTextStyles.bodyMd(),
+                onDone: () => m.animate = false,
+              )
+            : Text(
+                m.text,
+                style: m.mine ? AppTextStyles.bodyLg() : AppTextStyles.bodyMd(),
+              ),
       ),
     );
   }
@@ -505,8 +539,13 @@ Future<_Msg> _reply(String text) async {
     );
   }
 
-  Widget _box(BuildContext context, String text, bool animate,
-      VoidCallback onDone, Key k) {
+  Widget _box(
+    BuildContext context,
+    String text,
+    bool animate,
+    VoidCallback onDone,
+    Key k,
+  ) {
     final maxW = MediaQuery.of(context).size.width * 0.82;
     return Align(
       key: k,
@@ -518,7 +557,10 @@ Future<_Msg> _reply(String text) async {
         decoration: AppDecorations.cosmicCard(),
         child: animate
             ? _Typewriter(
-                text: text, style: AppTextStyles.bodyMd(), onDone: onDone)
+                text: text,
+                style: AppTextStyles.bodyMd(),
+                onDone: onDone,
+              )
             : Text(text, style: AppTextStyles.bodyMd()),
       ),
     );
@@ -577,8 +619,7 @@ Future<_Msg> _reply(String text) async {
     });
     if (l.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(t(context, 'ask.avatar.synastry.need_profile'))),
+        SnackBar(content: Text(t(context, 'ask.avatar.synastry.need_profile'))),
       );
       return;
     }
@@ -609,7 +650,8 @@ Future<_Msg> _reply(String text) async {
     final sm = ScaffoldMessenger.of(context);
     final savedMsg = t(context, 'ask.remember.saved');
     final ctl = TextEditingController(
-        text: raw.length > 150 ? raw.substring(0, 150) : raw);
+      text: raw.length > 150 ? raw.substring(0, 150) : raw,
+    );
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -620,7 +662,12 @@ Future<_Msg> _reply(String text) async {
           children: [
             Text(t(ctx, 'ask.remember.hint'), style: AppTextStyles.bodySm()),
             const SizedBox(height: 8),
-            TextField(controller: ctl, maxLength: 150, minLines: 1, maxLines: 4),
+            TextField(
+              controller: ctl,
+              maxLength: 150,
+              minLines: 1,
+              maxLines: 4,
+            ),
           ],
         ),
         actions: [
@@ -640,7 +687,8 @@ Future<_Msg> _reply(String text) async {
       debugPrint('AskPage remember failed: $e');
       if (!mounted) return;
       sm.showSnackBar(
-          SnackBar(content: Text(t(context, AskService.memoryErrKey(e)))));
+        SnackBar(content: Text(t(context, AskService.memoryErrKey(e)))),
+      );
     }
   }
 
@@ -666,7 +714,7 @@ Future<_Msg> _reply(String text) async {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             itemCount: items.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (_, i) => Center(
               child: InputChip(
                 label: Text(
@@ -716,8 +764,10 @@ Future<_Msg> _reply(String text) async {
             child: IconButton(
               tooltip: t(context, 'ask.send'),
               onPressed: _waiting ? null : _send,
-              icon: const Icon(Icons.arrow_upward_rounded,
-                  color: AppColors.violetPrimary),
+              icon: const Icon(
+                Icons.arrow_upward_rounded,
+                color: AppColors.violetPrimary,
+              ),
             ),
           ),
         ],
@@ -730,147 +780,171 @@ Future<_Msg> _reply(String text) async {
     context.watch<ReferenceNamesService>();
     final msgs = _messages.reversed.toList();
     final extra = _waiting ? 1 : 0;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(t(context, 'ask.title')),
-        actions: [
-          if (_av)
-            IconButton(
-              tooltip: t(context, 'notes.title'),
-              icon: const Icon(Icons.bookmark_border_rounded),
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const NotesPage()),
-              ),
-            ),
-        ],
-      ),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: SegmentedButton<String>(
-                showSelectedIcon: false,
-                segments: [
-                  ButtonSegment(
-                      value: 'natal',
-                      label: Text(_av
-                          ? t(context, 'ask.avatar.natal.name')
-                          : t(context, 'ask.mode.natal'))),
-                  ButtonSegment(
-                      value: 'forecast',
-                      label: Text(_av
-                          ? t(context, 'ask.avatar.forecast.name')
-                          : t(context, 'ask.mode.forecast'))),
-                  if (_av)
-                    ButtonSegment(
-                        value: 'synastry',
-                        label: Text(t(context, 'ask.avatar.synastry.name'))),
-                ],
-                selected: {_mode},
-                          onSelectionChanged: (s) {
-                askMode.value = s.first; // sıfırlama _onMode'da
-              },
-              ),
-            ),
-            if (_mode == 'forecast')
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: ActionChip(
-                  avatar:
-                      const Icon(Icons.calendar_month_outlined, size: 18),
-                  label: Text(_fMonth == null
-                      ? t(context, 'ask.forecast.pick')
-                      : '${t(context, 'ask.forecast.for')}: ${_fMonth!.substring(5)}-${_fMonth!.substring(0, 4)}'),
-                  onPressed: _pickMonth,
-                ),
-              ),
+    return CosmicBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text(t(context, 'ask.title')),
+          actions: [
             if (_av)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
-                child: Text(t(context, 'ask.avatar.$_mode.tag'),
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodySm()),
+              IconButton(
+                tooltip: t(context, 'notes.title'),
+                icon: const Icon(Icons.bookmark_border_rounded),
+                onPressed: () => Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => const NotesPage())),
               ),
-            if (_av && _mode == 'synastry')
+          ],
+        ),
+        body: SafeArea(
+          top: false,
+          child: Column(
+            children: [
               Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: (_partnersLoaded && _partners.isEmpty)
-                    ? Text(t(context, 'ask.avatar.synastry.need_profile'),
-                        style: AppTextStyles.bodySm())
-                    : ActionChip(
-                        avatar: const Icon(Icons.people_outline, size: 18),
-                        label: Text(_partnerName == null
-                            ? t(context, 'ask.avatar.partner.pick')
-                            : '${t(context, 'ask.avatar.partner.for')}: $_partnerName'),
-                        onPressed: _pickPartner,
-                      ),
-              ),
-            Expanded(
-              child: (_messages.isEmpty && !_waiting)
-                  ? _empty(context)
-                  : ListView.builder(
-                      reverse: true,
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                      itemCount: msgs.length + extra,
-                      itemBuilder: (c, i) {
-                        if (_waiting && i == 0) return _typing(c);
-                        return _bubble(c, msgs[i - extra]);
-                      },
-                    ),
-            ),
-            if (_failed)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                           t(context, _errKey),
-                        style: AppTextStyles.bodySm(color: AppColors.errorRed),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: SegmentedButton<String>(
+                  showSelectedIcon: false,
+                  segments: [
+                    ButtonSegment(
+                      value: 'natal',
+                      label: Text(
+                        _av
+                            ? t(context, 'ask.avatar.natal.name')
+                            : t(context, 'ask.mode.natal'),
                       ),
                     ),
-                    if (_errKey != 'ask.error.quota')
-                      TextButton(
-                        onPressed: () => _send(_lastText),
-                        child: Text(t(context, 'ask.retry')),
+                    ButtonSegment(
+                      value: 'forecast',
+                      label: Text(
+                        _av
+                            ? t(context, 'ask.avatar.forecast.name')
+                            : t(context, 'ask.mode.forecast'),
+                      ),
+                    ),
+                    if (_av)
+                      ButtonSegment(
+                        value: 'synastry',
+                        label: Text(t(context, 'ask.avatar.synastry.name')),
                       ),
                   ],
+                  selected: {_mode},
+                  onSelectionChanged: (s) {
+                    askMode.value = s.first; // sıfırlama _onMode'da
+                  },
                 ),
               ),
+              if (_mode == 'forecast')
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: ActionChip(
+                    avatar: const Icon(Icons.calendar_month_outlined, size: 18),
+                    label: Text(
+                      _fMonth == null
+                          ? t(context, 'ask.forecast.pick')
+                          : '${t(context, 'ask.forecast.for')}: ${_fMonth!.substring(5)}-${_fMonth!.substring(0, 4)}',
+                    ),
+                    onPressed: _pickMonth,
+                  ),
+                ),
+              if (_av)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+                  child: Text(
+                    t(context, 'ask.avatar.$_mode.tag'),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.bodySm(),
+                  ),
+                ),
+              if (_av && _mode == 'synastry')
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: (_partnersLoaded && _partners.isEmpty)
+                      ? Text(
+                          t(context, 'ask.avatar.synastry.need_profile'),
+                          style: AppTextStyles.bodySm(),
+                        )
+                      : ActionChip(
+                          avatar: const Icon(Icons.people_outline, size: 18),
+                          label: Text(
+                            _partnerName == null
+                                ? t(context, 'ask.avatar.partner.pick')
+                                : '${t(context, 'ask.avatar.partner.for')}: $_partnerName',
+                          ),
+                          onPressed: _pickPartner,
+                        ),
+                ),
+              Expanded(
+                child: (_messages.isEmpty && !_waiting)
+                    ? _empty(context)
+                    : ListView.builder(
+                        reverse: true,
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        itemCount: msgs.length + extra,
+                        itemBuilder: (c, i) {
+                          if (_waiting && i == 0) return _typing(c);
+                          return _bubble(c, msgs[i - extra]);
+                        },
+                      ),
+              ),
+              if (_failed)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          t(context, _errKey),
+                          style: AppTextStyles.bodySm(
+                            color: AppColors.errorRed,
+                          ),
+                        ),
+                      ),
+                      if (_errKey != 'ask.error.quota')
+                        TextButton(
+                          onPressed: () => _send(_lastText),
+                          child: Text(t(context, 'ask.retry')),
+                        ),
+                    ],
+                  ),
+                ),
               if (_langReset)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                  child: Text(
+                    t(context, 'ask.lang_reset'),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.bodySm(),
+                  ),
+                ),
+              _contextStrip(context),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  t(context, 'ask.lang_reset'),
+                  t(context, 'ask.disclaimer'),
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.bodySm(),
+                  style: AppTextStyles.bodyXs(),
                 ),
               ),
-            _contextStrip(context),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                t(context, 'ask.disclaimer'),
-                textAlign: TextAlign.center,
-                style: AppTextStyles.bodyXs(),
-              ),
-            ),
-            _composer(context),
-          ],
+              _composer(context),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
 /// K34: harf harf görünür; dokununca tamamlanır; reduce-motion'da anında.
 class _Typewriter extends StatefulWidget {
   final String text;
   final TextStyle? style;
   final VoidCallback onDone;
-  const _Typewriter(
-      {super.key, required this.text, this.style, required this.onDone});
+  const _Typewriter({
+    super.key,
+    required this.text,
+    this.style,
+    required this.onDone,
+  });
 
   @override
   State<_Typewriter> createState() => _TypewriterState();
@@ -891,7 +965,7 @@ class _TypewriterState extends State<_Typewriter> {
       WidgetsBinding.instance.addPostFrameCallback((_) => widget.onDone());
       return;
     }
-     _timer = Timer.periodic(const Duration(milliseconds: 30), (_) {
+    _timer = Timer.periodic(const Duration(milliseconds: 30), (_) {
       if (!mounted) return;
       var next = _n + 2;
       if (next >= widget.text.length) {
@@ -928,14 +1002,13 @@ class _TypewriterState extends State<_Typewriter> {
   }
 }
 
-
 /// AV: balonlar sÄ±rayla (balon baÅŸÄ±na daktilo + 450 ms ara); reduce-motion'da anÄ±nda.
 class _BubbleSeq extends StatefulWidget {
   final List<String> texts;
   final bool animate;
   final VoidCallback onAllDone;
   final Widget Function(String text, bool animate, VoidCallback onDone, Key key)
-      item;
+  item;
   const _BubbleSeq({
     super.key,
     required this.texts,
@@ -990,8 +1063,12 @@ class _BubbleSeqState extends State<_BubbleSeq> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (var i = 0; i < _shown && i < widget.texts.length; i++)
-          widget.item(widget.texts[i], widget.animate && i == _shown - 1, _next,
-              ValueKey(i)),
+          widget.item(
+            widget.texts[i],
+            widget.animate && i == _shown - 1,
+            _next,
+            ValueKey(i),
+          ),
       ],
     );
   }

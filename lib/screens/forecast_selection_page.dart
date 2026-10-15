@@ -6,6 +6,7 @@ import '../models/natal_chart_response.dart';
 import '../theme/app_theme.dart';
 import 'forecast_result_page.dart';
 import '../i18n/app_localizations.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 
 class ForecastSelectionPage extends StatelessWidget {
   final NatalChartResponse chartData;
@@ -25,7 +26,7 @@ class ForecastSelectionPage extends StatelessWidget {
       'key': 'forecast.weekly',
       'subtitle_key': 'forecast.weekly_subtitle',
       'emoji': '🗓️',
-      'colors': [Color(0xFF6D28D9), Color(0xFF8B5CF6)],
+      'colors': [Color(0xFF1E5BC6), Color(0xFF2D7DF0)],
     },
     {
       'type': 'monthly',
@@ -45,109 +46,111 @@ class ForecastSelectionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.bgDeep,
-      appBar: AppBar(
-        backgroundColor: AppTheme.bgDeep,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
-        title: Text(
-          t(context, 'forecast.title'),
-          style: const TextStyle(
-            color: AppTheme.textPrimary,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
+    return CosmicBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+          title: Text(
+            t(context, 'forecast.title'),
+            style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
           ),
+          elevation: 0,
         ),
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Üst kart — kullanıcı özeti
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF2E1F6B), Color(0xFF1A1240)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Üst kart — kullanıcı özeti
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF14316F), Color(0xFF0B1A40)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                  border: Border.all(color: Color(0x4D2D7DF0)),
                 ),
-                borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-                border: Border.all(color: Color(0x4D8B5CF6)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: AppTheme.violetGradient,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: AppTheme.violetGradient,
+                      ),
+                      child: const Center(
+                        child: Text('☽', style: TextStyle(fontSize: 22)),
+                      ),
                     ),
-                    child: const Center(
-                      child: Text('☽', style: TextStyle(fontSize: 22)),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          t(context, 'forecast.custom_forecast'),
-                          style: const TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            t(context, 'forecast.custom_forecast'),
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          t(context, 'forecast.select_period'),
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 12,
+                          const SizedBox(height: 2),
+                          Text(
+                            t(context, 'forecast.select_period'),
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: 12,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            const SizedBox(height: 28),
+              const SizedBox(height: 28),
 
-            Text(
-              t(context, 'forecast.which_period'),
-              style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.3,
+              Text(
+                t(context, 'forecast.which_period'),
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              t(context, 'forecast.personalized_notice'),
-              style: const TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 13,
+              const SizedBox(height: 4),
+              Text(
+                t(context, 'forecast.personalized_notice'),
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 13,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            Expanded(
-              child: ListView.separated(
-                itemCount: _options.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemBuilder: (ctx, i) => _buildCard(ctx, _options[i]),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: _options.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  itemBuilder: (ctx, i) => _buildCard(ctx, _options[i]),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

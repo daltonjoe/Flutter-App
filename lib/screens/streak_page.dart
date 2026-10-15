@@ -6,6 +6,7 @@ import '../core/theme/app_decorations.dart';
 import '../i18n/app_localizations.dart';
 import '../services/checkin_service.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 
 class StreakPage extends StatefulWidget {
   final String profileId;
@@ -58,35 +59,37 @@ class _StreakPageState extends State<StreakPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bgDeep,
-      appBar: AppBar(
+    return CosmicBackground(
+      child: Scaffold(
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Row(
-          children: [
-            Flexible(
-              child: Text(
-                t(context, 'streak.detail.title'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.h2(),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  t(context, 'streak.detail.title'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.h2(),
+                ),
               ),
+            ],
+          ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh, color: AppColors.textPrimary),
+              onPressed: _loading ? null : _load,
             ),
           ],
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.textPrimary),
-            onPressed: _loading ? null : _load,
-          ),
-        ],
+        body: SafeArea(child: _body(context)),
       ),
-      body: SafeArea(child: _body(context)),
     );
   }
 
@@ -250,7 +253,7 @@ class _StreakPageState extends State<StreakPage> {
                   const SizedBox(width: AppSpacing.xs),
                   Flexible(
                     child: Text(
-                   '${t(context, 'streak.best')}: $best',
+                      '${t(context, 'streak.best')}: $best',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.bodyMd(),

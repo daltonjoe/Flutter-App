@@ -22,6 +22,7 @@ import '../models/ask_context.dart';
 import '../providers/ask_context_provider.dart';
 import '../widgets/ask_add.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 
 class TodayPage extends StatefulWidget {
   const TodayPage({super.key});
@@ -417,7 +418,7 @@ class _TodayPageState extends State<TodayPage> {
     );
   }
 
-    void _addHeadline(Map head) {
+  void _addHeadline(Map head) {
     final pid = context.read<ActiveProfileProvider>().activeProfileId;
     if (pid == null) return;
     final tag = head['tag'] as Map?;
@@ -594,17 +595,21 @@ class _TodayPageState extends State<TodayPage> {
         child: _content(selectedData, loc),
       );
     }
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_t('today.title')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: pid == null || _loading ? null : () => _load(pid, loc),
-          ),
-        ],
+    return CosmicBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          title: Text(_t('today.title')),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: pid == null || _loading ? null : () => _load(pid, loc),
+            ),
+          ],
+        ),
+        body: SafeArea(child: body),
       ),
-      body: SafeArea(child: body),
     );
   }
 
@@ -691,7 +696,7 @@ class _TodayPageState extends State<TodayPage> {
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
-            if (context.read<ActiveProfileProvider>().activeProfileId != null)
+          if (context.read<ActiveProfileProvider>().activeProfileId != null)
             Align(
               alignment: Alignment.centerLeft,
               child: AskAddButton(onPressed: () => _addHeadline(head)),
@@ -765,7 +770,7 @@ class _TodayPageState extends State<TodayPage> {
                       ),
                     )
                   : null,
-             trailing: ValueListenableBuilder<bool>(
+              trailing: ValueListenableBuilder<bool>(
                 valueListenable: askEnabled,
                 builder: (ctx, on, _) => Row(
                   mainAxisSize: MainAxisSize.min,
@@ -773,8 +778,11 @@ class _TodayPageState extends State<TodayPage> {
                     if (on)
                       IconButton(
                         tooltip: t(ctx, 'ask.add'),
-                        icon: const Icon(Icons.auto_awesome_outlined,
-                            size: 18, color: AppColors.violetPrimary),
+                        icon: const Icon(
+                          Icons.auto_awesome_outlined,
+                          size: 18,
+                          color: AppColors.violetPrimary,
+                        ),
                         onPressed: () => _addEvent(e),
                       ),
                     if (e['applying'] is bool)
@@ -993,7 +1001,7 @@ class _CheckinCard extends StatelessWidget {
             width: AppSpacing.xxl,
             height: AppSpacing.xxl,
             child: Center(
-               child: Icon(_icons[todayMood - 1], size: 28, color: color),
+              child: Icon(_icons[todayMood - 1], size: 28, color: color),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -1134,7 +1142,7 @@ class _CheckinCard extends StatelessWidget {
                         ),
                         child: InkWell(
                           borderRadius: AppRadius.mdBr,
-             onTap: saving ? null : () => onPickMood(mood),
+                          onTap: saving ? null : () => onPickMood(mood),
                           child: Center(
                             child: Icon(
                               _icons[i],

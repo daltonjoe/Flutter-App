@@ -11,11 +11,16 @@ import '../services/reference_names_service.dart';
 import '../widgets/ask_add.dart';
 import '../providers/ask_context_provider.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 
 class PlacementContentPage extends StatefulWidget {
   final NatalChartResponse chartData;
   final String? initialKey;
-  const PlacementContentPage({super.key, required this.chartData, this.initialKey});
+  const PlacementContentPage({
+    super.key,
+    required this.chartData,
+    this.initialKey,
+  });
 
   @override
   State<PlacementContentPage> createState() => _PlacementContentPageState();
@@ -31,7 +36,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
   late final bool _birthTimeKnown;
   late final List<(String, String)> _tabs;
 
- String? _loc;
+  String? _loc;
   bool _loading = true;
   bool _error = false;
   Map<String, List<PlacementContent>> _data = {};
@@ -40,13 +45,11 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
   void initState() {
     super.initState();
     _birthTimeKnown = widget.chartData.input?.birthTimeKnown == true;
-    _tabs = _allTabs
-        .where((t) => _birthTimeKnown || t.$1 != 'moon')
-        .toList();
+    _tabs = _allTabs.where((t) => _birthTimeKnown || t.$1 != 'moon').toList();
     _load();
   }
 
-    @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final loc = context.watch<LanguageProvider>().locale.languageCode;
@@ -61,7 +64,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
 
   Future<void> _load() async {
     final c = widget.chartData;
-   final locale = context.read<LanguageProvider>().locale.languageCode;
+    final locale = context.read<LanguageProvider>().locale.languageCode;
     _loc = locale;
     String code(int? i) => i == null ? '' : (RefIds.signCode(i) ?? '');
     try {
@@ -93,28 +96,33 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
 
   @override
   Widget build(BuildContext context) {
-   final idx = _tabs.indexWhere((t) => t.$1 == widget.initialKey);
+    final idx = _tabs.indexWhere((t) => t.$1 == widget.initialKey);
     return DefaultTabController(
       length: _tabs.length,
       initialIndex: idx < 0 ? 0 : idx,
-      child: Scaffold(
-        backgroundColor: AppTheme.bgDeep,
-        appBar: AppBar(
-          backgroundColor: AppTheme.bgDeep,
-          iconTheme: const IconThemeData(color: AppTheme.textPrimary),
-          title: Text(t(context, 'placement.title'),
+      child: CosmicBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+            title: Text(
+              t(context, 'placement.title'),
               style: const TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600)),
-          bottom: TabBar(
-            indicatorColor: AppTheme.violet,
-            labelColor: AppTheme.violet,
-            unselectedLabelColor: AppTheme.textMuted,
-            tabs: [for (final tab in _tabs) Tab(text: t(context, tab.$2))],
+                color: AppTheme.textPrimary,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            bottom: TabBar(
+              indicatorColor: AppTheme.violet,
+              labelColor: AppTheme.violet,
+              unselectedLabelColor: AppTheme.textMuted,
+              tabs: [for (final tab in _tabs) Tab(text: t(context, tab.$2))],
+            ),
           ),
+          body: _body(),
         ),
-        body: _body(),
       ),
     );
   }
@@ -125,30 +133,37 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
     }
     if (_error) {
       return Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(t(context, 'placement.error'),
-              style: const TextStyle(color: AppTheme.textSecondary)),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _loading = true;
-                _error = false;
-              });
-              _load();
-            },
-            child: Text(t(context, 'placement.retry')),
-          ),
-        ]),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              t(context, 'placement.error'),
+              style: const TextStyle(color: AppTheme.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _loading = true;
+                  _error = false;
+                });
+                _load();
+              },
+              child: Text(t(context, 'placement.retry')),
+            ),
+          ],
+        ),
       );
     }
     return TabBarView(
       children: [
         for (final tab in _tabs)
-          Column(children: [
-            _askBtn(tab.$1),
-            Expanded(child: _list(_data[tab.$1] ?? [])),
-          ]),
+          Column(
+            children: [
+              _askBtn(tab.$1),
+              Expanded(child: _list(_data[tab.$1] ?? [])),
+            ],
+          ),
       ],
     );
   }
@@ -156,8 +171,13 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
   Widget _askBtn(String key) {
     final c = widget.chartData;
     final n = context.read<ReferenceNamesService>();
-    
-    final pl = c.planets?[key == 'sun' ? 'Sun' : key == 'moon' ? 'Moon' : ''];
+
+    final pl =
+        c.planets?[key == 'sun'
+            ? 'Sun'
+            : key == 'moon'
+            ? 'Moon'
+            : ''];
     String q;
     if (key == 'ascendant') {
       final s = c.houses?['house_1']?.signIndex;
@@ -171,8 +191,11 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
         'sign': n.sign(pl.signIndex + 1),
         'house': n.house(pl.house),
       };
-      q = t(context, _birthTimeKnown ? 'ask.about.placement' : 'ask.about.nohouse',
-          args: args);
+      q = t(
+        context,
+        _birthTimeKnown ? 'ask.about.placement' : 'ask.about.nohouse',
+        args: args,
+      );
     }
     return ValueListenableBuilder<bool>(
       valueListenable: askEnabled,
@@ -195,8 +218,10 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
   Widget _list(List<PlacementContent> items) {
     if (items.isEmpty) {
       return Center(
-        child: Text(t(context, 'placement.empty'),
-            style: const TextStyle(color: AppTheme.textSecondary)),
+        child: Text(
+          t(context, 'placement.empty'),
+          style: const TextStyle(color: AppTheme.textSecondary),
+        ),
       );
     }
     return Center(
@@ -231,53 +256,76 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
                 width: 8,
                 height: 8,
                 margin: const EdgeInsets.only(right: 6),
-                decoration: BoxDecoration(color: themeColor, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: themeColor,
+                  shape: BoxShape.circle,
+                ),
               ),
               Text(
                 t(context, 'placement.theme.${c.themeCode}'),
                 style: TextStyle(
-                    color: themeColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700),
+                  color: themeColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text(c.title,
-                style: const TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700)),
+            child: Text(
+              c.title,
+              style: const TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
           children: [
             if (c.shortDescription != null)
-              Text(c.shortDescription!,
-                  style: const TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: 13,
-                      fontStyle: FontStyle.italic)),
+              Text(
+                c.shortDescription!,
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 13,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
             if (c.content != null) ...[
               const SizedBox(height: 10),
-              Text(c.content!,
-                  style: const TextStyle(
-                      color: AppTheme.textPrimary, fontSize: 14, height: 1.5)),
+              Text(
+                c.content!,
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
             ],
             if (c.keywords.isNotEmpty) ...[
               const SizedBox(height: 12),
-              Wrap(spacing: 6, runSpacing: 6, children: [
-                for (final k in c.keywords)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: themeColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  for (final k in c.keywords)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: themeColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        k,
+                        style: TextStyle(color: themeColor, fontSize: 11),
+                      ),
                     ),
-                    child: Text(k,
-                        style: TextStyle(color: themeColor, fontSize: 11)),
-                  ),
-              ]),
+                ],
+              ),
             ],
             _bullets('placement.strengths', c.strengths),
             _bullets('placement.challenges', c.challenges),
@@ -291,28 +339,40 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
     if (items.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(top: 14),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(t(context, titleKey),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            t(context, titleKey),
             style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 13,
-                fontWeight: FontWeight.w700)),
-        const SizedBox(height: 6),
-        for (final s in items)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('• ', style: TextStyle(color: AppTheme.violet)),
-              Expanded(
-                child: Text(s,
-                    style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          for (final s in items)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('• ', style: TextStyle(color: AppTheme.violet)),
+                  Expanded(
+                    child: Text(
+                      s,
+                      style: const TextStyle(
                         color: AppTheme.textSecondary,
                         fontSize: 13,
-                        height: 1.4)),
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ]),
-          ),
-      ]),
+            ),
+        ],
+      ),
     );
   }
 }

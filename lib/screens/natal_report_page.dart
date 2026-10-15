@@ -5,6 +5,7 @@ import '../providers/language_provider.dart';
 import '../services/astro_service.dart';
 import '../theme/app_theme.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 import '../i18n/app_localizations.dart';
 import '../core/utils/text_parser.dart';
 import '../widgets/analysis/analysis_section_card.dart';
@@ -146,59 +147,63 @@ class _NatalReportPageState extends State<NatalReportPage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return CosmicLoadingScreen(
-        message: t(context, 'natal_report.loading'),
-      );
+      return CosmicLoadingScreen(message: t(context, 'natal_report.loading'));
     }
 
-    return Scaffold(
-      backgroundColor: AppTheme.bgDeep,
-      body: CustomScrollView(
-        slivers: [
-          // ── Header ─────────────────────────────────────────────
-          SliverAppBar(
-            pinned: true,
-            backgroundColor: AppTheme.bgDeep,
-            iconTheme: const IconThemeData(color: AppTheme.textPrimary),
-            title: Text(
-              t(context, 'natal_report.title', args: {'name': widget.userName}),
-              style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(
-                  Icons.refresh_rounded,
-                  color: AppTheme.textSecondary,
+    return CosmicBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: CustomScrollView(
+          slivers: [
+            // ── Header ─────────────────────────────────────────────
+            SliverAppBar(
+              pinned: true,
+              backgroundColor: AppTheme.bgDeep,
+              iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+              title: Text(
+                t(
+                  context,
+                  'natal_report.title',
+                  args: {'name': widget.userName},
                 ),
-                onPressed: _fetchReport,
-                tooltip: t(context, 'natal_report.refresh'),
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ],
-          ),
-
-          // ── Body ───────────────────────────────────────────────
-          if (_errorMsg != null)
-            SliverFillRemaining(
-              child: _ErrorView(message: _errorMsg!, onRetry: _fetchReport),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 60),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  _buildPersonHero(),
-                  const SizedBox(height: 32),
-                  ..._renderModernReport(_report ?? ''),
-                  const SizedBox(height: 40),
-                  _buildFooter(),
-                ]),
-              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.refresh_rounded,
+                    color: AppTheme.textSecondary,
+                  ),
+                  onPressed: _fetchReport,
+                  tooltip: t(context, 'natal_report.refresh'),
+                ),
+              ],
             ),
-        ],
+
+            // ── Body ───────────────────────────────────────────────
+            if (_errorMsg != null)
+              SliverFillRemaining(
+                child: _ErrorView(message: _errorMsg!, onRetry: _fetchReport),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 60),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    _buildPersonHero(),
+                    const SizedBox(height: 32),
+                    ..._renderModernReport(_report ?? ''),
+                    const SizedBox(height: 40),
+                    _buildFooter(),
+                  ]),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -213,7 +218,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
       padding: const EdgeInsets.all(24),
       decoration: cosmicCard(
         gradient: const LinearGradient(
-          colors: [Color(0xFF2D1B69), Color(0xFF130E29)],
+          colors: [Color(0xFF12306E), Color(0xFF081330)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -226,7 +231,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: const BoxDecoration(
-                  color: Color(0x268B5CF6),
+                  color: Color(0x262D7DF0),
                   shape: BoxShape.circle,
                 ),
                 child: const Text('✨', style: TextStyle(fontSize: 20)),
@@ -292,9 +297,9 @@ class _NatalReportPageState extends State<NatalReportPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0x991A1535),
+        color: const Color(0x990E1C40),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x338B5CF6)),
+        border: Border.all(color: const Color(0x332D7DF0)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -364,7 +369,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
         const Text(
           'Ephemerai · AI Astrology',
           style: TextStyle(
-            color: Color(0x808B5CF6),
+            color: Color(0x802D7DF0),
             fontSize: 10,
             fontWeight: FontWeight.w600,
             letterSpacing: 1.2,
@@ -409,9 +414,9 @@ class _ErrorView extends StatelessWidget {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0x268B5CF6),
+                  color: const Color(0x262D7DF0),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0x4D8B5CF6)),
+                  border: Border.all(color: const Color(0x4D2D7DF0)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

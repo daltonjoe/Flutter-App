@@ -14,11 +14,12 @@ import '../services/match_service.dart';
 import '../services/reference_names_service.dart';
 import '../models/ask_context.dart';
 import '../providers/ask_context_provider.dart' show askEnabled;
-import '../widgets/ask_add.dart' show addToAsk, askAbout, askBridge, askBridgeOn;
+import '../widgets/ask_add.dart'
+    show addToAsk, askAbout, askBridge, askBridgeOn;
 import '../services/user_settings_service.dart';
 import '../core/match_weights.dart';
 import 'edit_birth_data_page.dart';
-
+import '../presentation/widgets/components/cosmic_background.dart';
 
 class _ProfileEntry {
   final String id;
@@ -63,9 +64,11 @@ class _MatchPageState extends State<MatchPage> {
   void initState() {
     super.initState();
     _loadProfiles();
-    unawaited(UserSettingsService.isFlagEnabled('match_v2').then((v) {
-      if (mounted) setState(() => _v2 = v);
-    }));
+    unawaited(
+      UserSettingsService.isFlagEnabled('match_v2').then((v) {
+        if (mounted) setState(() => _v2 = v);
+      }),
+    );
   }
 
   static String _pk(String a, String b) {
@@ -85,9 +88,11 @@ class _MatchPageState extends State<MatchPage> {
       if (uid != null) {
         final r = await Supabase.instance.client
             .from('user_profiles')
-            .select('id,display_name,birth_time_known,sun_sign_id,moon_sign_id,ascendant_sign_id')
+            .select(
+              'id,display_name,birth_time_known,sun_sign_id,moon_sign_id,ascendant_sign_id',
+            )
             .eq('user_id', uid);
-      rows = List<Map<String, dynamic>>.from(r);
+        rows = List<Map<String, dynamic>>.from(r);
       }
       final list = <_ProfileEntry>[];
       for (final row in rows) {
@@ -129,6 +134,7 @@ class _MatchPageState extends State<MatchPage> {
       });
     }
   }
+
   Future<void> _maybeFetch(String? a, String? b) async {
     if (a == null || b == null) return;
     final key = _pk(a, b);
@@ -179,7 +185,7 @@ class _MatchPageState extends State<MatchPage> {
   Future<void> _loadTexts(String key, MatchResult r, String loc) async {
     final tk = '$key|$loc';
     final c = _textCache[tk];
-     if (c != null) {
+    if (c != null) {
       if (mounted) setState(() => _texts = c);
       return;
     }
@@ -393,81 +399,83 @@ class _MatchPageState extends State<MatchPage> {
   }
 
   @override
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     context.watch<ReferenceNamesService>();
     final noAnim = MediaQuery.disableAnimationsOf(context);
     final l = AppLocalizations.of(context);
-    return Scaffold(
-      backgroundColor: AppColors.bgDeep,
-      appBar: AppBar(
+    return CosmicBackground(
+      child: Scaffold(
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Row(
-          children: [
-            Flexible(
-              child: Text(
-                t(context, 'match.title'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.h2(),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  t(context, 'match.title'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.h2(),
+                ),
               ),
+            ],
+          ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh, color: AppColors.textPrimary),
+              onPressed: () {
+                final a = _profileA;
+                final b = _profileB;
+                if (a != null && b != null) {
+                  _cache.remove(_pk(a, b));
+                  unawaited(_maybeFetch(a, b));
+                } else {
+                  unawaited(_loadProfiles());
+                }
+              },
             ),
           ],
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.textPrimary),
-            onPressed: () {
-              final a = _profileA;
-              final b = _profileB;
-              if (a != null && b != null) {
-                _cache.remove(_pk(a, b));
-                unawaited(_maybeFetch(a, b));
-              } else {
-                unawaited(_loadProfiles());
-              }
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenH,
-            AppSpacing.contentTop,
-            AppSpacing.screenH,
-            AppSpacing.contentBottom,
-          ),
-          children: [
-            Container(
-              decoration: AppDecorations.cosmicCard(),
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      _selector(isA: true),
-                      const SizedBox(width: AppSpacing.sm),
-                      Icon(
-                        Icons.favorite_border,
-                        size: 20,
-                        color: AppColors.violetPrimary,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      _selector(isA: false),
-                    ],
-                  ),
-                ],
-              ),
+        body: SafeArea(
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenH,
+              AppSpacing.contentTop,
+              AppSpacing.screenH,
+              AppSpacing.contentBottom,
             ),
-            const SizedBox(height: AppSpacing.md),
-            _body(noAnim, l),
-          ],
+            children: [
+              Container(
+                decoration: AppDecorations.cosmicCard(),
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        _selector(isA: true),
+                        const SizedBox(width: AppSpacing.sm),
+                        Icon(
+                          Icons.favorite_border,
+                          size: 20,
+                          color: AppColors.violetPrimary,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        _selector(isA: false),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _body(noAnim, l),
+            ],
+          ),
         ),
       ),
     );
@@ -517,7 +525,7 @@ class _MatchPageState extends State<MatchPage> {
       return const SizedBox.shrink();
     }
     final note = !r.timeKnownA || !r.timeKnownB;
-      // Yönsüz metin: A.x-B.y ve A.y-B.x aynı anahtar; küçük orb olanı tut.
+    // Yönsüz metin: A.x-B.y ve A.y-B.x aynı anahtar; küçük orb olanı tut.
     final dedup = <String, MatchAspect>{};
     for (final x in r.aspects) {
       final k = MatchService.textKey(x.bodyAId, x.bodyBId, x.aspectTypeId);
@@ -559,7 +567,10 @@ class _MatchPageState extends State<MatchPage> {
                   a,
                   i == aspects.length - 1,
                   _texts[MatchService.textKey(
-                      a.bodyAId, a.bodyBId, a.aspectTypeId)],
+                    a.bodyAId,
+                    a.bodyBId,
+                    a.aspectTypeId,
+                  )],
                 );
               }),
             ),
@@ -624,7 +635,8 @@ class _MatchPageState extends State<MatchPage> {
       ),
     );
   }
-    void _addAspect(MatchAspect a) {
+
+  void _addAspect(MatchAspect a) {
     final pa = _profileA;
     final pb = _profileB;
     if (pa == null || pb == null) return;
@@ -718,8 +730,11 @@ class _MatchPageState extends State<MatchPage> {
                         ? IconButton(
                             tooltip: t(ctx, 'ask.add'),
                             visualDensity: VisualDensity.compact,
-                            icon: const Icon(Icons.auto_awesome_outlined,
-                                size: 18, color: AppColors.violetPrimary),
+                            icon: const Icon(
+                              Icons.auto_awesome_outlined,
+                              size: 18,
+                              color: AppColors.violetPrimary,
+                            ),
                             onPressed: () => _addAspect(a),
                           )
                         : const SizedBox.shrink(),
@@ -746,17 +761,23 @@ class _MatchPageState extends State<MatchPage> {
     );
   }
 
-    List<WeightedAspect> _weighted(List<MatchAspect> l) {
+  List<WeightedAspect> _weighted(List<MatchAspect> l) {
     final out = <WeightedAspect>[];
     for (final x in l) {
-      final m = MatchService.meta[
-          MatchService.textKey(x.bodyAId, x.bodyBId, x.aspectTypeId)];
+      final m = MatchService
+          .meta[MatchService.textKey(x.bodyAId, x.bodyBId, x.aspectTypeId)];
       if (m == null) continue; // metinsiz: hesaba girmez
       final lo = x.bodyAId < x.bodyBId ? x.bodyAId : x.bodyBId;
       final hi = x.bodyAId < x.bodyBId ? x.bodyBId : x.bodyAId;
-      out.add(WeightedAspect(lo, hi, x.aspectTypeId,
+      out.add(
+        WeightedAspect(
+          lo,
+          hi,
+          x.aspectTypeId,
           aspectWeight(lo, hi, x.aspectTypeId, x.tightness, m.intensity),
-          themeOf(lo, hi)));
+          themeOf(lo, hi),
+        ),
+      );
     }
     return out;
   }
@@ -770,18 +791,23 @@ class _MatchPageState extends State<MatchPage> {
 
   Widget _signCell(int? id, bool show, String? pid) {
     if (show && id != null) {
-      return Text(ReferenceNamesService.instance.sign(id),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: AppTextStyles.bodyMd(color: AppColors.textPrimary));
+      return Text(
+        ReferenceNamesService.instance.sign(id),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: AppTextStyles.bodyMd(color: AppColors.textPrimary),
+      );
     }
     return InkWell(
       onTap: pid == null
           ? null
           : () async {
               final ok = await Navigator.of(context, rootNavigator: true)
-                  .push<bool>(MaterialPageRoute(
-                      builder: (_) => EditBirthDataPage(profileId: pid)));
+                  .push<bool>(
+                    MaterialPageRoute(
+                      builder: (_) => EditBirthDataPage(profileId: pid),
+                    ),
+                  );
               if (ok != true || !mounted) return;
               _cache.clear();
               _textCache.clear();
@@ -792,29 +818,31 @@ class _MatchPageState extends State<MatchPage> {
         constraints: const BoxConstraints(minHeight: 44),
         child: Align(
           alignment: Alignment.centerLeft,
-          child: Text(t(context, 'match.add_time'),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.bodySm(color: AppColors.goldAccent)),
+          child: Text(
+            t(context, 'match.add_time'),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodySm(color: AppColors.goldAccent),
+          ),
         ),
       ),
     );
   }
 
   Widget _v2Body(MatchResult r, List<MatchAspect> all, bool note) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _v2Top(r, all, note),
-          const SizedBox(height: AppSpacing.lg),
-          _v2List(all),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _v2Top(r, all, note),
+      const SizedBox(height: AppSpacing.lg),
+      _v2List(all),
+    ],
+  );
 
   String _heroLine(List<WeightedAspect> top) {
     if (top.isEmpty) return '';
     final s =
         _texts[MatchService.textKey(top.first.a, top.first.b, top.first.asp)] ??
-            '';
+        '';
     final m = RegExp(r'[.!?](\s|$)').firstMatch(s);
     return (m == null ? s : s.substring(0, m.start + 1)).trim();
   }
@@ -870,15 +898,21 @@ class _MatchPageState extends State<MatchPage> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.auto_awesome_outlined,
-                      size: 16, color: AppColors.violetPrimary),
+                  const Icon(
+                    Icons.auto_awesome_outlined,
+                    size: 16,
+                    color: AppColors.violetPrimary,
+                  ),
                   const SizedBox(width: AppSpacing.xs),
                   Expanded(
-                    child: Text(t(ctx, 'match.ask.cta'),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.bodySm(
-                            color: AppColors.violetPrimary)),
+                    child: Text(
+                      t(ctx, 'match.ask.cta'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodySm(
+                        color: AppColors.violetPrimary,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -890,15 +924,18 @@ class _MatchPageState extends State<MatchPage> {
                   for (final q in const [
                     'match.ask.q1',
                     'match.ask.q2',
-                    'match.ask.q3'
+                    'match.ask.q3',
                   ])
                     ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 44),
                       child: ActionChip(
-                        label: Text(t(ctx, q),
-                            softWrap: true,
-                            style: AppTextStyles.bodySm(
-                                color: AppColors.textPrimary)),
+                        label: Text(
+                          t(ctx, q),
+                          softWrap: true,
+                          style: AppTextStyles.bodySm(
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
                         onPressed: () => _askSyn(x, q),
                       ),
                     ),
@@ -937,7 +974,8 @@ class _MatchPageState extends State<MatchPage> {
     final ranked = rankAspects(_weighted(all));
     const themeOrder = ['pull', 'feel', 'talk', 'pace', 'grow'];
     const chipKeys = ['all', 'harmony', 'tension', ...themeOrder];
-    String chipLabel(String k) => (k == 'all' || k == 'harmony' || k == 'tension')
+    String chipLabel(String k) =>
+        (k == 'all' || k == 'harmony' || k == 'tension')
         ? t(context, 'match.filter.$k')
         : t(context, 'match.theme.$k');
 
@@ -949,9 +987,10 @@ class _MatchPageState extends State<MatchPage> {
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.xs),
               child: ChoiceChip(
-                label: Text(chipLabel(k),
-                    style:
-                        AppTextStyles.bodySm(color: AppColors.textPrimary)),
+                label: Text(
+                  chipLabel(k),
+                  style: AppTextStyles.bodySm(color: AppColors.textPrimary),
+                ),
                 selected: _filter == k,
                 selectedColor: AppColors.violetPrimary,
                 onSelected: (_) {
@@ -976,17 +1015,25 @@ class _MatchPageState extends State<MatchPage> {
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
               tilePadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm, vertical: 2),
+                horizontal: AppSpacing.sm,
+                vertical: 2,
+              ),
               childrenPadding: const EdgeInsets.fromLTRB(
-                  AppSpacing.sm, 0, AppSpacing.sm, AppSpacing.sm),
+                AppSpacing.sm,
+                0,
+                AppSpacing.sm,
+                AppSpacing.sm,
+              ),
               expandedCrossAxisAlignment: CrossAxisAlignment.start,
               title: Row(
                 children: [
                   Container(
                     width: 10,
                     height: 10,
-                    decoration:
-                        BoxDecoration(color: col, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: col,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
@@ -1012,9 +1059,10 @@ class _MatchPageState extends State<MatchPage> {
                 ),
               ),
               children: [
-                Text(_texts[keyOf(x)] ?? '',
-                    style:
-                        AppTextStyles.bodyMd(color: AppColors.textSecondary)),
+                Text(
+                  _texts[keyOf(x)] ?? '',
+                  style: AppTextStyles.bodyMd(color: AppColors.textSecondary),
+                ),
                 _askBlock(x),
               ],
             ),
@@ -1027,13 +1075,20 @@ class _MatchPageState extends State<MatchPage> {
     for (final th in themeOrder) {
       final items = ranked.where((x) => x.theme == th && pass(x)).toList();
       if (items.isEmpty) continue;
-      groups.add(Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.sm, bottom: AppSpacing.xs),
-        child: Text(t(context, 'match.theme.$th'),
+      groups.add(
+        Padding(
+          padding: const EdgeInsets.only(
+            top: AppSpacing.sm,
+            bottom: AppSpacing.xs,
+          ),
+          child: Text(
+            t(context, 'match.theme.$th'),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.h3()),
-      ));
+            style: AppTextStyles.h3(),
+          ),
+        ),
+      );
       groups.addAll(items.map(card));
     }
     return Column(
@@ -1057,22 +1112,24 @@ class _MatchPageState extends State<MatchPage> {
     final top = top3(w);
     final a = _prof(_profileA), b = _prof(_profileB);
     Widget col(_ProfileEntry? p, bool known) => Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(p?.displayName ?? '',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.h3()),
-              const SizedBox(height: AppSpacing.xs),
-              _signCell(p?.sunId, true, p?.id),
-              const SizedBox(height: AppSpacing.xs),
-              _signCell(p?.moonId, known, p?.id),
-              const SizedBox(height: AppSpacing.xs),
-              _signCell(p?.ascId, known, p?.id),
-            ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            p?.displayName ?? '',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.h3(),
           ),
-        );
+          const SizedBox(height: AppSpacing.xs),
+          _signCell(p?.sunId, true, p?.id),
+          const SizedBox(height: AppSpacing.xs),
+          _signCell(p?.moonId, known, p?.id),
+          const SizedBox(height: AppSpacing.xs),
+          _signCell(p?.ascId, known, p?.id),
+        ],
+      ),
+    );
     final svc = ReferenceNamesService.instance;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1084,10 +1141,14 @@ class _MatchPageState extends State<MatchPage> {
         if (themes.isNotEmpty) ...[
           Text(
             themes.length == 2
-                ? t(context, 'match.hero.two', args: {
-                    'a': t(context, 'match.theme.${themes[0]}'),
-                    'b': t(context, 'match.theme.${themes[1]}'),
-                  })
+                ? t(
+                    context,
+                    'match.hero.two',
+                    args: {
+                      'a': t(context, 'match.theme.${themes[0]}'),
+                      'b': t(context, 'match.theme.${themes[1]}'),
+                    },
+                  )
                 : t(context, 'match.theme.${themes[0]}'),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -1095,11 +1156,12 @@ class _MatchPageState extends State<MatchPage> {
           ),
           if (_heroLine(top).isNotEmpty) ...[
             const SizedBox(height: AppSpacing.xs),
-            Text(_heroLine(top),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style:
-                    AppTextStyles.bodyMd(color: AppColors.textSecondary)),
+            Text(
+              _heroLine(top),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.bodyMd(color: AppColors.textSecondary),
+            ),
           ],
           const SizedBox(height: AppSpacing.md),
         ],
@@ -1116,10 +1178,12 @@ class _MatchPageState extends State<MatchPage> {
           ),
         ),
         const SizedBox(height: AppSpacing.md),
-        Text(t(context, 'match.top3_title'),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.h3()),
+        Text(
+          t(context, 'match.top3_title'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTextStyles.h3(),
+        ),
         const SizedBox(height: AppSpacing.sm),
         if (top.isEmpty)
           _infoCard(context, t(context, 'match.no_aspects'))
@@ -1134,16 +1198,18 @@ class _MatchPageState extends State<MatchPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                        '${svc.planet(x.a)} ${svc.aspect(x.asp)} ${svc.planet(x.b)}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.bodyLg(
-                            color: AppColors.goldAccent)),
+                      '${svc.planet(x.a)} ${svc.aspect(x.asp)} ${svc.planet(x.b)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodyLg(color: AppColors.goldAccent),
+                    ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                        _texts[MatchService.textKey(x.a, x.b, x.asp)] ?? '',
-                        style: AppTextStyles.bodyMd(
-                            color: AppColors.textSecondary)),
+                      _texts[MatchService.textKey(x.a, x.b, x.asp)] ?? '',
+                      style: AppTextStyles.bodyMd(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
                   ],
                 ),
               ),

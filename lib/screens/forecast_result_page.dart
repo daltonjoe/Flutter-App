@@ -8,6 +8,7 @@ import '../providers/language_provider.dart';
 import '../services/astro_service.dart';
 import '../theme/app_theme.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 import '../i18n/app_localizations.dart';
 import '../core/utils/text_parser.dart';
 import '../widgets/analysis/analysis_section_card.dart';
@@ -43,7 +44,7 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
 
   static const Map<String, List<Color>> _colors = {
     'daily': [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
-    'weekly': [Color(0xFF6D28D9), Color(0xFF8B5CF6)],
+    'weekly': [Color(0xFF1E5BC6), Color(0xFF2D7DF0)],
     'monthly': [Color(0xFF0284C7), Color(0xFF38BDF8)],
     'yearly': [Color(0xFFD97706), Color(0xFFFBBF24)],
   };
@@ -94,33 +95,35 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
     final colors =
         _colors[widget.analysisType] ?? [AppTheme.violetSoft, AppTheme.violet];
 
-    return Scaffold(
-      backgroundColor: AppTheme.bgDeep,
-      appBar: AppBar(
-        backgroundColor: AppTheme.bgDeep,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
-        title: Text(
-          '$emoji ${t(context, 'forecast.result_title', args: {'period': widget.periodLabel})}',
-          style: const TextStyle(
-            color: AppTheme.textPrimary,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        elevation: 0,
-        actions: [
-          if (!_isLoading)
-            IconButton(
-              icon: const Icon(
-                Icons.refresh_rounded,
-                color: AppTheme.textSecondary,
-                size: 20,
-              ),
-              onPressed: _fetch,
+    return CosmicBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+          title: Text(
+            '$emoji ${t(context, 'forecast.result_title', args: {'period': widget.periodLabel})}',
+            style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
             ),
-        ],
+          ),
+          elevation: 0,
+          actions: [
+            if (!_isLoading)
+              IconButton(
+                icon: const Icon(
+                  Icons.refresh_rounded,
+                  color: AppTheme.textSecondary,
+                  size: 20,
+                ),
+                onPressed: _fetch,
+              ),
+          ],
+        ),
+        body: _buildBody(emoji, colors),
       ),
-      body: _buildBody(emoji, colors),
     );
   }
 

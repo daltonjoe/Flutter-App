@@ -8,6 +8,7 @@ import '../providers/language_provider.dart';
 import '../services/astro_service.dart';
 import '../theme/app_theme.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 import '../i18n/app_localizations.dart';
 import '../core/utils/text_parser.dart';
 import '../presentation/widgets/components/analysis_section_card.dart';
@@ -21,7 +22,6 @@ import '../providers/ask_context_provider.dart';
 import '../providers/active_profile_provider.dart';
 import '../models/ask_context.dart';
 import '../widgets/ask_add.dart';
-
 
 class PlanetReportPage extends StatefulWidget {
   final String planetName;
@@ -40,7 +40,7 @@ class PlanetReportPage extends StatefulWidget {
 }
 
 class _PlanetReportPageState extends State<PlanetReportPage> {
- List<Map<String, dynamic>> _sections = [];
+  List<Map<String, dynamic>> _sections = [];
   bool _isLoading = true;
   bool _isFallback = false;
   String? _report;
@@ -62,8 +62,18 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
 
   // signIndex (0-11) -> zodiac_signs.code. Sıra DB'de doğrulandı (1-12).
   static const List<String> _signCodes = [
-    'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
-    'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces',
+    'aries',
+    'taurus',
+    'gemini',
+    'cancer',
+    'leo',
+    'virgo',
+    'libra',
+    'scorpio',
+    'sagittarius',
+    'capricorn',
+    'aquarius',
+    'pisces',
   ];
 
   static String _signCodeOf(PlanetData? pd) {
@@ -78,7 +88,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
     _fetch();
   }
 
-    @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final loc = context.watch<LanguageProvider>().locale.languageCode;
@@ -86,17 +96,25 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
   }
 
   Future<void> _fetch() async {
-    setState(() { _isLoading = true; _error = null; _isFallback = false; });
+    setState(() {
+      _isLoading = true;
+      _error = null;
+      _isFallback = false;
+    });
 
-    final locale = Provider.of<LanguageProvider>(context, listen: false)
-        .locale.languageCode;
+    final locale = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    ).locale.languageCode;
     _loc = locale;
     final pd = widget.chartData.planets?[widget.planetName];
     final birthTimeKnown = widget.chartData.input?.birthTimeKnown == true;
     final house = pd?.house ?? 0;
 
     if (widget.planetName == 'Moon' && !birthTimeKnown) {
-      setState(() { _isLoading = false; });
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
 
@@ -104,41 +122,48 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
       final signCode = _signCodeOf(pd);
       var query = Supabase.instance.client
           .from('placement_content')
-          .select('title, content, strengths, challenges, '
-              'celestial_bodies!inner(code), zodiac_signs!inner(code), '
-              'astrological_houses!inner(house_number), '
-              'content_themes(code, sort_order)')
+          .select(
+            'title, content, strengths, challenges, '
+            'celestial_bodies!inner(code), zodiac_signs!inner(code), '
+            'astrological_houses!inner(house_number), '
+            'content_themes(code, sort_order)',
+          )
           .eq('celestial_bodies.code', widget.planetName)
           .eq('zodiac_signs.code', signCode);
       if (birthTimeKnown && house > 0) {
         query = query.eq('astrological_houses.house_number', house);
       }
-      final rows = await query
-          .eq('locale', locale)
-          .eq('is_active', true);
-        if (!mounted) return;
-        if (rows.isEmpty) {
+      final rows = await query.eq('locale', locale).eq('is_active', true);
+      if (!mounted) return;
+      if (rows.isEmpty) {
         // Fallback: Supabase'de içerik yoksa eski AI akışına düş
         final r = await AstroService.generatePlanetReport(
           planetName: widget.planetName,
           chartData: widget.chartData.toChartPayload(),
           locale: locale,
         );
-          if (!mounted) return;
-          setState(() { _report = r; _isFallback = true; _isLoading = false; });
+        if (!mounted) return;
+        setState(() {
+          _report = r;
+          _isFallback = true;
+          _isLoading = false;
+        });
       } else {
         setState(() {
           _sections = List<Map<String, dynamic>>.from(rows);
           _isLoading = false;
         });
       }
- } on AstroServiceException catch (e) {
-        if (!mounted) return;
-        setState(() { _error = e.message; _isLoading = false; });
+    } on AstroServiceException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.message;
+        _isLoading = false;
+      });
     } catch (e) {
-        debugPrint('planet_report fetch error: $e');
-        if (!mounted) return;
-        setState(() {
+      debugPrint('planet_report fetch error: $e');
+      if (!mounted) return;
+      setState(() {
         _error = t(context, 'planet_report.unexpected_error');
         _isLoading = false;
       });
@@ -153,67 +178,65 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
     final pd = widget.chartData.planets?[widget.planetName];
     final names = context.watch<ReferenceNamesService>();
     final pid = RefIds.planets[widget.planetName];
-    final planetLabel =
-        pid != null ? names.planet(pid) : widget.planetNameTR;
+    final planetLabel = pid != null ? names.planet(pid) : widget.planetNameTR;
 
-    return Scaffold(
-      backgroundColor: AppTheme.bgDeep,
-      appBar: AppBar(
-        backgroundColor: AppTheme.bgDeep,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
-        title: Text(
-          t(
-            context,
-            'planet_report.title',
-              args: {'name': planetLabel},
-          ),
-          style: const TextStyle(
-            color: AppTheme.textPrimary,
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        elevation: 0,
-        actions: [
-          if (!_isLoading && _error == null)
-            IconButton(
-              icon: const Icon(
-                Icons.refresh_rounded,
-                color: AppTheme.textSecondary,
-                size: 20,
-              ),
-              onPressed: _fetch,
+    return CosmicBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+          title: Text(
+            t(context, 'planet_report.title', args: {'name': planetLabel}),
+            style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
             ),
-        ],
+          ),
+          elevation: 0,
+          actions: [
+            if (!_isLoading && _error == null)
+              IconButton(
+                icon: const Icon(
+                  Icons.refresh_rounded,
+                  color: AppTheme.textSecondary,
+                  size: 20,
+                ),
+                onPressed: _fetch,
+              ),
+          ],
+        ),
+        body: _isLoading
+            ? CosmicLoader(message: t(context, 'planet_report.loading'))
+            : _error != null
+            ? _buildError()
+            : _buildContent(color, emoji, pd),
       ),
-      body: _isLoading
-          ? CosmicLoader(message: t(context, 'planet_report.loading'))
-          : _error != null
-          ? _buildError()
-          : _buildContent(color, emoji, pd),
     );
   }
 
-    Widget _buildContent(Color color, String emoji, PlanetData? pd) {
+  Widget _buildContent(Color color, String emoji, PlanetData? pd) {
     final names = context.watch<ReferenceNamesService>();
     final pid = RefIds.planets[widget.planetName];
-    final planetLabel =
-        pid != null ? names.planet(pid) : widget.planetNameTR;
+    final planetLabel = pid != null ? names.planet(pid) : widget.planetNameTR;
     // ── FIX: Translate sign name from backend (always Turkish) ───────
-   final translatedSign =
-        pd != null ? names.sign(RefIds.signId(pd.signIndex)) : '';
+    final translatedSign = pd != null
+        ? names.sign(RefIds.signId(pd.signIndex))
+        : '';
 
     final known = widget.chartData.input?.birthTimeKnown == true;
     final askQ = (pd == null || pid == null)
         ? null
-        : t(context, known && pd.house > 0
-                ? 'ask.about.placement'
-                : 'ask.about.nohouse',
+        : t(
+            context,
+            known && pd.house > 0 ? 'ask.about.placement' : 'ask.about.nohouse',
             args: {
               'planet': planetLabel,
               'sign': translatedSign,
               'house': known && pd.house > 0 ? names.house(pd.house) : '',
-            });
+            },
+          );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 60),
@@ -294,7 +317,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                       planetLabel,
+                        planetLabel,
                         style: TextStyle(
                           color: color,
                           fontSize: 22,
@@ -335,12 +358,15 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
           const SizedBox(height: 24),
 
           // Report
-                    // Report
-  if (pd != null && pd.house <= 0)
+          // Report
+          if (pd != null && pd.house <= 0)
             Text(
               t(context, 'planet_report.time_unknown'),
               style: const TextStyle(
-                  color: AppTheme.textSecondary, fontSize: 14, height: 1.5),
+                color: AppTheme.textSecondary,
+                fontSize: 14,
+                height: 1.5,
+              ),
             )
           else if (_isFallback)
             ..._renderModernReportText(_report!, color)
