@@ -604,7 +604,9 @@ class _SettingsPageState extends State<SettingsPage>
       await sp.setBool("force_consent", true);
       nav.pushNamedAndRemoveUntil("/signin", (route) => false);
       debugPrint("signout: signin pushed");
+      diag68("signout pre-clear");
       await prov.clearActive();
+      diag68("signout post-clear");
     } catch (e) {
       debugPrint("SettingsPage._signOut failed: $e");
       if (!mounted) return;

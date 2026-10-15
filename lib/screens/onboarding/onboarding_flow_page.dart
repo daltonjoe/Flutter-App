@@ -11,6 +11,7 @@ import '../../presentation/widgets/components/onboarding_progress_bar.dart';
 import 'onboarding_birthdate_page.dart';
 import 'onboarding_language_page.dart';
 import 'package:flutter/services.dart';
+import "package:flutter_application/diag68.dart";
 
 
 
@@ -36,6 +37,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
   void initState() {
     super.initState();
     _step = _minStep;
+    diag68("page: flow init");
     _controller = PageController(initialPage: _minStep);
     if (!widget.isFirstProfile) {
       data.languageCode = context.read<LanguageProvider>().locale.languageCode;

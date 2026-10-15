@@ -7,6 +7,7 @@ import "../../core/theme/app_colors.dart";
 import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
 import "../../services/account_linking_service.dart";
+import "package:flutter_application/diag68.dart";
 
 class OnboardingRegisterPage extends StatefulWidget {
   const OnboardingRegisterPage({super.key});
@@ -23,6 +24,7 @@ class _OnboardingRegisterPageState extends State<OnboardingRegisterPage> {
   @override
   void initState() {
     super.initState();
+    diag68("page: register init");
     _sub = Supabase.instance.client.auth.onAuthStateChange.listen((s) {
       final u = s.session?.user;
       if (u == null || u.isAnonymous) return;

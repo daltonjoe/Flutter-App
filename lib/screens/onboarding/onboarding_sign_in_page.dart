@@ -30,6 +30,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
   @override
   void initState() {
     super.initState();
+    diag68("page: signin init");
     _sub = Supabase.instance.client.auth.onAuthStateChange.listen((s) {
       final u = s.session?.user;
       if (u == null || u.isAnonymous) return;
