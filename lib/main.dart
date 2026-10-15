@@ -337,6 +337,7 @@ Future<void> _restoreAccount67(ActiveProfileProvider prov) async {
     final k = cons.map((r) => r["kind"]).toSet();
     _startConsent67 = !(k.contains("privacy") && k.contains("terms") && k.contains("ai"));
     final sp67 = await SharedPreferences.getInstance();
+    diag68("restore consent", "start=$_startConsent67 kinds=${k.length} force=${sp67.getBool("force_consent")}");
     if (sp67.getBool("force_consent") == true) _startConsent67 = true;
   } catch (e) {
     debugPrint("restore account failed: $e");

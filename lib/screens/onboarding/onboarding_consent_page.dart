@@ -28,6 +28,7 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
   @override
   void initState() {
     super.initState();
+    diag68("page: consent init");
     _check();
   }
 
@@ -46,11 +47,13 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
       final sp = await SharedPreferences.getInstance();
       final force = sp.getBool("force_consent") == true;
       final k = rows.map((r) => r["kind"]).toSet();
+      diag68("consent check", "force=$force kinds=${k.length}");
       if (!force && k.contains("privacy") && k.contains("terms") && k.contains("ai")) {
         _home();
         return;
       }
     } catch (e) {
+      diag68("consent check ERR", "${e.runtimeType}");
       debugPrint("consent check failed: $e");
     }
     if (mounted) setState(() => _checking = false);
