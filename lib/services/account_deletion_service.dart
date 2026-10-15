@@ -11,6 +11,16 @@ class AccountDeletionService {
     } catch (_) {}
   }
 
+  /// 89: yalniz sunucuda sil; yerel oturum ve profil dokunulmaz.
+  static Future<void> deleteRemoteOnly() async {
+    final response = await Supabase.instance.client.functions.invoke(
+      "delete-account",
+    );
+    if (response.status < 200 || response.status >= 300) {
+      throw Exception("remote delete failed");
+    }
+  }
+
   static Future<void> deleteAccount() async {
     final response = await Supabase.instance.client.functions.invoke(
       'delete-account',
