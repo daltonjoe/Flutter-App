@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'active_chart_page.dart' show signingOut74;
 import 'package:flutter_application/paywall/subscription_settings_row.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -596,6 +597,7 @@ class _SettingsPageState extends State<SettingsPage>
     final nav = Navigator.of(context, rootNavigator: true);
     final prov = context.read<ActiveProfileProvider>();
     try {
+      signingOut74 = true;
       diag68("signout before");
       await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
       await Supabase.instance.client.auth.signInAnonymously();
@@ -608,6 +610,7 @@ class _SettingsPageState extends State<SettingsPage>
       nav.pushNamedAndRemoveUntil("/onboarding/link-account", (route) => false);
       debugPrint("signout: link-account pushed");
     } catch (e) {
+      signingOut74 = false;
       debugPrint("SettingsPage._signOut failed: $e");
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

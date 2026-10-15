@@ -10,6 +10,8 @@ import "package:flutter_application/diag68.dart";
 import '../services/chart_repository.dart';
 import 'chart_page.dart';
 
+bool signingOut74 = false;
+
 class ActiveChartPage extends StatefulWidget {
   const ActiveChartPage({super.key});
 
@@ -54,6 +56,12 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
     _redirectedToOnboarding = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      if (signingOut74) {
+        diag68("chart redirect skipped");
+        _redirectedToOnboarding = false;
+        return;
+      }
+      diag68("chart redirect fired");
       Navigator.of(
         context,
         rootNavigator: true,
@@ -113,6 +121,12 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
     } else {
       await provider.clearActive();
     }
+  }
+
+  @override
+  void dispose() {
+    signingOut74 = false;
+    super.dispose();
   }
 
   void _retry() {
