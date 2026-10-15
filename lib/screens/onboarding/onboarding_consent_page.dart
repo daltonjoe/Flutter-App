@@ -45,10 +45,10 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
           .select("kind")
           .inFilter("kind", ["privacy", "terms", "ai"]);
       final sp = await SharedPreferences.getInstance();
-      final force = sp.getBool("force_consent") == true;
+      await sp.remove("force_consent");
       final k = rows.map((r) => r["kind"]).toSet();
-      diag68("consent check", "force=$force kinds=${k.length}");
-      if (!force && k.contains("privacy") && k.contains("terms") && k.contains("ai")) {
+      diag68("consent check", "kinds=${k.length}");
+      if (k.contains("privacy") && k.contains("terms") && k.contains("ai")) {
         _home();
         return;
       }
