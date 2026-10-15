@@ -255,14 +255,19 @@ class _WebErr67State extends State<_WebErr67> {
       if (!_webExists67) return;
       _webExists67 = false;
       if (!mounted) return;
-      final nav70 = Navigator.of(context);
+      // 90: nav70 kalkti
       diag68("web exists snackbar", "shown");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t(context, "onboarding.register.exists")),
           action: SnackBarAction(
             label: t(context, "onboarding.register.signin"),
-            onPressed: () => nav70.pushNamed("/signin"),
+            onPressed: () {
+              diag68("web exists signin direct");
+              startOAuthSignin90(OAuthProvider.google).catchError((Object e) {
+                diag68("web exists signin ERR", "${e.runtimeType}");
+              });
+            },
           ),
         ),
       );

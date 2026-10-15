@@ -200,3 +200,23 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
     );
   }
 }
+
+/// 90: snackbar Sign in dogrudan Google girisi baslatir (sayfa acilmaz).
+Future<void> startOAuthSignin90(OAuthProvider p) async {
+  diag68("signin oauth start");
+  final sp = await SharedPreferences.getInstance();
+  await sp.setString("auth_intent", "signin");
+  try {
+    final c = Supabase.instance.client;
+    final tok = c.auth.currentSession?.refreshToken;
+    if (c.auth.currentUser?.isAnonymous == true && tok != null) {
+      await sp.setString("guest_refresh", tok);
+    } else {
+      await sp.remove("guest_refresh");
+    }
+  } catch (e) {
+    debugPrint("guest save failed: $e");
+  }
+  await Supabase.instance.client.auth
+      .signInWithOAuth(p, redirectTo: kAuthRedirectUrl);
+}
