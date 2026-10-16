@@ -104,6 +104,7 @@ class ChartInput {
         birthTimeLocal: json['birth_time_local'] ?? '',
         birthTimeUtc: json['birth_time_utc'] ?? '',
         julianDay: (json['julian_day'] as num?)?.toDouble() ?? 0.0,
+        birthTimeKnown: json['birth_time_known'] as bool? ?? true,
       );
 }
 
