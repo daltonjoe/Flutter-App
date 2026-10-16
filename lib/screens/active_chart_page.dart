@@ -9,6 +9,8 @@ import '../providers/active_profile_provider.dart';
 import "package:flutter_application/diag68.dart";
 import '../services/chart_repository.dart';
 import 'chart_page.dart';
+import '../redesign/redesign_flags.dart';
+import '../redesign/chart/redesign_chart_page.dart';
 
 bool signingOut74 = false;
 
@@ -150,10 +152,16 @@ class _ActiveChartPageState extends State<ActiveChartPage> {
     if (result == null) return const CosmicLoader();
     final profileId = context.watch<ActiveProfileProvider>().activeProfileId;
     if (profileId == null) return const CosmicLoader();
-    return ChartPage(
-      key: ValueKey(profileId),
-      chartData: result.chart,
-      userName: result.name,
-    );
+    return kUseRedesign
+        ? RedesignChartPage(
+            key: ValueKey(profileId),
+            chartData: result.chart,
+            userName: result.name,
+          )
+        : ChartPage(
+            key: ValueKey(profileId),
+            chartData: result.chart,
+            userName: result.name,
+          );
   }
 }
