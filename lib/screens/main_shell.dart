@@ -12,6 +12,8 @@ import '../core/theme/app_dimensions.dart';
 import '../i18n/app_localizations.dart';
 import '../services/user_settings_service.dart';
 import '../widgets/navigation/cosmic_bottom_nav.dart';
+import '../redesign/redesign_flags.dart';
+import '../redesign/splash/splash_overlay.dart';
 
 final ValueNotifier<int> shellTab = ValueNotifier<int>(1);
 
@@ -266,6 +268,7 @@ class _MainShellState extends State<MainShell>
                   },
                 ),
               ),
+            if (kUseRedesign) const Positioned.fill(child: SplashOverlay()),
           ],
         ),
       ),
