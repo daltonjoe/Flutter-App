@@ -475,6 +475,8 @@
   "rd.tab.moon": "Luna",
   "rd.tab.ascendant": "Ascendente",
   "rd.tab.satellites": "Satélites",
+  "rd.house.meaning_title": "Significado de la casa",
+  "rd.house.meaning_placeholder": "La interpretación de {planet} en {house} aparecerá aquí pronto.",
   "rd.house_meaning.placeholder": "El significado de la casa {number} aparecerá aquí.",
   "rd.house_meaning.time_unknown": "La hora de nacimiento es desconocida, por lo que no hay significados de casas."
 }

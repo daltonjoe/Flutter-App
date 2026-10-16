@@ -198,6 +198,8 @@
   "rd.tab.moon": "القمر",
   "rd.tab.ascendant": "الطالع",
   "rd.tab.satellites": "الأقمار",
+  "rd.house.meaning_title": "معنى البيت",
+  "rd.house.meaning_placeholder": "سيظهر هنا قريبًا تفسير {planet} في {house}.",
   "rd.house_meaning.placeholder": "سيظهر هنا معنى البيت {number}.",
   "rd.house_meaning.time_unknown": "وقت الميلاد غير معروف، لذا معاني البيوت غير متاحة."
 }

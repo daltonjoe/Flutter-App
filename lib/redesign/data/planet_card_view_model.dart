@@ -9,6 +9,7 @@ class PlanetCardViewModel {
     required this.name,
     required this.sign,
     required this.houseName,
+    required this.houseNumber,
     required this.degree,
     required this.retrograde,
     required this.emoji,
@@ -18,6 +19,7 @@ class PlanetCardViewModel {
   final String name;
   final String sign;
   final String? houseName;
+  final int? houseNumber;
   final double degree;
   final bool retrograde;
   final String emoji;
@@ -59,14 +61,16 @@ class PlanetCardViewModel {
       if (!birthTimeKnown && key == 'Moon') continue;
       final data = planets[key];
       if (data == null) continue;
-      final houseName =
-          (birthTimeKnown && data.house > 0) ? names.house(data.house) : null;
+      final houseName = (birthTimeKnown && data.house > 0)
+          ? names.house(data.house)
+          : null;
       items.add(
         PlanetCardViewModel(
           key: key,
           name: names.planet(RefIds.planets[key] ?? 0),
           sign: names.sign(data.signIndex + 1),
           houseName: houseName,
+          houseNumber: (birthTimeKnown && data.house > 0) ? data.house : null,
           degree: data.degreeInSign,
           retrograde: data.retrograde,
           emoji: _emojis[key] ?? '✦',

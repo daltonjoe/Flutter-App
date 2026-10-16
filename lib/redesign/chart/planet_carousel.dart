@@ -16,9 +16,11 @@ import '../assets_map.dart';
 import '../data/planet_card_view_model.dart';
 
 class PlanetCarousel extends StatefulWidget {
-  const PlanetCarousel({super.key, required this.chartData});
+  const PlanetCarousel({super.key, required this.chartData, this.onSettled});
 
   final NatalChartResponse chartData;
+
+  final ValueChanged<int>? onSettled;
 
   @override
   State<PlanetCarousel> createState() => _PlanetCarouselState();
@@ -29,6 +31,8 @@ class _PlanetCarouselState extends State<PlanetCarousel> {
     viewportFraction: 0.85,
     initialPage: 0,
   );
+
+  int _lastSettled = 0;
 
   @override
   void dispose() {
@@ -62,35 +66,48 @@ class _PlanetCarouselState extends State<PlanetCarousel> {
                 PointerDeviceKind.stylus,
               },
             ),
-            child: PageView.builder(
-              controller: _controller,
-              itemCount: items.length,
-              clipBehavior: Clip.none,
-              itemBuilder: (context, i) {
-                final item = items[i];
-                return Padding(
-                  padding: const EdgeInsetsDirectional.symmetric(
-                    horizontal: AppSpacing.xs,
-                  ),
-                  child: AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, child) {
-                      final double page =
-                          (_controller.hasClients &&
-                              _controller.position.haveDimensions)
-                          ? (_controller.page ?? 0.0)
-                          : 0.0;
-                      final double f = math.max(0.85, 1 - (page - i).abs());
-                      return _PlanetCard(
-                        item: item,
-                        chartData: widget.chartData,
-                        height: h,
-                        scale: f,
-                      );
-                    },
-                  ),
-                );
+            child: NotificationListener<ScrollEndNotification>(
+              onNotification: (n) {
+                if (n.metrics.axis == Axis.horizontal &&
+                    _controller.hasClients) {
+                  final i = (_controller.page ?? 0).round();
+                  if (i != _lastSettled) {
+                    _lastSettled = i;
+                    widget.onSettled?.call(i);
+                  }
+                }
+                return false;
               },
+              child: PageView.builder(
+                controller: _controller,
+                itemCount: items.length,
+                clipBehavior: Clip.none,
+                itemBuilder: (context, i) {
+                  final item = items[i];
+                  return Padding(
+                    padding: const EdgeInsetsDirectional.symmetric(
+                      horizontal: AppSpacing.xs,
+                    ),
+                    child: AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, child) {
+                        final double page =
+                            (_controller.hasClients &&
+                                _controller.position.haveDimensions)
+                            ? (_controller.page ?? 0.0)
+                            : 0.0;
+                        final double f = math.max(0.85, 1 - (page - i).abs());
+                        return _PlanetCard(
+                          item: item,
+                          chartData: widget.chartData,
+                          height: h,
+                          scale: f,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
           );
         },
