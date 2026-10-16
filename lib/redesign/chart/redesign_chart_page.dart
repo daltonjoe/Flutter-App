@@ -8,6 +8,7 @@ import '../../models/natal_chart_response.dart';
 import '../../presentation/widgets/components/cosmic_background.dart';
 import '../detail/redesign_detail_page.dart';
 import 'chart_category_bar.dart';
+import 'chart_extras.dart';
 import 'house_meaning_panel.dart';
 import 'planet_carousel.dart';
 
@@ -99,6 +100,13 @@ class _RedesignChartPageState extends State<RedesignChartPage> {
                 child: HouseMeaningPanel(
                   chartData: widget.chartData,
                   selected: _selected,
+                ),
+              ),
+              SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
+              SliverToBoxAdapter(
+                child: ChartExtras(
+                  chartData: widget.chartData,
+                  userName: widget.userName,
                 ),
               ),
               SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
