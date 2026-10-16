@@ -45,6 +45,8 @@ dependencies:
   package_info_plus: ^10.2.2
   url_launcher: ^6.3.3
   purchases_flutter: 8.0.0
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +70,7 @@ flutter:
     - assets/images/zodiac/
     - assets/images/redesign/
     - assets/images/redesign/planets/
+    - assets/glyphs/
     - assets/data/cities.json
     - locales/
 

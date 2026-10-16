@@ -1,0 +1,102 @@
+// lib/presentation/widgets/components/glyph.dart
+// Astroloji sembolü çizen bileşen: SVG (varsa) -> Unicode -> metin etiketi.
+
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../core/constants/astro_glyphs.dart';
+import '../../../core/theme/app_colors.dart';
+
+/// `assets/glyphs/` altında SVG varlığı bulunan glyph anahtarları.
+///
+/// Boş başlar; ilgili SVG eklenip anahtar buraya yazıldığında [Glyph] o
+/// anahtarı otomatik olarak SVG üzerinden çizer.
+const Set<String> kSvgGlyphs = <String>{};
+
+/// Astroloji sembolü gösteren widget.
+///
+/// Çizim sırası: (a) [kSvgGlyphs] içindeyse SVG, (b) Unicode fallback,
+/// (c) ASC/MC gibi metin etiketleri. Bilinmeyen anahtar boş kutu döndürür ve
+/// hiçbir exception fırlatmaz.
+class Glyph extends StatelessWidget {
+  const Glyph(
+    this.name, {
+    super.key,
+    this.size = 24,
+    this.color,
+    this.decorative = false,
+    this.semanticLabel,
+  });
+
+  /// [AstroGlyphs.glyphs] içindeki anahtar.
+  final String name;
+
+  /// Sembolün kare boyutu (dp).
+  final double size;
+
+  /// Sembol rengi; verilmezse [AppColors.mist].
+  final Color? color;
+
+  /// true ise semantics ağacından tamamen dışlanır (süsleme).
+  final bool decorative;
+
+  /// Erişilebilirlik etiketi; verilmezse [name] kullanılır.
+  final String? semanticLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final resolved = color ?? AppColors.mist;
+    final glyph = AstroGlyphs.glyphFor(name);
+
+    final Widget child;
+    if (glyph == null) {
+      child = SizedBox(width: size, height: size);
+    } else if (kSvgGlyphs.contains(name)) {
+      child = SvgPicture.asset(
+        'assets/glyphs/$name.svg',
+        width: size,
+        height: size,
+        colorFilter: ColorFilter.mode(resolved, BlendMode.srcIn),
+      );
+    } else if (glyph.isTextLabel) {
+      child = Text(
+        glyph.character,
+        textScaler: TextScaler.noScaling,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.inter(
+          fontSize: size * 0.55,
+          fontWeight: FontWeight.w700,
+          color: resolved,
+        ),
+      );
+    } else {
+      // U+FE0E (variation selector-15): metin sunumunu zorlar, emoji render'ı engeller.
+      child = SizedBox(
+        width: size,
+        height: size,
+        child: Center(
+          child: Text(
+            '${glyph.character}\uFE0E',
+            textScaler: TextScaler.noScaling,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.notoSansSymbols2(
+              fontSize: size,
+              height: 1.0,
+              color: resolved,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (decorative) {
+      return ExcludeSemantics(child: child);
+    }
+    return Semantics(
+      label: semanticLabel ?? name,
+      image: true,
+      child: child,
+    );
+  }
+}
