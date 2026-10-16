@@ -1,10 +1,10 @@
 // lib/widgets/navigation/cosmic_bottom_nav.dart
-// Cosmic Sanctum — yüzen (şeffaf zeminli) alt gezinme çubuğu.
+// Cosmic Sanctum — yüzen (cam zeminli) tek parça "hap" alt gezinme çubuğu.
 //
 // Gezinme mantığı içermez: [selectedIndex]'i vurgular ve dokunulan öğenin
 // `index` değerini [onTap] ile yukarı bildirir.
 
-import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +13,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_shadows.dart';
 import '../../core/theme/app_typography.dart';
+import '../../providers/ask_context_provider.dart';
 import 'nav_badge.dart';
 
 /// Alt gezinme çubuğunda gösterilecek tek bir sekme tanımı.
@@ -37,12 +38,13 @@ class CosmicNavItem {
   final String label;
 }
 
-/// Şeffaf zeminli, yüzen alt gezinme çubuğu.
+/// Yüzen, cam zeminli "hap" alt gezinme çubuğu.
 ///
-/// Daireler tek bir çizgide değil, [NavWavePattern] çarpanlarına göre
-/// zikzaklı (dalgalı) dizilir; her etiket kendi dairesini takip eder.
-/// Ofsetler slot sırasına bağlıdır, seçime göre değişmez.
-class CosmicBottomNav extends StatelessWidget {
+/// Tüm öğeler tek bir yatay hizada, eşit genişlikte slotlarda durur; zikzak
+/// (dalga) dizilimi kullanılmaz. Etiket yalnızca aktif öğede görünür ve aktif
+/// öğenin altında, slotlar arasında kayan 4 px'lik altın bir gösterge bulunur.
+/// Ask sekmesi (index = [kAskTab]) çok hafif bir altın "nefes" glow'u taşır.
+class CosmicBottomNav extends StatefulWidget {
   const CosmicBottomNav({
     super.key,
     required this.items,
@@ -54,7 +56,7 @@ class CosmicBottomNav extends StatelessWidget {
   /// Görünür sekmeler, ekrandaki sırayla (3–5 arası değişebilir).
   final List<CosmicNavItem> items;
 
-  /// Seçili sekenin [items] içindeki konumu.
+  /// Seçili sekmenin [items] içindeki konumu.
   final int selectedIndex;
 
   /// Dokunulan öğenin [CosmicNavItem.index] değeri ile çağrılır.
@@ -64,76 +66,156 @@ class CosmicBottomNav extends StatelessWidget {
   final Map<int, int> badgeCounts;
 
   @override
+  State<CosmicBottomNav> createState() => _CosmicBottomNavState();
+}
+
+class _CosmicBottomNavState extends State<CosmicBottomNav>
+    with SingleTickerProviderStateMixin {
+  /// Ask "nefes" glow döngüsü süresi (tek yön).
+  static const Duration _glowDuration = Duration(seconds: 5);
+
+  /// Aktif gösterge kayma süresi.
+  static const Duration _indicatorDuration = Duration(milliseconds: 320);
+
+  late final AnimationController _glow = AnimationController(
+    vsync: this,
+    duration: _glowDuration,
+  );
+
+  late final Animation<double> _glowOpacity = Tween<double>(
+    begin: 0.10,
+    end: 0.22,
+  ).animate(CurvedAnimation(parent: _glow, curve: Curves.easeInOutSine));
+
+  /// [CosmicBottomNav.items] içinde Ask sekmesinin slotu (yoksa null).
+  int? _askSlot;
+
+  @override
+  void initState() {
+    super.initState();
+    _askSlot = _findAskSlot();
+  }
+
+  @override
+  void didUpdateWidget(CosmicBottomNav oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _askSlot = _findAskSlot();
+    _syncGlow();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncGlow();
+  }
+
+  int? _findAskSlot() {
+    for (var i = 0; i < widget.items.length; i++) {
+      if (widget.items[i].index == kAskTab) return i;
+    }
+    return null;
+  }
+
+  /// Nefes animasyonunu yalnızca hareket kısıtı yokken çalıştırır; aksi halde
+  /// durdurur. Sekme görünmezken [SingleTickerProviderStateMixin] ticker'ı
+  /// TickerMode üzerinden otomatik askıya alır.
+  void _syncGlow() {
+    final shouldRun =
+        _askSlot != null && !MediaQuery.disableAnimationsOf(context);
+    if (shouldRun) {
+      if (!_glow.isAnimating) _glow.repeat(reverse: true);
+    } else if (_glow.isAnimating) {
+      _glow.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _glow.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final duration = reduceMotion
-        ? Duration.zero
-        : const Duration(milliseconds: 220);
+    final duration = reduceMotion ? Duration.zero : _indicatorDuration;
+    final glowOn = !reduceMotion && _askSlot != null;
+    final bottomSafe = MediaQuery.viewPaddingOf(context).bottom;
+    final slotCount = widget.items.length;
 
-    // Etiketin dikey alanı metin ölçeğiyle birlikte büyür, ancak ayrılan
-    // banda ([AppSizes.navLabelHeight]) sığacak şekilde sınırlanır.
-    final double labelHeight = MediaQuery.textScalerOf(context)
-        .scale(AppSpacing.md)
-        .clamp(AppSpacing.md, AppSizes.navLabelHeight)
-        .toDouble();
-
-    // Zikzak ofsetleri: slot sırasına göre sabit (seçime bağlı değil).
-    final pattern = NavWavePattern.forCount(items.length);
-    final List<double> offsets = pattern.length == items.length
-        ? [for (final m in pattern) m * AppSizes.navWaveAmplitude]
-        : List<double>.filled(items.length, 0);
-
-    // Daire yuvası + ara boşluk + etiket bandı.
-    final double contentHeight =
-        AppSizes.navItemSelectedSize + AppSpacing.xs + labelHeight;
-
-    // İçerik, en yüksek ve en alçak slotun sığacağı kadar dikey boşlukla
-    // ortalanır; böylece hiçbir daire/etiket taşmaz.
-    final double minOffset = offsets.reduce(math.min);
-    final double maxOffset = offsets.reduce(math.max);
-    final double slack =
-        AppSizes.bottomNavHeight - contentHeight - (maxOffset - minOffset);
-    final double topPad = slack / 2 - minOffset;
-
-    // Zemin şeffaftır; okunabilirlik perdesi sayfa seviyesinde (MainShell)
-    // çizilir. ColoredBox dokunuşları yutar: çubuğun boş alanına yapılan
-    // dokunuş arkadaki sayfa içeriğine geçmez (öğeler yine kendi
-    // dokunuşlarını alır).
-    return ColoredBox(
-      color: Colors.transparent,
-      child: Padding(
-        padding: EdgeInsets.only(bottom: bottomInset),
-        child: SizedBox(
-          height: AppSizes.bottomNavHeight,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenH),
-            child: Row(
-              // Her hücre tam yüksekliğe yayılır: dokunma alanı ofsetle
-              // birlikte hareket eder, komşularla çakışmaz.
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (var i = 0; i < items.length; i++)
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: topPad + offsets[i]),
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: _NavItemCell(
-                          item: items[i],
-                          selected: i == selectedIndex,
-                          badgeCount: badgeCounts[items[i].index],
-                          duration: duration,
-                          labelHeight: labelHeight,
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            onTap(items[i].index);
-                          },
+    return Padding(
+      padding: EdgeInsetsDirectional.only(
+        start: AppSpacing.screenH,
+        end: AppSpacing.screenH,
+        bottom: AppSizes.navBarBottomGap + bottomSafe,
+      ),
+      child: SizedBox(
+        height: AppSizes.navBarHeight,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            border: Border.all(color: AppColors.hairline, width: 1),
+            boxShadow: AppShadows.cardShadow,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: AppSizes.navBarBlurSigma,
+                sigmaY: AppSizes.navBarBlurSigma,
+              ),
+              child: ColoredBox(
+                color: AppColors.navyDeep.withValues(alpha: 0.80),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final slotWidth = slotCount == 0
+                        ? 0.0
+                        : constraints.maxWidth / slotCount;
+                    return Stack(
+                      children: [
+                        // Slotlar arasında kayan aktif gösterge.
+                        if (slotCount > 0)
+                          AnimatedPositionedDirectional(
+                            duration: duration,
+                            curve: Curves.easeInOutCubic,
+                            start: slotWidth * (widget.selectedIndex + 0.5) -
+                                AppSizes.navDotSize / 2,
+                            bottom: AppSizes.navDotInset,
+                            width: AppSizes.navDotSize,
+                            height: AppSizes.navDotSize,
+                            child: const DecoratedBox(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.gold,
+                              ),
+                            ),
+                          ),
+                        Row(
+                          children: [
+                            for (var i = 0; i < slotCount; i++)
+                              Expanded(
+                                child: _NavSlot(
+                                  item: widget.items[i],
+                                  selected: i == widget.selectedIndex,
+                                  badgeCount:
+                                      widget.badgeCounts[widget.items[i].index],
+                                  glow: i == _askSlot ? _glowOpacity : null,
+                                  glowOn: glowOn && i == _askSlot,
+                                  onTap: () {
+                                    if (i != widget.selectedIndex) {
+                                      HapticFeedback.selectionClick();
+                                    }
+                                    widget.onTap(widget.items[i].index);
+                                  },
+                                ),
+                              ),
+                          ],
                         ),
-                      ),
-                    ),
-                  ),
-              ],
+                      ],
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ),
@@ -142,142 +224,105 @@ class CosmicBottomNav extends StatelessWidget {
   }
 }
 
-class _NavItemCell extends StatelessWidget {
-  const _NavItemCell({
+/// Tek bir sekme yuvası: ikon (+ yalnızca aktifken etiket) ve rozet.
+class _NavSlot extends StatelessWidget {
+  const _NavSlot({
     required this.item,
     required this.selected,
     required this.badgeCount,
-    required this.duration,
-    required this.labelHeight,
+    required this.glow,
+    required this.glowOn,
     required this.onTap,
   });
 
   final CosmicNavItem item;
   final bool selected;
   final int? badgeCount;
-  final Duration duration;
-  final double labelHeight;
+
+  /// Ask sekmesinin "nefes" opaklık animasyonu (yalnızca Ask slotunda dolu).
+  final Animation<double>? glow;
+  final bool glowOn;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final circleColor = selected ? AppColors.textPrimary : AppColors.bgSurface;
-    final iconColor = selected ? AppColors.bgDeep : AppColors.textSecondary;
-    final labelColor = selected
-        ? AppColors.textPrimary
-        : AppColors.textSecondary;
-    final double diameter = selected
-        ? AppSizes.navItemSelectedSize
-        : AppSizes.navItemSize;
+    final iconColor = selected ? AppColors.gold : AppColors.mist;
 
     return Semantics(
       button: true,
       selected: selected,
       label: item.label,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          minWidth: AppSpacing.xxl,
-          minHeight: AppSpacing.xxl,
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: AppRadius.lgBr,
-          splashColor: AppColors.violetPrimary.withValues(alpha: 0.08),
-          highlightColor: Colors.transparent,
-          child: Column(
-            // İçerik tam olarak kendi yüksekliği kadar yer kaplar; böylece
-            // zikzak ofseti kırpılmadan (yarıya inmeden) uygulanır.
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Sabit yükseklikli daire yuvası: seçili daire büyüse de
-              // diğer sekmeler ve etiketler kaymaz.
-              SizedBox(
-                height: AppSizes.navItemSelectedSize,
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      AnimatedContainer(
-                        duration: duration,
-                        curve: Curves.easeOutCubic,
-                        width: diameter,
-                        height: diameter,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: circleColor,
-                          border: selected
-                              ? null
-                              : Border.all(color: AppColors.borderSubtle),
-                          boxShadow: selected ? AppShadows.violetGlow : null,
-                        ),
-                        child: Center(
-                          child: TweenAnimationBuilder<double>(
-                            tween: Tween<double>(
-                              begin: 0,
-                              end: selected ? 1 : 0,
-                            ),
-                            duration: duration,
-                            curve: Curves.easeOutCubic,
-                            builder: (context, t, _) {
-                              final color =
-                                  Color.lerp(
-                                    AppColors.textSecondary,
-                                    AppColors.bgDeep,
-                                    t,
-                                  ) ??
-                                  iconColor;
-                              final double iconSize =
-                                  AppSizes.navIconSize +
-                                  (AppSizes.navIconSelectedSize -
-                                          AppSizes.navIconSize) *
-                                      t;
-                              return AnimatedSwitcher(
-                                duration: duration,
-                                switchInCurve: Curves.easeOutCubic,
-                                switchOutCurve: Curves.easeOutCubic,
-                                child: Icon(
-                                  selected ? item.activeIcon : item.icon,
-                                  key: ValueKey<bool>(selected),
-                                  size: iconSize,
-                                  color: color,
-                                ),
-                              );
-                            },
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.innerBr,
+        splashColor: AppColors.gold.withValues(alpha: 0.08),
+        highlightColor: Colors.transparent,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: AppSizes.navBarIconSize,
+              height: AppSizes.navBarIconSize,
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  if (glowOn && glow != null)
+                    FadeTransition(
+                      opacity: glow!,
+                      child: const SizedBox(
+                        width: AppSizes.navGlowSize,
+                        height: AppSizes.navGlowSize,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.gold,
+                                blurRadius: AppSizes.navGlowBlur,
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: NavBadge(count: badgeCount),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              SizedBox(
-                height: labelHeight,
-                child: Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      item.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.bodyXs(color: labelColor).copyWith(
-                        fontWeight: selected
-                            ? FontWeight.w600
-                            : FontWeight.w400,
-                      ),
                     ),
+                  Icon(
+                    selected ? item.activeIcon : item.icon,
+                    size: AppSizes.navBarIconSize,
+                    color: iconColor,
                   ),
-                ),
+                  PositionedDirectional(
+                    top: -AppSpacing.xs,
+                    end: -AppSpacing.xs,
+                    child: NavBadge(count: badgeCount),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            // Etiket yalnızca aktif öğede çizilir; pasifte yer tutulur ki ikon
+            // dikey konumu değişmesin. FittedBox dar ekranda taşmayı önler.
+            SizedBox(
+              height: AppSizes.navBarLabelHeight,
+              child: selected
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsetsDirectional.symmetric(
+                          horizontal: AppSpacing.xs,
+                        ),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            item.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.miniTag(color: AppColors.gold),
+                          ),
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+          ],
         ),
       ),
     );

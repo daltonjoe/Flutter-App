@@ -203,9 +203,12 @@ class _MainShellState extends State<MainShell>
     });
     final items = [for (final v in visible) _navItem(v, context)];
     final selected = visible.indexOf(idx);
-    // Klavye açıkken çubuk gizlenir; böylece (özellikle AskPage girişi)
-    // klavyenin üstünde kalır ve çubuk yukarı itilmez.
-    final showNav = MediaQuery.viewInsetsOf(context).bottom == 0;
+    // Klavye açıkken çubuk aşağı kayıp solarak gizlenir; ağaçtan çıkarılmaz.
+    // Böylece (özellikle AskPage girişi) klavyenin üstünde kalır.
+    final navHidden = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final navDuration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : const Duration(milliseconds: 280);
 
     return PopScope(
       canPop: false,
@@ -230,23 +233,27 @@ class _MainShellState extends State<MainShell>
               ),
             ),
             // Okunabilirlik perdesi: sayfa arka planı görünür kalır.
-            // Sadece çubuk yüksekliği kadar; dokunuşları engellemez.
-            if (showNav)
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: IgnorePointer(
+            // Çubuk bölgesi + üstünde yumuşak geçiş; dokunuşları engellemez.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: IgnorePointer(
+                child: AnimatedOpacity(
+                  duration: navDuration,
+                  curve: Curves.easeInOutCubic,
+                  opacity: navHidden ? 0.0 : 1.0,
                   child: SizedBox(
-                    height: AppSizes.bottomNavInset(context),
+                    height: AppSizes.bottomNavInset(context) +
+                        AppSizes.navScrimExtra,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            AppColors.bgDeep.withValues(alpha: 0),
-                            AppColors.bgDeep.withValues(alpha: 0.78),
+                            AppColors.bgVoid.withValues(alpha: 0),
+                            AppColors.bgVoid.withValues(alpha: 0.9),
                           ],
                         ),
                       ),
@@ -254,20 +261,34 @@ class _MainShellState extends State<MainShell>
                   ),
                 ),
               ),
-            // Şeffaf yüzen gezinme çubuğu.
-            if (showNav)
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: CosmicBottomNav(
-                  items: items,
-                  selectedIndex: selected,
-                  onTap: (tab) {
-                    shellTab.value = tab;
-                  },
+            ),
+            // Yüzen "hap" gezinme çubuğu: klavye açıkken aşağı kayar ve
+            // solarak gizlenir; ağaçtan çıkarılmaz.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: IgnorePointer(
+                ignoring: navHidden,
+                child: AnimatedSlide(
+                  duration: navDuration,
+                  curve: Curves.easeInOutCubic,
+                  offset: navHidden ? const Offset(0, 1) : Offset.zero,
+                  child: AnimatedOpacity(
+                    duration: navDuration,
+                    curve: Curves.easeInOutCubic,
+                    opacity: navHidden ? 0.0 : 1.0,
+                    child: CosmicBottomNav(
+                      items: items,
+                      selectedIndex: selected,
+                      onTap: (tab) {
+                        shellTab.value = tab;
+                      },
+                    ),
+                  ),
                 ),
               ),
+            ),
             if (kUseRedesign) const Positioned.fill(child: SplashOverlay()),
           ],
         ),

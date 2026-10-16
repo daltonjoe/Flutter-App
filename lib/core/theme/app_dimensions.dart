@@ -17,11 +17,21 @@ class AppSpacing {
   /// Standard horizontal screen padding
   static const double screenH = 20.0;
 
+  /// Standard inner padding of a card / panel surface
+  static const double cardPadding = 20.0;
+
+  /// Vertical gap between two sections
+  static const double sectionGap = 32.0;
+
+  /// Vertical gap between two cards of the same section
+  static const double cardGap = 12.0;
+
   /// Standard top padding for content below a SliverAppBar
   static const double contentTop = 8.0;
 
-  /// Standard bottom padding to clear the nav bar
-  static const double contentBottom = 60.0;
+  /// Standard bottom padding to clear the floating nav bar.
+  /// Device safe-area is added on top of this by [AppSizes.scrollBottomPadding].
+  static const double contentBottom = 100.0;
 
   // ── Input / form ─────────────────────────────────────────────────────
   static const double inputLabelGap = 8.0;
@@ -42,6 +52,13 @@ class AppRadius {
   static const double xl = 32.0;
   static const double pill = 999.0;
 
+  // ── Semantic names ───────────────────────────────────────────────────
+  /// Card / panel corner radius (24).
+  static const double card = lg;
+
+  /// Inner element corner radius (16).
+  static const double inner = md;
+
   // ── Convenience BorderRadius ─────────────────────────────────────────
   // ignore: non_constant_identifier_names
   static final BorderRadius smBr = _br(sm);
@@ -53,15 +70,21 @@ class AppRadius {
   static final BorderRadius xlBr = _br(xl);
   // ignore: non_constant_identifier_names
   static final BorderRadius pillBr = _br(pill);
+  // ignore: non_constant_identifier_names
+  static final BorderRadius cardBr = _br(card);
+  // ignore: non_constant_identifier_names
+  static final BorderRadius innerBr = _br(inner);
 }
 
 class AppSizes {
   AppSizes._();
 
   // ── Component heights ────────────────────────────────────────────────
-  static const double ctaHeight = 58.0;
+  static const double ctaHeight = 52.0;
   static const double inputHeight = 56.0;
   static const double languagePillHeight = 36.0;
+  static const double chipHeight = 32.0;
+  static const double segmentHeight = 40.0;
 
   // ── Bottom navigation ────────────────────────────────────────────────
   /// Seçili olmayan sekme dairesinin çapı.
@@ -86,19 +109,52 @@ class AppSizes {
   /// Çubuk içeriğinin dikey nefes payı.
   static const double navVerticalPadding = 8.0;
 
-  /// Yüzen alt navigasyon çubuğunun toplam iç yüksekliği; sabit sayı yerine
-  /// bileşenlerden türetilir: seçili daire + etiket + zikzak salınımı + nefes.
-  /// Safe-area hariçtir.
-  static const double bottomNavHeight =
-      navItemSelectedSize +
-      navLabelHeight +
-      NavWavePattern.maxSwing * navWaveAmplitude +
-      navVerticalPadding;
+  // ── Yüzen "hap" navigasyon çubuğu (yeni tasarım) ─────────────────────
+  /// Hap çubuğun iç yüksekliği (safe-area ve alt boşluk hariç).
+  static const double navBarHeight = 64.0;
+
+  /// Hap çubuğun ekranın altından yüzdüğü boşluk (safe-area eklenir).
+  static const double navBarBottomGap = 12.0;
+
+  /// Nav bar ikon boyutu (aktif/pasif aynı).
+  static const double navBarIconSize = 24.0;
+
+  /// Aktif etiket için ayrılan dikey alan.
+  static const double navBarLabelHeight = 12.0;
+
+  /// Aktif gösterge noktasının çapı.
+  static const double navDotSize = 4.0;
+
+  /// Aktif gösterge noktasının çubuk tabanından uzaklığı.
+  static const double navDotInset = 8.0;
+
+  /// Cam (glass) efekti için BackdropFilter bulanıklık kuvveti.
+  static const double navBarBlurSigma = 20.0;
+
+  /// Ask sekmesinin "nefes" glow daire çapı.
+  static const double navGlowSize = 32.0;
+
+  /// Ask sekmesinin "nefes" glow bulanıklığı.
+  static const double navGlowBlur = 20.0;
+
+  /// Okunabilirlik perdesinin çubuk üstüne eklediği yumuşak geçiş payı.
+  static const double navScrimExtra = 40.0;
+
+  /// Yüzen alt navigasyon çubuğunun toplam iç yüksekliği:
+  /// hap yüksekliği + alt boşluk. Safe-area hariçtir.
+  static const double bottomNavHeight = navBarHeight + navBarBottomGap;
 
   /// Yüzen navigasyon çubuğunun altında kalan içerik için gereken boşluk:
   /// çubuk yüksekliği + cihazın alt güvenli alanı (home indicator).
   static double bottomNavInset(BuildContext context) =>
       bottomNavHeight + MediaQuery.of(context).viewPadding.bottom;
+
+  /// Kaydırılabilir (scroll) içerik için alt boşluk:
+  /// çubuk bölgesi + cihazın alt güvenli alanı + nefes payı.
+  static double scrollBottomPadding(BuildContext context) =>
+      bottomNavHeight +
+      MediaQuery.of(context).viewPadding.bottom +
+      AppSpacing.lg;
 
   // ── Icon containers ──────────────────────────────────────────────────
   static const double planetIconContainer = 44.0;
