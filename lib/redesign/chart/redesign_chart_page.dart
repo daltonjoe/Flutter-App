@@ -6,6 +6,9 @@ import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../models/natal_chart_response.dart';
 import '../../presentation/widgets/components/cosmic_background.dart';
+import '../../screens/placement_content_page.dart';
+import 'chart_category_bar.dart';
+import 'planet_carousel.dart';
 
 class RedesignChartPage extends StatelessWidget {
   const RedesignChartPage({
@@ -14,7 +17,6 @@ class RedesignChartPage extends StatelessWidget {
     required this.userName,
   });
 
-  // Faz 5'te kullanılacak.
   final NatalChartResponse chartData;
 
   final String userName;
@@ -55,6 +57,23 @@ class RedesignChartPage extends StatelessWidget {
                   ),
                 ),
               ),
+              SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
+              SliverToBoxAdapter(
+                child: ChartCategoryBar(
+                  birthTimeKnown: chartData.input?.birthTimeKnown == true,
+                  onOpenPlacement: (k) => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PlacementContentPage(
+                        chartData: chartData,
+                        initialKey: k,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
+              SliverToBoxAdapter(child: PlanetCarousel(chartData: chartData)),
               SliverToBoxAdapter(
                 child: SizedBox(height: AppSizes.bottomNavInset(context)),
               ),
