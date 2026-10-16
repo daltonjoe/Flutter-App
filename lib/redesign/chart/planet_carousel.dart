@@ -1,6 +1,7 @@
 // Gezegen karuseli (Faz 5). Ölçekleme PageController ile animasyonlanır.
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -52,35 +53,45 @@ class _PlanetCarouselState extends State<PlanetCarousel> {
         builder: (context, constraints) {
           final double h = constraints.maxHeight;
 
-          return PageView.builder(
-            controller: _controller,
-            itemCount: items.length,
-            clipBehavior: Clip.none,
-            itemBuilder: (context, i) {
-              final item = items[i];
-              return Padding(
-                padding: const EdgeInsetsDirectional.symmetric(
-                  horizontal: AppSpacing.xs,
-                ),
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    final double page =
-                        (_controller.hasClients &&
-                            _controller.position.haveDimensions)
-                        ? (_controller.page ?? 0.0)
-                        : 0.0;
-                    final double f = math.max(0.85, 1 - (page - i).abs());
-                    return _PlanetCard(
-                      item: item,
-                      chartData: widget.chartData,
-                      height: h,
-                      scale: f,
-                    );
-                  },
-                ),
-              );
-            },
+          return ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+                PointerDeviceKind.trackpad,
+                PointerDeviceKind.stylus,
+              },
+            ),
+            child: PageView.builder(
+              controller: _controller,
+              itemCount: items.length,
+              clipBehavior: Clip.none,
+              itemBuilder: (context, i) {
+                final item = items[i];
+                return Padding(
+                  padding: const EdgeInsetsDirectional.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      final double page =
+                          (_controller.hasClients &&
+                              _controller.position.haveDimensions)
+                          ? (_controller.page ?? 0.0)
+                          : 0.0;
+                      final double f = math.max(0.85, 1 - (page - i).abs());
+                      return _PlanetCard(
+                        item: item,
+                        chartData: widget.chartData,
+                        height: h,
+                        scale: f,
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
           );
         },
       ),
