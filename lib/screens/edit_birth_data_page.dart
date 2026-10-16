@@ -54,7 +54,8 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
       final row = await Supabase.instance.client
           .from('user_profiles')
           .select(
-              'birth_date, birth_time, birth_time_known, birth_city, latitude, longitude, timezone')
+            'birth_date, birth_time, birth_time_known, birth_city, latitude, longitude, timezone',
+          )
           .eq('id', widget.profileId)
           .single();
       final cities = await CityModel.loadAll();
@@ -112,9 +113,9 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
       _results = v.trim().isEmpty
           ? []
           : _all
-              .where((c) => c.display.toLowerCase().contains(v.toLowerCase()))
-              .take(6)
-              .toList();
+                .where((c) => c.display.toLowerCase().contains(v.toLowerCase()))
+                .take(6)
+                .toList();
     });
   }
 
@@ -164,13 +165,14 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
   }
 
   Widget _label(String key) => Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.lg, bottom: 4),
-        child: Text(t(context, key),
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: AppColors.textMuted)),
-      );
+    padding: const EdgeInsets.only(top: AppSpacing.lg, bottom: 4),
+    child: Text(
+      t(context, key),
+      style: Theme.of(
+        context,
+      ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) =>
@@ -183,14 +185,18 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
         backgroundColor: AppColors.bgDeep,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        title: Text(t(context, 'birth_data.title'),
-            style: Theme.of(context).textTheme.titleMedium),
+        title: Text(
+          t(context, 'birth_data.title'),
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
-      body: Stack(children: [
-      SafeArea(
-        child: _loading
-            ? const CosmicLoader()
-            : _loadFailed
+      body: Stack(
+        children: [
+          SafeArea(
+            bottom: false,
+            child: _loading
+                ? const CosmicLoader()
+                : _loadFailed
                 ? Center(child: Text(t(context, 'birth_time.error')))
                 : Column(
                     children: [
@@ -199,7 +205,8 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
                           keyboardDismissBehavior:
                               ScrollViewKeyboardDismissBehavior.onDrag,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.screenH),
+                            horizontal: AppSpacing.screenH,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
@@ -225,11 +232,13 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
                               if (_results.isNotEmpty)
                                 Container(
                                   margin: const EdgeInsets.only(top: 8),
-                                  constraints:
-                                      const BoxConstraints(maxHeight: 220),
+                                  constraints: const BoxConstraints(
+                                    maxHeight: 220,
+                                  ),
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                        color: Theme.of(context).dividerColor),
+                                      color: Theme.of(context).dividerColor,
+                                    ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: ListView.builder(
@@ -252,10 +261,17 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
                                       mode: CupertinoDatePickerMode.time,
                                       use24hFormat: true,
                                       initialDateTime: DateTime(
-                                          2000, 1, 1, _time.hour, _time.minute),
-                                      onDateTimeChanged: (d) => _time =
-                                          TimeOfDay(
-                                              hour: d.hour, minute: d.minute),
+                                        2000,
+                                        1,
+                                        1,
+                                        _time.hour,
+                                        _time.minute,
+                                      ),
+                                      onDateTimeChanged: (d) =>
+                                          _time = TimeOfDay(
+                                            hour: d.hour,
+                                            minute: d.minute,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -263,61 +279,76 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
                               TextButton(
                                 onPressed: () =>
                                     setState(() => _timeKnown = !_timeKnown),
-                                child: Text(_timeKnown
-                                    ? t(context, 'onboarding.birthtime.unknown')
-                                    : t(context, 'birth_data.time_known')),
+                                child: Text(
+                                  _timeKnown
+                                      ? t(
+                                          context,
+                                          'onboarding.birthtime.unknown',
+                                        )
+                                      : t(context, 'birth_data.time_known'),
+                                ),
                               ),
                               if (_error)
                                 Container(
-                                  margin:
-                                      const EdgeInsets.only(top: AppSpacing.sm),
+                                  margin: const EdgeInsets.only(
+                                    top: AppSpacing.sm,
+                                  ),
                                   padding: const EdgeInsets.all(AppSpacing.sm),
                                   decoration: AppDecorations.errorBanner(),
-                                  child: Text(t(context, 'birth_time.error'),
-                                      style: const TextStyle(
-                                          color: AppColors.errorRed)),
+                                  child: Text(
+                                    t(context, 'birth_time.error'),
+                                    style: const TextStyle(
+                                      color: AppColors.errorRed,
+                                    ),
+                                  ),
                                 ),
                             ],
                           ),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(AppSpacing.screenH),
+                        padding: EdgeInsets.fromLTRB(
+                          AppSpacing.screenH,
+                          AppSpacing.screenH,
+                          AppSpacing.screenH,
+                          AppSizes.bottomNavInset(context),
+                        ),
                         child: CosmicCtaButton(
                           label: t(context, 'birth_time.save'),
                           onTap: _saving ? () {} : _save,
                         ),
                       ),
                     ],
-                      ),
-      ),
-      if (_saving)
-        Positioned.fill(
-          child: AbsorbPointer(
-            child: Container(
-              color: AppColors.bgDeep,
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 240,
-                      height: 240,
-                      child: ZodiacOrbitalAnimation(size: 240),
+                  ),
+          ),
+          if (_saving)
+            Positioned.fill(
+              child: AbsorbPointer(
+                child: Container(
+                  color: AppColors.bgDeep,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 240,
+                          height: 240,
+                          child: ZodiacOrbitalAnimation(size: 240),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          t(context, 'onboarding.calculating.title'),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      t(context, 'onboarding.calculating.title'),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }

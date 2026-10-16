@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 
 import '../core/theme/app_decorations.dart';
+import '../core/theme/app_dimensions.dart';
 import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../services/ask_service.dart';
@@ -63,7 +64,9 @@ class _NotesPageState extends State<NotesPage> {
       });
       debugPrint('NotesPage load ms=${sw.elapsedMilliseconds}');
     } catch (e) {
-      debugPrint('NotesPage load failed after ms=${sw.elapsedMilliseconds}: $e');
+      debugPrint(
+        'NotesPage load failed after ms=${sw.elapsedMilliseconds}: $e',
+      );
       if (!mounted) return;
       setState(() {
         _loading = false;
@@ -91,13 +94,18 @@ class _NotesPageState extends State<NotesPage> {
     final sm = ScaffoldMessenger.of(context);
     final raw = '${row['body'] ?? ''}';
     final ctl = TextEditingController(
-        text: raw.length > 150 ? raw.substring(0, 150) : raw);
+      text: raw.length > 150 ? raw.substring(0, 150) : raw,
+    );
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(t(ctx, 'notes.edit')),
         content: TextField(
-            controller: ctl, maxLength: 150, minLines: 1, maxLines: 4),
+          controller: ctl,
+          maxLength: 150,
+          minLines: 1,
+          maxLines: 4,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -115,7 +123,8 @@ class _NotesPageState extends State<NotesPage> {
       debugPrint('NotesPage edit failed: $e');
       if (!mounted) return;
       sm.showSnackBar(
-          SnackBar(content: Text(t(context, AskService.memoryErrKey(e)))));
+        SnackBar(content: Text(t(context, AskService.memoryErrKey(e)))),
+      );
     }
   }
 
@@ -162,18 +171,29 @@ class _NotesPageState extends State<NotesPage> {
       body = const CosmicLoader();
     } else if (_err) {
       body = Center(
-          child: Text(t(context, 'ask.error'), style: AppTextStyles.bodyMd()));
+        child: Text(t(context, 'ask.error'), style: AppTextStyles.bodyMd()),
+      );
     } else if (_rows.isEmpty) {
       body = Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Text(t(context, 'notes.empty'),
-              textAlign: TextAlign.center, style: AppTextStyles.bodyMd()),
+          child: Text(
+            t(context, 'notes.empty'),
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMd(),
+          ),
         ),
       );
     } else {
       body = ListView.separated(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          AppSpacing.md,
+          AppSpacing.md,
+          // SafeArea(bottom: true) alt güvenli alanı zaten ekliyor; burada
+          // yalnızca çubuk yüksekliği kadar boşluk bırakılır.
+          AppSizes.bottomNavHeight,
+        ),
         itemCount: _rows.length,
         separatorBuilder: (_, _) => const SizedBox(height: 8),
         itemBuilder: (c, i) {
@@ -184,8 +204,10 @@ class _NotesPageState extends State<NotesPage> {
             child: Row(
               children: [
                 Expanded(
-                  child: Text('${r['body'] ?? ''}',
-                      style: AppTextStyles.bodyMd()),
+                  child: Text(
+                    '${r['body'] ?? ''}',
+                    style: AppTextStyles.bodyMd(),
+                  ),
                 ),
                 IconButton(
                   tooltip: t(c, 'notes.edit'),
@@ -211,7 +233,10 @@ class _NotesPageState extends State<NotesPage> {
             Padding(
               padding: const EdgeInsets.only(right: 4),
               child: Center(
-                child: Text('${_rows.length}/10', style: AppTextStyles.bodyMd()),
+                child: Text(
+                  '${_rows.length}/10',
+                  style: AppTextStyles.bodyMd(),
+                ),
               ),
             ),
           if (_rows.isNotEmpty)

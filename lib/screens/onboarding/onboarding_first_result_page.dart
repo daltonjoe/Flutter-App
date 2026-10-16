@@ -66,7 +66,7 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage> {
           fit: StackFit.expand,
           children: [
             Positioned.fill(
-              child: Image.asset('assets/images/logo/background.png',
+              child: Image.asset('assets/images/logo/background.jpg',
                   fit: BoxFit.cover),
             ),
             SafeArea(

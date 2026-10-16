@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 
 enum WheelTone {
-  female, male, neutral,
-  single, dating, engaged, married, divorced, separated,
-  gold, purple, indigo,
+  female,
+  male,
+  neutral,
+  single,
+  dating,
+  engaged,
+  married,
+  divorced,
+  separated,
+  gold,
+  purple,
+  indigo,
 }
 
 class WheelOption {
@@ -19,18 +28,48 @@ class _P {
 }
 
 const _pal = {
-  WheelTone.female: _P(Color(0x14FF4D94), Color(0x4DFF65A8), Color(0xFFFDE2EE),
-      Color(0xFFFF4D94), [Color(0xFFFF65A8), Color(0xFFA855F7)]),
-  WheelTone.male: _P(Color(0x1455E6FC), Color(0x4D3FA6F8), Color(0xFFE0F2FE),
-      Color(0xFF38BDF8), [Color(0xFF38BDF8), Color(0xFF4F46E5)]),
-  WheelTone.neutral: _P(Color(0xFF1A1030), Color(0x408B5CF6), Color(0xFFC4B5FD),
-      Color(0xFF8B5CF6), [Color(0xFF8B5CF6), Color(0xFF6D28D9)]),
-  WheelTone.gold: _P(Color(0x14F59E0B), Color(0x4DF59E0B), Color(0xFFFDE68A),
-      Color(0xFFF59E0B), [Color(0xFFF59E0B), Color(0xFFEA580C)]),
-  WheelTone.purple: _P(Color(0x149333EA), Color(0x4DC026D3), Color(0xFFE879F9),
-      Color(0xFF9333EA), [Color(0xFF9333EA), Color(0xFF4F46E5)]),
-  WheelTone.indigo: _P(Color(0x146366F1), Color(0x4D6366F1), Color(0xFFC7D2FE),
-      Color(0xFF6366F1), [Color(0xFF4338CA), Color(0xFF0EA5E9)]),
+  WheelTone.female: _P(
+    Color(0x14FF4D94),
+    Color(0x4DFF65A8),
+    Color(0xFFFDE2EE),
+    Color(0xFFFF4D94),
+    [Color(0xFFFF65A8), Color(0xFFC9A24A)],
+  ),
+  WheelTone.male: _P(
+    Color(0x1455E6FC),
+    Color(0x4D3FA6F8),
+    Color(0xFFE0F2FE),
+    Color(0xFF38BDF8),
+    [Color(0xFF38BDF8), Color(0xFF3B5FD9)],
+  ),
+  WheelTone.neutral: _P(
+    Color(0xFF0E1C40),
+    Color(0x402D7DF0),
+    Color(0xFFBFD4FF),
+    Color(0xFF2D7DF0),
+    [Color(0xFF2D7DF0), Color(0xFF1E5BC6)],
+  ),
+  WheelTone.gold: _P(
+    Color(0x14F59E0B),
+    Color(0x4DF59E0B),
+    Color(0xFFFDE68A),
+    Color(0xFFF59E0B),
+    [Color(0xFFF59E0B), Color(0xFFEA580C)],
+  ),
+  WheelTone.purple: _P(
+    Color(0x14C9A24A),
+    Color(0x4DC9A24A),
+    Color(0xFFE8D5A3),
+    Color(0xFFC9A24A),
+    [Color(0xFFC9A24A), Color(0xFF3B5FD9)],
+  ),
+  WheelTone.indigo: _P(
+    Color(0x143B5FD9),
+    Color(0x4D3B5FD9),
+    Color(0xFFBFD4FF),
+    Color(0xFF3B5FD9),
+    [Color(0xFF1E3FA8), Color(0xFF0EA5E9)],
+  ),
 };
 
 class CosmicWheelPicker extends StatefulWidget {
@@ -101,7 +140,12 @@ class _CosmicWheelPickerState extends State<CosmicWheelPicker> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: sel ? Colors.transparent : p.border),
                 boxShadow: sel
-                    ? [BoxShadow(color: p.glow.withOpacity(0.6), blurRadius: 16)]
+                    ? [
+                        BoxShadow(
+                          color: p.glow.withOpacity(0.6),
+                          blurRadius: 16,
+                        ),
+                      ]
                     : null,
               ),
               child: Text(

@@ -89,7 +89,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
           // 1) Statik yedek arka plan
           Positioned.fill(
             child: Image.asset(
-              'assets/images/logo/background.png',
+              'assets/images/logo/background.jpg',
               fit: BoxFit.cover,
             ),
           ),

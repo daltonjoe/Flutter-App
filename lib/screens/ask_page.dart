@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../services/reference_names_service.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_decorations.dart';
+import '../core/theme/app_dimensions.dart';
 import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../providers/ask_context_provider.dart';
@@ -926,6 +927,10 @@ class _AskPageState extends State<AskPage> {
                 ),
               ),
               _composer(context),
+              // Klavye kapalıyken giriş alanının yüzen çubuğun üstünde
+              // kalması için çubuk yüksekliği kadar boşluk bırakılır.
+              if (MediaQuery.viewInsetsOf(context).bottom == 0)
+                const SizedBox(height: AppSizes.bottomNavHeight),
             ],
           ),
         ),

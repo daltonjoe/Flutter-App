@@ -203,7 +203,7 @@ class AppTextStyles {
     fontFamily: AppFonts.body,
     fontSize: 10,
     fontWeight: FontWeight.w600,
-    color: Color(0x808B5CF6),
+    color: Color(0x802D7DF0),
     letterSpacing: 1.2,
   );
 

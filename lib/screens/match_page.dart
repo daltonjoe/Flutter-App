@@ -442,13 +442,14 @@ class _MatchPageState extends State<MatchPage> {
           ],
         ),
         body: SafeArea(
+          bottom: false,
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               AppSpacing.screenH,
               AppSpacing.contentTop,
               AppSpacing.screenH,
-              AppSpacing.contentBottom,
+              AppSizes.bottomNavInset(context),
             ),
             children: [
               Container(

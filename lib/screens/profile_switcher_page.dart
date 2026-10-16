@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -27,16 +26,11 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
   bool _isLoading = true;
   String? _error;
   List<Map<String, dynamic>> _profiles = [];
-  late final AnimationController _twinkle;
   late final AnimationController _entrance;
 
   @override
   void initState() {
     super.initState();
-    _twinkle = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 3200),
-    );
     _entrance = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -46,7 +40,6 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
 
   @override
   void dispose() {
-    _twinkle.dispose();
     _entrance.dispose();
     super.dispose();
   }
@@ -82,10 +75,8 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
       });
       final disableAnimations = MediaQuery.of(context).disableAnimations;
       if (disableAnimations) {
-        _twinkle.stop();
         _entrance.value = 1;
       } else {
-        _twinkle.repeat(reverse: true);
         _entrance.forward();
       }
     } catch (e) {
@@ -239,41 +230,6 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
     return name.characters.first.toUpperCase();
   }
 
-  // ── Starfield CustomPaint ─────────────────────────────────────────────
-  List<_Star> _seedStars(int seed, int count, Size size) {
-    final r = Random(seed);
-    return List.generate(count, (_) {
-      final x = r.nextDouble() * size.width;
-      final y = r.nextDouble() * size.height;
-      final r2 = r.nextDouble() * 1.6 + 0.4;
-      final isViolet = r.nextDouble() < 0.35;
-      final phase = r.nextDouble() * 2 * pi;
-      return _Star(x, y, r2, isViolet, phase);
-    });
-  }
-
-  Widget _buildStarfield(Size size) {
-    return SizedBox.expand(
-      child: LayoutBuilder(
-        builder: (ctx, constraints) {
-          final sz = Size(constraints.maxWidth, constraints.maxHeight);
-          final stars = _seedStars(42, 60, sz);
-          return AnimatedBuilder(
-            animation: _twinkle,
-            builder: (_, w) => CustomPaint(
-              size: sz,
-              painter: _StarfieldPainter(
-                stars: stars,
-                t: _twinkle.value,
-                disabled: MediaQuery.of(ctx).disableAnimations,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   // ── Skeleton blocks ───────────────────────────────────────────────────
   Widget _sk({double h = 56, double? w}) => Container(
     height: h,
@@ -307,24 +263,6 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
               .clamp(0.0, 1.0);
           return FlexibleSpaceBar(
             collapseMode: CollapseMode.pin,
-            background: Stack(
-              fit: StackFit.expand,
-              children: [
-                _buildStarfield(Size.infinite),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppColors.bgDeep.withValues(alpha: 0.0),
-                        AppColors.bgDeep.withValues(alpha: 0.85),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
             titlePadding: const EdgeInsetsDirectional.only(
               start: AppSpacing.screenH,
               bottom: 14,
@@ -831,11 +769,11 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
         ),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               AppSpacing.screenH,
               0,
               AppSpacing.screenH,
-              AppSpacing.contentBottom,
+              AppSizes.bottomNavInset(context),
             ),
             child: CosmicCard(
               child: Column(
@@ -917,49 +855,12 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
             ),
             SliverToBoxAdapter(child: _buildIdentity(active)),
             SliverToBoxAdapter(child: _buildShortcuts(active)),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: AppSpacing.contentBottom),
+            SliverToBoxAdapter(
+              child: SizedBox(height: AppSizes.bottomNavInset(context)),
             ),
           ],
         ),
       ),
     );
   }
-}
-
-class _Star {
-  final double x;
-  final double y;
-  final double radius;
-  final bool isViolet;
-  final double phase;
-  const _Star(this.x, this.y, this.radius, this.isViolet, this.phase);
-}
-
-class _StarfieldPainter extends CustomPainter {
-  final List<_Star> stars;
-  final double t;
-  final bool disabled;
-  _StarfieldPainter({
-    required this.stars,
-    required this.t,
-    required this.disabled,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    for (final s in stars) {
-      final baseA = s.isViolet ? 0.45 : 0.55;
-      final twinkle = disabled
-          ? baseA
-          : (baseA + sin(t * 2 * pi + s.phase) * 0.30).clamp(0.08, 0.85);
-      final c = s.isViolet
-          ? AppColors.violetPrimary.withValues(alpha: twinkle)
-          : AppColors.textPrimary.withValues(alpha: twinkle);
-      canvas.drawCircle(Offset(s.x, s.y), s.radius, Paint()..color = c);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _StarfieldPainter old) => old.t != t;
 }

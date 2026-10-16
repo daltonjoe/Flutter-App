@@ -61,7 +61,7 @@ class LanguageSelector extends StatelessWidget {
                     width: 6,
                     height: 6,
                     decoration: const BoxDecoration(
-                      color: Color(0xFFB07BFF),
+                      color: Color(0xFF6FA8FF),
                       shape: BoxShape.circle,
                     ),
                   ),

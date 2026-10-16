@@ -228,7 +228,12 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 600),
         child: ListView.separated(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            AppSizes.bottomNavInset(context),
+          ),
           itemCount: items.length,
           separatorBuilder: (_, _) => const SizedBox(height: 12),
           itemBuilder: (_, i) => _themeCard(items[i]),

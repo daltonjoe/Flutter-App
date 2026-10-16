@@ -39,7 +39,7 @@ class CosmicOutlineButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = labelColor ?? AppColors.violetPrimary;
-    final border = borderColor ?? const Color(0x598B5CF6);
+    final border = borderColor ?? const Color(0x592D7DF0);
 
     return SizedBox(
       height: height,

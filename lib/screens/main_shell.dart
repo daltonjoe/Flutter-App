@@ -7,8 +7,11 @@ import 'ask_page.dart';
 import 'match_page.dart';
 import 'profile_switcher_page.dart';
 import 'today_page.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_dimensions.dart';
 import '../i18n/app_localizations.dart';
 import '../services/user_settings_service.dart';
+import '../widgets/navigation/cosmic_bottom_nav.dart';
 
 final ValueNotifier<int> shellTab = ValueNotifier<int>(1);
 
@@ -25,9 +28,24 @@ class _MainShellState extends State<MainShell>
     with SingleTickerProviderStateMixin {
   late final AnimationController _fade = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 220),
+    duration: const Duration(milliseconds: 320),
     value: 1,
   );
+  late final Animation<double> _fadeOpacity = CurvedAnimation(
+    parent: _fade,
+    curve: Curves.easeOutCubic,
+  );
+
+  /// Hafif yukarı kayma (~8 px): çocuk yüksekliğinin küçük bir kesri
+  /// (tipik ekranda ~8 px) kadar aşağıdan yukarı gelir.
+  late final Animation<Offset> _slide = Tween<Offset>(
+    begin: const Offset(0, 0.02),
+    end: Offset.zero,
+  ).animate(CurvedAnimation(parent: _fade, curve: Curves.easeOutCubic));
+  late final Animation<double> _scale = Tween<double>(
+    begin: 0.98,
+    end: 1.0,
+  ).animate(CurvedAnimation(parent: _fade, curve: Curves.easeOutCubic));
   int _index = 1; // Today hazır olana kadar varsayılan: Harita
   final _keys = List.generate(5, (_) => GlobalKey<NavigatorState>());
   bool _matchTabEnabled = false;
@@ -132,32 +150,42 @@ class _MainShellState extends State<MainShell>
     return appOnGenerateRoute(s);
   }
 
-  NavigationDestination _dest(int tab, BuildContext context) {
+  CosmicNavItem _navItem(int tab, BuildContext context) {
     final l = AppLocalizations.of(context);
     switch (tab) {
       case 0:
-        return NavigationDestination(
-          icon: const Icon(Icons.wb_sunny_outlined),
+        return CosmicNavItem(
+          index: 0,
+          icon: Icons.wb_sunny_outlined,
+          activeIcon: Icons.wb_sunny,
           label: l?.translate('nav.today') ?? 'nav.today',
         );
       case 1:
-        return NavigationDestination(
-          icon: const Icon(Icons.public),
+        return CosmicNavItem(
+          index: 1,
+          icon: Icons.public_outlined,
+          activeIcon: Icons.public,
           label: l?.translate('nav.chart') ?? 'nav.chart',
         );
       case 2:
-        return NavigationDestination(
-          icon: const Icon(Icons.person_outline),
+        return CosmicNavItem(
+          index: 2,
+          icon: Icons.person_outline,
+          activeIcon: Icons.person,
           label: l?.translate('nav.profile') ?? 'nav.profile',
         );
       case 3:
-        return NavigationDestination(
-          icon: const Icon(Icons.favorite_border),
+        return CosmicNavItem(
+          index: 3,
+          icon: Icons.favorite_border,
+          activeIcon: Icons.favorite,
           label: l?.translate('nav.match') ?? 'nav.match',
         );
       default:
-        return NavigationDestination(
-          icon: const Icon(Icons.auto_awesome_outlined),
+        return CosmicNavItem(
+          index: kAskTab,
+          icon: Icons.auto_awesome_outlined,
+          activeIcon: Icons.auto_awesome,
           label: l?.translate('nav.ask') ?? 'nav.ask',
         );
     }
@@ -171,6 +199,12 @@ class _MainShellState extends State<MainShell>
       if (!visible.contains(i)) return const SizedBox.shrink();
       return Navigator(key: _keys[i], onGenerateRoute: (s) => _onRoute(i, s));
     });
+    final items = [for (final v in visible) _navItem(v, context)];
+    final selected = visible.indexOf(idx);
+    // Klavye açıkken çubuk gizlenir; böylece (özellikle AskPage girişi)
+    // klavyenin üstünde kalır ve çubuk yukarı itilmez.
+    final showNav = MediaQuery.viewInsetsOf(context).bottom == 0;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -179,16 +213,60 @@ class _MainShellState extends State<MainShell>
         if (nav != null && nav.canPop()) nav.pop();
       },
       child: Scaffold(
-        body: FadeTransition(
-          opacity: _fade,
-          child: IndexedStack(index: idx, children: stackChildren),
-        ),
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: visible.indexOf(idx),
-          onDestinationSelected: (i) {
-            shellTab.value = visible[i];
-          },
-          destinations: [for (final v in visible) _dest(v, context)],
+        extendBody: true,
+        body: Stack(
+          children: [
+            // Sayfa içeriği: fade + hafif yukarı kayma + çok hafif ölçek.
+            FadeTransition(
+              opacity: _fadeOpacity,
+              child: SlideTransition(
+                position: _slide,
+                child: ScaleTransition(
+                  scale: _scale,
+                  child: IndexedStack(index: idx, children: stackChildren),
+                ),
+              ),
+            ),
+            // Okunabilirlik perdesi: sayfa arka planı görünür kalır.
+            // Sadece çubuk yüksekliği kadar; dokunuşları engellemez.
+            if (showNav)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: IgnorePointer(
+                  child: SizedBox(
+                    height: AppSizes.bottomNavInset(context),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            AppColors.bgDeep.withValues(alpha: 0),
+                            AppColors.bgDeep.withValues(alpha: 0.78),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            // Şeffaf yüzen gezinme çubuğu.
+            if (showNav)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: CosmicBottomNav(
+                  items: items,
+                  selectedIndex: selected,
+                  onTap: (tab) {
+                    shellTab.value = tab;
+                  },
+                ),
+              ),
+          ],
         ),
       ),
     );

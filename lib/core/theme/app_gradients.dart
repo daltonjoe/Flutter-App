@@ -27,7 +27,7 @@ class AppGradients {
   );
 
   static const LinearGradient forecastYearly = LinearGradient(
-    colors: [Color(0xFFD97706), Color(0xFFFBBF24)],
+    colors: [Color(0xFFB8860B), Color(0xFFE3C777)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -50,31 +50,31 @@ class AppGradients {
   // ── Cosmic radial glow ───────────────────────────────────────────────
   /// Use as a background RadialGradient — fades violet glow into deep bg
   static const RadialGradient cosmicRadialGlow = RadialGradient(
-    colors: [Color(0x3D8B5CF6), AppColors.bgDeep],
+    colors: [Color(0x3D2D7DF0), AppColors.bgDeep],
     radius: 0.8,
   );
 
   // ── Ambient background glow (used in bg orbs) ────────────────────────
   static const RadialGradient ambientViolet = RadialGradient(
-    colors: [Color(0x1E8B5CF6), Colors.transparent],
+    colors: [Color(0x1E2D7DF0), Colors.transparent],
   );
 
   static const RadialGradient ambientIndigo = RadialGradient(
-    colors: [Color(0x144F46E5), Colors.transparent],
+    colors: [Color(0x143B5FD9), Colors.transparent],
   );
 
   // ── Hero header gradient ─────────────────────────────────────────────
   static const LinearGradient heroHeader = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFF1A1240), AppColors.bgDeep],
+    colors: [Color(0xFF0B1A40), AppColors.bgDeep],
   );
 
   // ── Convenience aliases (keep old names working) ─────────────────────
   static const LinearGradient violetGradient = primaryCta;
-  static const LinearGradient cardGradient   = cosmicCard;
-  static const RadialGradient glowGradient   = RadialGradient(
-    colors: [Color(0x408B5CF6), Color(0x008B5CF6)],
+  static const LinearGradient cardGradient = cosmicCard;
+  static const RadialGradient glowGradient = RadialGradient(
+    colors: [Color(0x402D7DF0), Color(0x002D7DF0)],
     radius: 0.8,
   );
 }

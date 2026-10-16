@@ -20,11 +20,11 @@ class CitySearchField extends StatefulWidget {
 
 class _CitySearchFieldState extends State<CitySearchField> {
   // ── App renkleri (create_profile_page ile aynı) ───────────────────
-  static const Color _surface = Color(0xFF1A1730);
-  static const Color _accent = Color(0xFFB07BFF);
-  static const Color _textPrimary = Color(0xFFF0EAFF);
-  static const Color _textSecondary = Color(0xFF9985C0);
-  static const Color _border = Color(0xFF2E2850);
+  static const Color _surface = Color(0xFF0E1C40);
+  static const Color _accent = Color(0xFF6FA8FF);
+  static const Color _textPrimary = Color(0xFFF2F6FF);
+  static const Color _textSecondary = Color(0xFF93A6C9);
+  static const Color _border = Color(0xFF1F3668);
 
   final TextEditingController _controller = TextEditingController();
   List<CityModel> _filtered = [];
@@ -172,10 +172,10 @@ class _CityListItem extends StatefulWidget {
 }
 
 class _CityListItemState extends State<_CityListItem> {
-  static const Color _surfaceHover = Color(0xFF221F3A);
-  static const Color _accent = Color(0xFFB07BFF);
-  static const Color _textPrimary = Color(0xFFF0EAFF);
-  static const Color _textSecondary = Color(0xFF9985C0);
+  static const Color _surfaceHover = Color(0xFF122350);
+  static const Color _accent = Color(0xFF6FA8FF);
+  static const Color _textPrimary = Color(0xFFF2F6FF);
+  static const Color _textSecondary = Color(0xFF93A6C9);
 
   bool _hovered = false;
 

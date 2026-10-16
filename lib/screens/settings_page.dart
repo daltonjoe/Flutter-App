@@ -183,7 +183,7 @@ class _SettingsPageState extends State<SettingsPage>
       parent: _animController,
       curve: Interval(start, end, curve: Curves.easeOut),
     );
- return FadeTransition(opacity: fade, child: child);
+    return FadeTransition(opacity: fade, child: child);
   }
 
   Widget _skeleton({double height = 56, double? width}) {
@@ -199,11 +199,11 @@ class _SettingsPageState extends State<SettingsPage>
 
   Widget _buildSkeleton() {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.screenH,
         AppSpacing.contentTop,
         AppSpacing.screenH,
-        AppSpacing.contentBottom,
+        AppSizes.bottomNavInset(context),
       ),
       children: [
         _sectionLabel('settings.section.notifications'),
@@ -613,9 +613,9 @@ class _SettingsPageState extends State<SettingsPage>
       signingOut74 = false;
       debugPrint("SettingsPage._signOut failed: $e");
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(t(context, "ask.error"))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(t(context, "ask.error"))));
     }
   }
 
@@ -648,7 +648,9 @@ class _SettingsPageState extends State<SettingsPage>
                   _buildRow(
                     leading: Text(
                       statusText,
-                      style: AppTextStyles.bodyMd(color: AppColors.textSecondary),
+                      style: AppTextStyles.bodyMd(
+                        color: AppColors.textSecondary,
+                      ),
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
@@ -658,7 +660,9 @@ class _SettingsPageState extends State<SettingsPage>
                     _buildRow(
                       leading: Text(
                         t(context, "settings.account.signout"),
-                        style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
+                        style: AppTextStyles.bodyLg(
+                          color: AppColors.textPrimary,
+                        ),
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
@@ -693,7 +697,9 @@ class _SettingsPageState extends State<SettingsPage>
                   maxLines: 2,
                 ),
                 onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const LegalAgreementsPage()),
+                  MaterialPageRoute<void>(
+                    builder: (_) => const LegalAgreementsPage(),
+                  ),
                 ),
               ),
             ),
@@ -720,8 +726,6 @@ class _SettingsPageState extends State<SettingsPage>
       ),
     );
   }
-
-
 
   Widget _dangerSection() {
     final disableAnimations = MediaQuery.of(context).disableAnimations;
@@ -783,7 +787,7 @@ class _SettingsPageState extends State<SettingsPage>
                       ),
                     ),
                   ),
- if (progress > 0)
+                  if (progress > 0)
                     Positioned.fill(
                       child: ClipRRect(
                         borderRadius: AppRadius.pillBr,
@@ -923,11 +927,11 @@ class _SettingsPageState extends State<SettingsPage>
               ),
             )
           : ListView(
-              padding: const EdgeInsets.fromLTRB(
+              padding: EdgeInsets.fromLTRB(
                 AppSpacing.screenH,
                 AppSpacing.contentTop,
                 AppSpacing.screenH,
-                AppSpacing.contentBottom,
+                AppSizes.bottomNavInset(context),
               ),
               children: [
                 _notificationsSection(),

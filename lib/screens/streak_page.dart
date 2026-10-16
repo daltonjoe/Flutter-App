@@ -159,11 +159,13 @@ class _StreakPageState extends State<StreakPage> {
     if (empty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(
+        padding: EdgeInsets.fromLTRB(
           AppSpacing.screenH,
           AppSpacing.contentTop,
           AppSpacing.screenH,
-          AppSpacing.contentBottom,
+          // SafeArea(bottom: true) alt güvenli alanı zaten ekliyor; burada
+          // yalnızca çubuk yüksekliği kadar boşluk bırakılır.
+          AppSizes.bottomNavHeight,
         ),
         children: [
           Container(
@@ -202,11 +204,13 @@ class _StreakPageState extends State<StreakPage> {
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.screenH,
         AppSpacing.contentTop,
         AppSpacing.screenH,
-        AppSpacing.contentBottom,
+        // SafeArea(bottom: true) alt güvenli alanı zaten ekliyor; burada
+        // yalnızca çubuk yüksekliği kadar boşluk bırakılır.
+        AppSizes.bottomNavHeight,
       ),
       children: [
         Container(

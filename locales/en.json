@@ -460,5 +460,15 @@
   "paywall.restore": "Restore",
   "paywall.restore.none": "No purchases to restore.",
   "settings.account.signout": "Sign out",
-  "settings.account.signout_body": "You will be signed out on this device. Sign in again to get your profiles back."
+  "settings.account.signout_body": "You will be signed out on this device. Sign in again to get your profiles back.",
+  "paywall.title": "Try Ephemeria for free",
+  "paywall.trial_days": "{days} days free",
+  "paywall.save_badge": "Save {percent}%",
+  "paywall.cta_trial_days": "Start {days}-Day trial",
+  "paywall.cta_continue": "Continue",
+  "paywall.free_trial_cancel_anytime": "Free trial. Cancel anytime.",
+  "paywall.cancel_anytime": "Cancel anytime.",
+  "paywall.per_month": "/month",
+  "paywall.per_week": "/week",
+  "paywall.plan.weekly": "Weekly"
 }

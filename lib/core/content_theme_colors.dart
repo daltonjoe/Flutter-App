@@ -9,4 +9,4 @@ const Map<String, Color> contentThemeColors = {
 };
 
 Color themeColorFor(String code) =>
-    contentThemeColors[code] ?? const Color(0xFF8B5CF6); // fallback: violet
+    contentThemeColors[code] ?? const Color(0xFF2D7DF0); // fallback: violet

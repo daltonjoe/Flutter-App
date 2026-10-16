@@ -191,7 +191,12 @@ class _NatalReportPageState extends State<NatalReportPage> {
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 60),
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  12,
+                  20,
+                  AppSizes.bottomNavInset(context),
+                ),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     _buildPersonHero(),

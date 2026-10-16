@@ -74,7 +74,7 @@ class SoulBoundBottomNav extends StatelessWidget {
       height: AppSizes.bottomNavHeight + bottomPadding,
       decoration: const BoxDecoration(
         // Glass-dark background
-        color: Color(0xE6110E22), // bgCard at ~90 % opacity
+        color: Color(0xE60A1431), // bgCard at ~90 % opacity
         border: Border(
           top: BorderSide(color: AppColors.borderSubtle, width: 1),
         ),
@@ -110,10 +110,9 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor =
-        active ? AppColors.textPrimary : AppColors.textMuted;
-    final labelColor =
-        active ? const Color(0xFFD4C7FF) : AppColors.textMuted; // lavender active
+    final iconColor = active ? AppColors.textPrimary : AppColors.textMuted;
+    // VARSAYIM: lavanta aktif etiket -> açık buz mavisi
+    final labelColor = active ? const Color(0xFFBFD4FF) : AppColors.textMuted;
 
     return InkWell(
       onTap: onTap,

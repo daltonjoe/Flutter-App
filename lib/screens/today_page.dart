@@ -608,7 +608,7 @@ class _TodayPageState extends State<TodayPage> {
             ),
           ],
         ),
-        body: SafeArea(child: body),
+        body: SafeArea(bottom: false, child: body),
       ),
     );
   }
@@ -618,7 +618,12 @@ class _TodayPageState extends State<TodayPage> {
     if (d == null) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          AppSpacing.md,
+          AppSpacing.md,
+          AppSizes.bottomNavInset(context),
+        ),
         children: [_weekStrip(loc)],
       );
     }
@@ -631,7 +636,12 @@ class _TodayPageState extends State<TodayPage> {
     final known = (_data ?? d)['time_known'] != false;
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.md,
+        AppSpacing.md,
+        AppSizes.bottomNavInset(context),
+      ),
       children: [
         _weekStrip(loc),
         const SizedBox(height: 8),

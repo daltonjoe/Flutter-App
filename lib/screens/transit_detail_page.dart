@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/theme/app_colors.dart';
+import '../core/theme/app_dimensions.dart';
 import '../i18n/app_localizations.dart';
 import '../models/ask_context.dart';
 import '../widgets/ask_add.dart';
@@ -130,7 +131,12 @@ class _TransitDetailPageState extends State<TransitDetailPage> {
       body: _loading
           ? const CosmicLoader()
           : ListView(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.screenH,
+                AppSpacing.screenH,
+                AppSpacing.screenH,
+                AppSizes.bottomNavInset(context),
+              ),
               children: [
                 Text(
                   widget.title,
@@ -174,7 +180,7 @@ class _TransitDetailPageState extends State<TransitDetailPage> {
                         : AppColors.textPrimary,
                   ),
                 ),
-               if (widget.profileId != null && widget.day != null) ...[
+                if (widget.profileId != null && widget.day != null) ...[
                   const SizedBox(height: 16),
                   Align(
                     alignment: Alignment.centerLeft,

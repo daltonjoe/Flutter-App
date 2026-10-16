@@ -4,10 +4,8 @@
 import 'package:flutter_application/models/zodiac_sign.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:math' as math;
 import '../models/natal_chart_response.dart';
 import '../core/reference_ids.dart';
-import '../widgets/animations/zodiac_orbital_animation.dart';
 import '../theme/app_theme.dart';
 import '../i18n/app_localizations.dart';
 import '../services/reference_names_service.dart';
@@ -29,7 +27,6 @@ class ChartPage extends StatefulWidget {
 
 class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   late AnimationController _entranceCtrl;
-  late AnimationController _orbitCtrl;
   late List<Animation<double>> _cardAnims;
 
   static const Map<String, Map<String, dynamic>> _planetMeta = {
@@ -76,11 +73,6 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     super.initState();
     final count = (widget.chartData.planets?.length ?? 0).clamp(1, 20);
 
-    _orbitCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 20),
-    )..repeat();
-
     _entranceCtrl = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 600 + count * 50),
@@ -99,7 +91,6 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _entranceCtrl.dispose();
-    _orbitCtrl.dispose();
     super.dispose();
   }
 
@@ -116,7 +107,6 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
-            _buildBgOrbs(),
             CustomScrollView(
               slivers: [
                 // ── Hero header ──────────────────────────────────
@@ -124,6 +114,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                   expandedHeight: 240,
                   pinned: true,
                   backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
                   iconTheme: const IconThemeData(color: AppTheme.textPrimary),
                   flexibleSpace: FlexibleSpaceBar(
                     background: _buildHero(
@@ -221,7 +212,7 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
                       _buildForecastBtn(),
                       const SizedBox(height: 12),
                       _buildAnalysisBtn(),
-                      const SizedBox(height: 48),
+                      SizedBox(height: AppSizes.bottomNavInset(context)),
                     ]),
                   ),
                 ),
@@ -233,56 +224,6 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     );
   }
 
-  // ── Background orbs ───────────────────────────────────────────────
-  Widget _buildBgOrbs() {
-    return AnimatedBuilder(
-      animation: _orbitCtrl,
-      builder: (_, _) {
-        final t = _orbitCtrl.value;
-        return Stack(
-          children: [
-            Positioned(
-              top: -60,
-              right: -40,
-              child: Container(
-                width: 250,
-                height: 250,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      AppTheme.violet.withOpacity(
-                        0.08 + 0.04 * math.sin(t * 2 * math.pi),
-                      ),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 200,
-              left: -80,
-              child: Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      AppTheme.indigo.withOpacity(0.06),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   // ── Hero ──────────────────────────────────────────────────────────
   Widget _buildHero(
     ChartSummary? summary,
@@ -290,7 +231,6 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     bool birthTimeKnown,
     ReferenceNamesService names,
   ) {
-    final double screenWidth = MediaQuery.of(context).size.width;
     final sunSign = _resolvedSign(
       names,
       widget.chartData.planets?['Sun']?.signIndex,
@@ -306,16 +246,6 @@ class _ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
       color: Colors.transparent,
       child: Stack(
         children: [
-          // ── Background Orbital Animation ──────────────────────────
-          Positioned(
-            top: -20,
-            right: -60,
-            child: Opacity(
-              opacity: 0.4,
-              child: ZodiacOrbitalAnimation(size: screenWidth * 0.6),
-            ),
-          ),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 88, 24, 16),
             child: Row(

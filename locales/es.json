@@ -456,5 +456,15 @@
   "paywall.restore": "Restore",
   "paywall.restore.none": "No purchases to restore.",
   "settings.account.signout": "Sign out",
-  "settings.account.signout_body": "You will be signed out on this device. Sign in again to get your profiles back."
+  "settings.account.signout_body": "You will be signed out on this device. Sign in again to get your profiles back.",
+  "paywall.title": "Prueba Ephemeria gratis",
+  "paywall.trial_days": "{days} días gratis",
+  "paywall.save_badge": "Ahorra {percent}%",
+  "paywall.cta_trial_days": "Iniciar prueba de {days} días",
+  "paywall.cta_continue": "Continuar",
+  "paywall.free_trial_cancel_anytime": "Prueba gratuita. Cancela en cualquier momento.",
+  "paywall.cancel_anytime": "Cancela en cualquier momento.",
+  "paywall.per_month": "/mes",
+  "paywall.per_week": "/semana",
+  "paywall.plan.weekly": "Semanal"
 }

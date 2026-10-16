@@ -40,7 +40,6 @@ dependencies:
   cupertino_icons: ^1.0.8
   provider: ^6.1.1
   shared_preferences: ^2.5.2
-  lottie: ^3.0.0
   share_plus: ^13.3.0
   flutter_timezone: ^5.1.1
   package_info_plus: ^10.2.2
@@ -68,7 +67,6 @@ flutter:
     - assets/images/logo/
     - assets/images/zodiac/
     - assets/data/cities.json
-    - assets/animations/
     - locales/
 
   fonts:

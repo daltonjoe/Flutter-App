@@ -4,7 +4,11 @@ import "package:flutter_application/paywall/paywall_service.dart";
 import "package:provider/provider.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 import '../../core/constants/auth_redirect.dart';
+import "../../core/theme/app_borders.dart";
 import "../../core/theme/app_colors.dart";
+import "../../core/theme/app_decorations.dart";
+import "../../core/theme/app_dimensions.dart";
+import "../../core/theme/app_gradients.dart";
 import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
 import "../../providers/active_profile_provider.dart";
@@ -26,6 +30,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
   bool _busy = false;
   bool _err = false;
   bool _done = false;
+  bool _obscure = true;
 
   @override
   void initState() {
@@ -98,8 +103,11 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
       debugPrint("paywall init failed: $e");
     }
     if (pid == null) {
-      nav.pushNamedAndRemoveUntil("/onboarding", (r) => false,
-          arguments: {"isFirstProfile": true});
+      nav.pushNamedAndRemoveUntil(
+        "/onboarding",
+        (r) => false,
+        arguments: {"isFirstProfile": true},
+      );
     } else {
       nav.pushNamedAndRemoveUntil("/onboarding/consent", (r) => false);
     }
@@ -120,8 +128,10 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
   }
 
   Future<void> _signIn() async {
-    await Supabase.instance.client.auth
-        .signInWithPassword(email: _email.text.trim(), password: _pw.text);
+    await Supabase.instance.client.auth.signInWithPassword(
+      email: _email.text.trim(),
+      password: _pw.text,
+    );
     await _after();
   }
 
@@ -143,60 +153,315 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
     final sp70 = await SharedPreferences.getInstance();
     await sp70.setString("auth_intent", "signin");
     await _saveGuest84(sp70);
-    await Supabase.instance.client.auth
-        .signInWithOAuth(p, redirectTo: kAuthRedirectUrl);
+    await Supabase.instance.client.auth.signInWithOAuth(
+      p,
+      redirectTo: kAuthRedirectUrl,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    // ── Ekrana özgü ortak ölçüler (tek yerden ayarlanır) ────────────────
+    final double kControlHeight = AppSizes.ctaHeight;
+    final double kFormInset = AppSpacing.lg;
+    final double kFormPaddingH = AppSpacing.screenH + kFormInset;
+
     return Scaffold(
-      appBar: AppBar(title: Text(t(context, "auth.signin.title"))),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            Text(t(context, "auth.signin.description"),
-                style: AppTextStyles.bodyMd(color: AppColors.textPrimary)),
-            const SizedBox(height: 24),
-            TextField(
-              controller: _email,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(labelText: t(context, "onboarding.link_account.email_label")),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _pw,
-              obscureText: true,
-              decoration: InputDecoration(labelText: t(context, "onboarding.link_account.password_label")),
-            ),
-            if (_err) ...[
-              const SizedBox(height: 12),
-              Text(t(context, "auth.signin.error"),
-                  style: AppTextStyles.bodyMd(color: AppColors.roseAccent)),
-            ],
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-              onPressed: _busy ? null : () => _run(_signIn),
-              child: Text(t(context, "auth.signin.button")),
-            ),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-              icon: const Icon(Icons.g_mobiledata),
-              label: Text(t(context, "onboarding.link_account.google_button")),
-              onPressed: _busy ? null : () => _run(() => _oauth(OAuthProvider.google)),
-            ),
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-              icon: const Icon(Icons.apple),
-              label: Text(t(context, "onboarding.link_account.apple_button")),
-              onPressed: _busy ? null : () => _run(() => _oauth(OAuthProvider.apple)),
-            ),
-          ],
+      extendBodyBehindAppBar: true,
+      backgroundColor: AppColors.bgDeep,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(gradient: AppGradients.heroHeader),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.only(top: kToolbarHeight),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: (constraints.maxHeight - kToolbarHeight).clamp(
+                      0.0,
+                      double.infinity,
+                    ),
+                  ),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: kFormPaddingH,
+                        right: kFormPaddingH,
+                        bottom: AppSpacing.lg,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            t(context, "auth.signin.title"),
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.heroTitle(),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            t(context, "auth.signin.description"),
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.bodyMd(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xl),
+                          SizedBox(
+                            height: kControlHeight,
+                            child: TextField(
+                              controller: _email,
+                              keyboardType: TextInputType.emailAddress,
+                              style: AppTextStyles.bodyLg(
+                                color: AppColors.textPrimary,
+                              ),
+                              decoration: _fieldDecoration(
+                                hint: t(
+                                  context,
+                                  "onboarding.link_account.email_label",
+                                ),
+                                icon: Icons.mail_outline,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          SizedBox(
+                            height: kControlHeight,
+                            child: TextField(
+                              controller: _pw,
+                              obscureText: _obscure,
+                              style: AppTextStyles.bodyLg(
+                                color: AppColors.textPrimary,
+                              ),
+                              decoration: _fieldDecoration(
+                                hint: t(
+                                  context,
+                                  "onboarding.link_account.password_label",
+                                ),
+                                icon: Icons.lock_outline,
+                                suffix: IconButton(
+                                  icon: Icon(
+                                    _obscure
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                    color: AppColors.textMuted,
+                                  ),
+                                  onPressed: () =>
+                                      setState(() => _obscure = !_obscure),
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (_err) ...[
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              t(context, "auth.signin.error"),
+                              style: AppTextStyles.bodyMd(
+                                color: AppColors.roseAccent,
+                              ),
+                            ),
+                          ],
+                          // Alanlar arası ve alan→buton dikey boşlukları eşitlendi.
+                          const SizedBox(height: AppSpacing.md),
+                          _buildPrimaryCta(context, kControlHeight),
+                          const SizedBox(height: AppSpacing.lg),
+                          _buildOrDivider(context),
+                          const SizedBox(height: AppSpacing.lg),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildSocialButton(
+                                  height: kControlHeight,
+                                  leading: const Icon(
+                                    Icons.apple,
+                                    size: 22,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  label: t(
+                                    context,
+                                    "onboarding.link_account.apple_button",
+                                  ),
+                                  onTap: _busy
+                                      ? null
+                                      : () => _run(
+                                          () => _oauth(OAuthProvider.apple),
+                                        ),
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.md),
+                              Expanded(
+                                child: _buildSocialButton(
+                                  height: kControlHeight,
+                                  leading: _buildGoogleLogo(),
+                                  label: t(
+                                    context,
+                                    "onboarding.link_account.google_button",
+                                  ),
+                                  onTap: _busy
+                                      ? null
+                                      : () => _run(
+                                          () => _oauth(OAuthProvider.google),
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
+    );
+  }
+
+  // ── Görsel yardımcılar (davranış içermez) ──────────────────────────────
+
+  InputDecoration _fieldDecoration({
+    required String hint,
+    required IconData icon,
+    Widget? suffix,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: AppTextStyles.bodyMd(color: AppColors.textMuted),
+      prefixIcon: Icon(icon, color: AppColors.textMuted),
+      suffixIcon: suffix,
+      filled: true,
+      fillColor: AppColors.bgSurface,
+      // Yükseklik kControlHeight ile sabitlendiği için dikey dolgu bırakılmaz;
+      // böylece içerik (ikon + metin) 58px içinde ortalanır ve alanın görsel
+      // yüksekliği CTA ile birebir aynı olur.
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.inputPaddingH,
+      ),
+      border: AppBorders.inputDefault().copyWith(
+        borderRadius: AppRadius.pillBr,
+      ),
+      enabledBorder: AppBorders.inputDefault().copyWith(
+        borderRadius: AppRadius.pillBr,
+      ),
+      focusedBorder: AppBorders.inputFocused().copyWith(
+        borderRadius: AppRadius.pillBr,
+      ),
+    );
+  }
+
+  Widget _buildPrimaryCta(BuildContext context, double height) {
+    return SizedBox(
+      height: height,
+      child: DecoratedBox(
+        decoration: AppDecorations.primaryCta(
+          disabled: _busy,
+        ).copyWith(borderRadius: AppRadius.pillBr),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: AppRadius.pillBr,
+          child: InkWell(
+            borderRadius: AppRadius.pillBr,
+            onTap: _busy ? null : () => _run(_signIn),
+            child: Center(
+              child: Text(
+                t(context, "auth.signin.button"),
+                style: AppTextStyles.ctaPrimary,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrDivider(BuildContext context) {
+    return Row(
+      children: [
+        const Expanded(
+          child: Divider(color: AppColors.borderSubtle, height: 1),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+          child: Text(
+            t(context, "onboarding.link_account.or_divider"),
+            style: AppTextStyles.bodyXs(color: AppColors.textMuted),
+          ),
+        ),
+        const Expanded(
+          child: Divider(color: AppColors.borderSubtle, height: 1),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocialButton({
+    required double height,
+    required Widget leading,
+    required String label,
+    required VoidCallback? onTap,
+  }) {
+    final bool disabled = onTap == null;
+    return SizedBox(
+      height: height,
+      child: Material(
+        color: AppColors.bgCard,
+        borderRadius: AppRadius.pillBr,
+        child: InkWell(
+          borderRadius: AppRadius.pillBr,
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: AppRadius.pillBr,
+              border: Border.all(color: AppColors.borderMedium),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                leading,
+                const SizedBox(width: AppSpacing.sm),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      style: AppTextStyles.ctaSecondary(
+                        color: disabled
+                            ? AppColors.textDisabled
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGoogleLogo() {
+    return Image.asset(
+      'assets/images/logo/google_logo.png',
+      width: 20,
+      height: 20,
+      errorBuilder: (context, error, stackTrace) =>
+          const SizedBox(width: 20, height: 20),
     );
   }
 }
@@ -217,6 +482,8 @@ Future<void> startOAuthSignin90(OAuthProvider p) async {
   } catch (e) {
     debugPrint("guest save failed: $e");
   }
-  await Supabase.instance.client.auth
-      .signInWithOAuth(p, redirectTo: kAuthRedirectUrl);
+  await Supabase.instance.client.auth.signInWithOAuth(
+    p,
+    redirectTo: kAuthRedirectUrl,
+  );
 }

@@ -239,7 +239,12 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
           );
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 60),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.screenH,
+        AppSpacing.contentTop,
+        AppSpacing.screenH,
+        AppSizes.bottomNavInset(context),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

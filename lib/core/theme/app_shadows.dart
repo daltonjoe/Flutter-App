@@ -11,7 +11,7 @@ class AppShadows {
   /// Primary CTA / hero element glow
   static const List<BoxShadow> violetGlow = [
     BoxShadow(
-      color: AppColors.violetGlow, // 0x668B5CF6
+      color: AppColors.violetGlow, // 0x662D7DF0
       blurRadius: 24,
       offset: Offset(0, 8),
     ),
@@ -19,17 +19,13 @@ class AppShadows {
 
   /// Subtle violet glow for smaller interactive elements
   static const List<BoxShadow> violetGlowSm = [
-    BoxShadow(
-      color: Color(0x408B5CF6),
-      blurRadius: 12,
-      offset: Offset(0, 4),
-    ),
+    BoxShadow(color: Color(0x402D7DF0), blurRadius: 12, offset: Offset(0, 4)),
   ];
 
   // ── Hero orb glow ────────────────────────────────────────────────────
   static const List<BoxShadow> heroOrbGlow = [
     BoxShadow(
-      color: Color(0x808B5CF6), // 50 % violet
+      color: Color(0x802D7DF0), // 50 % violet
       blurRadius: 20,
     ),
   ];
@@ -45,11 +41,7 @@ class AppShadows {
 
   // ── Error / rose glow ────────────────────────────────────────────────
   static const List<BoxShadow> errorGlow = [
-    BoxShadow(
-      color: Color(0x40F87171),
-      blurRadius: 12,
-      offset: Offset(0, 4),
-    ),
+    BoxShadow(color: Color(0x40F87171), blurRadius: 12, offset: Offset(0, 4)),
   ];
 
   // ── Element-tinted glow (built at runtime with a given color) ────────

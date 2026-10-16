@@ -10,7 +10,6 @@
   "common.select": "اختر",
   "common.cancel": "إلغاء",
   "common.done": "تم",
-
   "loader.msg_1": "جاري حساب مواقع الكواكب...",
   "loader.msg_2": "جاري قراءة خطتك الكونية...",
   "loader.msg_3": "جاري تحليل جوانب الكواكب...",
@@ -18,12 +17,10 @@
   "loader.msg_5": "جاري إنتاج رؤيتك الشخصية...",
   "loader.msg_6": "جاري فك أسرار خريطة ميلادك...",
   "loader.msg_7": "جاري تحضير رسالة الكون...",
-
   "forecast.result_title": "توقعات {period}",
   "forecast.unexpected_error": "خطأ غير متوقع.",
   "forecast.loading": "جاري تحضير توقعاتك، قد يستغرق هذا من 15 إلى 30 ثانية...",
   "forecast.analysis_header": "تحليل توقعات {period}",
-
   "forecast.title": "تحليل التوقعات",
   "forecast.daily": "يومي",
   "forecast.daily_subtitle": "ماذا ينتظرك اليوم؟",
@@ -37,21 +34,17 @@
   "forecast.select_period": "اختر تحليلك الدوري المخصص.",
   "forecast.which_period": "أي فترة زمنية؟",
   "forecast.personalized_notice": "سيتم إنتاج تحليل شخصي بناءً على خريطتك.",
-
   "planet_report.house": "البيت {number}",
   "planet_report.retrograde": "تراجع ℞",
-
   "planet_report.title": "تحليل {name}",
   "planet_report.unexpected_error": "خطأ غير متوقع.",
   "planet_report.loading": "جاري تحضير تقرير الكوكب...",
-
   "natal_report.loading": "جاري تحليل خريطة ميلادك، قد يستغرق هذا من 15 إلى 30 ثانية...",
   "natal_report.title": "تحليل {name}",
   "natal_report.refresh": "تحديث",
   "natal_report.unexpected_error": "حدث خطأ غير متوقع.",
   "natal_report.retry": "إعادة المحاولة",
   "natal_report.footer_tagline": "بجانب دليلك الكوني",
-
   "create_profile.title": "اكتشف\nخريطة ميلادك",
   "create_profile.subtitle": "شارك تفاصيل ميلادك لتبدأ\nرحلتك الكونية.",
   "create_profile.name_label": "الاسم الكامل",
@@ -75,7 +68,6 @@
   "create_profile.guidance_desc": "تزيد دقة وقت الميلاد مباشرةً من دقة برجك الصاعد ومواضع البيوت.",
   "create_profile.security_footer": "يتم تشفير بياناتك ومعالجتها باستخدام الجداول الفلكية السويسرية والذكاء الاصطناعي.",
   "create_profile.quick_cities": "اختيار سريع للمدن",
-
   "chart.planets": "الكواكب",
   "chart.signs": "الأبراج",
   "chart.elements": "العناصر",
@@ -91,7 +83,6 @@
   "chart.natal_report": "تحليل خريطة الميلاد",
   "chart.planet_report": "تحليل الكوكب",
   "chart.ascendant": "الطالع",
-
   "chart.sun": "الشمس",
   "chart.moon": "القمر",
   "chart.mercury": "عطارد",
@@ -102,7 +93,6 @@
   "chart.uranus": "أورانوس",
   "chart.neptune": "نبتون",
   "chart.pluto": "بلوتو",
-
   "signs.aries": "الحمل",
   "signs.taurus": "الثور",
   "signs.gemini": "الجوزاء",
@@ -115,12 +105,10 @@
   "signs.capricorn": "الجدي",
   "signs.aquarius": "الدلو",
   "signs.pisces": "الحوت",
-
   "elements.fire": "نار",
   "elements.earth": "تراب",
   "elements.air": "هواء",
   "elements.water": "ماء",
-
   "placement.title": "تفسير مفصل",
   "placement.theme.love": "الحب والعلاقات",
   "placement.theme.career": "المهنة والمال",
@@ -129,11 +117,9 @@
   "placement.strengths": "نقاط القوة",
   "placement.challenges": "الجوانب الصعبة",
   "placement.button": "عرض التفسير المفصل",
-
   "placement.error": "حدثت مشكلة أثناء تحميل المحتوى.",
   "placement.retry": "حاول مرة أخرى",
   "placement.empty": "لا يوجد محتوى متاح لهذا الموقع حتى الآن.",
-
   "common.ok": "حسنًا",
   "onboarding.name.required": "يرجى إدخال اسمك حتى نتمكن من إعداد خريطة مخصصة لك.",
   "onboarding.city.required": "يجب عليك اختيار مكان ميلادك حتى نتمكن من تحليل مواقع الكواكب والنجوم بدقة.",
@@ -142,26 +128,21 @@
   "onboarding.birthtime.ask_relative": "سأسأل أحد أقاربي",
   "onboarding.birthtime.skip": "تخطي",
   "onboarding.birthtime.share_message": "هل تعرف وقت ميلادي؟",
-
   "onboarding.language.continue": "المتابعة باللغة العربية",
-
-   "onboarding.chart_save_failed": "تعذر حفظ خريطة ميلادك، يرجى المحاولة مرة أخرى.",
+  "onboarding.chart_save_failed": "تعذر حفظ خريطة ميلادك، يرجى المحاولة مرة أخرى.",
   "onboarding.link_account.title": "حفظ حسابك",
   "onboarding.link_account.description": "لتجنب فقدان بياناتك، يمكنك حفظ حسابك باستخدام بريدك الإلكتروني. يمكنك أيضًا تخطي هذه الخطوة الآن.",
   "onboarding.link_account.email_label": "البريد الإلكتروني",
   "onboarding.link_account.password_label": "كلمة المرور",
   "onboarding.link_account.email_invalid": "أدخل عنوان بريد إلكتروني صالحًا",
   "onboarding.link_account.password_too_short": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
-
   "onboarding.link_account.skip_button": "ليس الآن، تخطي",
   "onboarding.link_account.email_sent": "تم إرسال بريد إلكتروني للتحقق. يرجى التحقق من صندوق الوارد.",
   "onboarding.link_account.rate_limit_error": "تم إجراء محاولات كثيرة جدًا. يرجى المحاولة مرة أخرى بعد بضع دقائق.",
-
   "onboarding.link_account.save_button": "حفظ",
-"onboarding.link_account.or_divider": "أو",
-"onboarding.link_account.google_button": "المتابعة باستخدام Google",
-"onboarding.link_account.apple_button": "المتابعة باستخدام Apple",
-
+  "onboarding.link_account.or_divider": "أو",
+  "onboarding.link_account.google_button": "المتابعة باستخدام Google",
+  "onboarding.link_account.apple_button": "المتابعة باستخدام Apple",
   "onboarding.name.label": "الاسم",
   "onboarding.name.hint": "أدخل اسمك",
   "onboarding.birthtime.title": "في أي وقت وُلدت؟",
@@ -189,17 +170,24 @@
   "account_deletion.confirm": "حذف حسابي",
   "account_deletion.error": "تعذر حذف حسابك.",
   "account_deletion.loading": "جارٍ حذف حسابك...",
-
   "onboarding.city.title": "أين وُلدت؟",
   "onboarding.city.hint": "ابحث عن مدينتك",
   "onboarding.gender.title": "كيف تصف هويتك؟",
-  
   "onboarding.gender.male": "ذكر",
   "onboarding.gender.female": "أنثى",
   "onboarding.gender.prefer_not_to_say": "أفضل عدم الإفصاح",
-
- "onboarding.name.subtitle": "أخبرنا عن نفسك حتى نتمكن من تقديم توقع أكثر تخصيصًا لك.",
+  "onboarding.name.subtitle": "أخبرنا عن نفسك حتى نتمكن من تقديم توقع أكثر تخصيصًا لك.",
   "onboarding.birthdate.subtitle": "التاريخ مهم لتحديد برجك الشمسي وعلم الأعداد ومدى التوافق.",
   "onboarding.birthtime.subtitle": "الوقت مهم لتحديد بيوتك الفلكية وبرجك الصاعد والموقع الدقيق للقمر.",
-  "onboarding.gender.subtitle": "سيساعد ذلك في الكشف عن توازن طاقتك الذكورية والأنثوية."
+  "onboarding.gender.subtitle": "سيساعد ذلك في الكشف عن توازن طاقتك الذكورية والأنثوية.",
+  "paywall.title": "جرب إفيميريا مجانًا",
+  "paywall.trial_days": "{days} أيام مجانية",
+  "paywall.save_badge": "وفر {percent}%",
+  "paywall.cta_trial_days": "ابدأ التجربة لمدة {days} أيام",
+  "paywall.cta_continue": "استمرار",
+  "paywall.free_trial_cancel_anytime": "تجربة مجانية. يمكنك الإلğاء في أي وقت.",
+  "paywall.cancel_anytime": "يمكنك الإلğاء في أي وقت.",
+  "paywall.per_month": "/شهر",
+  "paywall.per_week": "/أسبوع",
+  "paywall.plan.weekly": "أسبوعي"
 }

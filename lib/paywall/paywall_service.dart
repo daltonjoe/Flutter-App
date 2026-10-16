@@ -9,11 +9,12 @@ const String kCreditsProductId = 'sb_msgs_50';
 const String kProEntitlement = 'pro';
 
 class PaywallOffer {
-  const PaywallOffer({this.yearly, this.monthly, this.credits});
+  const PaywallOffer({this.yearly, this.monthly, this.weekly, this.credits});
   final Package? yearly;
   final Package? monthly;
+  final Package? weekly;
   final StoreProduct? credits;
-  bool get hasPlans => yearly != null || monthly != null;
+  bool get hasPlans => yearly != null || monthly != null || weekly != null;
 }
 
 class PaywallService {
@@ -33,7 +34,9 @@ class PaywallService {
     if (uid == null) return false;
     try {
       if (!_ready) {
-        await Purchases.configure(PurchasesConfiguration(_key)..appUserID = uid);
+        await Purchases.configure(
+          PurchasesConfiguration(_key)..appUserID = uid,
+        );
         _ready = true;
       } else {
         await Purchases.logIn(uid);
@@ -52,13 +55,19 @@ class PaywallService {
       final cur = offerings.current;
       StoreProduct? credits;
       try {
-        final ps = await Purchases.getProducts([kCreditsProductId],
-            productCategory: ProductCategory.nonSubscription);
+        final ps = await Purchases.getProducts([
+          kCreditsProductId,
+        ], productCategory: ProductCategory.nonSubscription);
         if (ps.isNotEmpty) credits = ps.first;
       } catch (e) {
         debugPrint('paywall credits product error: $e');
       }
-      return PaywallOffer(yearly: cur?.annual, monthly: cur?.monthly, credits: credits);
+      return PaywallOffer(
+        yearly: cur?.annual,
+        monthly: cur?.monthly,
+        weekly: cur?.weekly,
+        credits: credits,
+      );
     } catch (e) {
       debugPrint('paywall offerings error: $e');
       return null;
@@ -67,7 +76,8 @@ class PaywallService {
 
   static bool _cancelled(Object e) {
     if (e is PlatformException) {
-      return PurchasesErrorHelper.getErrorCode(e) == PurchasesErrorCode.purchaseCancelledError;
+      return PurchasesErrorHelper.getErrorCode(e) ==
+          PurchasesErrorCode.purchaseCancelledError;
     }
     return false;
   }
