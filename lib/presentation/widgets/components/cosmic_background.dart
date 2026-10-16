@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// Yıldızlı arka plan görselinin varsayılan opaklığı (tek kaynak).
-const double kCosmicBackgroundOpacity = 0.75;
+///
+/// Görsel mavi baskın (ortalama RGB ≈ 17/19/31); yeni bgVoid zemininin
+/// "gece gökyüzü" karakterini bozmaması ve altın vurguların öne çıkması
+/// için 0.60'a düşürüldü.
+const double kCosmicBackgroundOpacity = 0.60;
 
 /// Yıldızlı arka plan görselini [child] arkasına yerleştirir.
 ///

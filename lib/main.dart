@@ -139,7 +139,7 @@ class SoulBoundApp extends StatelessWidget {
       ],
       builder: (context, child) {
         return ColoredBox(
-          color: Colors.black,
+          color: AppColors.bgVoid,
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
