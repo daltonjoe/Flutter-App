@@ -66,6 +66,8 @@ flutter:
     - assets/images/relationship/
     - assets/images/logo/
     - assets/images/zodiac/
+    - assets/images/redesign/
+    - assets/images/redesign/planets/
     - assets/data/cities.json
     - locales/
 

@@ -189,5 +189,15 @@
   "paywall.cancel_anytime": "يمكنك الإلğاء في أي وقت.",
   "paywall.per_month": "/شهر",
   "paywall.per_week": "/أسبوع",
-  "paywall.plan.weekly": "أسبوعي"
+  "paywall.plan.weekly": "أسبوعي",
+  "rd.splash.title": "Ephemerai",
+  "rd.splash.tagline": "اكتشف نفسك",
+  "rd.chart.planet_positions": "مواقع الكواكب",
+  "rd.tab.all": "الكل",
+  "rd.tab.sun": "الشمس",
+  "rd.tab.moon": "القمر",
+  "rd.tab.ascendant": "الطالع",
+  "rd.tab.satellites": "الأقمار",
+  "rd.house_meaning.placeholder": "سيظهر هنا معنى البيت {number}.",
+  "rd.house_meaning.time_unknown": "وقت الميلاد غير معروف، لذا معاني البيوت غير متاحة."
 }

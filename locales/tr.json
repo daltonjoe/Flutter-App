@@ -470,5 +470,15 @@
   "paywall.cancel_anytime": "İstediğin zaman iptal et.",
   "paywall.per_month": "/ay",
   "paywall.per_week": "/hafta",
-  "paywall.plan.weekly": "Haftalık"
+  "paywall.plan.weekly": "Haftalık",
+  "rd.splash.title": "Ephemerai",
+  "rd.splash.tagline": "Kendini Keşfet",
+  "rd.chart.planet_positions": "Gezegen Pozisyonları",
+  "rd.tab.all": "Tümü",
+  "rd.tab.sun": "Güneş",
+  "rd.tab.moon": "Ay",
+  "rd.tab.ascendant": "Yükselen",
+  "rd.tab.satellites": "Uydular",
+  "rd.house_meaning.placeholder": "{number}. evin anlamı burada görünecek.",
+  "rd.house_meaning.time_unknown": "Doğum saati bilinmediği için ev anlamları gösterilemiyor."
 }

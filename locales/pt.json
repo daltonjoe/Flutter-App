@@ -466,5 +466,15 @@
   "paywall.cancel_anytime": "Cancele a qualquer momento.",
   "paywall.per_month": "/mês",
   "paywall.per_week": "/semana",
-  "paywall.plan.weekly": "Semanal"
+  "paywall.plan.weekly": "Semanal",
+  "rd.splash.title": "Ephemerai",
+  "rd.splash.tagline": "Descubra-se",
+  "rd.chart.planet_positions": "Posições planetárias",
+  "rd.tab.all": "Tudo",
+  "rd.tab.sun": "Sol",
+  "rd.tab.moon": "Lua",
+  "rd.tab.ascendant": "Ascendente",
+  "rd.tab.satellites": "Satélites",
+  "rd.house_meaning.placeholder": "O significado da casa {number} aparecerá aqui.",
+  "rd.house_meaning.time_unknown": "A hora de nascimento é desconhecida, então os significados das casas não estão disponíveis."
 }

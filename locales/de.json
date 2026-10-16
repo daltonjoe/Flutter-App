@@ -466,5 +466,15 @@
   "paywall.cancel_anytime": "Jederzeit kündbar.",
   "paywall.per_month": "/Monat",
   "paywall.per_week": "/Woche",
-  "paywall.plan.weekly": "Wöchentlich"
+  "paywall.plan.weekly": "Wöchentlich",
+  "rd.splash.title": "Ephemerai",
+  "rd.splash.tagline": "Entdecke dich selbst",
+  "rd.chart.planet_positions": "Planetenpositionen",
+  "rd.tab.all": "Alle",
+  "rd.tab.sun": "Sonne",
+  "rd.tab.moon": "Mond",
+  "rd.tab.ascendant": "Aszendent",
+  "rd.tab.satellites": "Satelliten",
+  "rd.house_meaning.placeholder": "Die Bedeutung des {number}. Hauses erscheint hier.",
+  "rd.house_meaning.time_unknown": "Die Geburtszeit ist unbekannt, daher sind keine Hausdeutungen verfügbar."
 }
