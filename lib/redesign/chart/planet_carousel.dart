@@ -10,10 +10,10 @@ import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../models/natal_chart_response.dart';
-import '../../screens/planet_report_page.dart';
 import '../../services/reference_names_service.dart';
 import '../assets_map.dart';
 import '../data/planet_card_view_model.dart';
+import '../detail/redesign_detail_page.dart';
 
 class PlanetCarousel extends StatefulWidget {
   const PlanetCarousel({super.key, required this.chartData, this.onSettled});
@@ -139,10 +139,9 @@ class _PlanetCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => PlanetReportPage(
-              planetName: item.key,
-              planetNameTR: item.name,
+            builder: (_) => RedesignDetailPage.planet(
               chartData: chartData,
+              planetKey: item.key,
             ),
           ),
         );

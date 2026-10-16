@@ -6,7 +6,7 @@ import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../models/natal_chart_response.dart';
 import '../../presentation/widgets/components/cosmic_background.dart';
-import '../../screens/placement_content_page.dart';
+import '../detail/redesign_detail_page.dart';
 import 'chart_category_bar.dart';
 import 'house_meaning_panel.dart';
 import 'planet_carousel.dart';
@@ -79,9 +79,9 @@ class _RedesignChartPageState extends State<RedesignChartPage> {
                   onOpenPlacement: (k) => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => PlacementContentPage(
+                      builder: (_) => RedesignDetailPage.placement(
                         chartData: widget.chartData,
-                        initialKey: k,
+                        placementKey: k,
                       ),
                     ),
                   ),
