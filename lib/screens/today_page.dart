@@ -1589,18 +1589,6 @@ class _TodayPageState extends State<TodayPage> {
             ),
           ),
         ],
-
-        const SizedBox(height: 24),
-
-        Center(
-          child: Text(
-            _t('ask.disclaimer'),
-
-            textAlign: TextAlign.center,
-
-            style: AppTextStyles.bodyXs(color: AppColors.mist),
-          ),
-        ),
       ],
     );
   }

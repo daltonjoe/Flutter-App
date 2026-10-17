@@ -7,7 +7,6 @@ import '../providers/ask_bridge.dart';
 import 'package:flutter/services.dart';
 import '../services/reference_names_service.dart';
 import '../core/theme/app_colors.dart';
-import '../core/theme/app_decorations.dart';
 import '../core/theme/app_dimensions.dart';
 import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
@@ -793,19 +792,26 @@ class _AskPageState extends State<AskPage> {
     final maxW = MediaQuery.of(context).size.width * 0.82;
     return Align(
       key: k,
-      alignment: Alignment.centerLeft,
-      child: Container(
-        constraints: BoxConstraints(maxWidth: maxW),
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: AppDecorations.cosmicCard(),
-        child: animate
-            ? _Typewriter(
-                text: text,
-                style: AppTextStyles.bodyMd(),
-                onDone: onDone,
-              )
-            : Text(text, style: AppTextStyles.bodyMd()),
+      alignment: AlignmentDirectional.centerStart,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const AskStar(size: 14),
+            const SizedBox(height: AppSpacing.xs),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxW),
+              child: animate
+                  ? _Typewriter(
+                      text: text,
+                      style: AppTextStyles.bodyMd(),
+                      onDone: onDone,
+                    )
+                  : Text(text, style: AppTextStyles.bodyMd()),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1244,22 +1250,6 @@ class _AskPageState extends State<AskPage> {
                 ),
               _contextStrip(context),
               _composer(context),
-              // Dipnot: composer'ın hemen altında, tek satır.
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md,
-                  AppSpacing.xs,
-                  AppSpacing.md,
-                  0,
-                ),
-                child: Text(
-                  t(context, 'ask.disclaimer'),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.bodyXs(color: AppColors.mist),
-                ),
-              ),
               // Klavye kapalıyken yüzen çubuğun üstünde kalması için boşluk;
               // klavye açıkken yalnız kısa bir pay bırakılır.
               SizedBox(
