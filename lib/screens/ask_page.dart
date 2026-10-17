@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show ImageFilter;
 import '../paywall/paywall_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 import '../services/user_settings_service.dart';
 import '../presentation/widgets/components/cosmic_background.dart';
+import '../presentation/widgets/components/cosmic_card.dart';
+import '../presentation/widgets/components/cosmic_segmented.dart';
+import '../presentation/widgets/components/glyph.dart';
+import '../redesign/ask/ask_hero.dart';
+import '../redesign/ask/star_typing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'notes_page.dart';
 
 class _Msg {
@@ -27,7 +34,16 @@ class _Msg {
   final String text;
   bool animate; // K34: yalnız yeni gelen yanıt, bitince false
   final List<String>? bubbles; // AV: balon dizisi
-  _Msg(this.mine, this.text, {this.animate = false, this.bubbles});
+
+  /// Güvenlik / kota / hata kaynaklı sistem mesajı: aksiyon satırı gösterilmez.
+  final bool system;
+  _Msg(
+    this.mine,
+    this.text, {
+    this.animate = false,
+    this.bubbles,
+    this.system = false,
+  });
 }
 
 class AskPage extends StatefulWidget {
@@ -54,6 +70,7 @@ class _AskPageState extends State<AskPage> {
   String? _partnerName;
   List<Map<String, dynamic>> _partners = [];
   bool _partnersLoaded = false;
+  bool _showFirstNote = false; // B7: boş durumda bir kez göster
 
   @override
   void initState() {
@@ -69,6 +86,23 @@ class _AskPageState extends State<AskPage> {
       if (v && _mode == 'synastry') _autoPartner();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => _onDraft());
+    SharedPreferences.getInstance().then((p) {
+      if (!mounted) return;
+      if (!(p.getBool('ask_first_note_seen') ?? false)) {
+        setState(() => _showFirstNote = true);
+      }
+    });
+  }
+
+  /// B7: ilk-kez bilgi kartı yalnızca daha önce kapatılmadıysa gösterilir.
+  Future<void> _dismissFirstNote() async {
+    setState(() => _showFirstNote = false);
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setBool('ask_first_note_seen', true);
+    } catch (e) {
+      debugPrint('AskPage first-note persist failed: $e');
+    }
   }
 
   void _onBridge() {
@@ -194,11 +228,12 @@ class _AskPageState extends State<AskPage> {
         false,
         res.reply ?? (safe[s] ?? safe['fallback']!),
         animate: true,
+        system: true,
       );
     }
     final rp = res.reply;
     if (rp == null || rp.trim().isEmpty) {
-      return _Msg(false, safe['fallback']!, animate: true);
+      return _Msg(false, safe['fallback']!, animate: true, system: true);
     }
     final bl = res.bubbles;
     return _Msg(
@@ -370,68 +405,259 @@ class _AskPageState extends State<AskPage> {
     });
   }
 
+  /// Öneri kartlarının solundaki gezegen glyph'i — moda göre.
+  static const Map<String, List<String>> _suggestGlyphs = {
+    'natal': ['sun', 'moon', 'mercury'],
+    'forecast': ['jupiter', 'venus', 'saturn'],
+    'synastry': ['venus', 'mars', 'moon'],
+  };
+
   Widget _empty(BuildContext context) {
+    final reduce = MediaQuery.disableAnimationsOf(context);
+    final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final glyphs =
+        _suggestGlyphs[_mode] ?? const <String>['sun', 'moon', 'mercury'];
     final sugg = [
       t(context, 'ask.suggest.$_mode.1'),
       t(context, 'ask.suggest.$_mode.2'),
       t(context, 'ask.suggest.$_mode.3'),
     ];
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        const SizedBox(height: 24),
-        const Icon(
-          Icons.auto_awesome_outlined,
-          size: 40,
-          color: AppColors.violetPrimary,
-        ),
-        const SizedBox(height: 16),
-        Text(
-          t(context, 'ask.empty_title.$_mode'),
-          textAlign: TextAlign.center,
-          style: AppTextStyles.h3(),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          t(context, 'ask.empty_body.$_mode'),
-          textAlign: TextAlign.center,
-          style: AppTextStyles.bodyMd(),
-        ),
-        const SizedBox(height: 20),
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final s in sugg)
-              ActionChip(
-                label: Text(s, style: AppTextStyles.chip()),
-                onPressed: () => _send(s),
+    return LayoutBuilder(
+      builder: (context, c) {
+        final minH = (c.maxHeight - AppSpacing.sm - AppSpacing.md).clamp(
+          0.0,
+          double.infinity,
+        );
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            AppSpacing.sm,
+            AppSpacing.md,
+            AppSpacing.md,
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: minH),
+            child: IntrinsicHeight(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Klavye açıkken kahraman alanı gizlenir.
+                  if (!keyboardOpen)
+                    AskHero(
+                      mode: _mode,
+                      month: _fMonth,
+                      onPickMonth: _pickMonth,
+                      partnerName: _partnerName,
+                      partnersEmpty: _partnersLoaded && _partners.isEmpty,
+                      onPickPartner: _pickPartner,
+                    ),
+                  const Spacer(),
+                  if (_showFirstNote) ...[
+                    _firstNote(context),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  for (var i = 0; i < sugg.length; i++)
+                    Padding(
+                      padding: EdgeInsets.only(top: i == 0 ? 0 : AppSpacing.sm),
+                      child: _suggestCard(
+                        context,
+                        sugg[i],
+                        glyphs[i],
+                        i,
+                        reduce,
+                      ),
+                    ),
+                ],
               ),
-          ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _firstNote(BuildContext context) {
+    return CosmicCard(
+      compact: true,
+      blur: false,
+      radius: AppRadius.md,
+      borderColor: AppColors.borderMedium,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 2),
+                child: AskStar(size: 14),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  t(context, 'ask.first_note.body'),
+                  style: AppTextStyles.bodySm(color: AppColors.mist),
+                ),
+              ),
+            ],
+          ),
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: TextButton(
+              onPressed: _dismissFirstNote,
+              style: TextButton.styleFrom(
+                minimumSize: const Size(48, 40),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              ),
+              child: Text(
+                t(context, 'ask.first_note.ok'),
+                style: AppTextStyles.bodySm(color: AppColors.gold),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _suggestCard(
+    BuildContext context,
+    String text,
+    String glyph,
+    int index,
+    bool reduce,
+  ) {
+    final card = CosmicCard(
+      compact: true,
+      blur: false,
+      radius: AppRadius.md,
+      padding: EdgeInsets.zero,
+      onTap: () => _send(text),
+      child: SizedBox(
+        height: AppSizes.inputHeight,
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(
+            AppSpacing.md,
+            0,
+            AppSpacing.md,
+            0,
+          ),
+          child: Row(
+            children: [
+              Glyph(glyph, size: 20, color: AppColors.gold, decorative: true),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  text,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bodyLg(),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Icon(
+                Directionality.of(context) == TextDirection.rtl
+                    ? Icons.arrow_back_ios_new_rounded
+                    : Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: AppColors.mist,
+              ),
+            ],
+          ),
         ),
-      ],
+      ),
+    );
+    if (reduce) return card;
+    // 60 ms kademe, 400 ms süre, 16 px aşağıdan yukarı belirme.
+    final dur = 400 + index * 60;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: Duration(milliseconds: dur),
+      curve: Interval(index * 60 / dur, 1.0, curve: Curves.easeOut),
+      builder: (context, v, child) => Opacity(
+        opacity: v.clamp(0.0, 1.0),
+        child: Transform.translate(
+          offset: Offset(0, 16 * (1 - v)),
+          child: child,
+        ),
+      ),
+      child: card,
     );
   }
 
   Widget _bubble(BuildContext context, _Msg m) {
     final core = _bubbleCore(context, m);
-    if (m.mine || m.text.trim().isEmpty) return core;
+    // Sistem (güvenlik / hata / kota) mesajlarında aksiyon satırı yoktur.
+    if (m.mine || m.text.trim().isEmpty || m.system) return core;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [core, _reportLink(context, m)],
+      children: [core, _actions(context, m)],
     );
   }
 
-  Widget _reportLink(BuildContext context, _Msg m) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: TextButton(
-        onPressed: () => _reportReply(m),
-        style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
-        child: Text(t(context, 'ask.report'), style: AppTextStyles.bodySm()),
+  /// Normal asistan yanıtının altındaki aksiyon satırı.
+  Widget _actions(BuildContext context, _Msg m) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(top: AppSpacing.xs),
+      child: Wrap(
+        spacing: AppSpacing.sm,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          _actionButton(
+            context,
+            'ask.remember',
+            Icons.bookmark_add_outlined,
+            () => _remember(m.text),
+          ),
+          _actionButton(
+            context,
+            'ask.copy',
+            Icons.copy_rounded,
+            () => _copy(m.text),
+          ),
+          TextButton(
+            onPressed: () => _reportReply(m),
+            style: TextButton.styleFrom(
+              minimumSize: const Size(48, 40),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+            ),
+            child: Text(
+              t(context, 'ask.report'),
+              style: AppTextStyles.bodySm(color: AppColors.mist),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _actionButton(
+    BuildContext context,
+    String key,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
+    return TextButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 16, color: AppColors.mist),
+      label: Text(
+        t(context, key),
+        style: AppTextStyles.bodySm(color: AppColors.mist),
+      ),
+      style: TextButton.styleFrom(
+        minimumSize: const Size(44, 40),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+      ),
+    );
+  }
+
+  Future<void> _copy(String text) async {
+    await Clipboard.setData(ClipboardData(text: text));
+    HapticFeedback.lightImpact();
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(t(context, 'ask.copied'))));
   }
 
   Future<void> _reportReply(_Msg m) async {
@@ -502,30 +728,47 @@ class _AskPageState extends State<AskPage> {
   }
 
   Widget _bubbleBase(BuildContext context, _Msg m) {
-    final maxW = MediaQuery.of(context).size.width * 0.82;
+    final maxW = MediaQuery.of(context).size.width * 0.80;
+    if (m.mine) {
+      // Kullanıcı mesajı: sağda, Navy Raised hap.
+      return Align(
+        alignment: AlignmentDirectional.centerEnd,
+        child: Container(
+          constraints: BoxConstraints(maxWidth: maxW),
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.navyRaised,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.hairline),
+          ),
+          child: Text(m.text, style: AppTextStyles.bodyLg()),
+        ),
+      );
+    }
+    // Asistan: balonsuz, sola yaslı — üstte küçük altın ✦.
     return Align(
-      alignment: m.mine ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        constraints: BoxConstraints(maxWidth: maxW),
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: m.mine
-            ? BoxDecoration(
-                color: AppColors.violetPrimary.withAlpha(64),
-                borderRadius: BorderRadius.circular(16),
-              )
-            : AppDecorations.cosmicCard(),
-        child: (!m.mine && m.animate)
-            ? _Typewriter(
-                key: ObjectKey(m),
-                text: m.text,
-                style: AppTextStyles.bodyMd(),
-                onDone: () => m.animate = false,
-              )
-            : Text(
-                m.text,
-                style: m.mine ? AppTextStyles.bodyLg() : AppTextStyles.bodyMd(),
-              ),
+      alignment: AlignmentDirectional.centerStart,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const AskStar(size: 14),
+            const SizedBox(height: AppSpacing.xs),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxW),
+              child: m.animate
+                  ? _Typewriter(
+                      key: ObjectKey(m),
+                      text: m.text,
+                      style: AppTextStyles.bodyLg(),
+                      onDone: () => m.animate = false,
+                    )
+                  : Text(m.text, style: AppTextStyles.bodyLg()),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -693,16 +936,6 @@ class _AskPageState extends State<AskPage> {
     }
   }
 
-  Widget _typing(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Text(t(context, 'ask.typing'), style: AppTextStyles.bodySm()),
-      ),
-    );
-  }
-
   Widget _contextStrip(BuildContext context) {
     return ListenableBuilder(
       listenable: Listenable.merge([askContext, askMode]),
@@ -713,22 +946,61 @@ class _AskPageState extends State<AskPage> {
           height: 48,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
             itemCount: items.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
             itemBuilder: (_, i) => Center(
-              child: InputChip(
-                label: Text(
-                  items[i].displayLabel,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.chip(),
+              child: Container(
+                height: AppSizes.chipHeight,
+                padding: const EdgeInsetsDirectional.only(
+                  start: AppSpacing.cardGap,
+                  end: AppSpacing.xs,
                 ),
-                deleteButtonTooltipMessage: t(context, 'ask.context.remove'),
-                onDeleted: () {
-                  HapticFeedback.selectionClick();
-                  askContext.remove(items[i].id);
-                },
+                decoration: BoxDecoration(
+                  color: AppColors.navyRaised,
+                  borderRadius: AppRadius.pillBr,
+                  border: Border.all(color: AppColors.hairline),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.auto_awesome,
+                      size: 14,
+                      color: AppColors.gold,
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 160),
+                      child: Text(
+                        items[i].displayLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.chip(color: AppColors.gold),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Semantics(
+                      button: true,
+                      label: t(context, 'ask.context.remove'),
+                      child: InkWell(
+                        borderRadius: AppRadius.pillBr,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          askContext.remove(items[i].id);
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(6),
+                          child: Icon(
+                            Icons.close,
+                            size: 14,
+                            color: AppColors.mist,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -738,40 +1010,98 @@ class _AskPageState extends State<AskPage> {
   }
 
   Widget _composer(BuildContext context) {
+    final reduce = MediaQuery.disableAnimationsOf(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 4, 8, 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _ctl,
-              minLines: 1,
-              maxLines: 5,
-              textCapitalization: TextCapitalization.sentences,
-              textInputAction: TextInputAction.send,
-              focusNode: _inputFocus,
-              onSubmitted: (_) => _send(),
-              style: AppTextStyles.bodyLg(),
-              decoration: InputDecoration(
-                hintText: t(context, 'ask.placeholder'),
-              ),
+      padding: const EdgeInsetsDirectional.fromSTEB(
+        AppSpacing.md,
+        AppSpacing.xs,
+        AppSpacing.md,
+        AppSpacing.sm,
+      ),
+      // Sayfadaki tek BackdropFilter: cam hap.
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: const EdgeInsetsDirectional.fromSTEB(
+              AppSpacing.md,
+              2,
+              6,
+              2,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.navyDeep.withValues(alpha: 0.80),
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(color: AppColors.hairline),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _ctl,
+                    minLines: 1,
+                    maxLines: 4,
+                    textCapitalization: TextCapitalization.sentences,
+                    textInputAction: TextInputAction.send,
+                    focusNode: _inputFocus,
+                    onSubmitted: (_) => _send(),
+                    style: AppTextStyles.bodyLg(),
+                    decoration: InputDecoration(
+                      hintText: t(context, 'ask.placeholder'),
+                      border: InputBorder.none,
+                      isCollapsed: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _ctl,
+                    builder: (context, v, _) {
+                      final active = v.text.trim().isNotEmpty && !_waiting;
+                      return Semantics(
+                        button: true,
+                        enabled: active,
+                        label: t(context, 'ask.send'),
+                        child: GestureDetector(
+                          onTap: active ? () => _send() : null,
+                          child: AnimatedContainer(
+                            duration: reduce
+                                ? Duration.zero
+                                : const Duration(milliseconds: 200),
+                            width: AppSizes.sectionIconBadge,
+                            height: AppSizes.sectionIconBadge,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: active
+                                  ? AppColors.gold
+                                  : AppColors.navyRaised,
+                              border: Border.all(
+                                color: active
+                                    ? AppColors.gold
+                                    : AppColors.hairline,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.arrow_upward_rounded,
+                              size: 20,
+                              color: active ? AppColors.onGold : AppColors.mist,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 4),
-          SizedBox(
-            width: 48,
-            height: 48,
-            child: IconButton(
-              tooltip: t(context, 'ask.send'),
-              onPressed: _waiting ? null : _send,
-              icon: const Icon(
-                Icons.arrow_upward_rounded,
-                color: AppColors.violetPrimary,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -779,6 +1109,8 @@ class _AskPageState extends State<AskPage> {
   @override
   Widget build(BuildContext context) {
     context.watch<ReferenceNamesService>();
+    final reduce = MediaQuery.disableAnimationsOf(context);
+    final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
     final msgs = _messages.reversed.toList();
     final extra = _waiting ? 1 : 0;
     return CosmicBackground(
@@ -802,101 +1134,89 @@ class _AskPageState extends State<AskPage> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: SegmentedButton<String>(
-                  showSelectedIcon: false,
-                  segments: [
-                    ButtonSegment(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  AppSpacing.sm,
+                  AppSpacing.md,
+                  0,
+                ),
+                child: CosmicSegmented<String>(
+                  selected: _mode,
+                  onChanged: (v) => askMode.value = v, // sıfırlama _onMode'da
+                  items: [
+                    CosmicSegment(
                       value: 'natal',
-                      label: Text(
-                        _av
-                            ? t(context, 'ask.avatar.natal.name')
-                            : t(context, 'ask.mode.natal'),
-                      ),
+                      glyph: 'moon',
+                      label: _av
+                          ? t(context, 'ask.avatar.natal.name')
+                          : t(context, 'ask.mode.natal'),
                     ),
-                    ButtonSegment(
+                    CosmicSegment(
                       value: 'forecast',
-                      label: Text(
-                        _av
-                            ? t(context, 'ask.avatar.forecast.name')
-                            : t(context, 'ask.mode.forecast'),
-                      ),
+                      glyph: 'mercury',
+                      label: _av
+                          ? t(context, 'ask.avatar.forecast.name')
+                          : t(context, 'ask.mode.forecast'),
                     ),
                     if (_av)
-                      ButtonSegment(
+                      CosmicSegment(
                         value: 'synastry',
-                        label: Text(t(context, 'ask.avatar.synastry.name')),
+                        glyph: 'venus',
+                        label: t(context, 'ask.avatar.synastry.name'),
                       ),
                   ],
-                  selected: {_mode},
-                  onSelectionChanged: (s) {
-                    askMode.value = s.first; // sıfırlama _onMode'da
-                  },
                 ),
               ),
-              if (_mode == 'forecast')
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: ActionChip(
-                    avatar: const Icon(Icons.calendar_month_outlined, size: 18),
-                    label: Text(
-                      _fMonth == null
-                          ? t(context, 'ask.forecast.pick')
-                          : '${t(context, 'ask.forecast.for')}: ${_fMonth!.substring(5)}-${_fMonth!.substring(0, 4)}',
-                    ),
-                    onPressed: _pickMonth,
-                  ),
-                ),
               if (_av)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
-                  child: Text(
-                    t(context, 'ask.avatar.$_mode.tag'),
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodySm(),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    AppSpacing.sm,
+                    AppSpacing.md,
+                    0,
                   ),
-                ),
-              if (_av && _mode == 'synastry')
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: (_partnersLoaded && _partners.isEmpty)
-                      ? Text(
-                          t(context, 'ask.avatar.synastry.need_profile'),
-                          style: AppTextStyles.bodySm(),
-                        )
-                      : ActionChip(
-                          avatar: const Icon(Icons.people_outline, size: 18),
-                          label: Text(
-                            _partnerName == null
-                                ? t(context, 'ask.avatar.partner.pick')
-                                : '${t(context, 'ask.avatar.partner.for')}: $_partnerName',
-                          ),
-                          onPressed: _pickPartner,
-                        ),
+                  child: AnimatedSwitcher(
+                    duration: reduce
+                        ? Duration.zero
+                        : const Duration(milliseconds: 200),
+                    child: Text(
+                      t(context, 'ask.avatar.$_mode.tag'),
+                      key: ValueKey<String>(_mode),
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.bodySm(color: AppColors.mist),
+                    ),
+                  ),
                 ),
               Expanded(
                 child: (_messages.isEmpty && !_waiting)
                     ? _empty(context)
                     : ListView.builder(
                         reverse: true,
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        padding: EdgeInsets.fromLTRB(
+                          AppSpacing.md,
+                          AppSpacing.sm,
+                          AppSpacing.md,
+                          AppSizes.scrollBottomPadding(context),
+                        ),
                         itemCount: msgs.length + extra,
                         itemBuilder: (c, i) {
-                          if (_waiting && i == 0) return _typing(c);
+                          if (_waiting && i == 0) return const StarTyping();
                           return _bubble(c, msgs[i - extra]);
                         },
                       ),
               ),
               if (_failed)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
                         child: Text(
                           t(context, _errKey),
                           style: AppTextStyles.bodySm(
-                            color: AppColors.errorRed,
+                            color: AppColors.statusDanger,
                           ),
                         ),
                       ),
@@ -910,7 +1230,12 @@ class _AskPageState extends State<AskPage> {
                 ),
               if (_langReset)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    0,
+                    AppSpacing.md,
+                    AppSpacing.xs,
+                  ),
                   child: Text(
                     t(context, 'ask.lang_reset'),
                     textAlign: TextAlign.center,
@@ -918,19 +1243,28 @@ class _AskPageState extends State<AskPage> {
                   ),
                 ),
               _contextStrip(context),
+              _composer(context),
+              // Dipnot: composer'ın hemen altında, tek satır.
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  AppSpacing.xs,
+                  AppSpacing.md,
+                  0,
+                ),
                 child: Text(
                   t(context, 'ask.disclaimer'),
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.bodyXs(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bodyXs(color: AppColors.mist),
                 ),
               ),
-              _composer(context),
-              // Klavye kapalıyken giriş alanının yüzen çubuğun üstünde
-              // kalması için çubuk yüksekliği kadar boşluk bırakılır.
-              if (MediaQuery.viewInsetsOf(context).bottom == 0)
-                const SizedBox(height: AppSizes.bottomNavHeight),
+              // Klavye kapalıyken yüzen çubuğun üstünde kalması için boşluk;
+              // klavye açıkken yalnız kısa bir pay bırakılır.
+              SizedBox(
+                height: keyboardOpen ? 12 : AppSizes.bottomNavInset(context),
+              ),
             ],
           ),
         ),
