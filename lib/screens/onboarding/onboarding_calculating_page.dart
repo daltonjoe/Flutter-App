@@ -58,21 +58,22 @@ class _OnboardingCalculatingPageState extends State<OnboardingCalculatingPage> {
       canPop: _failed,
       child: Scaffold(
         backgroundColor: AppColors.bgDeep,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            const Positioned.fill(child: LoadingVideo()),
-            SafeArea(
-              child: _failed
-                  ? CosmicErrorState(
+        // Video arka planı CosmicLoader sağlar (tek controller).
+        body: _failed
+            ? Stack(
+                fit: StackFit.expand,
+                children: [
+                  const Positioned.fill(child: LoadingVideo()),
+                  SafeArea(
+                    child: CosmicErrorState(
                       message: t(context, 'onboarding.chart_save_failed'),
                       retryLabel: t(context, 'profile_switcher.retry'),
                       onRetry: _retry,
-                    )
-                  : const CosmicLoader(),
-            ),
-          ],
-        ),
+                    ),
+                  ),
+                ],
+              )
+            : const CosmicLoader(),
       ),
     );
   }
