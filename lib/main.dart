@@ -5,8 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
-import 'screens/chart_page.dart';
-import 'models/natal_chart_response.dart';
 import 'providers/language_provider.dart';
 import 'providers/active_profile_provider.dart';
 import 'services/reference_names_service.dart';
@@ -200,15 +198,6 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
   }
   if (settings.name == '/home') {
     return MaterialPageRoute(builder: (_) => const MainShell());
-  }
-  if (settings.name == '/chart') {
-    final args = settings.arguments as Map<String, dynamic>;
-    return MaterialPageRoute(
-      builder: (_) => ChartPage(
-        chartData: args['chartData'] as NatalChartResponse,
-        userName: args['userName'] as String,
-      ),
-    );
   }
   if (settings.name == '/settings') {
     return MaterialPageRoute(

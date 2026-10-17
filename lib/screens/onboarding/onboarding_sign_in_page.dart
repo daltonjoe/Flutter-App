@@ -8,14 +8,12 @@ import "../../core/theme/app_borders.dart";
 import "../../core/theme/app_colors.dart";
 import "../../core/theme/app_decorations.dart";
 import "../../core/theme/app_dimensions.dart";
-import "../../core/theme/app_gradients.dart";
 import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
 import "../../providers/active_profile_provider.dart";
 import "package:flutter_application/diag68.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "../../main.dart" show showNotFound70;
-import "../../redesign/redesign_flags.dart";
 import "../../redesign/splash/splash_backdrop.dart";
 
 class OnboardingSignInPage extends StatefulWidget {
@@ -170,7 +168,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
 
     final scaffold = Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: kUseRedesign ? Colors.transparent : AppColors.bgDeep,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
@@ -181,9 +179,6 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: kUseRedesign
-            ? null
-            : const BoxDecoration(gradient: AppGradients.heroHeader),
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -332,12 +327,10 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
         ),
       ),
     );
-    return kUseRedesign
-        ? Stack(
-            fit: StackFit.expand,
-            children: [const SplashBackdrop(), scaffold],
-          )
-        : scaffold;
+    return Stack(
+      fit: StackFit.expand,
+      children: [const SplashBackdrop(), scaffold],
+    );
   }
 
   // ── Görsel yardımcılar (davranış içermez) ──────────────────────────────

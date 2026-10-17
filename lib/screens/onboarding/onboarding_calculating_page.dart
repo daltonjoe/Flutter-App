@@ -3,7 +3,6 @@ import '../../presentation/widgets/components/cosmic_loader.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_error_state.dart';
 import '../../core/theme/app_colors.dart';
-import '../../redesign/redesign_flags.dart';
 import '../../redesign/splash/splash_backdrop.dart';
 
 class OnboardingCalculatingPage extends StatefulWidget {
@@ -62,7 +61,7 @@ class _OnboardingCalculatingPageState extends State<OnboardingCalculatingPage> {
         body: Stack(
           fit: StackFit.expand,
           children: [
-            if (kUseRedesign) const Positioned.fill(child: SplashBackdrop()),
+            const Positioned.fill(child: SplashBackdrop()),
             SafeArea(
               child: _failed
                   ? CosmicErrorState(
