@@ -227,7 +227,6 @@ class _MatchPageState extends State<MatchPage> {
       _resultError = null;
     });
     unawaited(_maybeFetch(_profileA, _profileB));
-    Navigator.of(context).maybePop();
   }
 
   void _setB(String id) {
@@ -239,7 +238,6 @@ class _MatchPageState extends State<MatchPage> {
       _resultError = null;
     });
     unawaited(_maybeFetch(_profileA, _profileB));
-    Navigator.of(context).maybePop();
   }
 
   Future<void> _openPicker({required bool isA}) async {
@@ -247,6 +245,9 @@ class _MatchPageState extends State<MatchPage> {
     final options = _profiles.where((p) => p.id != exclude).toList();
     await showModalBottomSheet<void>(
       context: context,
+      // Alt navigasyon çubuğunun üstünde açılsın: sekmenin yerel navigator'ı
+      // çubuğun altında kaldığı için en alttaki profil seçilemiyordu.
+      useRootNavigator: true,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
@@ -314,6 +315,9 @@ class _MatchPageState extends State<MatchPage> {
                             child: InkWell(
                               borderRadius: AppRadius.mdBr,
                               onTap: () {
+                                // Sheet kök navigator'da açıldığı için kapatma
+                                // sheet'in kendi context'iyle yapılır.
+                                Navigator.of(ctx).pop();
                                 if (isA) {
                                   _setA(p.id);
                                 } else {

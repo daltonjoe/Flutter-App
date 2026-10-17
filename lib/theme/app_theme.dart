@@ -80,18 +80,17 @@ class AppTheme {
   // ── Gradients ───────────────────────────────────────────────────────
   static const LinearGradient violetGradient = AppGradients.primaryCta;
   static const LinearGradient cosmicGradient = LinearGradient(
-    colors: [Color(0xFF3B5FD9), Color(0xFF2D7DF0), Color(0xFFC9A24A)],
+    colors: [AppColors.navyRaised, AppColors.info, AppColors.gold],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   static const LinearGradient cardGradient = AppGradients.cosmicCard;
-  static const RadialGradient glowGradient = RadialGradient(
-    colors: [Color(0x402D7DF0), Color(0x002D7DF0)],
-    radius: 0.8,
-  );
+  static const RadialGradient glowGradient = AppGradients.glowGradient;
 
   // ── Shadows ─────────────────────────────────────────────────────────
-  static const List<BoxShadow> violetGlow = AppShadows.violetGlow;
+  /// Legacy name — the system now uses a single neutral shadow (no tinted
+  /// shadow presets); see AppShadows.glow() for runtime coloured glows.
+  static const List<BoxShadow> violetGlow = AppShadows.cardShadow;
   static const List<BoxShadow> cardShadow = AppShadows.cardShadow;
 
   // ── Radii ───────────────────────────────────────────────────────────

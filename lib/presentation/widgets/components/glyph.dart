@@ -1,3 +1,4 @@
+import 'planet_glyph_icon.dart';
 // lib/presentation/widgets/components/glyph.dart
 // Astroloji sembolü çizen bileşen: SVG (varsa) -> Unicode -> metin etiketi.
 
@@ -46,6 +47,15 @@ class Glyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (PlanetGlyphIcon.supports(name)) {
+      return PlanetGlyphIcon(
+        name: name,
+        size: size,
+        color: color,
+        decorative: decorative,
+        semanticLabel: semanticLabel,
+      );
+    }
     final resolved = color ?? AppColors.mist;
     final glyph = AstroGlyphs.glyphFor(name);
 
@@ -72,15 +82,30 @@ class Glyph extends StatelessWidget {
       );
     } else {
       // U+FE0E (variation selector-15): metin sunumunu zorlar, emoji render'ı engeller.
-      child = SizedBox(
-        width: size,
-        height: size,
+      // Paketlenmiş NotoSansSymbols2 kullanılır; ağ indirmesi olmadığından ilk
+      // karede emoji fallback'ine düşülmez.
+      child = SizedBox.square(
+        dimension: size,
         child: Center(
           child: Text(
             '${glyph.character}\uFE0E',
             textScaler: TextScaler.noScaling,
             textAlign: TextAlign.center,
-            style: GoogleFonts.notoSansSymbols2(
+            softWrap: false,
+            overflow: TextOverflow.visible,
+            textHeightBehavior: const TextHeightBehavior(
+              applyHeightToFirstAscent: false,
+              applyHeightToLastDescent: false,
+              leadingDistribution: TextLeadingDistribution.even,
+            ),
+            strutStyle: const StrutStyle(
+              forceStrutHeight: true,
+              height: 1.0,
+              leading: 0,
+              fontFamily: 'NotoSansSymbols2',
+            ),
+            style: TextStyle(
+              fontFamily: 'NotoSansSymbols2',
               fontSize: size,
               height: 1.0,
               color: resolved,

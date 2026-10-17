@@ -10,9 +10,12 @@ import '../../../core/theme/app_typography.dart';
 
 /// Primary call-to-action button for the Cosmic Sanctum design system.
 ///
-/// 58px height · full width · violet gradient · 16px radius · ambient glow.
+/// [AppSizes.ctaHeight] tall · full width · gold gradient · pill radius ·
+/// gold ambient glow.
 /// Supports an optional leading [icon], a [loading] spinner state, and a
 /// [disabled] state that mutes the gradient and suppresses the glow.
+///
+/// Dolu altın yalnızca ekranın tek birincil eylemi için.
 class CosmicCtaButton extends StatelessWidget {
   const CosmicCtaButton({
     super.key,
@@ -52,15 +55,15 @@ class CosmicCtaButton extends StatelessWidget {
       height: height,
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderRadius: AppRadius.pillBr,
         gradient: _interactive ? (gradient ?? AppGradients.primaryCta) : null,
         color: _interactive ? null : AppColors.bgSurface,
-        boxShadow: _interactive ? AppShadows.violetGlow : null,
+        boxShadow: _interactive ? AppShadows.glow(AppColors.gold, blur: 28) : null,
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: AppRadius.pillBr,
           onTap: _interactive ? onTap : null,
           child: Center(child: _buildContent()),
         ),
@@ -76,14 +79,14 @@ class CosmicCtaButton extends StatelessWidget {
         child: CircularProgressIndicator(
           strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation<Color>(
-            disabled ? AppColors.textMuted : AppColors.violetPrimary,
+            disabled ? AppColors.textMuted : AppColors.onGold,
           ),
         ),
       );
     }
 
     final textStyle = AppTextStyles.ctaPrimary.copyWith(
-      color: disabled ? AppColors.textDisabled : Colors.white,
+      color: disabled ? AppColors.textDisabled : AppColors.onGold,
     );
 
     if (icon != null) {

@@ -1,56 +1,40 @@
 // lib/core/theme/app_shadows.dart
-// SoulBound Cosmic Sanctum — shadow & glow presets
+// Ephemerai — shadow & glow presets
+//
+// One neutral shadow for the whole system; any coloured light comes from the
+// runtime [glow] helper (blur 24–40, opacity 25–35 %).
 
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
 
 class AppShadows {
   AppShadows._();
 
-  // ── Violet glow ──────────────────────────────────────────────────────
-  /// Primary CTA / hero element glow
-  static const List<BoxShadow> violetGlow = [
-    BoxShadow(
-      color: AppColors.violetGlow, // 0x662D7DF0
-      blurRadius: 24,
-      offset: Offset(0, 8),
-    ),
-  ];
-
-  /// Subtle violet glow for smaller interactive elements
-  static const List<BoxShadow> violetGlowSm = [
-    BoxShadow(color: Color(0x402D7DF0), blurRadius: 12, offset: Offset(0, 4)),
-  ];
-
-  // ── Hero orb glow ────────────────────────────────────────────────────
-  static const List<BoxShadow> heroOrbGlow = [
-    BoxShadow(
-      color: Color(0x802D7DF0), // 50 % violet
-      blurRadius: 20,
-    ),
-  ];
-
-  // ── Generic card shadow ──────────────────────────────────────────────
+  // ── Single neutral shadow ────────────────────────────────────────────
+  /// 0 12 40 rgba(0,0,0,.45) — the only static shadow in the system.
   static const List<BoxShadow> cardShadow = [
     BoxShadow(
-      color: Color(0x66000000), // 40 % black
-      blurRadius: 16,
-      offset: Offset(0, 4),
+      color: Color(0x73000000), // 45 % black
+      blurRadius: 40,
+      offset: Offset(0, 12),
     ),
   ];
 
-  // ── Error / rose glow ────────────────────────────────────────────────
-  static const List<BoxShadow> errorGlow = [
-    BoxShadow(color: Color(0x40F87171), blurRadius: 12, offset: Offset(0, 4)),
-  ];
+  // ── Legacy alias ─────────────────────────────────────────────────────
+  /// Kept so existing widgets keep compiling. Tinted shadow presets were
+  /// removed; use [glow] for a coloured light.
+  static const List<BoxShadow> violetGlow = cardShadow;
 
-  // ── Element-tinted glow (built at runtime with a given color) ────────
-  /// Returns a single-shadow glow list tinted with [color].
-  static List<BoxShadow> coloredGlow(Color color, {double blur = 16}) => [
+  // ── Glow helper ──────────────────────────────────────────────────────
+  /// Returns a single coloured glow tinted with [color].
+  /// [blur] is clamped to 24–40 and [alpha] to 25–35 %.
+  static List<BoxShadow> glow(
+    Color color, {
+    double blur = 32,
+    double alpha = 0.30,
+  }) => [
     BoxShadow(
-      color: color.withValues(alpha: 0.35),
-      blurRadius: blur,
-      offset: const Offset(0, 4),
+      color: color.withValues(alpha: alpha.clamp(0.25, 0.35)),
+      blurRadius: blur.clamp(24.0, 40.0),
     ),
   ];
 }

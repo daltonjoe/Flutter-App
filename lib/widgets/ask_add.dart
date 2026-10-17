@@ -14,9 +14,9 @@ import '../screens/main_shell.dart' show shellTab;
 bool addToAsk(BuildContext context, AskContext c) {
   final ok = askContext.add(c);
   if (!ok) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(t(context, 'ask.context.limit'))),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(t(context, 'ask.context.limit'))));
     return false;
   }
   HapticFeedback.selectionClick();
@@ -58,8 +58,12 @@ class AskAddButton extends StatelessWidget {
         if (!on) return const SizedBox.shrink();
         return TextButton.icon(
           onPressed: onPressed,
-          icon: const Icon(Icons.auto_awesome_outlined,
-              size: 18, color: AppColors.violetPrimary),
+          style: TextButton.styleFrom(foregroundColor: AppColors.gold),
+          icon: const Icon(
+            Icons.auto_awesome_outlined,
+            size: 18,
+            color: AppColors.gold,
+          ),
           label: Text(t(c, 'ask.add')),
         );
       },

@@ -185,14 +185,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
     }
 
     try {
-      final int? signIndex;
-      if (key == 'ascendant') {
-        signIndex = widget.chartData.houses?['house_1']?.signIndex;
-      } else {
-        signIndex = widget.chartData
-            .planets?[key == 'sun' ? 'Sun' : 'Moon']
-            ?.signIndex;
-      }
+      final int? signIndex = placementSignIndex(widget.chartData, key);
       final result = await PlacementContentService.fetch(
         placements: <String, String>{
           key: signIndex == null ? '' : (RefIds.signCode(signIndex) ?? ''),
@@ -243,32 +236,8 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
 
   bool get _timeUnknown => widget.isPlanet && (_planetData?.house ?? 1) <= 0;
 
-  List<DetailSection> _sortedSections() {
-    final list = <DetailSection>[..._sections];
-    list.sort((a, b) => a.themeOrder.compareTo(b.themeOrder));
-    return list;
-  }
-
-  List<String> _themeCodes(List<DetailSection> sections) {
-    final codes = <String>[];
-    for (final section in sections) {
-      if (section.themeCode.isEmpty || codes.contains(section.themeCode)) {
-        continue;
-      }
-      codes.add(section.themeCode);
-    }
-    return codes;
-  }
-
-  int _indexForCode(List<String> codes) {
-    final code = _selectedCode;
-    if (code == null) return 0;
-    final index = codes.indexOf(code);
-    return index < 0 ? 0 : index;
-  }
-
   void _onThemeSelected(int index) {
-    final codes = _themeCodes(_sortedSections());
+    final codes = _themeCodes(_sortedSections(_sections));
     if (index < 0 || index >= codes.length) return;
     setState(() {
       _selectedCode = codes[index];
@@ -282,10 +251,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
   }
 
   String _emoji(ReferenceNamesService names, String planetKey) {
-    for (final item in PlanetCardViewModel.fromChart(
-      widget.chartData,
-      names,
-    )) {
+    for (final item in PlanetCardViewModel.fromChart(widget.chartData, names)) {
       if (item.key == planetKey) return item.emoji;
     }
     return '✦';
@@ -294,7 +260,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
   @override
   Widget build(BuildContext context) {
     final names = context.watch<ReferenceNamesService>();
-    final sections = _sortedSections();
+    final sections = _sortedSections(_sections);
     final codes = _themeCodes(sections);
     final showTabs =
         !_loading &&
@@ -302,7 +268,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
         !_isFallback &&
         !_timeUnknown &&
         codes.isNotEmpty;
-    final selectedIndex = _indexForCode(codes);
+    final selectedIndex = _indexForCode(codes, _selectedCode);
     final selectedCode = codes.isEmpty ? null : codes[selectedIndex];
 
     final slivers = <Widget>[
@@ -341,7 +307,9 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
       );
     } else {
       if (showTabs) {
-        slivers.add(const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.sm)));
+        slivers.add(
+          const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.sm)),
+        );
         slivers.add(
           SliverToBoxAdapter(
             child: DetailTabBar(
@@ -399,7 +367,8 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
 
   Widget _topRow(BuildContext context) {
     final bool rtl = Directionality.of(context) == TextDirection.rtl;
-    final bool canRefresh = widget.isPlanet && !_loading && _errorMessage == null;
+    final bool canRefresh =
+        widget.isPlanet && !_loading && _errorMessage == null;
     return Row(
       children: [
         IconButton(
@@ -439,7 +408,13 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        _metaLine(names),
+        _metaLine(
+          context,
+          names: names,
+          signIndex: _signIndex,
+          planetData: _planetData,
+          birthTimeKnown: _birthTimeKnown,
+        ),
         if (widget.isPlanet && pd != null) ...[
           const SizedBox(height: AppSpacing.xs),
           Text(
@@ -487,75 +462,14 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
     );
   }
 
-  Widget _metaLine(ReferenceNamesService names) {
-    final parts = <String>[];
-    final signIndex = _signIndex;
-    if (signIndex != null) {
-      parts.add(names.sign(RefIds.signId(signIndex)));
-    }
-    final pd = _planetData;
-    if (pd != null && _birthTimeKnown && pd.house > 0) {
-      parts.add(
-        t(
-          context,
-          'planet_report.house',
-          args: {'number': pd.house.toString()},
-        ),
-      );
-    }
-    if (pd != null && pd.retrograde) {
-      parts.add(t(context, 'planet_report.retrograde'));
-    }
-    if (parts.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(top: AppSpacing.xs),
-      child: Text(
-        parts.join('  ·  '),
-        style: AppTextStyles.bodyMd(),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-  }
-
   Widget _askSection(ReferenceNamesService names) {
     if (!widget.isPlanet) {
-      final key = widget.modeKey;
-      final String question;
-      if (key == 'ascendant') {
-        final signIndex = widget.chartData.houses?['house_1']?.signIndex;
-        if (signIndex == null) return const SizedBox.shrink();
-        question = t(
-          context,
-          'ask.about.asc',
-          args: {'sign': names.sign(RefIds.signId(signIndex))},
-        );
-      } else {
-        final pd = _planetData;
-        if (pd == null) return const SizedBox.shrink();
-        final id = RefIds.planets[key == 'sun' ? 'Sun' : 'Moon'] ?? 0;
-        question = t(
-          context,
-          _birthTimeKnown ? 'ask.about.placement' : 'ask.about.nohouse',
-          args: {
-            'planet': names.planet(id),
-            'sign': names.sign(RefIds.signId(pd.signIndex)),
-            'house': names.house(pd.house),
-          },
-        );
-      }
-      return ValueListenableBuilder<bool>(
-        valueListenable: askEnabled,
-        builder: (_, on, _) => !on
-            ? const SizedBox.shrink()
-            : Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: FilledButton.icon(
-                  onPressed: () => askAbout(question),
-                  icon: const Icon(Icons.auto_awesome_outlined, size: 18),
-                  label: Text(t(context, 'ask.about.button')),
-                ),
-              ),
+      return _placementAskButton(
+        context,
+        chartData: widget.chartData,
+        placementKey: widget.modeKey,
+        birthTimeKnown: _birthTimeKnown,
+        names: names,
       );
     }
 
@@ -635,38 +549,174 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
       );
     }
 
-    final visible = selectedCode == null
-        ? sections
-        : sections.where((s) => s.themeCode == selectedCode).toList();
-    if (visible.isEmpty) {
-      return Text(
-        t(context, 'placement.empty'),
-        style: AppTextStyles.bodyMd(),
-      );
-    }
+    return _sectionsColumn(context, sections, selectedCode);
+  }
+}
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 250),
-      transitionBuilder: (child, animation) =>
-          FadeTransition(opacity: animation, child: child),
-      layoutBuilder: (currentChild, previousChildren) => Stack(
-        alignment: AlignmentDirectional.topStart,
-        children: [...previousChildren, ?currentChild],
-      ),
-      child: Column(
-        key: ValueKey<String>(selectedCode ?? 'all'),
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final section in visible) ...[
-            _sectionCard(section),
-            const SizedBox(height: AppSpacing.md),
-          ],
+// ── Paylaşılan yerleşim yardımcıları ────────────────────────────────────
+// Detay sayfası ve harita sayfasındaki satır içi görünüm aynı parçaları
+// kullanır; böylece kopyala-yapıştır çoğaltma olmaz.
+
+List<DetailSection> _sortedSections(List<DetailSection> sections) {
+  final list = <DetailSection>[...sections];
+  list.sort((a, b) => a.themeOrder.compareTo(b.themeOrder));
+  return list;
+}
+
+List<String> _themeCodes(List<DetailSection> sections) {
+  final codes = <String>[];
+  for (final section in sections) {
+    if (section.themeCode.isEmpty || codes.contains(section.themeCode)) {
+      continue;
+    }
+    codes.add(section.themeCode);
+  }
+  return codes;
+}
+
+int _indexForCode(List<String> codes, String? code) {
+  if (code == null) return 0;
+  final index = codes.indexOf(code);
+  return index < 0 ? 0 : index;
+}
+
+/// 'sun' | 'moon' | 'ascendant' yerleşimi için burç indeksi.
+int? placementSignIndex(NatalChartResponse chartData, String key) {
+  if (key == 'ascendant') return chartData.houses?['house_1']?.signIndex;
+  return chartData.planets?[key == 'sun' ? 'Sun' : 'Moon']?.signIndex;
+}
+
+/// 'sun' | 'moon' yerleşimi için gezegen verisi (yükselende yoktur).
+PlanetData? _placementPlanetData(NatalChartResponse chartData, String key) {
+  if (key == 'sun') return chartData.planets?['Sun'];
+  if (key == 'moon') return chartData.planets?['Moon'];
+  return null;
+}
+
+Widget _sectionsColumn(
+  BuildContext context,
+  List<DetailSection> sections,
+  String? selectedCode,
+) {
+  final visible = selectedCode == null
+      ? sections
+      : sections.where((s) => s.themeCode == selectedCode).toList();
+  if (visible.isEmpty) {
+    return Text(t(context, 'placement.empty'), style: AppTextStyles.bodyMd());
+  }
+
+  return AnimatedSwitcher(
+    duration: const Duration(milliseconds: 250),
+    transitionBuilder: (child, animation) =>
+        FadeTransition(opacity: animation, child: child),
+    layoutBuilder: (currentChild, previousChildren) => Stack(
+      alignment: AlignmentDirectional.topStart,
+      children: [...previousChildren, ?currentChild],
+    ),
+    child: Column(
+      key: ValueKey<String>(selectedCode ?? 'all'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final section in visible) ...[
+          _PlacementCard(section),
+          const SizedBox(height: AppSpacing.md),
         ],
+      ],
+    ),
+  );
+}
+
+Widget _metaLine(
+  BuildContext context, {
+  required ReferenceNamesService names,
+  required int? signIndex,
+  required PlanetData? planetData,
+  required bool birthTimeKnown,
+}) {
+  final parts = <String>[];
+  if (signIndex != null) {
+    parts.add(names.sign(RefIds.signId(signIndex)));
+  }
+  if (planetData != null && birthTimeKnown && planetData.house > 0) {
+    parts.add(
+      t(
+        context,
+        'planet_report.house',
+        args: {'number': planetData.house.toString()},
       ),
     );
   }
+  if (planetData != null && planetData.retrograde) {
+    parts.add(t(context, 'planet_report.retrograde'));
+  }
+  if (parts.isEmpty) return const SizedBox.shrink();
+  return Padding(
+    padding: const EdgeInsetsDirectional.only(top: AppSpacing.xs),
+    child: Text(
+      parts.join('  ·  '),
+      style: AppTextStyles.bodyMd(),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    ),
+  );
+}
 
-  Widget _sectionCard(DetailSection section) {
+/// Yerleşim modu için Ask butonu (detay sayfası ve satır içi görünüm ortak).
+Widget _placementAskButton(
+  BuildContext context, {
+  required NatalChartResponse chartData,
+  required String placementKey,
+  required bool birthTimeKnown,
+  required ReferenceNamesService names,
+}) {
+  final key = placementKey;
+  final String question;
+  if (key == 'ascendant') {
+    final signIndex = chartData.houses?['house_1']?.signIndex;
+    if (signIndex == null) return const SizedBox.shrink();
+    question = t(
+      context,
+      'ask.about.asc',
+      args: {'sign': names.sign(RefIds.signId(signIndex))},
+    );
+  } else {
+    final pd = _placementPlanetData(chartData, key);
+    if (pd == null) return const SizedBox.shrink();
+    final id = RefIds.planets[key == 'sun' ? 'Sun' : 'Moon'] ?? 0;
+    question = t(
+      context,
+      birthTimeKnown ? 'ask.about.placement' : 'ask.about.nohouse',
+      args: {
+        'planet': names.planet(id),
+        'sign': names.sign(RefIds.signId(pd.signIndex)),
+        'house': names.house(pd.house),
+      },
+    );
+  }
+  return ValueListenableBuilder<bool>(
+    valueListenable: askEnabled,
+    builder: (_, on, _) => !on
+        ? const SizedBox.shrink()
+        : Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: FilledButton.icon(
+              onPressed: () => askAbout(question),
+              icon: const Icon(Icons.auto_awesome_outlined, size: 18),
+              label: Text(t(context, 'ask.about.button')),
+            ),
+          ),
+  );
+}
+
+/// Yerleşim içeriği kartı (başlık, kısa açıklama, gövde, anahtar kelimeler,
+/// güçlü yönler/zorluklar). Detay sayfası ve satır içi görünüm ortak kullanır.
+class _PlacementCard extends StatelessWidget {
+  const _PlacementCard(this.section);
+
+  final DetailSection section;
+
+  @override
+  Widget build(BuildContext context) {
     final color = themeColorFor(section.themeCode);
     final short = section.shortDescription;
     final body = section.content;
@@ -709,13 +759,12 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
               children: [
-                for (final keyword in section.keywords)
-                  _chip(keyword, color),
+                for (final keyword in section.keywords) _chip(keyword, color),
               ],
             ),
           ],
-          _bullets('placement.strengths', section.strengths, color),
-          _bullets('placement.challenges', section.challenges, color),
+          _bullets(context, 'placement.strengths', section.strengths, color),
+          _bullets(context, 'placement.challenges', section.challenges, color),
         ],
       ),
     );
@@ -740,7 +789,12 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
     );
   }
 
-  Widget _bullets(String labelKey, List<String> items, Color color) {
+  Widget _bullets(
+    BuildContext context,
+    String labelKey,
+    List<String> items,
+    Color color,
+  ) {
     if (items.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsetsDirectional.only(top: AppSpacing.md),
@@ -769,14 +823,116 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(item, style: AppTextStyles.bodySm()),
-                  ),
+                  Expanded(child: Text(item, style: AppTextStyles.bodySm())),
                 ],
               ),
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Harita sayfasındaki Sun/Moon/Ascendant sekmeleri için satır içi yerleşim
+/// içeriği. Veri yükleme sayfa durumunda (RedesignChartPage) yapılır; bu widget
+/// yalnızca önceden yüklenmiş bölümleri gösterir. Böylece sekme geçişinde
+/// yeniden fetch/loader oluşmaz.
+class PlacementInlineContent extends StatefulWidget {
+  const PlacementInlineContent({
+    super.key,
+    required this.chartData,
+    required this.placementKey,
+    required this.sections,
+  });
+
+  final NatalChartResponse chartData;
+
+  /// 'sun' | 'moon' | 'ascendant'
+  final String placementKey;
+
+  /// Önceden yüklenmiş bölümler (boş olabilir).
+  final List<DetailSection> sections;
+
+  @override
+  State<PlacementInlineContent> createState() => _PlacementInlineContentState();
+}
+
+class _PlacementInlineContentState extends State<PlacementInlineContent> {
+  String? _selectedCode;
+
+  bool get _birthTimeKnown => widget.chartData.input?.birthTimeKnown == true;
+
+  @override
+  void didUpdateWidget(covariant PlacementInlineContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Sekme değişiminde tema seçimi sıfırlanır; veri yüklemesi yapılmaz.
+    if (oldWidget.placementKey != widget.placementKey) {
+      _selectedCode = null;
+    }
+  }
+
+  void _onThemeSelected(int index) {
+    final codes = _themeCodes(_sortedSections(widget.sections));
+    if (index < 0 || index >= codes.length) return;
+    setState(() {
+      _selectedCode = codes[index];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final names = context.watch<ReferenceNamesService>();
+    final key = widget.placementKey;
+    final sections = _sortedSections(widget.sections);
+    final codes = _themeCodes(sections);
+    final selectedIndex = _indexForCode(codes, _selectedCode);
+    final selectedCode = codes.isEmpty ? null : codes[selectedIndex];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (codes.isNotEmpty) ...[
+          DetailTabBar(
+            themeCodes: codes,
+            selectedIndex: selectedIndex,
+            onSelected: _onThemeSelected,
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
+        Padding(
+          padding: const EdgeInsetsDirectional.symmetric(
+            horizontal: AppSpacing.screenH,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t(context, 'chart.$key'),
+                style: AppTextStyles.h1(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              _metaLine(
+                context,
+                names: names,
+                signIndex: placementSignIndex(widget.chartData, key),
+                planetData: _placementPlanetData(widget.chartData, key),
+                birthTimeKnown: _birthTimeKnown,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _placementAskButton(
+                context,
+                chartData: widget.chartData,
+                placementKey: key,
+                birthTimeKnown: _birthTimeKnown,
+                names: names,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _sectionsColumn(context, sections, selectedCode),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

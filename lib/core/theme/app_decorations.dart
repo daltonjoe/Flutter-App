@@ -1,5 +1,5 @@
 // lib/core/theme/app_decorations.dart
-// SoulBound Cosmic Sanctum — composite BoxDecoration presets
+// Ephemerai — composite BoxDecoration presets
 //
 // All reusable card/container decorations live here.
 // Screens import this instead of constructing BoxDecoration inline.
@@ -14,8 +14,8 @@ class AppDecorations {
   AppDecorations._();
 
   // ── Cosmic card (default) ────────────────────────────────────────────
-  /// The primary reusable card surface: card gradient + subtle violet border
-  /// + card shadow. Pass overrides to customise without breaking the baseline.
+  /// The primary reusable card surface: card gradient + hairline border
+  /// + neutral shadow. Pass overrides to customise without breaking the baseline.
   static BoxDecoration cosmicCard({
     Color? borderColor,
     double? borderWidth,
@@ -24,7 +24,7 @@ class AppDecorations {
     double? radius,
   }) => BoxDecoration(
     gradient: gradient ?? AppGradients.cosmicCard,
-    borderRadius: BorderRadius.circular(radius ?? AppRadius.lg),
+    borderRadius: BorderRadius.circular(radius ?? AppRadius.card),
     border: Border.all(
       color: borderColor ?? AppColors.borderSubtle,
       width: borderWidth ?? 1.0,
@@ -33,17 +33,17 @@ class AppDecorations {
   );
 
   // ── Glowing CTA card ─────────────────────────────────────────────────
-  /// Card variant with a violet glow — used for the primary analysis card
+  /// Card variant with a golden glow — used for the primary analysis card
   static BoxDecoration cosmicCardGlowing({Gradient? gradient}) => cosmicCard(
     gradient: gradient,
-    shadows: AppShadows.violetGlow,
+    shadows: AppShadows.glow(AppColors.gold),
     borderColor: AppColors.borderMedium,
   );
 
   // ── Input field container ────────────────────────────────────────────
   static BoxDecoration inputField({bool hasError = false}) => BoxDecoration(
     color: AppColors.bgSurface,
-    borderRadius: AppRadius.mdBr,
+    borderRadius: AppRadius.innerBr,
     border: Border.all(
       color: hasError ? AppColors.borderError : AppColors.borderSubtle,
       width: 1.2,
@@ -52,20 +52,20 @@ class AppDecorations {
 
   // ── Mini tag (ASC / MC chips) ────────────────────────────────────────
   static BoxDecoration miniTag() => BoxDecoration(
-    color: const Color(0x262D7DF0),
+    color: AppColors.gold.withValues(alpha: 0.15),
     borderRadius: BorderRadius.circular(8),
     border: Border.all(color: AppColors.borderMedium),
   );
 
   // ── Hero zodiac orb ──────────────────────────────────────────────────
-  static BoxDecoration heroOrb() => const BoxDecoration(
+  static BoxDecoration heroOrb() => BoxDecoration(
     shape: BoxShape.circle,
-    gradient: LinearGradient(
-      colors: [Color(0xFF1A4488), AppColors.violetPrimary],
+    gradient: const LinearGradient(
+      colors: [AppColors.navyRaised, AppColors.violetPrimary],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ),
-    boxShadow: AppShadows.heroOrbGlow,
+    boxShadow: AppShadows.glow(AppColors.gold),
   );
 
   // ── Planet icon circle ───────────────────────────────────────────────
@@ -94,7 +94,7 @@ class AppDecorations {
   // ── Forecast selection user card ─────────────────────────────────────
   static BoxDecoration forecastUserCard() => BoxDecoration(
     gradient: const LinearGradient(
-      colors: [Color(0xFF14316F), Color(0xFF0B1A40)],
+      colors: [AppColors.navyRaised, AppColors.navyDeep],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ),
@@ -125,21 +125,20 @@ class AppDecorations {
       );
 
   // ── Retrograde chip ──────────────────────────────────────────────────
-  static const BoxDecoration retrogradeChip = BoxDecoration(
-    color: Color(0x14C9A24A),
-    borderRadius: BorderRadius.all(Radius.circular(20)),
-    // Note: border must be set via BoxDecoration.border — see retrogradeChipBorder
+  static BoxDecoration retrogradeChip() => BoxDecoration(
+    color: AppColors.gold.withValues(alpha: 0.08),
+    borderRadius: BorderRadius.circular(AppRadius.pill),
   );
 
   static BoxDecoration retrogradeChipFull() => BoxDecoration(
-    color: const Color(0x14C9A24A),
-    borderRadius: BorderRadius.circular(20),
-    border: Border.all(color: const Color(0x4DC9A24A)),
+    color: AppColors.gold.withValues(alpha: 0.08),
+    borderRadius: BorderRadius.circular(AppRadius.pill),
+    border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
   );
 
   // ── Retrograde badge (inline ℞ chip inside planet card) ─────────────
   static BoxDecoration retrogradeBadge() => BoxDecoration(
-    color: const Color(0x26C9A24A),
+    color: AppColors.gold.withValues(alpha: 0.15),
     borderRadius: BorderRadius.circular(6),
   );
 
@@ -149,15 +148,15 @@ class AppDecorations {
 
   // ── Error banner ─────────────────────────────────────────────────────
   static BoxDecoration errorBanner() => BoxDecoration(
-    color: const Color(0x14F87171),
+    color: AppColors.errorRed.withValues(alpha: 0.08),
     borderRadius: AppRadius.mdBr,
-    border: Border.all(color: const Color(0x40F87171)),
+    border: Border.all(color: AppColors.errorRed.withValues(alpha: 0.25)),
   );
 
   // ── Person hero card (natal report) ─────────────────────────────────
   static BoxDecoration personHeroCard() => cosmicCard(
     gradient: const LinearGradient(
-      colors: [Color(0xFF12306E), Color(0xFF081330)],
+      colors: [AppColors.navyRaised, AppColors.bgVoid],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ),
@@ -165,14 +164,14 @@ class AppDecorations {
 
   // ── Hero chip (Sun / Moon / ASC chips in natal report) ───────────────
   static BoxDecoration heroChip() => BoxDecoration(
-    color: const Color(0x990E1C40),
+    color: AppColors.navyRaised.withValues(alpha: 0.6),
     borderRadius: BorderRadius.circular(14),
-    border: Border.all(color: const Color(0x332D7DF0)),
+    border: Border.all(color: AppColors.hairlineTop),
   );
 
   // ── Retry / outline action button ────────────────────────────────────
   static BoxDecoration outlineAction() => BoxDecoration(
-    color: const Color(0x262D7DF0),
+    color: AppColors.gold.withValues(alpha: 0.15),
     borderRadius: AppRadius.mdBr,
     border: Border.all(color: AppColors.borderMedium),
   );
@@ -182,14 +181,14 @@ class AppDecorations {
     borderRadius: AppRadius.mdBr,
     gradient: disabled ? null : AppGradients.primaryCta,
     color: disabled ? AppColors.bgSurface : null,
-    boxShadow: disabled ? null : AppShadows.violetGlow,
+    boxShadow: disabled ? null : AppShadows.glow(AppColors.gold, blur: 24),
   );
 
   // ── Outline / secondary CTA button ──────────────────────────────────
   static BoxDecoration secondaryCta() => BoxDecoration(
     borderRadius: AppRadius.mdBr,
     color: AppColors.bgCard,
-    border: Border.all(color: const Color(0x592D7DF0)),
+    border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
   );
 
   // ── Person avatar circle (forecast header) ───────────────────────────
@@ -206,8 +205,10 @@ class AppDecorations {
   );
 
   // ── Section icon badge ───────────────────────────────────────────────
-  static BoxDecoration sectionIconBadge() =>
-      const BoxDecoration(color: Color(0x262D7DF0), shape: BoxShape.circle);
+  static BoxDecoration sectionIconBadge() => BoxDecoration(
+    color: AppColors.gold.withValues(alpha: 0.15),
+    shape: BoxShape.circle,
+  );
 
   // ── House number box ─────────────────────────────────────────────────
   static BoxDecoration houseBox(Color color) => BoxDecoration(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/theme/app_colors.dart';
+import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 
 /// snippet_feedback 👍/👎. Aynı butona tekrar basınca oy silinir.
@@ -94,7 +95,7 @@ class _FeedbackVoteState extends State<FeedbackVote> {
         Expanded(
           child: Text(
             t(context, 'feedback.prompt'),
-            style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+            style: AppTextStyles.bodySm(color: AppColors.mist),
           ),
         ),
         IconButton(
@@ -103,7 +104,7 @@ class _FeedbackVoteState extends State<FeedbackVote> {
           icon: Icon(
             _vote == 1 ? Icons.thumb_up : Icons.thumb_up_outlined,
             size: 20,
-            color: _vote == 1 ? AppColors.tealSuccess : AppColors.textMuted,
+            color: _vote == 1 ? AppColors.gold : AppColors.mist,
           ),
           onPressed: _busy ? null : () => _set(1),
         ),
@@ -113,7 +114,7 @@ class _FeedbackVoteState extends State<FeedbackVote> {
           icon: Icon(
             _vote == -1 ? Icons.thumb_down : Icons.thumb_down_outlined,
             size: 20,
-            color: _vote == -1 ? AppColors.amberTransit : AppColors.textMuted,
+            color: _vote == -1 ? AppColors.gold : AppColors.mist,
           ),
           onPressed: _busy ? null : () => _set(-1),
         ),

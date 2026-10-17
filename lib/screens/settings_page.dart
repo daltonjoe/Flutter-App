@@ -375,6 +375,9 @@ class _SettingsPageState extends State<SettingsPage>
 
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
+      // Aynı kök neden: yerel navigator'da açılınca kaydet butonu alt
+      // navigasyon çubuğunun altında kalıyordu.
+      useRootNavigator: true,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
@@ -524,6 +527,9 @@ class _SettingsPageState extends State<SettingsPage>
 
     showModalBottomSheet<void>(
       context: context,
+      // Alt navigasyon çubuğunun üstünde açılsın: yerel navigator'da açıldığında
+      // listenin en alttaki dilleri çubuğun altında kalıp seçilemiyordu.
+      useRootNavigator: true,
       backgroundColor: AppColors.bgCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),

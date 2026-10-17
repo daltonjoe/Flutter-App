@@ -1,26 +1,27 @@
-// Kategori çubuğu: All · Sun · Moon · Ascendant · Satellites (Faz 5).
+// Kategori çubuğu: Hepsi · Güneş · Ay · Yükselen (chip satırı).
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
-import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
+import '../../presentation/widgets/components/cosmic_chip.dart';
 
 class ChartCategoryBar extends StatelessWidget {
   const ChartCategoryBar({
     super.key,
     required this.birthTimeKnown,
-    required this.onOpenPlacement,
+    required this.selectedKey,
+    required this.onSelect,
   });
 
   final bool birthTimeKnown;
-  final ValueChanged<String> onOpenPlacement;
+
+  /// Seçili sekme anahtarı: 'all' | 'sun' | 'moon' | 'ascendant'.
+  final String selectedKey;
+
+  final ValueChanged<String> onSelect;
 
   @override
   Widget build(BuildContext context) {
-    final bool moonEnabled = birthTimeKnown;
-    final bool ascEnabled = birthTimeKnown;
-
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsetsDirectional.symmetric(
@@ -28,86 +29,50 @@ class ChartCategoryBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // "All" her zaman seçili.
-          _BarItem(
+          _chip(
             label: t(context, 'rd.tab.all'),
-            color: AppColors.violetPrimary,
-            selected: true,
-            onTap: null,
+            selected: selectedKey == 'all',
+            onTap: () => onSelect('all'),
           ),
-          const SizedBox(width: AppSpacing.lg),
-          _BarItem(
+          const SizedBox(width: AppSpacing.sm),
+          _chip(
             label: t(context, 'chart.sun'),
-            color: AppColors.textSecondary,
-            selected: false,
-            onTap: () => onOpenPlacement('sun'),
+            selected: selectedKey == 'sun',
+            onTap: () => onSelect('sun'),
           ),
-          const SizedBox(width: AppSpacing.lg),
-          _BarItem(
+          const SizedBox(width: AppSpacing.sm),
+          _chip(
             label: t(context, 'chart.moon'),
-            color: moonEnabled ? AppColors.textSecondary : AppColors.textDisabled,
-            selected: false,
-            onTap: moonEnabled ? () => onOpenPlacement('moon') : null,
+            selected: selectedKey == 'moon',
+            enabled: birthTimeKnown,
+            onTap: () => onSelect('moon'),
           ),
-          const SizedBox(width: AppSpacing.lg),
-          _BarItem(
+          const SizedBox(width: AppSpacing.sm),
+          _chip(
             label: t(context, 'chart.ascendant'),
-            color: ascEnabled ? AppColors.textSecondary : AppColors.textDisabled,
-            selected: false,
-            onTap: ascEnabled ? () => onOpenPlacement('ascendant') : null,
-          ),
-          const SizedBox(width: AppSpacing.lg),
-          _BarItem(
-            label: t(context, 'rd.tab.satellites'),
-            color: AppColors.textDisabled,
-            selected: false,
-            onTap: null,
+            selected: selectedKey == 'ascendant',
+            enabled: birthTimeKnown,
+            onTap: () => onSelect('ascendant'),
           ),
         ],
       ),
     );
   }
-}
 
-class _BarItem extends StatelessWidget {
-  const _BarItem({
-    required this.label,
-    required this.color,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final Color color;
-  final bool selected;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 40),
-        alignment: AlignmentDirectional.centerStart,
-        child: IntrinsicWidth(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                label,
-                style: AppTextStyles.bodyLg(color: color),
-                maxLines: 1,
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Container(
-                height: 2.5,
-                color: selected ? AppColors.violetPrimary : null,
-              ),
-            ],
-          ),
-        ),
-      ),
+  /// Sekme chip'i. [enabled] false iken dokunuş kapanır ve chip soluklaştırılır
+  /// (CosmicChip'in ayrı bir pasif durumu yok).
+  Widget _chip({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+    bool enabled = true,
+  }) {
+    final chip = CosmicChip(
+      label: label,
+      selected: selected,
+      onTap: enabled ? onTap : null,
     );
+    if (enabled) return chip;
+    return Opacity(opacity: 0.5, child: chip);
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_shadows.dart';
 import 'cosmic_cta_button.dart';
 
 class CosmicAlertAction {
@@ -18,7 +20,7 @@ Future<void> showCosmicAlert(
     context: context,
     barrierDismissible: false,
     barrierLabel: 'alert',
-    barrierColor: Colors.black54,
+    barrierColor: AppColors.bgVoid.withValues(alpha: 0.6),
     transitionDuration: const Duration(milliseconds: 500),
     pageBuilder: (_, __, ___) => const SizedBox.shrink(),
     transitionBuilder: (ctx, anim, _, __) {
@@ -42,19 +44,20 @@ Future<void> showCosmicAlert(
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
+                      gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [Color(0xFF4A1519), Color(0xFF2A0B10)],
+                        colors: [
+                          AppColors.statusDanger.withValues(alpha: 0.18),
+                          AppColors.bgVoid,
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(radius),
-                      border: Border.all(
-                          color: const Color(0xFFE53935).withOpacity(0.6)),
-                      boxShadow: [
-                        BoxShadow(
-                            color: const Color(0xFFE53935).withOpacity(0.35),
-                            blurRadius: 24)
-                      ],
+                      border: Border.all(color: AppColors.borderError),
+                      boxShadow: AppShadows.glow(
+                        AppColors.statusDanger,
+                        blur: 24,
+                      ),
                     ),
                     child: FadeTransition(
                       opacity: fade,
@@ -68,7 +71,7 @@ Future<void> showCosmicAlert(
                               Text(title,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
-                                      color: Colors.white,
+                                      color: AppColors.textPrimary,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w800)),
                               const SizedBox(height: 8),
@@ -76,7 +79,7 @@ Future<void> showCosmicAlert(
                             Text(message,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                    color: Colors.white70, height: 1.4)),
+                                    color: AppColors.textSecondary, height: 1.4)),
                             const SizedBox(height: 20),
                             for (final a in actions)
                               Padding(
@@ -84,9 +87,9 @@ Future<void> showCosmicAlert(
                                 child: a.primary
                                     ? CosmicCtaButton(
                                         label: a.label,
-                                        gradient: const LinearGradient(colors: [
-                                          Color(0xFFE53935),
-                                          Color(0xFFB71C1C)
+                                        gradient: LinearGradient(colors: [
+                                          AppColors.statusDanger,
+                                          AppColors.statusChallenging,
                                         ]),
                                         onTap: () {
                                           Navigator.of(ctx).pop();
@@ -100,7 +103,7 @@ Future<void> showCosmicAlert(
                                         },
                                         child: Text(a.label,
                                             style: const TextStyle(
-                                                color: Colors.white70)),
+                                                color: AppColors.textSecondary)),
                                       ),
                               ),
                           ],

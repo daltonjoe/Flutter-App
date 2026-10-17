@@ -11,7 +11,7 @@ import '../../../core/theme/app_typography.dart';
 ///
 /// Features:
 /// - 56px minimum height dark-surface container
-/// - Subtle violet border by default; red when [errorText] is set
+/// - Subtle hairline border by default; danger border when [errorText] is set
 /// - Upper-left icon + uppercase overline label row
 /// - Optional trailing [actionWidget] (e.g. a calendar icon button)
 /// - Validation visual state driven by [errorText]
@@ -79,7 +79,7 @@ class CosmicInputField extends StatelessWidget {
               Icon(
                 icon,
                 size: 13,
-                color: disabled ? AppColors.textDisabled : AppColors.violetPrimary,
+                color: disabled ? AppColors.textDisabled : AppColors.gold,
               ),
               const SizedBox(width: 12),
               Text(

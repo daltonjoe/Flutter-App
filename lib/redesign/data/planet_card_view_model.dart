@@ -8,6 +8,7 @@ class PlanetCardViewModel {
     required this.key,
     required this.name,
     required this.sign,
+    required this.signIndex,
     required this.houseName,
     required this.houseNumber,
     required this.degree,
@@ -18,6 +19,10 @@ class PlanetCardViewModel {
   final String key;
   final String name;
   final String sign;
+
+  /// Burç indeksi (0 tabanlı): 0 = Koç … 11 = Balık.
+  final int signIndex;
+
   final String? houseName;
   final int? houseNumber;
   final double degree;
@@ -69,6 +74,7 @@ class PlanetCardViewModel {
           key: key,
           name: names.planet(RefIds.planets[key] ?? 0),
           sign: names.sign(data.signIndex + 1),
+          signIndex: data.signIndex,
           houseName: houseName,
           houseNumber: (birthTimeKnown && data.house > 0) ? data.house : null,
           degree: data.degreeInSign,
@@ -78,5 +84,23 @@ class PlanetCardViewModel {
       );
     }
     return items;
+  }
+
+  /// Dereceyi "12°36′" biçiminde döndürür (derece + dakika).
+  ///
+  /// Dakika sade tamsayı olarak yazılır (0 ile doldurulmaz). 59.5′ ve üstü
+  /// yuvarlamada bir üst dereceye taşınır; sonuç 30°'yi geçmez.
+  static String formatDegree(double d) {
+    var deg = d.floor();
+    var min = ((d - deg) * 60).round();
+    if (min >= 60) {
+      min -= 60;
+      deg += 1;
+    }
+    if (deg >= 30) {
+      deg = 30;
+      min = 0;
+    }
+    return '$deg°$min′';
   }
 }

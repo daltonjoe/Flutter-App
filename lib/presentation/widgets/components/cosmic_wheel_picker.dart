@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 
 enum WheelTone {
   female,
@@ -27,48 +28,48 @@ class _P {
   const _P(this.bg, this.border, this.text, this.glow, this.grad);
 }
 
-const _pal = {
+final _pal = <WheelTone, _P>{
   WheelTone.female: _P(
-    Color(0x14FF4D94),
-    Color(0x4DFF65A8),
-    Color(0xFFFDE2EE),
-    Color(0xFFFF4D94),
-    [Color(0xFFFF65A8), Color(0xFFC9A24A)],
+    AppColors.themeLove.withValues(alpha: 0.08),
+    AppColors.themeLove.withValues(alpha: 0.30),
+    AppColors.themeLove,
+    AppColors.themeLove,
+    [AppColors.themeLove, AppColors.gold],
   ),
   WheelTone.male: _P(
-    Color(0x1455E6FC),
-    Color(0x4D3FA6F8),
-    Color(0xFFE0F2FE),
-    Color(0xFF38BDF8),
-    [Color(0xFF38BDF8), Color(0xFF3B5FD9)],
+    AppColors.themeCareer.withValues(alpha: 0.08),
+    AppColors.themeCareer.withValues(alpha: 0.30),
+    AppColors.textPrimary,
+    AppColors.themeCareer,
+    [AppColors.themeCareer, AppColors.info],
   ),
   WheelTone.neutral: _P(
-    Color(0xFF0E1C40),
-    Color(0x402D7DF0),
-    Color(0xFFBFD4FF),
-    Color(0xFF2D7DF0),
-    [Color(0xFF2D7DF0), Color(0xFF1E5BC6)],
+    AppColors.navyDeep,
+    AppColors.info.withValues(alpha: 0.25),
+    AppColors.textSecondary,
+    AppColors.info,
+    [AppColors.info, AppColors.elementWater],
   ),
   WheelTone.gold: _P(
-    Color(0x14F59E0B),
-    Color(0x4DF59E0B),
-    Color(0xFFFDE68A),
-    Color(0xFFF59E0B),
-    [Color(0xFFF59E0B), Color(0xFFEA580C)],
+    AppColors.gold.withValues(alpha: 0.08),
+    AppColors.gold.withValues(alpha: 0.30),
+    AppColors.goldSoft,
+    AppColors.gold,
+    [AppColors.amberTransit, AppColors.goldDeep],
   ),
   WheelTone.purple: _P(
-    Color(0x14C9A24A),
-    Color(0x4DC9A24A),
-    Color(0xFFE8D5A3),
-    Color(0xFFC9A24A),
-    [Color(0xFFC9A24A), Color(0xFF3B5FD9)],
+    AppColors.themeIdentity.withValues(alpha: 0.08),
+    AppColors.themeIdentity.withValues(alpha: 0.30),
+    AppColors.themeIdentity,
+    AppColors.themeIdentity,
+    [AppColors.gold, AppColors.elementWater],
   ),
   WheelTone.indigo: _P(
-    Color(0x143B5FD9),
-    Color(0x4D3B5FD9),
-    Color(0xFFBFD4FF),
-    Color(0xFF3B5FD9),
-    [Color(0xFF1E3FA8), Color(0xFF0EA5E9)],
+    AppColors.elementWater.withValues(alpha: 0.08),
+    AppColors.elementWater.withValues(alpha: 0.30),
+    AppColors.textSecondary,
+    AppColors.elementWater,
+    [AppColors.elementWater, AppColors.info],
   ),
 };
 
@@ -142,7 +143,7 @@ class _CosmicWheelPickerState extends State<CosmicWheelPicker> {
                 boxShadow: sel
                     ? [
                         BoxShadow(
-                          color: p.glow.withOpacity(0.6),
+                          color: p.glow.withValues(alpha: 0.6),
                           blurRadius: 16,
                         ),
                       ]
@@ -153,7 +154,7 @@ class _CosmicWheelPickerState extends State<CosmicWheelPicker> {
                 style: TextStyle(
                   fontSize: sel ? 18 : 16,
                   fontWeight: FontWeight.w600,
-                  color: sel ? Colors.white : p.text.withOpacity(1.0),
+                  color: sel ? AppColors.textPrimary : p.text,
                 ),
               ),
             ),

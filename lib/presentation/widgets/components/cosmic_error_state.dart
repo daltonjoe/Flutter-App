@@ -9,7 +9,7 @@ import 'cosmic_cta_button.dart';
 
 /// A full-area error state with a cosmic visual treatment.
 ///
-/// Shows an error icon with a rose glow, the [message] text, and an optional
+/// Shows an error icon with a danger glow, the [message] text, and an optional
 /// [onRetry] button. Drop it inside a [SliverFillRemaining], a [Center], or
 /// any container that provides height.
 ///
@@ -42,7 +42,7 @@ class CosmicErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ── Error icon with rose glow ─────────────────────────────
+            // ── Error icon with danger glow ─────────────────────────────
             if (!compact)
               Container(
                 width: 72,
@@ -89,7 +89,7 @@ class CosmicErrorState extends StatelessWidget {
                   height: 46,
                   icon: const Icon(
                     Icons.refresh_rounded,
-                    color: Colors.white,
+                    color: AppColors.onGold,
                     size: 16,
                   ),
                 ),

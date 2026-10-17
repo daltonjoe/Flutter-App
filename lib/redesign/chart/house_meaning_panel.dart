@@ -8,6 +8,7 @@ import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../models/natal_chart_response.dart';
+import '../../presentation/widgets/components/cosmic_card.dart';
 import '../../providers/language_provider.dart';
 import '../../services/reference_names_service.dart';
 import '../data/house_meaning_service.dart';
@@ -33,6 +34,7 @@ class _HouseMeaningPanelState extends State<HouseMeaningPanel> {
   String? _text;
   String? _textKey;
   String? _loc;
+  bool _open = false;
 
   @override
   void initState() {
@@ -102,11 +104,40 @@ class _HouseMeaningPanelState extends State<HouseMeaningPanel> {
         if (item == null) return const SizedBox.shrink();
 
         final houseNumber = item.houseNumber;
+        final reduceMotion = MediaQuery.disableAnimationsOf(context);
+        final rotateDuration = reduceMotion
+            ? Duration.zero
+            : const Duration(milliseconds: 200);
+        final sizeDuration = reduceMotion
+            ? Duration.zero
+            : const Duration(milliseconds: 250);
+        final switchDuration = reduceMotion
+            ? Duration.zero
+            : const Duration(milliseconds: 350);
+
+        const padding = EdgeInsetsDirectional.symmetric(
+          horizontal: AppSpacing.screenH,
+        );
+
+        // Doğum saati yoksa: açılmayan tek satır bilgi.
+        if (houseNumber == null) {
+          return Padding(
+            padding: padding,
+            child: CosmicCard(
+              blur: false,
+              compact: true,
+              radius: AppRadius.md,
+              child: Text(
+                t(context, 'planet_report.time_unknown'),
+                style: AppTextStyles.bodyMd(color: AppColors.mist),
+              ),
+            ),
+          );
+        }
+
         final key = '${item.key}-$houseNumber';
         final String? body;
-        if (houseNumber == null) {
-          body = t(context, 'planet_report.time_unknown');
-        } else if (_textKey == key) {
+        if (_textKey == key) {
           body =
               _text ??
               t(
@@ -121,40 +152,79 @@ class _HouseMeaningPanelState extends State<HouseMeaningPanel> {
           body = null;
         }
 
+        final title = t(
+          context,
+          'rd.house.what_is',
+          args: {'number': '$houseNumber'},
+        );
+
         return Padding(
-          padding: const EdgeInsetsDirectional.symmetric(
-            horizontal: AppSpacing.screenH,
-          ),
-          child: Container(
-            width: double.infinity,
-            constraints: const BoxConstraints(minHeight: 120),
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: AppColors.bgCard.withValues(alpha: 0.8),
-              borderRadius: AppRadius.lgBr,
-              border: Border.all(color: AppColors.borderSubtle),
-            ),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 350),
-              transitionBuilder: (child, animation) =>
-                  FadeTransition(opacity: animation, child: child),
-              layoutBuilder: (currentChild, previousChildren) => Stack(
-                alignment: AlignmentDirectional.topStart,
-                children: [...previousChildren, ?currentChild],
-              ),
+          padding: padding,
+          child: Semantics(
+            button: true,
+            expanded: _open,
+            label: title,
+            child: CosmicCard(
+              blur: false,
+              compact: true,
+              radius: AppRadius.md,
+              onTap: () => setState(() => _open = !_open),
               child: Column(
-                key: ValueKey('$key-${body == null ? 'l' : 'r'}'),
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    t(context, 'rd.house.meaning_title'),
-                    style: AppTextStyles.h3(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: AppTextStyles.bodyMd(
+                            color: AppColors.starlight,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      AnimatedRotation(
+                        turns: _open ? 0.5 : 0.0,
+                        duration: rotateDuration,
+                        curve: Curves.easeOutCubic,
+                        child: const Icon(
+                          Icons.expand_more_rounded,
+                          size: 20,
+                          color: AppColors.mist,
+                        ),
+                      ),
+                    ],
                   ),
-                  if (body != null) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(body, style: AppTextStyles.bodyMd()),
-                  ],
+                  AnimatedSize(
+                    duration: sizeDuration,
+                    curve: Curves.easeOutCubic,
+                    alignment: AlignmentDirectional.topStart,
+                    child: _open
+                        ? Padding(
+                            padding: const EdgeInsetsDirectional.only(
+                              top: AppSpacing.sm,
+                            ),
+                            child: AnimatedSwitcher(
+                              duration: switchDuration,
+                              transitionBuilder: (child, animation) =>
+                                  FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  ),
+                              child: SizedBox(
+                                key: ValueKey(
+                                  '$key-${body == null ? 'l' : 'r'}',
+                                ),
+                                width: double.infinity,
+                                child: body == null
+                                    ? const SizedBox.shrink()
+                                    : Text(body, style: AppTextStyles.bodyMd()),
+                              ),
+                            ),
+                          )
+                        : const SizedBox(width: double.infinity),
+                  ),
                 ],
               ),
             ),

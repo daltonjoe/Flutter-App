@@ -54,7 +54,7 @@ class AnalysisSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = color ?? AppColors.violetPrimary;
+    final accent = color ?? AppColors.gold;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -92,7 +92,7 @@ class AnalysisSectionCard extends StatelessWidget {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.cardPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

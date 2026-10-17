@@ -1,28 +1,30 @@
 // lib/core/theme/app_typography.dart
-// SoulBound Cosmic Sanctum — typography system
+// Ephemerai — typography system
 //
-// Font strategy:
-//   • Headings  → 'Playfair Display' (google_fonts package)
-//   • Body / UI → 'Inter' (google_fonts package)
+// Font strategy (google_fonts):
+//   • Display / headings → 'Cormorant Garamond' w600
+//   • Body / UI / numbers → 'Inter'
 //
-// If google_fonts is unavailable at runtime (offline / stripped build),
-// each TextStyle falls back gracefully to the platform serif / sans-serif.
+// Sizes (size/line-height):
+//   Display 34/40 · H1 28/34 · H2 22/28 · Body 15/24 · Caption 13/18
+//   Overline 11/16 (w500, letterSpacing 1.2, uppercase — uppercase must be
+//   applied by the caller, TextStyle has no text-transform).
 //
-// IMPORTANT: import google_fonts via pubspec.yaml before using this file:
-//   dependencies:
-//     google_fonts: ^6.2.1
+// Offline note: google_fonts downloads the families on first use and caches
+// them on device; when the download fails every style falls back to the
+// platform font. See the task report for the asset-bundling recommendation.
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 // ── Font-family name constants ──────────────────────────────────────────
-// We reference these strings so all usages stay in sync even if we later
-// swap providers (e.g. bundled assets) without touching every TextStyle.
+// Used for the global ThemeData.fontFamily fallback.
 class AppFonts {
   AppFonts._();
 
-  static const String heading = 'Libre Caslon Condensed';
-   static const String body = 'Libre Caslon Condensed';
+  static const String heading = 'Cormorant Garamond';
+  static const String body = 'Inter';
 }
 
 // ── Text styles ────────────────────────────────────────────────────────
@@ -30,239 +32,212 @@ class AppTextStyles {
   AppTextStyles._();
 
   // ── Display / Hero ──────────────────────────────────────────────────
-  /// Large hero heading — Playfair Display, 34 px, ExtraBold
-  static TextStyle heroTitle({Color color = AppColors.textPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.heading,
+  /// Display — Cormorant Garamond 34/40, w600.
+  static TextStyle display({Color color = AppColors.textPrimary}) =>
+      GoogleFonts.cormorantGaramond(
         fontSize: 34,
-        fontWeight: FontWeight.w800,
+        height: 40 / 34,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.5,
         color: color,
-        height: 1.15,
-        letterSpacing: -0.8,
       );
 
-  /// Section display heading — Playfair Display, 26 px, Bold
+  /// Large hero heading — alias of [display].
+  static TextStyle heroTitle({Color color = AppColors.textPrimary}) =>
+      display(color: color);
+
+  /// H1 — Cormorant Garamond 28/34, w600.
   static TextStyle displayLarge({Color color = AppColors.textPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.heading,
-        fontSize: 26,
-        fontWeight: FontWeight.w700,
-        color: color,
+      GoogleFonts.cormorantGaramond(
+        fontSize: 28,
+        height: 34 / 28,
+        fontWeight: FontWeight.w600,
         letterSpacing: -0.3,
-      );
-
-  // ── Headings (Playfair Display) ─────────────────────────────────────
-  /// H1 — 22 px, Bold
-  static TextStyle h1({Color color = AppColors.textPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.heading,
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
         color: color,
-        letterSpacing: -0.2,
       );
 
-  /// H2 — 18 px, SemiBold
-  static TextStyle h2({Color color = AppColors.textPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.heading,
-        fontSize: 18,
+  // ── Headings (Cormorant Garamond) ───────────────────────────────────
+  /// H2 — 22/28, w600.
+  static TextStyle h1({Color color = AppColors.textPrimary}) =>
+      GoogleFonts.cormorantGaramond(
+        fontSize: 22,
+        height: 28 / 22,
         fontWeight: FontWeight.w600,
         color: color,
       );
 
-  /// H3 — 16 px, SemiBold
+  /// Heading — 18/24, w600.
+  static TextStyle h2({Color color = AppColors.textPrimary}) =>
+      GoogleFonts.cormorantGaramond(
+        fontSize: 18,
+        height: 24 / 18,
+        fontWeight: FontWeight.w600,
+        color: color,
+      );
+
+  /// Heading — 16/22, w600.
   static TextStyle h3({Color color = AppColors.textPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.heading,
+      GoogleFonts.cormorantGaramond(
         fontSize: 16,
+        height: 22 / 16,
         fontWeight: FontWeight.w600,
         color: color,
       );
 
   // ── Planet / accent names ───────────────────────────────────────────
-  /// Planet name in header card — 22 px, Black, accent colored
+  /// Planet name in header card — 22/28, w600, accent coloured.
   static TextStyle planetName({Color color = AppColors.violetPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.heading,
+      GoogleFonts.cormorantGaramond(
         fontSize: 22,
-        fontWeight: FontWeight.w900,
+        height: 28 / 22,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.3,
         color: color,
-        letterSpacing: -0.5,
       );
 
   // ── Body (Inter) ────────────────────────────────────────────────────
-  /// Standard body copy — 15 px
+  /// Body — Inter 15/24.
   static TextStyle bodyLg({Color color = AppColors.textPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: 15,
+        height: 24 / 15,
         color: color,
-        height: 1.6,
       );
 
-  /// Secondary body copy — 14 px
+  /// Body small — Inter 14/22.
   static TextStyle bodyMd({Color color = AppColors.textSecondary}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: 14,
+        height: 22 / 14,
         color: color,
-        height: 1.55,
       );
 
-  /// Small body / caption — 13 px
+  /// Caption — Inter 13/18.
   static TextStyle bodySm({Color color = AppColors.textSecondary}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: 13,
+        height: 18 / 13,
         color: color,
-        height: 1.5,
       );
 
-  /// Extra-small / hint — 12 px
+  /// Extra-small / hint — Inter 12/16.
   static TextStyle bodyXs({Color color = AppColors.textMuted}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: 12,
+        height: 16 / 12,
         color: color,
-        height: 1.4,
       );
 
   // ── Labels & chips ──────────────────────────────────────────────────
-  /// Input field label — 11 px, Bold, tracked
-  static TextStyle fieldLabel({Color color = AppColors.textMuted}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+  /// Overline — Inter 11/16, w500, tracked. Caller must uppercase the text.
+  static TextStyle overline({Color color = AppColors.mist}) =>
+      GoogleFonts.inter(
         fontSize: 11,
-        fontWeight: FontWeight.w700,
-        color: color,
+        height: 16 / 11,
+        fontWeight: FontWeight.w500,
         letterSpacing: 1.2,
+        color: color,
       );
 
-  /// Small chip / pill label — 12 px, SemiBold
+  /// Input field label — Inter 11, w500, tracked.
+  static TextStyle fieldLabel({Color color = AppColors.textMuted}) =>
+      GoogleFonts.inter(
+        fontSize: 11,
+        height: 16 / 11,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 1.2,
+        color: color,
+      );
+
+  /// Small chip / pill label — Inter 12/16, w600.
   static TextStyle chip({Color color = AppColors.textPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: 12,
+        height: 16 / 12,
         fontWeight: FontWeight.w600,
         color: color,
       );
 
-  /// Mini tag (ASC / MC labels) — 10 px, SemiBold
+  /// Mini tag (ASC / MC labels) — Inter 10, w600.
   static TextStyle miniTag({Color color = AppColors.violetPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: 10,
         fontWeight: FontWeight.w600,
         color: color,
       );
 
-  /// Tiny label (house "ev" text) — 8 px
+  /// Tiny label (house "ev" text) — Inter 8.
   static TextStyle tinyLabel({Color color = AppColors.textMuted}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: 8,
         color: color,
       );
 
   // ── Buttons ─────────────────────────────────────────────────────────
-  /// Primary CTA button label — 16 px, Bold
-  static const TextStyle ctaPrimary = TextStyle(
-    fontFamily: AppFonts.body,
-    fontSize: 16,
-    fontWeight: FontWeight.w700,
-    color: Colors.white,
-    letterSpacing: 0.3,
-  );
+  /// Primary CTA button label — Inter 16, w600. Text colour follows the
+  /// gold CTA fill ([AppColors.onGold]).
+  static TextStyle get ctaPrimary => GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: AppColors.onGold,
+        letterSpacing: 0.3,
+      );
 
-  /// Secondary / outline button label — 15 px, SemiBold
+  /// Secondary / outline button label — Inter 15, w600.
   static TextStyle ctaSecondary({Color color = AppColors.violetPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: 15,
         fontWeight: FontWeight.w600,
         color: color,
       );
 
   // ── Navigation / app bar ────────────────────────────────────────────
-  /// App-bar title — 15–17 px, SemiBold
+  /// App-bar title — Inter 15–17, w600.
   static TextStyle appBarTitle({
     double size = 15,
     Color color = AppColors.textPrimary,
   }) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: size,
         fontWeight: FontWeight.w600,
         color: color,
       );
 
   // ── Branding ────────────────────────────────────────────────────────
-  /// Footer brand line — 10 px, SemiBold, tracked
-  static const TextStyle brandFooter = TextStyle(
-    fontFamily: AppFonts.body,
-    fontSize: 10,
-    fontWeight: FontWeight.w600,
-    color: Color(0x802D7DF0),
-    letterSpacing: 1.2,
-  );
+  /// Footer brand line — Inter 10, w600, tracked (gold @ 50 %).
+  static TextStyle get brandFooter => GoogleFonts.inter(
+        fontSize: 10,
+        fontWeight: FontWeight.w600,
+        color: const Color(0x80D9B36A),
+        letterSpacing: 1.2,
+      );
 
   // ── Numeric / degree values ─────────────────────────────────────────
-  /// Degree readout — 11 px, Bold
+  /// Degree readout — Inter 11, bold, tabular figures.
   static TextStyle degreeLabel({Color color = AppColors.violetPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: 11,
         fontWeight: FontWeight.bold,
         color: color,
+        fontFeatures: const [FontFeature.tabularFigures()],
       );
 
-  /// Large numeric (house number) — 16 px, ExtraBold
+  /// Large numeric (house number) — Inter 16, w700, tabular figures.
   static TextStyle houseNumber({Color color = AppColors.violetPrimary}) =>
-      TextStyle(
-        fontFamily: AppFonts.body,
+      GoogleFonts.inter(
         fontSize: 16,
-        fontWeight: FontWeight.w800,
+        fontWeight: FontWeight.w700,
         color: color,
+        fontFeatures: const [FontFeature.tabularFigures()],
       );
 
   // ── ThemeData TextTheme (used inside CosmicTheme) ───────────────────
-  static TextTheme get materialTextTheme => const TextTheme(
-    displayLarge: TextStyle(
-      fontFamily: AppFonts.heading,
-      fontSize: 32,
-      fontWeight: FontWeight.w800,
-      color: AppColors.textPrimary,
-    ),
-    headlineMedium: TextStyle(
-      fontFamily: AppFonts.heading,
-      fontSize: 22,
-      fontWeight: FontWeight.w700,
-      color: AppColors.textPrimary,
-    ),
-    titleLarge: TextStyle(
-      fontFamily: AppFonts.heading,
-      fontSize: 20,
-      fontWeight: FontWeight.w600,
-      color: AppColors.textPrimary,
-    ),
-    bodyLarge: TextStyle(
-      fontFamily: AppFonts.body,
-      fontSize: 15,
-      color: AppColors.textPrimary,
-      height: 1.6,
-    ),
-    bodyMedium: TextStyle(
-      fontFamily: AppFonts.body,
-      fontSize: 13,
-      color: AppColors.textSecondary,
-      height: 1.5,
-    ),
-    labelSmall: TextStyle(
-      fontFamily: AppFonts.body,
-      fontSize: 11,
-      color: AppColors.textMuted,
-      letterSpacing: 0.5,
-    ),
-  );
+  static TextTheme get materialTextTheme => TextTheme(
+        displayLarge: display(),
+        headlineMedium: h1(),
+        titleLarge: h2(),
+        bodyLarge: bodyLg(),
+        bodyMedium: bodySm(),
+        labelSmall: overline(color: AppColors.textMuted),
+      );
 }

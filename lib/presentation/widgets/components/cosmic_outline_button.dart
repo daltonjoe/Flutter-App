@@ -6,7 +6,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_typography.dart';
 
-/// Secondary action button — dark background, violet border, violet text.
+/// Secondary action button — transparent background, 1px gold @ 40 % border,
+/// gold label, pill radius.
 ///
 /// Height is 52px by default; pass [height] to match 58px on screens that
 /// align primary and secondary buttons side-by-side.
@@ -16,7 +17,7 @@ class CosmicOutlineButton extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.icon,
-    this.height = 52.0,
+    this.height = AppSizes.ctaHeight,
     this.borderColor,
     this.labelColor,
   });
@@ -38,21 +39,21 @@ class CosmicOutlineButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = labelColor ?? AppColors.violetPrimary;
-    final border = borderColor ?? const Color(0x592D7DF0);
+    final color = labelColor ?? AppColors.gold;
+    final border = borderColor ?? AppColors.borderStrong;
 
     return SizedBox(
       height: height,
       width: double.infinity,
       child: Material(
-        color: AppColors.bgCard,
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        color: Colors.transparent,
+        borderRadius: AppRadius.pillBr,
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: AppRadius.pillBr,
           onTap: onTap,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppRadius.md),
+              borderRadius: AppRadius.pillBr,
               border: Border.all(color: border, width: 1.0),
             ),
             child: Center(

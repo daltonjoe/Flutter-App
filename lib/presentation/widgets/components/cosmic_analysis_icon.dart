@@ -21,7 +21,7 @@ class CosmicAnalysisIcon extends StatefulWidget {
   final String icon;
   final double size;
 
-  /// Tint colour for the background and glow (defaults to violet).
+  /// Tint colour for the background and glow (defaults to gold).
   final Color? color;
 
   /// Set false for static rendering (e.g. in list thumbnails).
@@ -61,7 +61,7 @@ class _CosmicAnalysisIconState extends State<CosmicAnalysisIcon>
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.color ?? AppColors.violetPrimary;
+    final color = widget.color ?? AppColors.gold;
 
     final badge = Container(
       width: widget.size,
@@ -82,7 +82,7 @@ class _CosmicAnalysisIconState extends State<CosmicAnalysisIcon>
           widget.icon,
           style: TextStyle(
             fontSize: widget.size * 0.6,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
       ),
