@@ -39,17 +39,6 @@ class AstroGlyphs {
     'capricorn': AstroGlyph('\u2651'),
     'aquarius': AstroGlyph('\u2652'),
     'pisces': AstroGlyph('\u2653'),
-    // ── Gezegenler ──────────────────────────────────────────────────────
-    'sun': AstroGlyph('\u2609'),
-    'moon': AstroGlyph('\u263D'),
-    'mercury': AstroGlyph('\u263F'),
-    'venus': AstroGlyph('\u2640'),
-    'mars': AstroGlyph('\u2642'),
-    'jupiter': AstroGlyph('\u2643'),
-    'saturn': AstroGlyph('\u2644'),
-    'uranus': AstroGlyph('\u2645'),
-    'neptune': AstroGlyph('\u2646'),
-    'pluto': AstroGlyph('\u2647'),
     // ── Açılar ──────────────────────────────────────────────────────────
     'conjunction': AstroGlyph('\u260C'),
     'sextile': AstroGlyph('\u26B9'),

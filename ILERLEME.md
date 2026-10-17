@@ -17,7 +17,8 @@ Chart tamam: 5 prompt + Düzeltme A, B, C. Chip sekmeler, gezegen glyph şeridi 
 Chart kapanış silmeleri (izinli) büyük kısmı yapıldı: _valenceIcon, mloc, 7 locale anahtarı, _OrbitDot*, eski _element* zinciri.
 
 ## Kalan
-Chart kapanışın kalanı (chart_page.dart, AstroGlyphs silme kontrolü, ar.json eksik anahtar paritesi), Ask, Profile (profile_switcher_page) + Settings, Prompt 10 temizlik, Match.
+Ask, Profile (profile_switcher_page) + Settings, Prompt 10 temizlik, Match.
+Faz 9a temizlik (Bölüm A) tamam: chart_page.dart, AstroGlyphs gezegen kayıtları (sun…pluto) ve SoulBoundAssets silindi; prefernottosay.png yolu düzeltildi; background2.* + 4 italik font silindi; ar.json paritesi (496 anahtar) sağlandı.
 Cihaz görsel doğrulaması bekleyen: Düzeltme C (şerit ikonları, iç halka yıldızları, 3 halkalı kart dar ekran/Arapça).
 
 ## Güncel token/bileşen adları
@@ -34,4 +35,4 @@ Ask modları kodda: natal (Haritam/Öz) | forecast (Öngörü/Seyir) | synastry 
 - Today açık işleri: mood mini ikonu hafta şeridinde, hero glow nefes, bildirim priming, SVG mood yüzleri, Story paylaşım kartı, akşam yansıtma, gün noktası açıklaması.
 - Chart açık işleri: gezegen kartı tek cümle yorum (içerik kaynağı yok), element glyph SVG, ASC/MC sembol, başlıkta aktif profil avatarı (Profile aşamasında), natal çark/transit, doğum saati üç kademeli kesinlik (backend, kullanıcıya sor).
 - Prompt 10: planet_carousel.dart'ı kart/şerit/hero dosyalarına böl (onaylandı), burç→element renk eşlemesini tek yere al, eski token sayımı.
-- Locale: ar.json diğer dillere göre çok eksik görünüyor (ar≈217, diğerleri ≈492); doğrulanacak.
+- Locale: ar.json paritesi tamamlandı (8 dil = 496 anahtar).

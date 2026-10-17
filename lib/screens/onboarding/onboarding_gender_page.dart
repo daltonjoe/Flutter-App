@@ -30,7 +30,7 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
   String? get _imagePath {
     if (_selected == 'male') return 'assets/images/logo/male.png';
     if (_selected == 'female') return 'assets/images/logo/female.png';
-    if (_selected == 'prefer_not_to_say') return 'assets/images/logo/prefernottosay.png';
+    if (_selected == 'prefer_not_to_say') return 'assets/images/logo/prefer_not_to_say.png';
     return null;
   }
 

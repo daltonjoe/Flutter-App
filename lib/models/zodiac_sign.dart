@@ -67,13 +67,3 @@ enum ZodiacSign {
     }
   }
 }
-
-abstract class SoulBoundAssets {
-  static const String logo = 'assets/images/logo/soulbound_logo.png';
-
-  static String getZodiac(String signName) =>
-      ZodiacSign.fromString(signName).assetPath;
-
-  static String getZodiacByIndex(int signIndex) =>
-    ZodiacSign.fromSignIndex(signIndex).assetPath;
-}

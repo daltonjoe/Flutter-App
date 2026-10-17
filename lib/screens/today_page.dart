@@ -1785,7 +1785,8 @@ class _TodayPageState extends State<TodayPage> {
           Row(
             children: [
               if (glyphName != null &&
-                  AstroGlyphs.glyphFor(glyphName) != null) ...[
+                  (PlanetGlyphIcon.supports(glyphName) ||
+                      AstroGlyphs.glyphFor(glyphName) != null)) ...[
                 PlanetGlyphIcon(
                   name: glyphName,
                   size: 20,
