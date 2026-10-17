@@ -12,7 +12,6 @@ import '../presentation/widgets/components/cosmic_background.dart';
 import '../i18n/app_localizations.dart';
 import '../core/utils/text_parser.dart';
 import '../widgets/analysis/analysis_section_card.dart';
-import '../widgets/animations/zodiac_orbital_animation.dart';
 
 class ForecastResultPage extends StatefulWidget {
   final String analysisType;
@@ -195,13 +194,6 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Dynamic Background Animation ──────────────────────────
-          Center(
-            child: ZodiacOrbitalAnimation(
-              size: MediaQuery.of(context).size.width * 0.6,
-            ),
-          ),
-
           const SizedBox(height: 12),
 
           // Başlık kartı

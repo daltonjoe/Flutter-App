@@ -1,13 +1,13 @@
 // lib/presentation/widgets/components/cosmic_loader.dart
 // SoulBound Cosmic Sanctum — reusable loading state component
 //
-// Wraps the project's existing ZodiacOrbitalAnimation and AppLoader so the
-// loading state is consistent with the Cosmic Sanctum visual language.
-// Business logic and animation logic are untouched.
+// Renders the shared LoadingVideo backdrop with the message + progress strip
+// anchored above the floating bottom nav so the loading state is consistent
+// with the Cosmic Sanctum visual language.
 
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../widgets/animations/zodiac_orbital_animation.dart';
+import '../../../core/theme/app_dimensions.dart';
 import '../../../i18n/app_localizations.dart';
 import '../../../redesign/splash/loading_video.dart';
 
@@ -30,74 +30,60 @@ class _CosmicLoaderState extends State<CosmicLoader> {
       children: [
         // Arka plan: tek yükleme görseli (video; poster fallback'li).
         const Positioned.fill(child: LoadingVideo()),
+        // Okunabilirlik perdesi (yalnız görsel; dokunuşu yutmaz).
+        Positioned.fill(
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppColors.bgDeep.withValues(alpha: 0.0),
+                    AppColors.bgDeep.withValues(alpha: 0.60),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Mesaj + ilerleme bloğu: ortak çapa ([AppSizes.loadingMessageAlignment])
+        // ile ekranın ~%65'ine yerleşir, yüzen alt menünün üstünde kalır.
         SafeArea(
-          child: Column(
-            children: [
-              // Animation region
-              Expanded(
-                flex: 7,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: const ZodiacOrbitalAnimation(size: 400),
+          child: Align(
+            alignment: AppSizes.loadingMessageAlignment,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.message ??
+                        t(context, 'onboarding.calculating.title'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        backgroundColor: AppColors.violetPrimary.withValues(
+                          alpha: 0.12,
+                        ),
+                        valueColor: const AlwaysStoppedAnimation(
+                          AppColors.violetPrimary,
+                        ),
+                        minHeight: 3,
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-
-              // Progress region
-              Expanded(
-                flex: 3,
-                child: DecoratedBox(
-                  // Metin/progress okunabilirliği için hafif karartma.
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppColors.bgDeep.withValues(alpha: 0.30),
-                        AppColors.bgDeep.withValues(alpha: 0.55),
-                      ],
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: 16,
-                          left: 24,
-                          right: 24,
-                        ),
-                        child: Text(
-                          widget.message ??
-                              t(context, 'onboarding.calculating.title'),
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 60),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            backgroundColor: AppColors.violetPrimary.withValues(
-                              alpha: 0.12,
-                            ),
-                            valueColor: const AlwaysStoppedAnimation(
-                              AppColors.violetPrimary,
-                            ),
-                            minHeight: 3,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ],

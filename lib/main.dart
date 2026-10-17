@@ -32,6 +32,7 @@ import "session/session_controller.dart";
 import "session/supabase_session_source.dart";
 import "presentation/widgets/components/cosmic_loader.dart";
 import "presentation/widgets/components/cosmic_error_state.dart";
+import "redesign/splash/loading_video_host.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -112,6 +113,12 @@ if (kDebugMode) {
       child: const SoulBoundApp(),
     ),
   );
+
+  // Paylasilan yukleme videosunu ilk frame'den sonra arka planda hazirla.
+  // await yok; acilis gecikmez, hata host icinde loglanip yutulur.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    LoadingVideoHost.instance.warmUp();
+  });
 }
 
 class SoulBoundApp extends StatelessWidget {

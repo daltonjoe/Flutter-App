@@ -13,7 +13,7 @@ import '../presentation/widgets/components/cosmic_input_field.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/chart_persistence_service.dart';
-import '../../widgets/animations/zodiac_orbital_animation.dart';
+import '../redesign/splash/loading_video.dart';
 
 /// K33: doğum tarihi + yeri + saati tek ekran, tam yeniden hesap.
 class EditBirthDataPage extends StatefulWidget {
@@ -324,26 +324,26 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
           if (_saving)
             Positioned.fill(
               child: AbsorbPointer(
-                child: Container(
-                  color: AppColors.bgDeep,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: 240,
-                          height: 240,
-                          child: ZodiacOrbitalAnimation(size: 240),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    const LoadingVideo(),
+                    SafeArea(
+                      child: Align(
+                        alignment: AppSizes.loadingMessageAlignment,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.xl,
+                          ),
+                          child: Text(
+                            t(context, 'onboarding.calculating.title'),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          t(context, 'onboarding.calculating.title'),
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),

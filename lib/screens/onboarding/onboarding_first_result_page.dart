@@ -62,72 +62,76 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage> {
       canPop: false,
       child: Scaffold(
         backgroundColor: Colors.black,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            Positioned.fill(
-              child: Image.asset('assets/images/logo/background.jpg',
-                  fit: BoxFit.cover),
-            ),
-            SafeArea(
-              child: FutureBuilder<({NatalChartResponse chart, String name})>(
-                future: _future,
-                builder: (context, snap) {
-                  if (snap.connectionState != ConnectionState.done) {
-                    return const CosmicLoader();
-                  }
-                  if (snap.hasError || snap.data == null) {
-                    return CosmicErrorState(
-                      message: t(context, 'profile_switcher.error'),
-                      retryLabel: t(context, 'profile_switcher.retry'),
-                      onRetry: () => setState(() => _future = _load()),
-                    );
-                  }
-                  final s = snap.data!.chart.summary;
-                  final timeKnown = (s?.ascendantSign ?? '').isNotEmpty;
-                  return Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Spacer(),
-                        Text(
-                          t(context, 'onboarding.first_result.title'),
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const SizedBox(height: 24),
-                        _row(t(context, 'onboarding.first_result.sun'),
-                            s?.sunSign ?? ''),
-                        if (timeKnown) ...[
-                          _row(t(context, 'onboarding.first_result.moon'),
-                              s?.moonSign ?? ''),
-                          _row(t(context, 'onboarding.first_result.rising'),
-                              s?.ascendantSign ?? ''),
-                        ] else
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: Text(
-                              t(context, 'onboarding.first_result.time_hint'),
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ),
-                        const Spacer(),
-                        CosmicCtaButton(
-                          label: t(context, 'common.next'),
-                          disabled: false,
-                          onTap: _continue,
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-                  );
-                },
+        body: FutureBuilder<({NatalChartResponse chart, String name})>(
+          future: _future,
+          builder: (context, snap) {
+            // Yükleme dalının arka planını CosmicLoader (video + poster)
+            // sağlar; burada ayrıca görsel çizilmez (tek arka plan katmanı).
+            if (snap.connectionState != ConnectionState.done) {
+              return const CosmicLoader();
+            }
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(
+                  child: Image.asset('assets/images/logo/background.jpg',
+                      fit: BoxFit.cover),
+                ),
+                SafeArea(
+                  child: snap.hasError || snap.data == null
+                      ? CosmicErrorState(
+                          message: t(context, 'profile_switcher.error'),
+                          retryLabel: t(context, 'profile_switcher.retry'),
+                          onRetry: () => setState(() => _future = _load()),
+                        )
+                      : _summary(snap.data!.chart.summary),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _summary(ChartSummary? summary) {
+    final timeKnown = (summary?.ascendantSign ?? '').isNotEmpty;
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Spacer(),
+          Text(
+            t(context, 'onboarding.first_result.title'),
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 24),
+          _row(t(context, 'onboarding.first_result.sun'),
+              summary?.sunSign ?? ''),
+          if (timeKnown) ...[
+            _row(t(context, 'onboarding.first_result.moon'),
+                summary?.moonSign ?? ''),
+            _row(t(context, 'onboarding.first_result.rising'),
+                summary?.ascendantSign ?? ''),
+          ] else
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Text(
+                t(context, 'onboarding.first_result.time_hint'),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
-          ],
-        ),
+          const Spacer(),
+          CosmicCtaButton(
+            label: t(context, 'common.next'),
+            disabled: false,
+            onTap: _continue,
+          ),
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }

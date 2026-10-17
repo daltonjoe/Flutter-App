@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -6,18 +5,19 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
-import '../assets_map.dart';
+import 'loading_video_host.dart';
 import 'splash_clock.dart';
 
-/// Tek yükleme görseli: sessiz, döngüde oynayan video.
-const String kLoadingVideoAsset = 'assets/videos/loading_1.mp4';
+/// Uygulamanın kendi yıldızlı arka planı (CosmicBackground ile aynı görsel).
+/// Video hazır olana kadar poster olarak bu görünür.
+const String kLoadingPosterAsset = 'assets/images/logo/background.jpg';
 
 /// Açılış ve hesaplama ekranlarının video arka planı.
 ///
-/// Video hazır olana kadar [RdAssets.earthHome] posteri görünür; hazır olunca
-/// posterin üstüne kısa bir fade ile biner. Video başlatılamazsa, web'de veya
-/// hareket azaltma açıkken yalnız statik poster kalır. Hata sessizce yutulur;
-/// uygulama açılışı asla bloklanmaz.
+/// Video, ekranlar arası paylaşılan tek controller ([LoadingVideoHost]) ile
+/// çizilir; bu widget kendi controller'ını oluşturmaz. Controller hazır
+/// olana kadar poster ([kLoadingPosterAsset]) görünür, hazır olunca 250 ms
+/// fade ile video üstüne biner. Hareket azaltma açıkken yalnız poster kalır.
 class LoadingVideo extends StatefulWidget {
   const LoadingVideo({super.key, this.showTexts = false});
 
@@ -29,10 +29,8 @@ class LoadingVideo extends StatefulWidget {
 }
 
 class _LoadingVideoState extends State<LoadingVideo>
-    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
-  VideoPlayerController? _controller;
-  bool _ready = false;
-  bool _started = false;
+    with SingleTickerProviderStateMixin {
+  bool _attached = false;
 
   // showTexts: SplashBackdrop ile aynı metin sönümü (2100 → 2500 ms).
   late final AnimationController _textsClock = AnimationController(
@@ -50,65 +48,32 @@ class _LoadingVideoState extends State<LoadingVideo>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     if (widget.showTexts && _textsClock.value < 1.0) _textsClock.forward();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_started) return;
-    _started = true;
-    _initVideo();
-  }
-
-  Future<void> _initVideo() async {
-    if (kIsWeb || MediaQuery.disableAnimationsOf(context)) return;
-    try {
-      final c = VideoPlayerController.asset(
-        kLoadingVideoAsset,
-        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
-      );
-      _controller = c;
-      await c.initialize();
-      await c.setVolume(0);
-      await c.setLooping(true);
-      if (!mounted) {
-        await c.dispose();
-        _controller = null;
-        return;
-      }
-      await c.play();
-      setState(() => _ready = true);
-    } catch (e) {
-      debugPrint('LoadingVideo init failed: $e');
+    if (_attached) return;
+    // Erişilebilirlik: hareket azaltma açıkken videoya hiç bağlanılmaz.
+    if (MediaQuery.disableAnimationsOf(context)) {
+      debugPrint('LoadingVideo: reduceMotion');
+      return;
     }
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final c = _controller;
-    if (c == null || !_ready) return;
-    if (state == AppLifecycleState.resumed) {
-      c.play();
-    } else {
-      c.pause();
-    }
+    _attached = true;
+    LoadingVideoHost.instance.attach();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    if (_attached) LoadingVideoHost.instance.detach();
     _textsClock.dispose();
-    _controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final fade = MediaQuery.disableAnimationsOf(context)
-        ? Duration.zero
-        : const Duration(milliseconds: 250);
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
     return ClipRect(
       child: Stack(
         fit: StackFit.expand,
@@ -119,17 +84,26 @@ class _LoadingVideoState extends State<LoadingVideo>
               fit: StackFit.expand,
               children: [
                 Image.asset(
-                  RdAssets.earthHome,
+                  kLoadingPosterAsset,
                   fit: BoxFit.cover,
                   gaplessPlayback: true,
                   errorBuilder: (_, _, _) => const SizedBox.shrink(),
                 ),
-                AnimatedOpacity(
-                  opacity: _ready ? 1 : 0,
-                  duration: fade,
-                  curve: Curves.easeOut,
-                  child: _video(),
-                ),
+                if (!reduceMotion)
+                  ValueListenableBuilder<VideoPlayerController?>(
+                    valueListenable: LoadingVideoHost.instance.controller,
+                    builder: (context, controller, _) {
+                      final ready = controller?.value.isInitialized ?? false;
+                      return AnimatedOpacity(
+                        opacity: ready ? 1 : 0,
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOut,
+                        child: ready
+                            ? _video(controller!)
+                            : const SizedBox.shrink(),
+                      );
+                    },
+                  ),
               ],
             ),
           ),
@@ -139,17 +113,15 @@ class _LoadingVideoState extends State<LoadingVideo>
     );
   }
 
-  Widget _video() {
-    final c = _controller;
-    if (c == null || !_ready) return const SizedBox.shrink();
-    final size = c.value.size;
+  Widget _video(VideoPlayerController controller) {
+    final size = controller.value.size;
     return FittedBox(
       fit: BoxFit.cover,
       clipBehavior: Clip.hardEdge,
       child: SizedBox(
         width: size.width,
         height: size.height,
-        child: VideoPlayer(c),
+        child: VideoPlayer(controller),
       ),
     );
   }

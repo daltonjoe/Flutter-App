@@ -156,6 +156,14 @@ class AppSizes {
       MediaQuery.of(context).viewPadding.bottom +
       AppSpacing.lg;
 
+  // ── Yükleme (video) ekranları ────────────────────────────────────────
+  /// Video ekranlarındaki "yükleniyor" mesaj bloğunun dikey çapası.
+  ///
+  /// [Alignment] y = 0.30 → bloğun merkezi, güvenli alan içinde ekran
+  /// yüksekliğinin ~%65'ine denk gelir. Altında kalan boşluk (ekranın
+  /// ~%35'i) yüzen alt menünün ve home indicator'ın çok üstündedir.
+  static const Alignment loadingMessageAlignment = Alignment(0.0, 0.30);
+
   // ── Icon containers ──────────────────────────────────────────────────
   static const double planetIconContainer = 44.0;
   static const double heroZodiacOrb = 72.0;

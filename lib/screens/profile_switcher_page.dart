@@ -197,6 +197,7 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
   Future<void> _confirmDeleteProfile(String id) async {
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
+      useRootNavigator: true,
       isDismissible: true,
       backgroundColor: AppColors.navyDeep,
       shape: const RoundedRectangleBorder(
