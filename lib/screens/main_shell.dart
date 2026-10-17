@@ -16,6 +16,9 @@ import '../redesign/splash/splash_overlay.dart';
 
 final ValueNotifier<int> shellTab = ValueNotifier<int>(1);
 
+/// Profil sekmesinin shellTab indeksi.
+const int kProfileTab = 2;
+
 /// Artınca Harita sekmesi köke döner (profil değişiminde).
 final ValueNotifier<int> mapPopToRoot = ValueNotifier<int>(0);
 
@@ -56,7 +59,13 @@ class _MainShellState extends State<MainShell>
   bool get _matchOn => _matchTabLoaded && _matchTabEnabled;
 
   /// Görünen sekmelerin shellTab indeksleri (alt çubuk sırası).
-  List<int> get _visible => [0, 1, if (_askOn) kAskTab, if (_matchOn) 3, 2];
+  List<int> get _visible => [
+    0,
+    1,
+    if (_askOn) kAskTab,
+    if (_matchOn) 3,
+    kProfileTab,
+  ];
 
   @override
   void initState() {
@@ -243,7 +252,8 @@ class _MainShellState extends State<MainShell>
                   curve: Curves.easeInOutCubic,
                   opacity: navHidden ? 0.0 : 1.0,
                   child: SizedBox(
-                    height: AppSizes.bottomNavInset(context) +
+                    height:
+                        AppSizes.bottomNavInset(context) +
                         AppSizes.navScrimExtra,
                     child: DecoratedBox(
                       decoration: BoxDecoration(

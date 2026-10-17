@@ -1,15 +1,32 @@
 class RefIds {
   static int signId(int signIndex) => signIndex + 1;
-    static const signCodes = [
-    'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
-    'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces',
+  static const signCodes = [
+    'aries',
+    'taurus',
+    'gemini',
+    'cancer',
+    'leo',
+    'virgo',
+    'libra',
+    'scorpio',
+    'sagittarius',
+    'capricorn',
+    'aquarius',
+    'pisces',
   ];
 
   /// signIndex (0-11) -> dil-bağımsız burç kodu. Geçersizse null.
   static String? signCode(int signIndex) =>
       (signIndex >= 0 && signIndex < signCodes.length)
-          ? signCodes[signIndex]
-          : null;
+      ? signCodes[signIndex]
+      : null;
+
+  /// sign_id (1-12) -> 0 tabanlı burç indeksi. Geçersizse null.
+  static int? signIndex(int? signId) =>
+      (signId != null && signId >= 1 && signId <= signCodes.length)
+      ? signId - 1
+      : null;
+
   static int houseId(int houseNumber) => houseNumber;
 
   static const planets = {

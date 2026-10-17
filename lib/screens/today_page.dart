@@ -56,6 +56,8 @@ import '../presentation/widgets/components/cosmic_loader.dart';
 
 import '../presentation/widgets/components/cosmic_background.dart';
 
+import '../presentation/widgets/components/profile_avatar_button.dart';
+
 import '../presentation/widgets/components/cosmic_card.dart';
 
 import '../presentation/widgets/components/cosmic_chip.dart';
@@ -1305,6 +1307,11 @@ class _TodayPageState extends State<TodayPage> {
                   ),
                 ),
               ),
+            Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.screenH - 8),
+
+              child: const ProfileAvatarButton(),
+            ),
           ],
         ),
 

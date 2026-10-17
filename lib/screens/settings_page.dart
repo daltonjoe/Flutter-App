@@ -14,6 +14,7 @@ import '../core/theme/app_typography.dart';
 import '../i18n/app_localizations.dart';
 import '../presentation/widgets/components/cosmic_card.dart';
 import '../presentation/widgets/components/cosmic_error_state.dart';
+import '../presentation/widgets/components/overline_text.dart';
 import '../providers/active_profile_provider.dart';
 import "package:flutter_application/diag68.dart";
 import 'legal_agreements_page.dart';
@@ -168,10 +169,7 @@ class _SettingsPageState extends State<SettingsPage>
   Widget _sectionLabel(String key, {Color? color}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-      child: Text(
-        t(context, key).toUpperCase(),
-        style: AppTextStyles.fieldLabel(color: color ?? AppColors.textMuted),
-      ),
+      child: OverlineText(t(context, key), color: color),
     );
   }
 
@@ -191,7 +189,7 @@ class _SettingsPageState extends State<SettingsPage>
       height: height,
       width: width,
       decoration: BoxDecoration(
-        color: AppColors.bgSurface,
+        color: AppColors.navyRaised,
         borderRadius: AppRadius.mdBr,
       ),
     );
@@ -203,7 +201,7 @@ class _SettingsPageState extends State<SettingsPage>
         AppSpacing.screenH,
         AppSpacing.contentTop,
         AppSpacing.screenH,
-        AppSizes.bottomNavInset(context),
+        AppSizes.scrollBottomPadding(context),
       ),
       children: [
         _sectionLabel('settings.section.notifications'),
@@ -236,13 +234,14 @@ class _SettingsPageState extends State<SettingsPage>
           padding: const EdgeInsets.only(bottom: AppSpacing.lg),
           child: CosmicCard(child: _skeleton(height: 48)),
         ),
-        _sectionLabel('settings.danger.title', color: AppColors.errorRed),
+        _sectionLabel('settings.danger.title', color: AppColors.statusDanger),
         CosmicCard(child: _skeleton(height: 48)),
       ],
     );
   }
 
   Widget _buildRow({
+    IconData? icon,
     required Widget leading,
     Widget? trailing,
     VoidCallback? onTap,
@@ -251,7 +250,7 @@ class _SettingsPageState extends State<SettingsPage>
   }) {
     return InkWell(
       onTap: enabled ? onTap : null,
-      borderRadius: AppRadius.mdBr,
+      borderRadius: AppRadius.cardBr,
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: minHeight.toDouble()),
         child: Padding(
@@ -259,6 +258,10 @@ class _SettingsPageState extends State<SettingsPage>
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              if (icon != null) ...[
+                Icon(icon, size: 20, color: AppColors.mist),
+                const SizedBox(width: AppSpacing.cardGap),
+              ],
               Expanded(child: leading),
               if (trailing != null) ...[
                 const SizedBox(width: AppSpacing.sm),
@@ -289,31 +292,33 @@ class _SettingsPageState extends State<SettingsPage>
               child: Column(
                 children: [
                   _buildRow(
+                    icon: Icons.notifications_none,
                     leading: Text(
                       t(context, 'settings.notifications.enabled'),
-                      style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
+                      style: AppTextStyles.bodyLg(color: AppColors.starlight),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     trailing: Switch(
                       value: enabled,
                       onChanged: (v) => _onNotificationsChanged(v),
-                      activeThumbColor: AppColors.violetPrimary,
-                      activeTrackColor: AppColors.violetDark,
-                      inactiveThumbColor: AppColors.bgSurfaceBright,
-                      inactiveTrackColor: AppColors.bgSurfaceLow,
+                      activeThumbColor: AppColors.onGold,
+                      activeTrackColor: AppColors.gold,
+                      inactiveThumbColor: AppColors.navyRaised,
+                      inactiveTrackColor: AppColors.hairline,
                     ),
                   ),
-                  const Divider(height: 1, color: AppColors.borderSubtle),
+                  const Divider(height: 1, color: AppColors.hairline),
                   _buildRow(
+                    icon: Icons.schedule_outlined,
                     enabled: enabled,
                     onTap: enabled ? _pickTime : null,
                     leading: Text(
                       t(context, 'settings.notifications.time'),
                       style: AppTextStyles.bodyLg(
                         color: enabled
-                            ? AppColors.textPrimary
-                            : AppColors.textDisabled,
+                            ? AppColors.starlight
+                            : AppColors.mist.withValues(alpha: 0.5),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -322,8 +327,8 @@ class _SettingsPageState extends State<SettingsPage>
                       displayTime,
                       style: AppTextStyles.bodyMd(
                         color: enabled
-                            ? AppColors.violetPrimary
-                            : AppColors.textDisabled,
+                            ? AppColors.gold
+                            : AppColors.mist.withValues(alpha: 0.5),
                       ),
                     ),
                   ),
@@ -335,7 +340,7 @@ class _SettingsPageState extends State<SettingsPage>
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
                 t(context, 'settings.notifications.note'),
-                style: AppTextStyles.bodyXs(color: AppColors.textMuted),
+                style: AppTextStyles.bodyXs(color: AppColors.mist),
                 softWrap: true,
               ),
             ),
@@ -378,7 +383,7 @@ class _SettingsPageState extends State<SettingsPage>
       // Aynı kök neden: yerel navigator'da açılınca kaydet butonu alt
       // navigasyon çubuğunun altında kalıyordu.
       useRootNavigator: true,
-      backgroundColor: AppColors.bgCard,
+      backgroundColor: AppColors.navyDeep,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
       ),
@@ -401,7 +406,7 @@ class _SettingsPageState extends State<SettingsPage>
                       brightness: Brightness.dark,
                       textTheme: CupertinoTextThemeData(
                         dateTimePickerTextStyle: TextStyle(
-                          color: AppColors.textPrimary,
+                          color: AppColors.starlight,
                           fontSize: 20,
                         ),
                       ),
@@ -416,7 +421,7 @@ class _SettingsPageState extends State<SettingsPage>
                         initial.hour,
                         initial.minute,
                       ),
-                      backgroundColor: AppColors.bgCard,
+                      backgroundColor: AppColors.navyDeep,
                       onDateTimeChanged: (dt) {
                         picked = TimeOfDay(hour: dt.hour, minute: dt.minute);
                       },
@@ -429,7 +434,7 @@ class _SettingsPageState extends State<SettingsPage>
                   height: AppSizes.ctaHeight,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: AppColors.violetPrimary,
+                      color: AppColors.gold,
                       borderRadius: AppRadius.mdBr,
                     ),
                     child: TextButton(
@@ -489,9 +494,10 @@ class _SettingsPageState extends State<SettingsPage>
             CosmicCard(
               onTap: _showLanguageSheet,
               child: _buildRow(
+                icon: Icons.language,
                 leading: Text(
                   t(context, 'settings.language.title'),
-                  style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
+                  style: AppTextStyles.bodyLg(color: AppColors.starlight),
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -501,12 +507,15 @@ class _SettingsPageState extends State<SettingsPage>
                   children: [
                     Text(
                       currentEntry['label']!,
-                      style: AppTextStyles.bodyMd(
-                        color: AppColors.violetPrimary,
-                      ),
+                      style: AppTextStyles.bodyMd(color: AppColors.gold),
                     ),
                     const SizedBox(width: AppSpacing.xs),
-                    const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                    Icon(
+                      Directionality.of(context) == TextDirection.rtl
+                          ? Icons.chevron_left
+                          : Icons.chevron_right,
+                      color: AppColors.mist,
+                    ),
                   ],
                 ),
               ),
@@ -530,7 +539,7 @@ class _SettingsPageState extends State<SettingsPage>
       // Alt navigasyon çubuğunun üstünde açılsın: yerel navigator'da açıldığında
       // listenin en alttaki dilleri çubuğun altında kalıp seçilemiyordu.
       useRootNavigator: true,
-      backgroundColor: AppColors.bgCard,
+      backgroundColor: AppColors.navyDeep,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
       ),
@@ -559,16 +568,13 @@ class _SettingsPageState extends State<SettingsPage>
                             lang['label']!,
                             style: AppTextStyles.bodyLg(
                               color: selected
-                                  ? AppColors.violetPrimary
-                                  : AppColors.textPrimary,
+                                  ? AppColors.gold
+                                  : AppColors.starlight,
                             ),
                           ),
                         ),
                         if (selected)
-                          const Icon(
-                            Icons.check_circle,
-                            color: AppColors.violetPrimary,
-                          ),
+                          const Icon(Icons.check_circle, color: AppColors.gold),
                       ],
                     ),
                   ),
@@ -652,11 +658,10 @@ class _SettingsPageState extends State<SettingsPage>
               child: Column(
                 children: [
                   _buildRow(
+                    icon: Icons.person_outline,
                     leading: Text(
                       statusText,
-                      style: AppTextStyles.bodyMd(
-                        color: AppColors.textSecondary,
-                      ),
+                      style: AppTextStyles.bodyMd(color: AppColors.mist),
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
@@ -664,11 +669,10 @@ class _SettingsPageState extends State<SettingsPage>
                   ),
                   if (!isAnonymous)
                     _buildRow(
+                      icon: Icons.logout,
                       leading: Text(
                         t(context, "settings.account.signout"),
-                        style: AppTextStyles.bodyLg(
-                          color: AppColors.textPrimary,
-                        ),
+                        style: AppTextStyles.bodyLg(color: AppColors.starlight),
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
@@ -695,9 +699,10 @@ class _SettingsPageState extends State<SettingsPage>
             _sectionLabel('settings.section.privacy'),
             CosmicCard(
               child: _buildRow(
+                icon: Icons.description_outlined,
                 leading: Text(
                   t(context, 'settings.legal.row'),
-                  style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
+                  style: AppTextStyles.bodyLg(color: AppColors.starlight),
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -714,16 +719,17 @@ class _SettingsPageState extends State<SettingsPage>
             const SubscriptionSettingsRow(),
             CosmicCard(
               child: _buildRow(
+                icon: Icons.info_outline,
                 leading: Text(
                   t(context, 'settings.about.version'),
-                  style: AppTextStyles.bodyLg(color: AppColors.textPrimary),
+                  style: AppTextStyles.bodyLg(color: AppColors.starlight),
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                 ),
                 trailing: Text(
                   _appVersion ?? '',
-                  style: AppTextStyles.bodyMd(color: AppColors.textMuted),
+                  style: AppTextStyles.bodyMd(color: AppColors.mist),
                 ),
               ),
             ),
@@ -740,9 +746,9 @@ class _SettingsPageState extends State<SettingsPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _sectionLabel('settings.danger.title', color: AppColors.errorRed),
+          _sectionLabel('settings.danger.title', color: AppColors.statusDanger),
           CosmicCard(
-            borderColor: AppColors.errorRed.withValues(alpha: 0.4),
+            borderColor: AppColors.statusDanger.withValues(alpha: 0.4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -750,7 +756,7 @@ class _SettingsPageState extends State<SettingsPage>
                   padding: const EdgeInsets.only(bottom: AppSpacing.md),
                   child: Text(
                     t(context, 'settings.danger.warning'),
-                    style: AppTextStyles.bodySm(color: AppColors.textSecondary),
+                    style: AppTextStyles.bodySm(color: AppColors.mist),
                     softWrap: true,
                   ),
                 ),
@@ -785,10 +791,10 @@ class _SettingsPageState extends State<SettingsPage>
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppColors.errorRed.withValues(alpha: 0.12),
+                        color: AppColors.statusDanger.withValues(alpha: 0.12),
                         borderRadius: AppRadius.pillBr,
                         border: Border.all(
-                          color: AppColors.errorRed.withValues(alpha: 0.4),
+                          color: AppColors.statusDanger.withValues(alpha: 0.4),
                         ),
                       ),
                     ),
@@ -802,7 +808,9 @@ class _SettingsPageState extends State<SettingsPage>
                           child: FractionallySizedBox(
                             widthFactor: progress,
                             heightFactor: 1,
-                            child: const ColoredBox(color: AppColors.errorRed),
+                            child: const ColoredBox(
+                              color: AppColors.statusDanger,
+                            ),
                           ),
                         ),
                       ),
@@ -817,7 +825,7 @@ class _SettingsPageState extends State<SettingsPage>
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  AppColors.textPrimary,
+                                  AppColors.starlight,
                                 ),
                               ),
                             )
@@ -825,8 +833,8 @@ class _SettingsPageState extends State<SettingsPage>
                               t(context, 'settings.danger.hold'),
                               style: AppTextStyles.ctaSecondary(
                                 color: Color.lerp(
-                                  AppColors.errorRed,
-                                  AppColors.textPrimary,
+                                  AppColors.statusDanger,
+                                  AppColors.starlight,
                                   progress,
                                 )!,
                               ).copyWith(fontWeight: FontWeight.w700),
@@ -857,10 +865,10 @@ class _SettingsPageState extends State<SettingsPage>
                   : () => setState(() => _showConfirmForA11y = true),
               style: OutlinedButton.styleFrom(
                 side: BorderSide(
-                  color: AppColors.errorRed.withValues(alpha: 0.5),
+                  color: AppColors.statusDanger.withValues(alpha: 0.5),
                 ),
                 shape: RoundedRectangleBorder(borderRadius: AppRadius.pillBr),
-                disabledForegroundColor: AppColors.textDisabled,
+                disabledForegroundColor: AppColors.mist.withValues(alpha: 0.5),
               ),
               child: _deleting
                   ? const SizedBox(
@@ -869,14 +877,14 @@ class _SettingsPageState extends State<SettingsPage>
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.textPrimary,
+                          AppColors.starlight,
                         ),
                       ),
                     )
                   : Text(
                       t(context, 'settings.danger.delete_account'),
                       style: AppTextStyles.ctaSecondary(
-                        color: AppColors.errorRed,
+                        color: AppColors.statusDanger,
                       ).copyWith(fontWeight: FontWeight.w700),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -890,8 +898,8 @@ class _SettingsPageState extends State<SettingsPage>
             child: ElevatedButton(
               onPressed: _deleting ? null : _runAccountDelete,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.errorRed,
-                disabledBackgroundColor: AppColors.bgSurface,
+                backgroundColor: AppColors.statusDanger,
+                disabledBackgroundColor: AppColors.navyRaised,
                 shape: RoundedRectangleBorder(borderRadius: AppRadius.pillBr),
                 elevation: 0,
               ),
@@ -902,7 +910,7 @@ class _SettingsPageState extends State<SettingsPage>
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.textPrimary,
+                          AppColors.starlight,
                         ),
                       ),
                     )
@@ -937,7 +945,7 @@ class _SettingsPageState extends State<SettingsPage>
                 AppSpacing.screenH,
                 AppSpacing.contentTop,
                 AppSpacing.screenH,
-                AppSizes.bottomNavInset(context),
+                AppSizes.scrollBottomPadding(context),
               ),
               children: [
                 _notificationsSection(),

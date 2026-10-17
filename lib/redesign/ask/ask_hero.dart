@@ -3,11 +3,14 @@
 
 import 'package:flutter/material.dart';
 
+import '../../core/reference_ids.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_chip.dart';
+import '../../presentation/widgets/components/glyph.dart';
+import '../../providers/active_profile_provider.dart';
 import 'star_typing.dart';
 
 /// Sohbet boşken gösterilen kompakt karşılama alanı.
@@ -23,10 +26,14 @@ class AskHero extends StatelessWidget {
     this.partnerName,
     this.partnersEmpty = false,
     this.onPickPartner,
+    this.summary,
   });
 
   /// 'natal' | 'forecast' | 'synastry'
   final String mode;
+
+  /// Aktif profilin özeti — yalnız `natal` modunda chip üretir.
+  final ActiveProfileSummary? summary;
 
   /// Seçili ay (YYYY-MM) — yalnız `forecast`.
   final String? month;
@@ -107,7 +114,65 @@ class AskHero extends StatelessWidget {
             ),
           ],
         ],
+        if (mode == 'natal') ..._natalChips(context),
       ],
+    );
+  }
+
+  /// Natal modunda Güneş/Ay/Yükselen chip'leri; özet yoksa hiç üretilmez.
+  ///
+  /// Yükselen yalnız doğum saati biliniyorsa gösterilir.
+  List<Widget> _natalChips(BuildContext context) {
+    final s = summary;
+    if (s == null) return const [];
+    final chips = <Widget>[
+      if (s.sunIndex != null)
+        _tripleChip(context, 'sun', 'chart.sun', s.sunIndex!),
+      if (s.moonIndex != null)
+        _tripleChip(context, 'moon', 'chart.moon', s.moonIndex!),
+      if (s.birthTimeKnown && s.ascIndex != null)
+        _tripleChip(context, 'asc', 'chart.ascendant', s.ascIndex!),
+    ];
+    if (chips.isEmpty) return const [];
+    return [
+      const SizedBox(height: AppSpacing.md),
+      Wrap(
+        alignment: WrapAlignment.center,
+        spacing: AppSpacing.sm,
+        runSpacing: AppSpacing.sm,
+        children: chips,
+      ),
+    ];
+  }
+
+  /// "Güneş · Yengeç" biçiminde glyph + rol + burç adı chip'i.
+  Widget _tripleChip(
+    BuildContext context,
+    String glyph,
+    String roleKey,
+    int signIndex,
+  ) {
+    final code = RefIds.signCode(signIndex);
+    final signName = code == null ? '' : t(context, 'signs.$code');
+    return Container(
+      height: AppSizes.chipHeight,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.navyRaised,
+        borderRadius: AppRadius.pillBr,
+        border: Border.all(color: AppColors.hairline),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Glyph(glyph, size: 16, color: AppColors.gold, decorative: true),
+          const SizedBox(width: AppSpacing.xs),
+          Text(
+            '${t(context, roleKey)} · $signName',
+            style: AppTextStyles.chip(color: AppColors.starlight),
+          ),
+        ],
+      ),
     );
   }
 

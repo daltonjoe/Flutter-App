@@ -10,6 +10,7 @@ import '../../models/natal_chart_response.dart';
 import '../../presentation/widgets/components/cosmic_background.dart';
 import '../../presentation/widgets/components/cosmic_error_state.dart';
 import '../../presentation/widgets/components/cosmic_loader.dart';
+import '../../presentation/widgets/components/profile_avatar_button.dart';
 import '../../providers/language_provider.dart';
 import '../../services/placement_content_service.dart';
 import '../data/detail_section.dart';
@@ -167,15 +168,19 @@ class _RedesignChartPageState extends State<RedesignChartPage> {
                   top: AppSpacing.lg,
                 ),
                 sliver: SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        widget.userName,
-                        style: AppTextStyles.h1(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      Expanded(
+                        child: Text(
+                          widget.userName,
+                          style: AppTextStyles.h1(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
+                      const SizedBox(width: AppSpacing.sm),
+                      const ProfileAvatarButton(),
                     ],
                   ),
                 ),

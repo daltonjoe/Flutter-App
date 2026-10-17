@@ -23,6 +23,7 @@ import '../presentation/widgets/components/cosmic_background.dart';
 import '../presentation/widgets/components/cosmic_card.dart';
 import '../presentation/widgets/components/cosmic_segmented.dart';
 import '../presentation/widgets/components/glyph.dart';
+import '../presentation/widgets/components/profile_avatar_button.dart';
 import '../redesign/ask/ask_hero.dart';
 import '../redesign/ask/star_typing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -444,6 +445,7 @@ class _AskPageState extends State<AskPage> {
                   if (!keyboardOpen)
                     AskHero(
                       mode: _mode,
+                      summary: context.watch<ActiveProfileProvider>().summary,
                       month: _fMonth,
                       onPickMonth: _pickMonth,
                       partnerName: _partnerName,
@@ -1136,6 +1138,7 @@ class _AskPageState extends State<AskPage> {
                   context,
                 ).push(MaterialPageRoute(builder: (_) => const NotesPage())),
               ),
+            const ProfileAvatarButton(),
           ],
         ),
         body: SafeArea(

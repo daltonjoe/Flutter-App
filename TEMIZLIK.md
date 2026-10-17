@@ -24,3 +24,9 @@ Mevcut koddaki ölü/tekrar/gereksiz parçalar. Silme yalnızca kullanıcı ilgi
 
 - KALAN (kullanılmayan anahtar): locales/*.json → `ask.disclaimer` (8 dil). "Eğlence/öz-yansıtma; sağlık-hukuk-finans tavsiyesi değildir" notunu gösteren widget'lar bu işte kaldırıldı (ask_page.dart composer altı, today_page.dart altı); anahtar/değer locale kuralı gereği silinmedi. Silme adayı.
 
+## Profile + Settings yeniden tasarımı (faz-9a)
+
+- KALAN (kullanılmayan anahtar): locales/*.json → `profile_switcher.add` ("Add new profile", 8 dil). Profil şeridindeki ekleme chip'i artık kısa etiket `profile_switcher.new_short` kullanıyor; uzun varyant kodda okunmuyor. Silme adayı.
+- lib/screens/settings_page.dart:962 — `MISSING TOKENS` yorum satırı artık güncel değil: skeleton rengi `bgSurface` yerine `navyRaised` kullanılıyor, divider token'ı `hairline` olarak uygulandı. Yorum güncellenebilir/silinebilir.
+- KALAN (kullanılmayan anahtar): locales/*.json → `sen.new_profile` (8 dil) kodda okunmuyor (profil ekleme akışı `profile_switcher.new_short`/onboarding rotalarını kullanıyor). Silme adayı.
+
