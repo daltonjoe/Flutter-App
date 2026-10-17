@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'splash_backdrop.dart';
+import 'loading_video.dart';
 import 'splash_clock.dart';
 
 // MainShell üstünde gösterilen tam ekran splash katmanı.
@@ -49,7 +49,7 @@ class _SplashOverlayState extends State<SplashOverlay>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _c,
-      child: const SplashBackdrop(showTexts: true),
+      child: const LoadingVideo(showTexts: true),
       builder: (context, child) {
         if (_c.isCompleted) return const SizedBox.shrink();
         return AbsorbPointer(
