@@ -778,12 +778,13 @@ class _AskPageState extends State<AskPage> {
       texts: m.bubbles!,
       animate: m.animate,
       onAllDone: () => m.animate = false,
-      item: (txt, anim, done, k) => _box(context, txt, anim, done, k),
+      item: (i, txt, anim, done, k) => _box(context, i, txt, anim, done, k),
     );
   }
 
   Widget _box(
     BuildContext context,
+    int index,
     String text,
     bool animate,
     VoidCallback onDone,
@@ -798,7 +799,9 @@ class _AskPageState extends State<AskPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AskStar(size: 14),
+            index == 0
+                ? const AskStar(size: 14)
+                : const SizedBox(width: 14, height: 14),
             const SizedBox(height: AppSpacing.xs),
             ConstrainedBox(
               constraints: BoxConstraints(maxWidth: maxW),
@@ -1336,7 +1339,13 @@ class _BubbleSeq extends StatefulWidget {
   final List<String> texts;
   final bool animate;
   final VoidCallback onAllDone;
-  final Widget Function(String text, bool animate, VoidCallback onDone, Key key)
+  final Widget Function(
+    int index,
+    String text,
+    bool animate,
+    VoidCallback onDone,
+    Key key,
+  )
   item;
   const _BubbleSeq({
     super.key,
@@ -1393,6 +1402,7 @@ class _BubbleSeqState extends State<_BubbleSeq> {
       children: [
         for (var i = 0; i < _shown && i < widget.texts.length; i++)
           widget.item(
+            i,
             widget.texts[i],
             widget.animate && i == _shown - 1,
             _next,
