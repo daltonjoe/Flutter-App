@@ -13,7 +13,6 @@ class PlanetCardViewModel {
     required this.houseNumber,
     required this.degree,
     required this.retrograde,
-    required this.emoji,
   });
 
   final String key;
@@ -27,7 +26,6 @@ class PlanetCardViewModel {
   final int? houseNumber;
   final double degree;
   final bool retrograde;
-  final String emoji;
 
   static const List<String> _order = [
     'Sun',
@@ -41,19 +39,6 @@ class PlanetCardViewModel {
     'Neptune',
     'Pluto',
   ];
-
-  static const Map<String, String> _emojis = {
-    'Sun': '☀️',
-    'Moon': '🌙',
-    'Mercury': '☿',
-    'Venus': '♀',
-    'Mars': '♂',
-    'Jupiter': '♃',
-    'Saturn': '♄',
-    'Uranus': '♅',
-    'Neptune': '♆',
-    'Pluto': '♇',
-  };
 
   static List<PlanetCardViewModel> fromChart(
     NatalChartResponse chart,
@@ -79,7 +64,6 @@ class PlanetCardViewModel {
           houseNumber: (birthTimeKnown && data.house > 0) ? data.house : null,
           degree: data.degreeInSign,
           retrograde: data.retrograde,
-          emoji: _emojis[key] ?? '✦',
         ),
       );
     }

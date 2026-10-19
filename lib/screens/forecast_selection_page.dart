@@ -3,10 +3,11 @@
 
 import 'package:flutter/material.dart';
 import '../models/natal_chart_response.dart';
-import '../theme/app_theme.dart';
+import '../core/theme/cosmic_theme.dart';
 import 'forecast_result_page.dart';
 import '../i18n/app_localizations.dart';
 import '../presentation/widgets/components/cosmic_background.dart';
+import '../presentation/widgets/components/glyph.dart';
 
 class ForecastSelectionPage extends StatelessWidget {
   final NatalChartResponse chartData;
@@ -51,11 +52,11 @@ class ForecastSelectionPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+          iconTheme: const IconThemeData(color: AppColors.starlight),
           title: Text(
             t(context, 'forecast.title'),
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: AppColors.starlight,
               fontSize: 17,
               fontWeight: FontWeight.w700,
             ),
@@ -76,7 +77,7 @@ class ForecastSelectionPage extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   border: Border.all(color: Color(0x4D2D7DF0)),
                 ),
                 child: Row(
@@ -86,10 +87,15 @@ class ForecastSelectionPage extends StatelessWidget {
                       height: 48,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: AppTheme.violetGradient,
+                        gradient: AppGradients.primaryCta,
                       ),
                       child: const Center(
-                        child: Text('☽', style: TextStyle(fontSize: 22)),
+                        child: Glyph(
+                          'moon',
+                          size: 22,
+                          color: AppColors.gold,
+                          decorative: true,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -100,7 +106,7 @@ class ForecastSelectionPage extends StatelessWidget {
                           Text(
                             t(context, 'forecast.custom_forecast'),
                             style: const TextStyle(
-                              color: AppTheme.textPrimary,
+                              color: AppColors.starlight,
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                             ),
@@ -109,7 +115,7 @@ class ForecastSelectionPage extends StatelessWidget {
                           Text(
                             t(context, 'forecast.select_period'),
                             style: const TextStyle(
-                              color: AppTheme.textSecondary,
+                              color: AppColors.mist,
                               fontSize: 12,
                             ),
                           ),
@@ -125,7 +131,7 @@ class ForecastSelectionPage extends StatelessWidget {
               Text(
                 t(context, 'forecast.which_period'),
                 style: const TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: AppColors.starlight,
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.3,
@@ -135,7 +141,7 @@ class ForecastSelectionPage extends StatelessWidget {
               Text(
                 t(context, 'forecast.personalized_notice'),
                 style: const TextStyle(
-                  color: AppTheme.textSecondary,
+                  color: AppColors.mist,
                   fontSize: 13,
                 ),
               ),
@@ -178,8 +184,8 @@ class ForecastSelectionPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: AppTheme.bgCard,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          color: AppColors.navyDeep,
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(color: colors[0].withOpacity(0.25), width: 1),
         ),
         child: Row(
@@ -208,7 +214,7 @@ class ForecastSelectionPage extends StatelessWidget {
                   Text(
                     label,
                     style: const TextStyle(
-                      color: AppTheme.textPrimary,
+                      color: AppColors.starlight,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
@@ -217,7 +223,7 @@ class ForecastSelectionPage extends StatelessWidget {
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      color: AppTheme.textSecondary,
+                      color: AppColors.mist,
                       fontSize: 13,
                     ),
                   ),
@@ -231,7 +237,7 @@ class ForecastSelectionPage extends StatelessWidget {
                   isRtl
                       ? Icons.chevron_left_rounded
                       : Icons.chevron_right_rounded,
-                  color: AppTheme.textMuted,
+                  color: AppColors.mist,
                   size: 24,
                 );
               },

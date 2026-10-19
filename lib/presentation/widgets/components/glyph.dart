@@ -11,9 +11,29 @@ import '../../../core/theme/app_colors.dart';
 
 /// `assets/glyphs/` altında SVG varlığı bulunan glyph anahtarları.
 ///
-/// Boş başlar; ilgili SVG eklenip anahtar buraya yazıldığında [Glyph] o
-/// anahtarı otomatik olarak SVG üzerinden çizer.
-const Set<String> kSvgGlyphs = <String>{};
+/// Listelenen anahtarlar için [Glyph], `assets/glyphs/<anahtar>.svg`
+/// varlığını çizer; listede olmayanlar Unicode/metin yedeğine düşer.
+const Set<String> kSvgGlyphs = <String>{
+  // ── Burçlar ──
+  'aries',
+  'taurus',
+  'gemini',
+  'cancer',
+  'leo',
+  'virgo',
+  'libra',
+  'scorpio',
+  'sagittarius',
+  'capricorn',
+  'aquarius',
+  'pisces',
+  // ── Açılar ──
+  'conjunction',
+  'sextile',
+  'square',
+  'trine',
+  'opposition',
+};
 
 /// Astroloji sembolü gösteren widget.
 ///

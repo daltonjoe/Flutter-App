@@ -5,8 +5,8 @@
 //   • Gold  = value & emphasis.
 // Single source of truth: every raw hex value lives here and nowhere else.
 //
-// NOTE: legacy token names (violetPrimary, roseAccent, …) are kept so the
-// existing screens keep compiling; their VALUES now follow the new system.
+// NOTE: a few legacy aliases remain so existing screens keep compiling;
+// their VALUES follow the new system.
 
 import 'package:flutter/material.dart';
 
@@ -24,11 +24,9 @@ class AppColors {
   static const Color navyRaised = Color(0xFF111C42);
 
   static const Color bgDeep = bgVoid;
-  static const Color bgCard = navyDeep;
   static const Color bgCardTop = navyRaised;
   static const Color bgSurface = navyRaised;
   static const Color bgSurfaceLow = Color(0xFF070B18); // depressed surface
-  static const Color bgSurfaceBright = Color(0xFF1B2856); // elevated surface
 
   // ── Hairlines (white alpha) ─────────────────────────────────────────
   /// white @ 8 % — subtle dividers, default card border.
@@ -53,19 +51,11 @@ class AppColors {
   static const Color goldGlowClear = Color(0x00D9B36A);
 
   // Legacy "violet / primary" names → gold.
-  static const Color violetPrimary = gold;
   static const Color violetSoft = goldSoft;
-  static const Color violetDark = goldDeep;
-  static const Color violetGlow = goldGlow;
 
   // ── Accents / info ──────────────────────────────────────────────────
   /// Secondary interaction only (links, info states).
   static const Color info = Color(0xFF4C8DFF);
-
-  static const Color indigoAccent = info;
-
-  /// WARNING: misleading legacy name — value is GOLD, not rose.
-  static const Color roseAccent = gold;
 
   /// WARNING: misleading legacy name — value is GOLD, not rose.
   static const Color roseSoft = goldSoft;
@@ -95,13 +85,6 @@ class AppColors {
   /// health — sage.
   static const Color themeHealth = Color(0xFFA9C39A);
 
-  // ── Semantic (legacy names remapped) ────────────────────────────────
-  static const Color goldAccent = gold;
-  static const Color amberTransit = Color(0xFFE8B45C);
-  static const Color tealSuccess = statusSupportive;
-  static const Color errorRed = statusDanger;
-  static const Color successGreen = statusSupportive;
-
   // ── Text ────────────────────────────────────────────────────────────
   /// Primary text — contrast ≈ 16.2:1 on [navyDeep].
   static const Color starlight = Color(0xFFEEF1FA);
@@ -113,9 +96,6 @@ class AppColors {
   /// (3.8:1 on [bgVoid]); do not use for body copy.
   static const Color dim = Color(0xFF5E6A8F);
 
-  static const Color textPrimary = starlight;
-  static const Color textSecondary = mist;
-  static const Color textMuted = dim;
   static const Color textDisabled = Color(0xFF39415E);
 
   // ── Borders (pre-alpha-encoded) ─────────────────────────────────────
@@ -130,14 +110,4 @@ class AppColors {
 
   /// danger @ 50 % — validation error borders.
   static const Color borderError = Color(0x80FF6B7A);
-
-  // ── Convenience aliases (keep existing code compiling unchanged) ─────
-  static const Color violet = violetPrimary;
-  static const Color indigo = indigoAccent;
-  static const Color rose = roseAccent;
-  static const Color amber = amberTransit;
-  static const Color teal = tealSuccess;
-  static const Color error = errorRed;
-  static const Color success = successGreen;
-  static const Color warning = goldAccent;
 }

@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import '../models/natal_chart_response.dart';
 import '../providers/language_provider.dart';
 import '../services/astro_service.dart';
-import '../theme/app_theme.dart';
+import '../core/theme/cosmic_theme.dart';
+import '../presentation/widgets/components/glyph.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
 import '../presentation/widgets/components/cosmic_background.dart';
 import '../i18n/app_localizations.dart';
@@ -158,7 +159,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
             // ── Header ─────────────────────────────────────────────
             SliverAppBar(
               pinned: true,
-              backgroundColor: AppTheme.bgDeep,
+              backgroundColor: AppColors.bgDeep,
               iconTheme: const IconThemeData(color: AppColors.starlight),
               title: Text(
                 t(
@@ -221,7 +222,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
 
     return Container(
       padding: const EdgeInsets.all(24),
-      decoration: cosmicCard(
+      decoration: AppDecorations.cosmicCard(
         gradient: const LinearGradient(
           colors: [Color(0xFF12306E), Color(0xFF081330)],
           begin: Alignment.topLeft,
@@ -279,10 +280,34 @@ class _NatalReportPageState extends State<NatalReportPage> {
               runSpacing: 10,
               children: [
                 // ── FIX: Translate sign names from backend (always TR) ─
-                _heroChip('☀️', _translateSign(summary.sunSign)),
+                _heroChip(
+                  Glyph(
+                    'sun',
+                    size: 14,
+                    color: AppColors.gold,
+                    semanticLabel: t(context, 'chart.sun'),
+                  ),
+                  _translateSign(summary.sunSign),
+                ),
                 if (birthTimeKnown)
-                  _heroChip('🌙', _translateSign(summary.moonSign)),
-                _heroChip('⬆️', _translateSign(summary.ascendantSign)),
+                  _heroChip(
+                    Glyph(
+                      'moon',
+                      size: 14,
+                      color: AppColors.gold,
+                      semanticLabel: t(context, 'chart.moon'),
+                    ),
+                    _translateSign(summary.moonSign),
+                  ),
+                _heroChip(
+                  Glyph(
+                    'asc',
+                    size: 22,
+                    color: AppColors.gold,
+                    semanticLabel: t(context, 'chart.ascendant'),
+                  ),
+                  _translateSign(summary.ascendantSign),
+                ),
               ],
             ),
           ],
@@ -298,7 +323,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
     return t(context, key);
   }
 
-  Widget _heroChip(String emoji, String label) {
+  Widget _heroChip(Widget icon, String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -309,7 +334,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 14)),
+          icon,
           const SizedBox(width: 6),
           Text(
             label,
@@ -354,13 +379,13 @@ class _NatalReportPageState extends State<NatalReportPage> {
     if (t.contains('ay') || t.contains('moon')) return Colors.blueGrey;
     if (t.contains('aşk') || t.contains('love')) return Colors.pink;
     if (t.contains('kariyer') || t.contains('career')) return Colors.blue;
-    return AppTheme.violet;
+    return AppColors.gold;
   }
 
   Widget _buildFooter() {
     return Column(
       children: [
-        const Divider(color: AppTheme.bgSurface, height: 60),
+        const Divider(color: AppColors.bgSurface, height: 60),
         // ── FIX: Footer text localized ──────────────────────────────
         Text(
           t(context, 'natal_report.footer_tagline'),
@@ -401,14 +426,17 @@ class _ErrorView extends StatelessWidget {
           children: [
             const Icon(
               Icons.error_outline_rounded,
-              color: AppTheme.error,
+              color: AppColors.statusDanger,
               size: 48,
             ),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppTheme.error, fontSize: 14),
+              style: const TextStyle(
+                color: AppColors.statusDanger,
+                fontSize: 14,
+              ),
             ),
             const SizedBox(height: 24),
             GestureDetector(
@@ -428,7 +456,7 @@ class _ErrorView extends StatelessWidget {
                   children: [
                     const Icon(
                       Icons.refresh_rounded,
-                      color: AppTheme.violet,
+                      color: AppColors.gold,
                       size: 16,
                     ),
                     const SizedBox(width: 8),
@@ -438,7 +466,7 @@ class _ErrorView extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: AppTheme.violet,
+                          color: AppColors.gold,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

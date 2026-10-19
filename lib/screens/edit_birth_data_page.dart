@@ -298,7 +298,7 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
                                   child: Text(
                                     t(context, 'birth_time.error'),
                                     style: const TextStyle(
-                                      color: AppColors.errorRed,
+                                      color: AppColors.statusDanger,
                                     ),
                                   ),
                                 ),

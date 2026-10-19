@@ -22,11 +22,11 @@ class _StreakPageState extends State<StreakPage> {
   List<Checkin> _checkins = const [];
 
   static const Map<int, Color> _moodColors = {
-    1: AppColors.roseAccent,
-    2: AppColors.amberTransit,
-    3: AppColors.textMuted,
-    4: AppColors.tealSuccess,
-    5: AppColors.goldAccent,
+    1: AppColors.gold,
+    2: AppColors.statusChallenging,
+    3: AppColors.mist,
+    4: AppColors.statusSupportive,
+    5: AppColors.gold,
   };
 
   @override
@@ -78,12 +78,12 @@ class _StreakPageState extends State<StreakPage> {
             ],
           ),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+            icon: const Icon(Icons.arrow_back, color: AppColors.starlight),
             onPressed: () => Navigator.of(context).maybePop(),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.refresh, color: AppColors.textPrimary),
+              icon: const Icon(Icons.refresh, color: AppColors.starlight),
               onPressed: _loading ? null : _load,
             ),
           ],
@@ -107,12 +107,12 @@ class _StreakPageState extends State<StreakPage> {
               const Icon(
                 Icons.error_outline,
                 size: 40,
-                color: AppColors.errorRed,
+                color: AppColors.statusDanger,
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 t(context, 'today.error'),
-                style: AppTextStyles.h3(color: AppColors.errorRed),
+                style: AppTextStyles.h3(color: AppColors.statusDanger),
               ),
               const SizedBox(height: AppSpacing.xs),
               Row(
@@ -175,7 +175,7 @@ class _StreakPageState extends State<StreakPage> {
                 const Icon(
                   Icons.calendar_today,
                   size: 40,
-                  color: AppColors.textMuted,
+                  color: AppColors.mist,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Row(
@@ -187,7 +187,7 @@ class _StreakPageState extends State<StreakPage> {
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.bodyMd(
-                          color: AppColors.textSecondary,
+                          color: AppColors.mist,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -220,8 +220,8 @@ class _StreakPageState extends State<StreakPage> {
                 current.toString(),
                 style: AppTextStyles.heroTitle(
                   color: current > 0
-                      ? AppColors.violetPrimary
-                      : AppColors.textMuted,
+                      ? AppColors.gold
+                      : AppColors.mist,
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -250,7 +250,7 @@ class _StreakPageState extends State<StreakPage> {
                   Icon(
                     Icons.auto_awesome,
                     size: 16,
-                    color: AppColors.goldAccent,
+                    color: AppColors.gold,
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Flexible(
@@ -332,7 +332,7 @@ class _StreakPageState extends State<StreakPage> {
               final isToday = d == todayStripped;
               final bgColor = mood == null
                   ? AppColors.bgSurface
-                  : _moodColors[mood] ?? AppColors.textMuted;
+                  : _moodColors[mood] ?? AppColors.mist;
               final borderColor = mood == null
                   ? AppColors.borderSubtle
                   : (mood == 3
@@ -352,7 +352,7 @@ class _StreakPageState extends State<StreakPage> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isToday
-                              ? AppColors.violetPrimary
+                              ? AppColors.gold
                               : borderColor,
                           width: isToday ? 1.5 : 1.0,
                         ),

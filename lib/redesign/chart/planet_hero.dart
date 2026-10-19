@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_typography.dart';
 import '../../models/natal_chart_response.dart';
+import '../../presentation/widgets/components/planet_glyph_icon.dart';
 import '../../services/reference_names_service.dart';
 import '../assets_map.dart';
 import '../data/planet_card_view_model.dart';
@@ -191,15 +191,19 @@ class _PlanetHeroState extends State<PlanetHero>
     );
   }
 
-  /// Gezegen görseli; asset yüklenemezse emoji'ye düşer.
+  /// Gezegen görseli; asset yüklenemezse gezegen glyph'ine düşer.
   Widget _planetImage(PlanetCardViewModel item, {Key? key}) {
     return Image.asset(
       RdAssets.planetImage(item.key),
       key: key,
       height: 220,
       fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) =>
-          Text(item.emoji, style: AppTextStyles.displayLarge()),
+      errorBuilder: (context, error, stackTrace) => PlanetGlyphIcon(
+        name: item.key.toLowerCase(),
+        size: 28,
+        color: AppColors.mist,
+        semanticLabel: item.name,
+      ),
     );
   }
 }

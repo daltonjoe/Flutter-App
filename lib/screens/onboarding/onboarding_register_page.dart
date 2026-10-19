@@ -92,12 +92,12 @@ class _OnboardingRegisterPageState extends State<OnboardingRegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    final link = AppTextStyles.bodyMd(color: AppColors.textPrimary).copyWith(
+    final link = AppTextStyles.bodyMd(color: AppColors.starlight).copyWith(
       decoration: TextDecoration.underline,
       fontWeight: FontWeight.bold,
     );
-    final subtitle = AppTextStyles.bodyMd(color: AppColors.textSecondary);
-    final plain = AppTextStyles.bodyMd(color: AppColors.textMuted);
+    final subtitle = AppTextStyles.bodyMd(color: AppColors.mist);
+    final plain = AppTextStyles.bodyMd(color: AppColors.mist);
     final btn = TextButton.styleFrom(minimumSize: const Size(48, 48));
     final double hPad = AppSpacing.screenH + AppSpacing.lg;
     return Scaffold(
@@ -141,7 +141,7 @@ class _OnboardingRegisterPageState extends State<OnboardingRegisterPage> {
                             leading: const Icon(
                               Icons.mail_outline,
                               size: 22,
-                              color: AppColors.textPrimary,
+                              color: AppColors.starlight,
                             ),
                             label: t(context, "onboarding.register.email"),
                             onTap: _busy
@@ -165,7 +165,7 @@ class _OnboardingRegisterPageState extends State<OnboardingRegisterPage> {
                             leading: const Icon(
                               Icons.apple,
                               size: 22,
-                              color: AppColors.textPrimary,
+                              color: AppColors.starlight,
                             ),
                             label: t(context, "onboarding.register.apple"),
                             onTap: _busy

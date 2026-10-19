@@ -41,7 +41,7 @@ class AppGradients {
   // ── Card / surface gradients ─────────────────────────────────────────
   /// Cosmic card: raised navy top → deep navy base.
   static const LinearGradient cosmicCard = LinearGradient(
-    colors: [AppColors.bgCardTop, AppColors.bgCard],
+    colors: [AppColors.bgCardTop, AppColors.navyDeep],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import '../theme/app_theme.dart';
+import '../core/theme/cosmic_theme.dart';
 
 class LanguageSwitcher extends StatelessWidget {
   const LanguageSwitcher({super.key});
@@ -18,15 +18,15 @@ class LanguageSwitcher extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: AppTheme.bgCard.withOpacity(0.8),
+          color: AppColors.navyDeep.withOpacity(0.8),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: AppTheme.violet.withOpacity(0.4),
+            color: AppColors.gold.withOpacity(0.4),
             width: 1.2,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.violet.withOpacity(0.1),
+              color: AppColors.gold.withOpacity(0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -38,13 +38,13 @@ class LanguageSwitcher extends StatelessWidget {
             Icon(
               Icons.language_rounded,
               size: 16,
-              color: AppTheme.violet.withOpacity(0.9),
+              color: AppColors.gold.withOpacity(0.9),
             ),
             const SizedBox(width: 8),
             Text(
               isTR ? 'TR' : 'EN',
               style: const TextStyle(
-                color: AppTheme.textPrimary,
+                color: AppColors.starlight,
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.5,

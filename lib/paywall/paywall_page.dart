@@ -240,7 +240,7 @@ class _PaywallPageState extends State<PaywallPage>
         surfaceTintColor: Colors.transparent,
         actions: [
           IconButton(
-            icon: const Icon(Icons.close, color: AppColors.textSecondary),
+            icon: const Icon(Icons.close, color: AppColors.mist),
             onPressed: _busy ? null : _leave,
           ),
         ],
@@ -269,7 +269,7 @@ class _PaywallPageState extends State<PaywallPage>
                               _t("paywall.title"),
                               textAlign: TextAlign.center,
                               style: AppTextStyles.h1(
-                                color: AppColors.textPrimary,
+                                color: AppColors.starlight,
                               ),
                             ),
                             const SizedBox(height: AppSpacing.xl * 1.5),
@@ -321,7 +321,7 @@ class _PaywallPageState extends State<PaywallPage>
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Text(
                         _t(_errKey!),
-                        style: const TextStyle(color: AppColors.errorRed),
+                        style: const TextStyle(color: AppColors.statusDanger),
                       ),
                     ),
                   Text(
@@ -329,7 +329,7 @@ class _PaywallPageState extends State<PaywallPage>
                       _selIdx == 0 ? yd : (_selIdx == 1 ? md : null),
                     ),
                     textAlign: TextAlign.center,
-                    style: AppTextStyles.bodySm(color: AppColors.textMuted),
+                    style: AppTextStyles.bodySm(color: AppColors.mist),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   _buildCtaButton(),
@@ -370,10 +370,10 @@ class _PaywallPageState extends State<PaywallPage>
               vertical: AppSpacing.lg,
             ),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: AppColors.navyDeep,
               borderRadius: BorderRadius.circular(AppRadius.md),
               border: Border.all(
-                color: isSel ? AppColors.violetPrimary : AppColors.borderSubtle,
+                color: isSel ? AppColors.gold : AppColors.borderSubtle,
                 width: isSel ? 2 : 1,
               ),
             ),
@@ -389,13 +389,13 @@ class _PaywallPageState extends State<PaywallPage>
                           child: Text(
                             trial,
                             style: AppTextStyles.bodyXs(
-                              color: AppColors.textSecondary,
+                              color: AppColors.mist,
                             ).copyWith(fontWeight: FontWeight.w500),
                           ),
                         ),
                       Text(
                         label,
-                        style: AppTextStyles.h3(color: AppColors.textPrimary),
+                        style: AppTextStyles.h3(color: AppColors.starlight),
                       ),
                     ],
                   ),
@@ -403,7 +403,7 @@ class _PaywallPageState extends State<PaywallPage>
                 Text(
                   price,
                   style: AppTextStyles.bodyMd(
-                    color: AppColors.textPrimary,
+                    color: AppColors.starlight,
                   ).copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -431,15 +431,15 @@ class _PaywallPageState extends State<PaywallPage>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: active ? null : AppColors.roseAccent,
+              color: active ? null : AppColors.gold,
               gradient: active
                   ? LinearGradient(
                       begin: Alignment(-1.5 + 3.0 * v, -1.0),
                       end: Alignment(-0.5 + 3.0 * v, 1.0),
                       colors: const [
-                        AppColors.roseAccent,
+                        AppColors.gold,
                         AppColors.roseSoft,
-                        AppColors.roseAccent,
+                        AppColors.gold,
                       ],
                       stops: const [0.25, 0.5, 0.75],
                     )
@@ -447,7 +447,7 @@ class _PaywallPageState extends State<PaywallPage>
               borderRadius: BorderRadius.circular(AppRadius.pill),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.roseAccent.withValues(
+                  color: AppColors.gold.withValues(
                     alpha: 0.30 + 0.40 * v,
                   ),
                   blurRadius: 8 + 14 * v,
@@ -475,9 +475,9 @@ class _PaywallPageState extends State<PaywallPage>
       height: 24,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: sel ? AppColors.violetPrimary : Colors.transparent,
+        color: sel ? AppColors.gold : Colors.transparent,
         border: Border.all(
-          color: sel ? AppColors.violetPrimary : AppColors.textMuted,
+          color: sel ? AppColors.gold : AppColors.mist,
           width: 2,
         ),
       ),
@@ -551,7 +551,7 @@ class _PaywallPageState extends State<PaywallPage>
       onTap: onTap,
       child: Text(
         text,
-        style: AppTextStyles.bodySm(color: AppColors.textMuted),
+        style: AppTextStyles.bodySm(color: AppColors.mist),
       ),
     );
   }
@@ -559,7 +559,7 @@ class _PaywallPageState extends State<PaywallPage>
   Widget _dot() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Text("•", style: TextStyle(color: AppColors.textMuted)),
+      child: Text("•", style: TextStyle(color: AppColors.mist)),
     );
   }
 }

@@ -32,7 +32,7 @@ class NavBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: AppColors.errorRed,
+        color: AppColors.statusDanger,
         borderRadius: AppRadius.pillBr,
       ),
       child: Text(

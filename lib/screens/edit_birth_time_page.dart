@@ -78,11 +78,11 @@ class _EditBirthTimePageState extends State<EditBirthTimePage> {
       backgroundColor: AppColors.bgDeep,
       appBar: AppBar(
         backgroundColor: AppColors.bgDeep,
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        iconTheme: const IconThemeData(color: AppColors.starlight),
         title: Text(
           _t('birth_time.title'),
           style: const TextStyle(
-            color: AppColors.textPrimary,
+            color: AppColors.starlight,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -98,7 +98,7 @@ class _EditBirthTimePageState extends State<EditBirthTimePage> {
               Text(
                 _t('birth_time.hint'),
                 style: const TextStyle(
-                  color: AppColors.textSecondary,
+                  color: AppColors.mist,
                   fontSize: 14,
                   height: 1.5,
                 ),
@@ -117,7 +117,7 @@ class _EditBirthTimePageState extends State<EditBirthTimePage> {
                     children: [
                       const Icon(
                         Icons.access_time,
-                        color: AppColors.violetPrimary,
+                        color: AppColors.gold,
                         size: 28,
                       ),
                       const SizedBox(width: AppSpacing.md),
@@ -128,8 +128,8 @@ class _EditBirthTimePageState extends State<EditBirthTimePage> {
                               : _format(_selectedTime!),
                           style: TextStyle(
                             color: _selectedTime == null
-                                ? AppColors.textMuted
-                                : AppColors.textPrimary,
+                                ? AppColors.mist
+                                : AppColors.starlight,
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                           ),
@@ -137,7 +137,7 @@ class _EditBirthTimePageState extends State<EditBirthTimePage> {
                       ),
                       const Icon(
                         Icons.chevron_right,
-                        color: AppColors.textMuted,
+                        color: AppColors.mist,
                       ),
                     ],
                   ),
@@ -152,7 +152,7 @@ class _EditBirthTimePageState extends State<EditBirthTimePage> {
                     children: [
                       const Icon(
                         Icons.error_outline,
-                        color: AppColors.errorRed,
+                        color: AppColors.statusDanger,
                         size: 20,
                       ),
                       const SizedBox(width: AppSpacing.sm),
@@ -160,7 +160,7 @@ class _EditBirthTimePageState extends State<EditBirthTimePage> {
                         child: Text(
                           _t('birth_time.error'),
                           style: const TextStyle(
-                            color: AppColors.errorRed,
+                            color: AppColors.statusDanger,
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),

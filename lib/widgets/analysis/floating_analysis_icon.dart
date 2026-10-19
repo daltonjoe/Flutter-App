@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_theme.dart';
+import '../../core/theme/cosmic_theme.dart';
 
 /// A widget that displays a zodiac or planet icon with a subtle floating and rotating animation.
 class FloatingAnalysisIcon extends StatefulWidget {
@@ -61,10 +61,10 @@ class _FloatingAnalysisIconState extends State<FloatingAnalysisIcon>
               height: widget.size,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: (widget.color ?? AppTheme.violet).withOpacity(0.1),
+                color: (widget.color ?? AppColors.gold).withOpacity(0.1),
                 boxShadow: [
                   BoxShadow(
-                    color: (widget.color ?? AppTheme.violet).withOpacity(0.2),
+                    color: (widget.color ?? AppColors.gold).withOpacity(0.2),
                     blurRadius: 15,
                     spreadRadius: 2,
                   ),

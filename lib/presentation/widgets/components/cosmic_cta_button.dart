@@ -79,7 +79,7 @@ class CosmicCtaButton extends StatelessWidget {
         child: CircularProgressIndicator(
           strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation<Color>(
-            disabled ? AppColors.textMuted : AppColors.onGold,
+            disabled ? AppColors.mist : AppColors.onGold,
           ),
         ),
       );

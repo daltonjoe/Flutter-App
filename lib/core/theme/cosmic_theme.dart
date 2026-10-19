@@ -28,10 +28,10 @@ class CosmicTheme {
 
         // Base color scheme mapping
         colorScheme: const ColorScheme.dark(
-          primary: AppColors.violetPrimary,
-          secondary: AppColors.roseAccent,
-          surface: AppColors.bgCard,
-          error: AppColors.errorRed,
+          primary: AppColors.gold,
+          secondary: AppColors.gold,
+          surface: AppColors.navyDeep,
+          error: AppColors.statusDanger,
         ),
 
         // App bar
@@ -39,7 +39,7 @@ class CosmicTheme {
           backgroundColor: AppColors.bgDeep,
           elevation: 0,
           titleTextStyle: AppTextStyles.appBarTitle(),
-          iconTheme: const IconThemeData(color: AppColors.textPrimary),
+          iconTheme: const IconThemeData(color: AppColors.starlight),
         ),
 
         // Text theme uses our GoogleFonts-ready text styles

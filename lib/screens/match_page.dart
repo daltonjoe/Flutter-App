@@ -18,8 +18,14 @@ import '../widgets/ask_add.dart'
     show addToAsk, askAbout, askBridge, askBridgeOn;
 import '../services/user_settings_service.dart';
 import '../core/match_weights.dart';
+import '../core/reference_ids.dart';
+import '../core/constants/astro_glyphs.dart';
 import 'edit_birth_data_page.dart';
 import '../presentation/widgets/components/cosmic_background.dart';
+import '../presentation/widgets/components/glyph.dart';
+import '../presentation/widgets/components/planet_glyph_icon.dart';
+import '../presentation/widgets/components/cosmic_chip.dart';
+import '../presentation/widgets/components/overline_text.dart';
 
 class _ProfileEntry {
   final String id;
@@ -248,7 +254,7 @@ class _MatchPageState extends State<MatchPage> {
       // Alt navigasyon çubuğunun üstünde açılsın: sekmenin yerel navigator'ı
       // çubuğun altında kaldığı için en alttaki profil seçilemiyordu.
       useRootNavigator: true,
-      backgroundColor: AppColors.bgCard,
+      backgroundColor: AppColors.navyDeep,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
       ),
@@ -304,7 +310,7 @@ class _MatchPageState extends State<MatchPage> {
                       shrinkWrap: true,
                       physics: const AlwaysScrollableScrollPhysics(),
                       itemCount: options.length,
-                      separatorBuilder: (_, i) =>
+                      separatorBuilder: (_, __) =>
                           const SizedBox(height: AppSpacing.xs),
                       itemBuilder: (_, i) {
                         final p = options[i];
@@ -426,12 +432,12 @@ class _MatchPageState extends State<MatchPage> {
             ],
           ),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+            icon: const Icon(Icons.arrow_back, color: AppColors.starlight),
             onPressed: () => Navigator.of(context).maybePop(),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.refresh, color: AppColors.textPrimary),
+              icon: const Icon(Icons.refresh, color: AppColors.starlight),
               onPressed: () {
                 final a = _profileA;
                 final b = _profileB;
@@ -468,7 +474,7 @@ class _MatchPageState extends State<MatchPage> {
                         Icon(
                           Icons.favorite_border,
                           size: 20,
-                          color: AppColors.violetPrimary,
+                          color: AppColors.gold,
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         _selector(isA: false),
@@ -595,7 +601,7 @@ class _MatchPageState extends State<MatchPage> {
               text,
               maxLines: 4,
               overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.bodyMd(color: AppColors.textSecondary),
+              style: AppTextStyles.bodyMd(color: AppColors.mist),
             ),
           ),
         ],
@@ -616,7 +622,7 @@ class _MatchPageState extends State<MatchPage> {
                   t(context, 'match.error'),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.h3(color: AppColors.errorRed),
+                  style: AppTextStyles.h3(color: AppColors.statusDanger),
                 ),
               ),
             ],
@@ -666,8 +672,8 @@ class _MatchPageState extends State<MatchPage> {
     final bB = svc.planet(a.bodyBId);
     final asp = svc.aspect(a.aspectTypeId);
     final tight = a.tightness < 0.25;
-    final accent = tight ? AppColors.goldAccent : AppColors.textPrimary;
-    final muted = tight ? AppColors.goldAccent : AppColors.textSecondary;
+    final accent = tight ? AppColors.gold : AppColors.starlight;
+    final muted = tight ? AppColors.gold : AppColors.mist;
     final orbStr = a.orb.toStringAsFixed(1);
     final hasText = text != null && text.isNotEmpty;
     return Padding(
@@ -738,7 +744,7 @@ class _MatchPageState extends State<MatchPage> {
                             icon: const Icon(
                               Icons.auto_awesome_outlined,
                               size: 18,
-                              color: AppColors.violetPrimary,
+                              color: AppColors.gold,
                             ),
                             onPressed: () => _addAspect(a),
                           )
@@ -758,7 +764,7 @@ class _MatchPageState extends State<MatchPage> {
               ),
               child: Text(
                 text,
-                style: AppTextStyles.bodySm(color: AppColors.textSecondary),
+                style: AppTextStyles.bodySm(color: AppColors.mist),
               ),
             ),
         ],
@@ -794,15 +800,86 @@ class _MatchPageState extends State<MatchPage> {
     return null;
   }
 
-  Widget _signCell(int? id, bool show, String? pid) {
-    if (show && id != null) {
-      return Text(
-        ReferenceNamesService.instance.sign(id),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: AppTextStyles.bodyMd(color: AppColors.textPrimary),
-      );
-    }
+  // B1: id → glyph anahtarı çeviricileri (bilinmeyen id'de null döner).
+  static const List<String> _planetGlyphKeys = <String>[
+    'sun',
+    'moon',
+    'mercury',
+    'venus',
+    'mars',
+    'jupiter',
+    'saturn',
+    'uranus',
+    'neptune',
+    'pluto',
+  ];
+
+  static const Map<int, String> _aspectGlyphKeys = <int, String>{
+    1: 'conjunction',
+    2: 'sextile',
+    3: 'square',
+    4: 'trine',
+    5: 'opposition',
+  };
+
+  static String? _signGlyphKey(int? signId) {
+    final i = RefIds.signIndex(signId);
+    return i == null ? null : RefIds.signCode(i);
+  }
+
+  static String? _planetGlyphKey(int planetId) =>
+      (planetId >= 1 && planetId <= _planetGlyphKeys.length)
+      ? _planetGlyphKeys[planetId - 1]
+      : null;
+
+  static String? _aspectGlyphKey(int aspectTypeId) =>
+      _aspectGlyphKeys[aspectTypeId];
+
+  // B2: gezegen + açı + gezegen glyph üçlüsü; bilinmeyen id'de metne düşer.
+  Widget _aspectTrio(int a, int asp, int b, double size) {
+    final svc = ReferenceNamesService.instance;
+    final ka = _planetGlyphKey(a);
+    final kb = _planetGlyphKey(b);
+    final kAspect = _aspectGlyphKey(asp);
+    Widget planet(int id, String? key) => key == null
+        ? Text(
+            svc.planet(id),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodySm(color: AppColors.starlight),
+          )
+        : PlanetGlyphIcon(
+            name: key,
+            size: size,
+            color: AppColors.starlight,
+            decorative: true,
+          );
+    final aspect = kAspect == null
+        ? Text(
+            svc.aspect(asp),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodySm(color: AppColors.mist),
+          )
+        : Glyph(
+            kAspect,
+            size: size,
+            color: AstroGlyphs.aspectColorFor(kAspect) ?? AppColors.mist,
+            decorative: true,
+          );
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        planet(a, ka),
+        const SizedBox(width: AppSpacing.xs),
+        aspect,
+        const SizedBox(width: AppSpacing.xs),
+        planet(b, kb),
+      ],
+    );
+  }
+
+  Widget _signCell(String? pid) {
     return InkWell(
       onTap: pid == null
           ? null
@@ -827,12 +904,59 @@ class _MatchPageState extends State<MatchPage> {
             t(context, 'match.add_time'),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.bodySm(color: AppColors.goldAccent),
+            style: AppTextStyles.bodySm(color: AppColors.gold),
           ),
         ),
       ),
     );
   }
+
+  // B3: burç satırı — glyph (element rengi) + rol etiketi + burç adı.
+  Widget _signLine(int? signId, String roleKey) {
+    final key = _signGlyphKey(signId);
+    final name = signId == null
+        ? ''
+        : ReferenceNamesService.instance.sign(signId);
+    return Row(
+      children: [
+        if (key != null) ...[
+          Glyph(
+            key,
+            size: 20,
+            color: AstroGlyphs.elementColorFor(key) ?? AppColors.starlight,
+            decorative: true,
+          ),
+          const SizedBox(width: AppSpacing.xs),
+        ],
+        OverlineText(t(context, roleKey)),
+        const SizedBox(width: AppSpacing.xs),
+        Flexible(
+          child: Text(
+            name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodyMd(color: AppColors.starlight),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // B3: doğum saati bilinmeyen profilde yükselen satırı yerine mercan rozet.
+  Widget _unknownTimeBadge() => Container(
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+    decoration: BoxDecoration(
+      color: AppColors.statusChallenging.withValues(alpha: 0.14),
+      borderRadius: AppRadius.smBr,
+      border: Border.all(color: AppColors.statusChallenging),
+    ),
+    child: Text(
+      t(context, 'match.time_badge.unknown'),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: AppTextStyles.bodyXs(color: AppColors.statusChallenging),
+    ),
+  );
 
   Widget _v2Body(MatchResult r, List<MatchAspect> all, bool note) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -843,25 +967,100 @@ class _MatchPageState extends State<MatchPage> {
     ],
   );
 
-  String _heroLine(List<WeightedAspect> top) {
-    if (top.isEmpty) return '';
-    final s =
-        _texts[MatchService.textKey(top.first.a, top.first.b, top.first.asp)] ??
-        '';
-    final m = RegExp(r'[.!?](\s|$)').firstMatch(s);
-    return (m == null ? s : s.substring(0, m.start + 1)).trim();
+  // B5: akış/sürtünme dengesi — power akış, pressure/trouble sürtünme;
+  // neutral hesaba girmez. Toplam 0 ise değer 0'dır.
+  double _flowValue(List<WeightedAspect> w) {
+    var flow = 0.0, friction = 0.0;
+    for (final x in w) {
+      final m = MatchService.meta[MatchService.textKey(x.a, x.b, x.asp)];
+      if (m == null) continue;
+      final p = x.w * m.intensity;
+      if (m.valence == 'power') {
+        flow += p;
+      } else if (m.valence == 'pressure' || m.valence == 'trouble') {
+        friction += p;
+      }
+    }
+    final total = flow + friction;
+    return total == 0 ? 0.0 : (flow - friction) / total;
+  }
+
+  Widget _flowBar(double v) {
+    final positive = v >= 0;
+    final color = positive
+        ? AppColors.statusSupportive
+        : AppColors.statusChallenging;
+    final mag = v.abs().clamp(0.0, 1.0);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          height: 8,
+          child: LayoutBuilder(
+            builder: (ctx, c) {
+              final half = c.maxWidth / 2;
+              final fill = half * mag;
+              return Stack(
+                children: [
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.navyRaised,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: positive ? half : half - fill,
+                    top: 0,
+                    bottom: 0,
+                    width: fill,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: half - 0.5,
+                    top: 0,
+                    bottom: 0,
+                    width: 1,
+                    child: const ColoredBox(color: AppColors.hairline),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              t(context, 'match.friction'),
+              style: AppTextStyles.overline(color: AppColors.mist),
+            ),
+            Text(
+              t(context, 'match.flow'),
+              style: AppTextStyles.overline(color: AppColors.mist),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Color _valColor(String v) {
     switch (v) {
       case 'power':
-        return AppColors.tealSuccess;
+        return AppColors.statusSupportive;
       case 'pressure':
-        return AppColors.amberTransit;
       case 'trouble':
-        return AppColors.roseAccent;
+        return AppColors.statusChallenging;
       default:
-        return AppColors.goldAccent;
+        return AppColors.statusNeutral;
     }
   }
 
@@ -906,7 +1105,7 @@ class _MatchPageState extends State<MatchPage> {
                   const Icon(
                     Icons.auto_awesome_outlined,
                     size: 16,
-                    color: AppColors.violetPrimary,
+                    color: AppColors.gold,
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Expanded(
@@ -914,9 +1113,7 @@ class _MatchPageState extends State<MatchPage> {
                       t(ctx, 'match.ask.cta'),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.bodySm(
-                        color: AppColors.violetPrimary,
-                      ),
+                      style: AppTextStyles.bodySm(color: AppColors.gold),
                     ),
                   ),
                 ],
@@ -931,19 +1128,7 @@ class _MatchPageState extends State<MatchPage> {
                     'match.ask.q2',
                     'match.ask.q3',
                   ])
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(minHeight: 44),
-                      child: ActionChip(
-                        label: Text(
-                          t(ctx, q),
-                          softWrap: true,
-                          style: AppTextStyles.bodySm(
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        onPressed: () => _askSyn(x, q),
-                      ),
-                    ),
+                    CosmicChip(label: t(ctx, q), onTap: () => _askSyn(x, q)),
                 ],
               ),
             ],
@@ -991,17 +1176,10 @@ class _MatchPageState extends State<MatchPage> {
           for (final k in chipKeys)
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.xs),
-              child: ChoiceChip(
-                label: Text(
-                  chipLabel(k),
-                  style: AppTextStyles.bodySm(color: AppColors.textPrimary),
-                ),
+              child: CosmicChip(
+                label: chipLabel(k),
                 selected: _filter == k,
-                selectedColor: AppColors.violetPrimary,
-                onSelected: (_) {
-                  HapticFeedback.selectionClick();
-                  setState(() => _filter = k);
-                },
+                onTap: () => setState(() => _filter = k),
               ),
             ),
         ],
@@ -1041,12 +1219,14 @@ class _MatchPageState extends State<MatchPage> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
+                  _aspectTrio(x.a, x.asp, x.b, 16),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       '${svc.planet(x.a)} ${svc.aspect(x.asp)} ${svc.planet(x.b)}',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.bodyMd(color: AppColors.textPrimary),
+                      style: AppTextStyles.bodyMd(color: AppColors.starlight),
                     ),
                   ),
                 ],
@@ -1066,7 +1246,7 @@ class _MatchPageState extends State<MatchPage> {
               children: [
                 Text(
                   _texts[keyOf(x)] ?? '',
-                  style: AppTextStyles.bodyMd(color: AppColors.textSecondary),
+                  style: AppTextStyles.bodyMd(color: AppColors.mist),
                 ),
                 _askBlock(x),
               ],
@@ -1120,18 +1300,19 @@ class _MatchPageState extends State<MatchPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            p?.displayName ?? '',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.h3(),
-          ),
+          OverlineText(p?.displayName ?? ''),
           const SizedBox(height: AppSpacing.xs),
-          _signCell(p?.sunId, true, p?.id),
+          _signLine(p?.sunId, 'chart.sun'),
           const SizedBox(height: AppSpacing.xs),
-          _signCell(p?.moonId, known, p?.id),
-          const SizedBox(height: AppSpacing.xs),
-          _signCell(p?.ascId, known, p?.id),
+          if (known) ...[
+            _signLine(p?.moonId, 'chart.moon'),
+            const SizedBox(height: AppSpacing.xs),
+            _signLine(p?.ascId, 'chart.ascendant'),
+          ] else ...[
+            _signCell(p?.id),
+            const SizedBox(height: AppSpacing.xs),
+            _unknownTimeBadge(),
+          ],
         ],
       ),
     );
@@ -1159,15 +1340,8 @@ class _MatchPageState extends State<MatchPage> {
             overflow: TextOverflow.ellipsis,
             style: AppTextStyles.h1(),
           ),
-          if (_heroLine(top).isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              _heroLine(top),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.bodyMd(color: AppColors.textSecondary),
-            ),
-          ],
+          const SizedBox(height: AppSpacing.md),
+          _flowBar(_flowValue(w)),
           const SizedBox(height: AppSpacing.md),
         ],
         Container(
@@ -1202,18 +1376,24 @@ class _MatchPageState extends State<MatchPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${svc.planet(x.a)} ${svc.aspect(x.asp)} ${svc.planet(x.b)}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.bodyLg(color: AppColors.goldAccent),
+                    Row(
+                      children: [
+                        _aspectTrio(x.a, x.asp, x.b, 20),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(
+                            '${svc.planet(x.a)} ${svc.aspect(x.asp)} ${svc.planet(x.b)}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.bodyLg(color: AppColors.gold),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       _texts[MatchService.textKey(x.a, x.b, x.asp)] ?? '',
-                      style: AppTextStyles.bodyMd(
-                        color: AppColors.textSecondary,
-                      ),
+                      style: AppTextStyles.bodyMd(color: AppColors.mist),
                     ),
                   ],
                 ),

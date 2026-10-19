@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../models/natal_chart_response.dart';
 import '../providers/language_provider.dart';
 import '../services/astro_service.dart';
-import '../theme/app_theme.dart';
+import '../core/theme/cosmic_theme.dart';
 import '../presentation/widgets/components/cosmic_loader.dart';
 import '../presentation/widgets/components/cosmic_background.dart';
 import '../i18n/app_localizations.dart';
@@ -92,18 +92,18 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
   Widget build(BuildContext context) {
     final emoji = _emojis[widget.analysisType] ?? '✦';
     final colors =
-        _colors[widget.analysisType] ?? [AppTheme.violetSoft, AppTheme.violet];
+        _colors[widget.analysisType] ?? [AppColors.violetSoft, AppColors.gold];
 
     return CosmicBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+          iconTheme: const IconThemeData(color: AppColors.starlight),
           title: Text(
             '$emoji ${t(context, 'forecast.result_title', args: {'period': widget.periodLabel})}',
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: AppColors.starlight,
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -114,7 +114,7 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
               IconButton(
                 icon: const Icon(
                   Icons.refresh_rounded,
-                  color: AppTheme.textSecondary,
+                  color: AppColors.mist,
                   size: 20,
                 ),
                 onPressed: _fetch,
@@ -147,7 +147,7 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
                 ),
                 child: const Icon(
                   Icons.error_outline_rounded,
-                  color: AppTheme.error,
+                  color: AppColors.statusDanger,
                   size: 30,
                 ),
               ),
@@ -155,7 +155,7 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
               Text(
                 _error!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppTheme.error, fontSize: 14),
+                style: const TextStyle(color: AppColors.statusDanger, fontSize: 14),
               ),
               const SizedBox(height: 28),
               GestureDetector(
@@ -167,7 +167,7 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
                   ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(colors: colors),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
                   child: Text(
                     t(context, 'natal_report.retry'),
@@ -208,7 +208,7 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               border: Border.all(color: colors[0].withOpacity(0.3)),
             ),
             child: Row(
@@ -241,7 +241,7 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
                           args: {'period': widget.periodLabel},
                         ),
                         style: const TextStyle(
-                          color: AppTheme.textPrimary,
+                          color: AppColors.starlight,
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
@@ -250,7 +250,7 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
                       Text(
                         widget.chartData.location?.cityResolved ?? '',
                         style: const TextStyle(
-                          color: AppTheme.textSecondary,
+                          color: AppColors.mist,
                           fontSize: 12,
                         ),
                       ),

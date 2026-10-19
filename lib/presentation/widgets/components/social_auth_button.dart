@@ -37,7 +37,7 @@ class SocialAuthButton extends StatelessWidget {
     return SizedBox(
       height: AppSizes.ctaHeight,
       child: Material(
-        color: AppColors.bgCard,
+        color: AppColors.navyDeep,
         borderRadius: AppRadius.pillBr,
         child: InkWell(
           borderRadius: AppRadius.pillBr,
@@ -62,7 +62,7 @@ class SocialAuthButton extends StatelessWidget {
                       style: AppTextStyles.ctaSecondary(
                         color: disabled
                             ? AppColors.textDisabled
-                            : AppColors.textPrimary,
+                            : AppColors.starlight,
                       ),
                     ),
                   ),

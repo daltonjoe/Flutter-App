@@ -110,13 +110,13 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = active ? AppColors.textPrimary : AppColors.textMuted;
+    final iconColor = active ? AppColors.starlight : AppColors.mist;
     // VARSAYIM: lavanta aktif etiket -> açık buz mavisi
-    final labelColor = active ? const Color(0xFFBFD4FF) : AppColors.textMuted;
+    final labelColor = active ? const Color(0xFFBFD4FF) : AppColors.mist;
 
     return InkWell(
       onTap: onTap,
-      splashColor: AppColors.violetPrimary.withValues(alpha: 0.08),
+      splashColor: AppColors.gold.withValues(alpha: 0.08),
       highlightColor: Colors.transparent,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -129,10 +129,10 @@ class _NavItem extends StatelessWidget {
             decoration: active
                 ? BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: AppColors.violetPrimary.withValues(alpha: 0.14),
+                    color: AppColors.gold.withValues(alpha: 0.14),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.violetPrimary.withValues(alpha: 0.3),
+                        color: AppColors.gold.withValues(alpha: 0.3),
                         blurRadius: 10,
                       ),
                     ],

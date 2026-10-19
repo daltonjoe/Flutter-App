@@ -49,10 +49,10 @@ class CosmicErrorState extends StatelessWidget {
                 height: 72,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.errorRed.withValues(alpha: 0.08),
+                  color: AppColors.statusDanger.withValues(alpha: 0.08),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.errorRed.withValues(alpha: 0.22),
+                      color: AppColors.statusDanger.withValues(alpha: 0.22),
                       blurRadius: 24,
                     ),
                   ],
@@ -60,13 +60,13 @@ class CosmicErrorState extends StatelessWidget {
                 child: Center(
                   child: Icon(
                     icon,
-                    color: AppColors.errorRed,
+                    color: AppColors.statusDanger,
                     size: 32,
                   ),
                 ),
               )
             else
-              Icon(icon, color: AppColors.errorRed, size: 36),
+              Icon(icon, color: AppColors.statusDanger, size: 36),
 
             SizedBox(height: compact ? AppSpacing.sm : AppSpacing.md),
 
@@ -74,7 +74,7 @@ class CosmicErrorState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodySm(color: AppColors.errorRed)
+              style: AppTextStyles.bodySm(color: AppColors.statusDanger)
                   .copyWith(fontSize: 14),
             ),
 

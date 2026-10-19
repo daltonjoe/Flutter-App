@@ -39,14 +39,14 @@ final _pal = <WheelTone, _P>{
   WheelTone.male: _P(
     AppColors.themeCareer.withValues(alpha: 0.08),
     AppColors.themeCareer.withValues(alpha: 0.30),
-    AppColors.textPrimary,
+    AppColors.starlight,
     AppColors.themeCareer,
     [AppColors.themeCareer, AppColors.info],
   ),
   WheelTone.neutral: _P(
     AppColors.navyDeep,
     AppColors.info.withValues(alpha: 0.25),
-    AppColors.textSecondary,
+    AppColors.mist,
     AppColors.info,
     [AppColors.info, AppColors.elementWater],
   ),
@@ -55,7 +55,7 @@ final _pal = <WheelTone, _P>{
     AppColors.gold.withValues(alpha: 0.30),
     AppColors.goldSoft,
     AppColors.gold,
-    [AppColors.amberTransit, AppColors.goldDeep],
+    [AppColors.statusChallenging, AppColors.goldDeep],
   ),
   WheelTone.purple: _P(
     AppColors.themeIdentity.withValues(alpha: 0.08),
@@ -67,7 +67,7 @@ final _pal = <WheelTone, _P>{
   WheelTone.indigo: _P(
     AppColors.elementWater.withValues(alpha: 0.08),
     AppColors.elementWater.withValues(alpha: 0.30),
-    AppColors.textSecondary,
+    AppColors.mist,
     AppColors.elementWater,
     [AppColors.elementWater, AppColors.info],
   ),
@@ -154,7 +154,7 @@ class _CosmicWheelPickerState extends State<CosmicWheelPicker> {
                 style: TextStyle(
                   fontSize: sel ? 18 : 16,
                   fontWeight: FontWeight.w600,
-                  color: sel ? AppColors.textPrimary : p.text,
+                  color: sel ? AppColors.starlight : p.text,
                 ),
               ),
             ),

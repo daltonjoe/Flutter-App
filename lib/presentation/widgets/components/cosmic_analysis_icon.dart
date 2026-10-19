@@ -82,7 +82,7 @@ class _CosmicAnalysisIconState extends State<CosmicAnalysisIcon>
           widget.icon,
           style: TextStyle(
             fontSize: widget.size * 0.6,
-            color: AppColors.textPrimary,
+            color: AppColors.starlight,
           ),
         ),
       ),

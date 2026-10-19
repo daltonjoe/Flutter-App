@@ -128,7 +128,7 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
                   children: [
                     Text(
                       t(context, 'onboarding.link_account.description'),
-                      style: AppTextStyles.bodyMd(color: AppColors.textPrimary),
+                      style: AppTextStyles.bodyMd(color: AppColors.starlight),
                     ),
                     const SizedBox(height: 24),
                     TextFormField(
@@ -179,7 +179,7 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: AppColors.textPrimary,
+                                color: AppColors.starlight,
                               ),
                             )
                           : Text(

@@ -34,7 +34,7 @@ class CosmicOutlineButton extends StatelessWidget {
   /// Override border colour (defaults to 35% violet).
   final Color? borderColor;
 
-  /// Override label colour (defaults to [AppColors.violetPrimary]).
+  /// Override label colour (defaults to [AppColors.gold]).
   final Color? labelColor;
 
   @override

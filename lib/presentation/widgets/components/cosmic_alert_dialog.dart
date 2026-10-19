@@ -71,7 +71,7 @@ Future<void> showCosmicAlert(
                               Text(title,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
-                                      color: AppColors.textPrimary,
+                                      color: AppColors.starlight,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w800)),
                               const SizedBox(height: 8),
@@ -79,7 +79,7 @@ Future<void> showCosmicAlert(
                             Text(message,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                    color: AppColors.textSecondary, height: 1.4)),
+                                    color: AppColors.mist, height: 1.4)),
                             const SizedBox(height: 20),
                             for (final a in actions)
                               Padding(
@@ -103,7 +103,7 @@ Future<void> showCosmicAlert(
                                         },
                                         child: Text(a.label,
                                             style: const TextStyle(
-                                                color: AppColors.textSecondary)),
+                                                color: AppColors.mist)),
                                       ),
                               ),
                           ],

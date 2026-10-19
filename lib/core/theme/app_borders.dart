@@ -49,7 +49,7 @@ class AppBorders {
   static OutlineInputBorder inputFocused() => OutlineInputBorder(
     borderRadius: AppRadius.mdBr,
     borderSide: const BorderSide(
-      color: AppColors.violetPrimary,
+      color: AppColors.gold,
       width: _widthFocus,
     ),
   );
@@ -75,7 +75,7 @@ class AppBorders {
   static Border violet({double opacity = 0.18, double width = 1}) =>
       Border.fromBorderSide(
         BorderSide(
-          color: AppColors.violetPrimary.withValues(alpha: opacity),
+          color: AppColors.gold.withValues(alpha: opacity),
           width: width,
         ),
       );

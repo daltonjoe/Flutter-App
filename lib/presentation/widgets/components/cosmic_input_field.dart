@@ -85,7 +85,7 @@ class CosmicInputField extends StatelessWidget {
               Text(
                 label.toUpperCase(),
                 style: AppTextStyles.fieldLabel(
-                  color: disabled ? AppColors.textDisabled : AppColors.textMuted,
+                  color: disabled ? AppColors.textDisabled : AppColors.mist,
                 ),
               ),
               if (actionWidget != null) ...[
@@ -123,12 +123,12 @@ class CosmicInputField extends StatelessWidget {
                     style: AppTextStyles.bodyLg(
                       color: disabled
                           ? AppColors.textDisabled
-                          : AppColors.textPrimary,
+                          : AppColors.starlight,
                     ).copyWith(fontWeight: FontWeight.w500),
                     decoration: InputDecoration(
                       hintText: hint,
                       hintStyle: AppTextStyles.bodyMd(
-                        color: AppColors.textMuted,
+                        color: AppColors.mist,
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
@@ -145,7 +145,7 @@ class CosmicInputField extends StatelessWidget {
               padding: const EdgeInsets.only(top: 6, left: 4),
               child: Text(
                 errorText!,
-                style: AppTextStyles.bodyXs(color: AppColors.errorRed),
+                style: AppTextStyles.bodyXs(color: AppColors.statusDanger),
               ),
             ),
         ],

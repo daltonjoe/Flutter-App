@@ -371,7 +371,7 @@ class _AskPageState extends State<AskPage> {
                             child: Text(
                               i.toString().padLeft(2, '0'),
                               style: AppTextStyles.bodyLg(
-                                color: AppColors.textPrimary,
+                                color: AppColors.starlight,
                               ),
                             ),
                           ),
@@ -392,7 +392,7 @@ class _AskPageState extends State<AskPage> {
                             child: Text(
                               '$i',
                               style: AppTextStyles.bodyLg(
-                                color: AppColors.textPrimary,
+                                color: AppColors.starlight,
                               ),
                             ),
                           ),

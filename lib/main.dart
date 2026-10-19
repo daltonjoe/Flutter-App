@@ -1,10 +1,10 @@
 // lib/main.dart
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'theme/app_theme.dart';
+import 'core/theme/cosmic_theme.dart';
 import 'providers/language_provider.dart';
 import 'providers/active_profile_provider.dart';
 import 'services/reference_names_service.dart';
@@ -46,7 +46,7 @@ void main() async {
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: AppTheme.bgDeep,
+      systemNavigationBarColor: AppColors.bgDeep,
     ),
   );
 
@@ -132,7 +132,7 @@ class SoulBoundApp extends StatelessWidget {
     return MaterialApp(
       title: 'Ephemerai',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: CosmicTheme.darkTheme,
       locale: languageProvider.locale,
       supportedLocales: LanguageProvider.supportedLanguages
           .map((l) => Locale(l['code']!))

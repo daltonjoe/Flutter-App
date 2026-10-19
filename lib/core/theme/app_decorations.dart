@@ -61,7 +61,7 @@ class AppDecorations {
   static BoxDecoration heroOrb() => BoxDecoration(
     shape: BoxShape.circle,
     gradient: const LinearGradient(
-      colors: [AppColors.navyRaised, AppColors.violetPrimary],
+      colors: [AppColors.navyRaised, AppColors.gold],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ),
@@ -105,7 +105,7 @@ class AppDecorations {
   // ── Forecast period card ─────────────────────────────────────────────
   static BoxDecoration forecastPeriodCard(List<Color> gradientColors) =>
       BoxDecoration(
-        color: AppColors.bgCard,
+        color: AppColors.navyDeep,
         borderRadius: AppRadius.mdBr,
         border: Border.all(
           color: gradientColors[0].withValues(alpha: 0.25),
@@ -148,9 +148,9 @@ class AppDecorations {
 
   // ── Error banner ─────────────────────────────────────────────────────
   static BoxDecoration errorBanner() => BoxDecoration(
-    color: AppColors.errorRed.withValues(alpha: 0.08),
+    color: AppColors.statusDanger.withValues(alpha: 0.08),
     borderRadius: AppRadius.mdBr,
-    border: Border.all(color: AppColors.errorRed.withValues(alpha: 0.25)),
+    border: Border.all(color: AppColors.statusDanger.withValues(alpha: 0.25)),
   );
 
   // ── Person hero card (natal report) ─────────────────────────────────
@@ -187,7 +187,7 @@ class AppDecorations {
   // ── Outline / secondary CTA button ──────────────────────────────────
   static BoxDecoration secondaryCta() => BoxDecoration(
     borderRadius: AppRadius.mdBr,
-    color: AppColors.bgCard,
+    color: AppColors.navyDeep,
     border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
   );
 
@@ -199,7 +199,7 @@ class AppDecorations {
 
   // ── Language pill ────────────────────────────────────────────────────
   static BoxDecoration languagePill() => BoxDecoration(
-    color: AppColors.bgCard,
+    color: AppColors.navyDeep,
     borderRadius: BorderRadius.circular(AppRadius.pill),
     border: Border.all(color: AppColors.borderSubtle),
   );

@@ -105,13 +105,13 @@ class _TransitDetailPageState extends State<TransitDetailPage> {
   Color _valenceColor(String? v) {
     switch (v) {
       case 'power':
-        return AppColors.tealSuccess;
+        return AppColors.statusSupportive;
       case 'pressure':
-        return AppColors.amberTransit;
+        return AppColors.statusChallenging;
       case 'trouble':
-        return AppColors.roseAccent;
+        return AppColors.gold;
       default:
-        return AppColors.textMuted;
+        return AppColors.mist;
     }
   }
 

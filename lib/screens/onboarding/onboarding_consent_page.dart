@@ -143,7 +143,7 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.textMuted),
+        border: Border.all(color: AppColors.mist),
         borderRadius: BorderRadius.circular(16),
       ),
       child: CheckboxListTile(
@@ -156,11 +156,11 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
             GestureDetector(
               onTap: url.isEmpty ? null : () => _open(url),
               child: Text(t(context, linkKey),
-                  style: AppTextStyles.bodyMd(color: AppColors.textPrimary).copyWith(
+                  style: AppTextStyles.bodyMd(color: AppColors.starlight).copyWith(
                       decoration: TextDecoration.underline, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 4),
-            Text(t(context, checkKey), style: AppTextStyles.bodyMd(color: AppColors.textMuted)),
+            Text(t(context, checkKey), style: AppTextStyles.bodyMd(color: AppColors.mist)),
           ],
         ),
       ),
@@ -190,11 +190,11 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
               const SizedBox(height: 48),
               Text(t(context, "onboarding.consent.title"),
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.bodyLg(color: AppColors.textPrimary).copyWith(fontSize: 30)),
+                  style: AppTextStyles.bodyLg(color: AppColors.starlight).copyWith(fontSize: 30)),
               const SizedBox(height: 16),
               Text(t(context, "onboarding.consent.body"),
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.bodyMd(color: AppColors.textMuted)),
+                  style: AppTextStyles.bodyMd(color: AppColors.mist)),
               const SizedBox(height: 32),
               _box("onboarding.consent.privacy_link", "onboarding.consent.privacy_check",
                   kPrivacyPolicyUrl, _priv, (b) => setState(() => _priv = b)),

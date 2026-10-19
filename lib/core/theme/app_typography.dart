@@ -33,7 +33,7 @@ class AppTextStyles {
 
   // ── Display / Hero ──────────────────────────────────────────────────
   /// Display — Cormorant Garamond 34/40, w600.
-  static TextStyle display({Color color = AppColors.textPrimary}) =>
+  static TextStyle display({Color color = AppColors.starlight}) =>
       GoogleFonts.cormorantGaramond(
         fontSize: 34,
         height: 40 / 34,
@@ -43,11 +43,11 @@ class AppTextStyles {
       );
 
   /// Large hero heading — alias of [display].
-  static TextStyle heroTitle({Color color = AppColors.textPrimary}) =>
+  static TextStyle heroTitle({Color color = AppColors.starlight}) =>
       display(color: color);
 
   /// H1 — Cormorant Garamond 28/34, w600.
-  static TextStyle displayLarge({Color color = AppColors.textPrimary}) =>
+  static TextStyle displayLarge({Color color = AppColors.starlight}) =>
       GoogleFonts.cormorantGaramond(
         fontSize: 28,
         height: 34 / 28,
@@ -58,7 +58,7 @@ class AppTextStyles {
 
   // ── Headings (Cormorant Garamond) ───────────────────────────────────
   /// H2 — 22/28, w600.
-  static TextStyle h1({Color color = AppColors.textPrimary}) =>
+  static TextStyle h1({Color color = AppColors.starlight}) =>
       GoogleFonts.cormorantGaramond(
         fontSize: 22,
         height: 28 / 22,
@@ -67,7 +67,7 @@ class AppTextStyles {
       );
 
   /// Heading — 18/24, w600.
-  static TextStyle h2({Color color = AppColors.textPrimary}) =>
+  static TextStyle h2({Color color = AppColors.starlight}) =>
       GoogleFonts.cormorantGaramond(
         fontSize: 18,
         height: 24 / 18,
@@ -76,7 +76,7 @@ class AppTextStyles {
       );
 
   /// Heading — 16/22, w600.
-  static TextStyle h3({Color color = AppColors.textPrimary}) =>
+  static TextStyle h3({Color color = AppColors.starlight}) =>
       GoogleFonts.cormorantGaramond(
         fontSize: 16,
         height: 22 / 16,
@@ -86,7 +86,7 @@ class AppTextStyles {
 
   // ── Planet / accent names ───────────────────────────────────────────
   /// Planet name in header card — 22/28, w600, accent coloured.
-  static TextStyle planetName({Color color = AppColors.violetPrimary}) =>
+  static TextStyle planetName({Color color = AppColors.gold}) =>
       GoogleFonts.cormorantGaramond(
         fontSize: 22,
         height: 28 / 22,
@@ -97,7 +97,7 @@ class AppTextStyles {
 
   // ── Body (Inter) ────────────────────────────────────────────────────
   /// Body — Inter 15/24.
-  static TextStyle bodyLg({Color color = AppColors.textPrimary}) =>
+  static TextStyle bodyLg({Color color = AppColors.starlight}) =>
       GoogleFonts.inter(
         fontSize: 15,
         height: 24 / 15,
@@ -105,7 +105,7 @@ class AppTextStyles {
       );
 
   /// Body small — Inter 14/22.
-  static TextStyle bodyMd({Color color = AppColors.textSecondary}) =>
+  static TextStyle bodyMd({Color color = AppColors.mist}) =>
       GoogleFonts.inter(
         fontSize: 14,
         height: 22 / 14,
@@ -113,7 +113,7 @@ class AppTextStyles {
       );
 
   /// Caption — Inter 13/18.
-  static TextStyle bodySm({Color color = AppColors.textSecondary}) =>
+  static TextStyle bodySm({Color color = AppColors.mist}) =>
       GoogleFonts.inter(
         fontSize: 13,
         height: 18 / 13,
@@ -121,7 +121,7 @@ class AppTextStyles {
       );
 
   /// Extra-small / hint — Inter 12/16.
-  static TextStyle bodyXs({Color color = AppColors.textMuted}) =>
+  static TextStyle bodyXs({Color color = AppColors.mist}) =>
       GoogleFonts.inter(
         fontSize: 12,
         height: 16 / 12,
@@ -140,7 +140,7 @@ class AppTextStyles {
       );
 
   /// Input field label — Inter 11, w500, tracked.
-  static TextStyle fieldLabel({Color color = AppColors.textMuted}) =>
+  static TextStyle fieldLabel({Color color = AppColors.mist}) =>
       GoogleFonts.inter(
         fontSize: 11,
         height: 16 / 11,
@@ -150,7 +150,7 @@ class AppTextStyles {
       );
 
   /// Small chip / pill label — Inter 12/16, w600.
-  static TextStyle chip({Color color = AppColors.textPrimary}) =>
+  static TextStyle chip({Color color = AppColors.starlight}) =>
       GoogleFonts.inter(
         fontSize: 12,
         height: 16 / 12,
@@ -159,7 +159,7 @@ class AppTextStyles {
       );
 
   /// Mini tag (ASC / MC labels) — Inter 10, w600.
-  static TextStyle miniTag({Color color = AppColors.violetPrimary}) =>
+  static TextStyle miniTag({Color color = AppColors.gold}) =>
       GoogleFonts.inter(
         fontSize: 10,
         fontWeight: FontWeight.w600,
@@ -167,7 +167,7 @@ class AppTextStyles {
       );
 
   /// Tiny label (house "ev" text) — Inter 8.
-  static TextStyle tinyLabel({Color color = AppColors.textMuted}) =>
+  static TextStyle tinyLabel({Color color = AppColors.mist}) =>
       GoogleFonts.inter(
         fontSize: 8,
         color: color,
@@ -184,7 +184,7 @@ class AppTextStyles {
       );
 
   /// Secondary / outline button label — Inter 15, w600.
-  static TextStyle ctaSecondary({Color color = AppColors.violetPrimary}) =>
+  static TextStyle ctaSecondary({Color color = AppColors.gold}) =>
       GoogleFonts.inter(
         fontSize: 15,
         fontWeight: FontWeight.w600,
@@ -195,7 +195,7 @@ class AppTextStyles {
   /// App-bar title — Inter 15–17, w600.
   static TextStyle appBarTitle({
     double size = 15,
-    Color color = AppColors.textPrimary,
+    Color color = AppColors.starlight,
   }) =>
       GoogleFonts.inter(
         fontSize: size,
@@ -214,7 +214,7 @@ class AppTextStyles {
 
   // ── Numeric / degree values ─────────────────────────────────────────
   /// Degree readout — Inter 11, bold, tabular figures.
-  static TextStyle degreeLabel({Color color = AppColors.violetPrimary}) =>
+  static TextStyle degreeLabel({Color color = AppColors.gold}) =>
       GoogleFonts.inter(
         fontSize: 11,
         fontWeight: FontWeight.bold,
@@ -223,7 +223,7 @@ class AppTextStyles {
       );
 
   /// Large numeric (house number) — Inter 16, w700, tabular figures.
-  static TextStyle houseNumber({Color color = AppColors.violetPrimary}) =>
+  static TextStyle houseNumber({Color color = AppColors.gold}) =>
       GoogleFonts.inter(
         fontSize: 16,
         fontWeight: FontWeight.w700,
@@ -238,6 +238,6 @@ class AppTextStyles {
         titleLarge: h2(),
         bodyLarge: bodyLg(),
         bodyMedium: bodySm(),
-        labelSmall: overline(color: AppColors.textMuted),
+        labelSmall: overline(color: AppColors.mist),
       );
 }

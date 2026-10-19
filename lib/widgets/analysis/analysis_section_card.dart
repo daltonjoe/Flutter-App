@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_theme.dart';
+import '../../core/theme/cosmic_theme.dart';
 import 'floating_analysis_icon.dart';
 
 class AnalysisSectionCard extends StatelessWidget {
@@ -20,12 +20,12 @@ class AnalysisSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = color ?? AppTheme.violet;
+    final themeColor = color ?? AppColors.gold;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: AppTheme.bgSurface.withOpacity(0.6),
+        color: AppColors.bgSurface.withOpacity(0.6),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: themeColor.withOpacity(0.2),
@@ -76,7 +76,7 @@ class AnalysisSectionCard extends StatelessWidget {
                         child: Text(
                           title,
                           style: TextStyle(
-                            color: AppTheme.textPrimary,
+                            color: AppColors.starlight,
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.5,
@@ -95,7 +95,7 @@ class AnalysisSectionCard extends StatelessWidget {
                   Text(
                     content,
                     style: TextStyle(
-                      color: AppTheme.textSecondary.withOpacity(0.9),
+                      color: AppColors.mist.withOpacity(0.9),
                       fontSize: 15,
                       height: 1.6,
                       letterSpacing: 0.2,
@@ -124,7 +124,7 @@ class AnalysisSectionCard extends StatelessWidget {
                             child: Text(
                               point,
                               style: const TextStyle(
-                                color: AppTheme.textSecondary,
+                                color: AppColors.mist,
                                 fontSize: 14,
                                 height: 1.5,
                               ),

@@ -173,7 +173,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        iconTheme: const IconThemeData(color: AppColors.starlight),
       ),
       body: Container(
         width: double.infinity,
@@ -212,7 +212,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
                             t(context, "auth.signin.description"),
                             textAlign: TextAlign.center,
                             style: AppTextStyles.bodyMd(
-                              color: AppColors.textSecondary,
+                              color: AppColors.mist,
                             ),
                           ),
                           const SizedBox(height: AppSpacing.xl),
@@ -222,7 +222,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
                               controller: _email,
                               keyboardType: TextInputType.emailAddress,
                               style: AppTextStyles.bodyLg(
-                                color: AppColors.textPrimary,
+                                color: AppColors.starlight,
                               ),
                               decoration: _fieldDecoration(
                                 hint: t(
@@ -240,7 +240,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
                               controller: _pw,
                               obscureText: _obscure,
                               style: AppTextStyles.bodyLg(
-                                color: AppColors.textPrimary,
+                                color: AppColors.starlight,
                               ),
                               decoration: _fieldDecoration(
                                 hint: t(
@@ -253,7 +253,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
                                     _obscure
                                         ? Icons.visibility_off_outlined
                                         : Icons.visibility_outlined,
-                                    color: AppColors.textMuted,
+                                    color: AppColors.mist,
                                   ),
                                   onPressed: () =>
                                       setState(() => _obscure = !_obscure),
@@ -266,7 +266,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
                             Text(
                               t(context, "auth.signin.error"),
                               style: AppTextStyles.bodyMd(
-                                color: AppColors.roseAccent,
+                                color: AppColors.gold,
                               ),
                             ),
                           ],
@@ -284,7 +284,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
                                   leading: const Icon(
                                     Icons.apple,
                                     size: 22,
-                                    color: AppColors.textPrimary,
+                                    color: AppColors.starlight,
                                   ),
                                   label: t(
                                     context,
@@ -349,8 +349,8 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: AppTextStyles.bodyMd(color: AppColors.textMuted),
-      prefixIcon: Icon(icon, color: AppColors.textMuted),
+      hintStyle: AppTextStyles.bodyMd(color: AppColors.mist),
+      prefixIcon: Icon(icon, color: AppColors.mist),
       suffixIcon: suffix,
       filled: true,
       fillColor: AppColors.bgSurface,
@@ -407,7 +407,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Text(
             t(context, "onboarding.link_account.or_divider"),
-            style: AppTextStyles.bodyXs(color: AppColors.textMuted),
+            style: AppTextStyles.bodyXs(color: AppColors.mist),
           ),
         ),
         const Expanded(
@@ -427,7 +427,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
     return SizedBox(
       height: height,
       child: Material(
-        color: AppColors.bgCard,
+        color: AppColors.navyDeep,
         borderRadius: AppRadius.pillBr,
         child: InkWell(
           borderRadius: AppRadius.pillBr,
@@ -452,7 +452,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
                       style: AppTextStyles.ctaSecondary(
                         color: disabled
                             ? AppColors.textDisabled
-                            : AppColors.textPrimary,
+                            : AppColors.starlight,
                       ),
                     ),
                   ),

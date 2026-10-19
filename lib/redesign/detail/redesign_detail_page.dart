@@ -17,6 +17,7 @@ import '../../presentation/widgets/components/analysis_section_card.dart';
 import '../../presentation/widgets/components/cosmic_background.dart';
 import '../../presentation/widgets/components/cosmic_error_state.dart';
 import '../../presentation/widgets/components/cosmic_loader.dart';
+import '../../presentation/widgets/components/planet_glyph_icon.dart';
 import '../../providers/active_profile_provider.dart';
 import '../../providers/ask_context_provider.dart';
 import '../../providers/language_provider.dart';
@@ -26,7 +27,6 @@ import '../../services/reference_names_service.dart';
 import '../../widgets/ask_add.dart';
 import '../assets_map.dart';
 import '../data/detail_section.dart';
-import '../data/planet_card_view_model.dart';
 import 'detail_tab_bar.dart';
 
 class RedesignDetailPage extends StatefulWidget {
@@ -250,13 +250,6 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
     return id == null ? widget.modeKey : names.planet(id);
   }
 
-  String _emoji(ReferenceNamesService names, String planetKey) {
-    for (final item in PlanetCardViewModel.fromChart(widget.chartData, names)) {
-      if (item.key == planetKey) return item.emoji;
-    }
-    return '✦';
-  }
-
   @override
   Widget build(BuildContext context) {
     final names = context.watch<ReferenceNamesService>();
@@ -377,7 +370,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
             rtl
                 ? Icons.arrow_forward_ios_rounded
                 : Icons.arrow_back_ios_new_rounded,
-            color: AppColors.textPrimary,
+            color: AppColors.starlight,
             size: 20,
           ),
         ),
@@ -387,7 +380,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
             onPressed: _reload,
             icon: const Icon(
               Icons.refresh_rounded,
-              color: AppColors.textSecondary,
+              color: AppColors.mist,
               size: 20,
             ),
           ),
@@ -439,7 +432,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
         child: Center(
           child: Text(
             '✦',
-            style: AppTextStyles.displayLarge(color: AppColors.violetPrimary),
+            style: AppTextStyles.displayLarge(color: AppColors.gold),
           ),
         ),
       );
@@ -452,9 +445,11 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
           RdAssets.planetImage(assetKey),
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Center(
-            child: Text(
-              _emoji(names, assetKey),
-              style: AppTextStyles.displayLarge(),
+            child: PlanetGlyphIcon(
+              name: assetKey.toLowerCase(),
+              size: 28,
+              color: AppColors.mist,
+              semanticLabel: _displayName(names),
             ),
           ),
         ),
@@ -543,7 +538,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
               title: section.title,
               content: section.content,
               bulletPoints: section.bulletPoints,
-              color: AppColors.violetPrimary,
+              color: AppColors.gold,
             ),
         ],
       );
@@ -724,7 +719,7 @@ class _PlacementCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.bgCard.withValues(alpha: 0.8),
+        color: AppColors.navyDeep.withValues(alpha: 0.8),
         borderRadius: AppRadius.lgBr,
         border: Border.all(color: AppColors.borderSubtle),
       ),

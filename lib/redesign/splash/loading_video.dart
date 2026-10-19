@@ -194,12 +194,8 @@ class LoadingVideoLayer extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
-                    backgroundColor: AppColors.violetPrimary.withValues(
-                      alpha: 0.12,
-                    ),
-                    valueColor: const AlwaysStoppedAnimation(
-                      AppColors.violetPrimary,
-                    ),
+                    backgroundColor: AppColors.gold.withValues(alpha: 0.12),
+                    valueColor: const AlwaysStoppedAnimation(AppColors.gold),
                     minHeight: 3,
                   ),
                 ),
@@ -267,7 +263,7 @@ class _SplashTextsState extends State<_SplashTexts>
                 t(context, 'rd.splash.tagline'),
                 textAlign: TextAlign.center,
                 maxLines: 2,
-                style: AppTextStyles.h1(color: AppColors.textSecondary),
+                style: AppTextStyles.h1(color: AppColors.mist),
               ),
               const SizedBox(height: AppSpacing.xl),
             ],

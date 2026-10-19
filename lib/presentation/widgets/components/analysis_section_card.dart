@@ -111,7 +111,7 @@ class AnalysisSectionCard extends StatelessWidget {
                         child: Text(
                           title,
                           style: AppTextStyles.h2(
-                            color: AppColors.textPrimary,
+                            color: AppColors.starlight,
                           ).copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
@@ -133,7 +133,7 @@ class AnalysisSectionCard extends StatelessWidget {
                   Text(
                     content,
                     style: AppTextStyles.bodyLg(
-                      color: AppColors.textSecondary,
+                      color: AppColors.mist,
                     ).copyWith(
                       height: 1.6,
                       letterSpacing: 0.2,
@@ -151,7 +151,7 @@ class AnalysisSectionCard extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       strengthsLabel ?? 'Güçlü Yönler',
-                      style: AppTextStyles.bodyLg(color: AppColors.textPrimary)
+                      style: AppTextStyles.bodyLg(color: AppColors.starlight)
                           .copyWith(fontWeight: FontWeight.w700, fontSize: 13),
                     ),
                     const SizedBox(height: 8),
@@ -163,7 +163,7 @@ class AnalysisSectionCard extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       challengesLabel ?? 'Zorluklar',
-                      style: AppTextStyles.bodyLg(color: AppColors.textPrimary)
+                      style: AppTextStyles.bodyLg(color: AppColors.starlight)
                           .copyWith(fontWeight: FontWeight.w700, fontSize: 13),
                     ),
                     const SizedBox(height: 8),
@@ -199,7 +199,7 @@ class AnalysisSectionCard extends StatelessWidget {
           Expanded(
             child: Text(
               point,
-              style: AppTextStyles.bodySm(color: AppColors.textSecondary),
+              style: AppTextStyles.bodySm(color: AppColors.mist),
             ),
           ),
         ],

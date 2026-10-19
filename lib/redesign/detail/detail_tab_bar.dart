@@ -71,7 +71,7 @@ class _TabItem extends StatelessWidget {
               Text(
                 label,
                 style: AppTextStyles.bodyLg(
-                  color: selected ? color : AppColors.textSecondary,
+                  color: selected ? color : AppColors.mist,
                 ),
                 maxLines: 1,
               ),
