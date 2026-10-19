@@ -49,20 +49,20 @@ class AskHero extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Text(
           t(context, 'ask.empty_title.$mode'),
           textAlign: TextAlign.center,
           style: AppTextStyles.displayLarge(),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Text(
           t(context, 'ask.empty_body.$mode'),
           textAlign: TextAlign.center,
           style: AppTextStyles.bodySm(color: AppColors.mist),
         ),
         if (mode == 'forecast') ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
           CosmicChip(
             label: month == null
                 ? t(context, 'ask.forecast.pick')
@@ -73,7 +73,7 @@ class AskHero extends StatelessWidget {
           ),
         ],
         if (mode == 'synastry') ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
           if (partnersEmpty)
             Text(
               t(context, 'ask.avatar.synastry.need_profile'),
@@ -104,7 +104,7 @@ class AskHero extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.cardGap),
             CosmicChip(
               label: partnerName == null
                   ? t(context, 'ask.avatar.partner.pick')
@@ -208,7 +208,7 @@ class AskHero extends StatelessWidget {
         children: [
           Expanded(child: line),
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4),
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs),
             child: AskStar(size: 10),
           ),
           Expanded(child: line),

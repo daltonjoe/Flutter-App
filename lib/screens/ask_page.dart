@@ -352,7 +352,7 @@ class _AskPageState extends State<AskPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.cardGap),
             SizedBox(
               height: 200,
               child: Row(
@@ -403,7 +403,7 @@ class _AskPageState extends State<AskPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.md),
               child: SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -762,7 +762,7 @@ class _AskPageState extends State<AskPage> {
         alignment: AlignmentDirectional.centerEnd,
         child: Container(
           constraints: BoxConstraints(maxWidth: maxW),
-          margin: const EdgeInsets.symmetric(vertical: 4),
+          margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: AppColors.navyRaised,
@@ -777,7 +777,7 @@ class _AskPageState extends State<AskPage> {
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -823,7 +823,7 @@ class _AskPageState extends State<AskPage> {
       key: k,
       alignment: AlignmentDirectional.centerStart,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

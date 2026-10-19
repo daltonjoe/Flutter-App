@@ -98,7 +98,7 @@ void main() async {
     }
   }
 if (kDebugMode) {
-  debugPrint('TOKEN=${Supabase.instance.client.auth.currentSession?.accessToken}');
+  debugPrint('TOKEN=${Supabase.instance.client.auth.currentSession?.accessToken == null ? "null" : "present"}');
 }
   runApp(
     MultiProvider(

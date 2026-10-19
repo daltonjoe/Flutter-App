@@ -18,7 +18,7 @@ Mevcut koddaki ölü/tekrar/gereksiz parçalar. Silme yalnızca kullanıcı ilgi
 - DÜZELTİLDİ: lib/screens/onboarding/onboarding_gender_page.dart:33 — `prefernottosay.png` → `prefer_not_to_say.png` (dosya adı değişmedi, kod düzeltildi; görsel artık yüklenir).
 - SİLİNDİ: assets/images/logo/background2.jpg, assets/images/logo/background2.png, assets/fonts/LibreCaslonCondensed-Italic.ttf, assets/fonts/LibreCaslonCondensed-MediumItalic.ttf, assets/fonts/LibreCaslonCondensed-SemiBoldItalic.ttf, assets/fonts/LibreCaslonCondensed-BoldItalic.ttf (hepsi referanssız; italikler pubspec'te kayıtlı değildi).
 - KALAN: assets/fonts "Libre Caslon Condensed" family'si kodda hiçbir yerde kullanılmıyor (yalnız pubspec kaydı) — family + 4 normal ağırlık temizlik adayı. assets/glyphs/ yalnız .gitkeep (SVG yok; `kSvgGlyphs` boş, kod Unicode fallback'e düşüyor).
-- tools_add_keys_k33.py — tek seferlik anahtar ekleme script'i (birth_data.*, sen.edit_birth_data zaten uygulandı); temizlik adayı, bu işte silinmedi.
+- tools_add_keys_k33.py — tek seferlik anahtar ekleme script'i (birth_data.*, sen.edit_birth_data zaten uygulandı); temizlik adayı, bu işte silinmedi. TAMAMLANDI (2026-10-19): diğer kök script'lerle (tools_add_keys.py, tools_check_keys.py, scan-flutter.js) birlikte silindi.
 
 ## Dipnot kaldırma + Ask balon düzleştirme
 
@@ -38,7 +38,16 @@ Mevcut koddaki ölü/tekrar/gereksiz parçalar. Silme yalnızca kullanıcı ilgi
 - SİLİNDİ (faz-9a temizlik): locales/*.json → `ask.empty_title`, `ask.empty_body`, `ask.suggest_1/2/3` (8 dil). Ask boş durumu artık moda özel `ask.empty_title.$mode`, `ask.empty_body.$mode` ve `ask.suggest.$mode.N` anahtarlarını kullanıyor; eski tekil anahtarlar kodda okunmuyordu, 8 dilden silindi.
 - SİLİNDİ: locales/*.json → `ask.disclaimer` (8 dil). Yukarıdaki "Dipnot kaldırma" bölümünde kayıtlıydı; faz-9a temizlik turunda silindi.
 - lib/screens/ask_page.dart:1340 — `/// AV: balonlar sÄ±rayla ...` yorum satırı mojibake (UTF-8 bozulması); metin düzeltmesi veya silme adayı.
-- AYRI İŞ (bu turda düzeltilmedi): lib/screens/ask_page.dart — hardcode ölçüler: kullanıcı balonu 20/14/10 (~739-744), balon genişlikleri 0.80/0.82 (~732/~795), ay seçici sheet sabitleri 12/200/40/48/16 (~329-386), composer blur 12 (~1063).
+- AYRI İŞ (bu turda düzeltilmedi): lib/screens/ask_page.dart — hardcode ölçüler: kullanıcı balonu 20/14/10 (~739-744), balon genişlikleri 0.80/0.82 (~732/~795), ay seçici sheet sabitleri 12/200/40/48/16 (~329-386), composer blur 12 (~1063). KISMEN TAMAMLANDI (2026-10-19): birebir tokenı olan ölçüler tokena çevrildi (sheet 12→`AppSpacing.cardGap`, 16→`AppSpacing.md`; balon dikey `margin`/`padding` 4→`AppSpacing.xs`). KALAN (birebir uygun token yok): radius 20, balon `padding` 14/10, genişlik 0.80/0.82, sheet 200/40/48, composer blur 12.
+
+## Ask token turu + kök temizlik (2026-10-19)
+
+- TAMAMLANDI (2026-10-19): lib/redesign/ask/ask_hero.dart — `SizedBox` 8/16/12 → `AppSpacing.sm`/`md`/`cardGap`; connector `horizontal: 4` → `AppSpacing.xs`.
+- TAMAMLANDI (2026-10-19): lib/redesign/ask/star_typing.dart — padding 8/4 → `AppSpacing.sm`/`xs`; `SizedBox(width: 4)` → `AppSpacing.xs` (app_dimensions import eklendi).
+- TAMAMLANDI (2026-10-19): lib/main.dart:100-103 — `TOKEN=` debug logu artık token değerini yazmıyor (yalnız `present`/`null`); `kDebugMode` sarması korundu.
+- TAMAMLANDI (2026-10-19): kök tek seferlik script'ler silindi — scan-flutter.js, tools_add_keys.py, tools_add_keys_k33.py, tools_check_keys.py (kaynak referansı yok).
+- ATLANDI: lib/diag68.dart — silinmedi; 8 dosya import edip çağırıyor (main.dart, settings_page.dart, account_deletion_service.dart, active_chart_page.dart, onboarding_sign_in/register/flow/consent_page.dart).
+- ATLANDI (birebir/uygun token yok): ask_hero ikon 22 / glyph 16 / connector width 72, star_typing yıldız 8/10/14 + 900ms döngü + 0.30 opaklık tabanı, ask_add ikon 18.
 
 ## Faz-9a temizlik turu (FAZ 5)
 
@@ -49,7 +58,7 @@ Mevcut koddaki ölü/tekrar/gereksiz parçalar. Silme yalnızca kullanıcı ilgi
 - SİLİNDİ (2026-10-19, sıfır kod referansı): lib/widgets/city_search_field.dart — `CitySearchField` kodda hiçbir yerde import/çağrılmıyor (yalnız kendi dosyası + cosmic_input_field.dart:62 doc yorumu). Silindi.
 - SİLİNDİ (2026-10-19, sıfır kod referansı): lib/screens/planet_report_page.dart + lib/screens/placement_content_page.dart — ikisi de yalnız kendi dosyasından + doc yorumlarından referanslı; `lib/redesign/detail/redesign_detail_page.dart` ikisini ikame etti. Silindi.
 - ADAY (yetim kaldı): assets/images/redesign/earth_home.jpg + lib/redesign/assets_map.dart:5 `RdAssets.earthHome` — tek kullanıcı splash_backdrop.dart:75 idi ve silindi; asset dosyası ve pubspec.yaml kaydı yerinde kaldı (pubspec DOKUNMA). Kullanılmıyor; temizlik adayı.
-- YENİ ADAY: assets/glyphs/ klasörü yalnız .gitkeep (SVG asset yok, `kSvgGlyphs` boş) ve pubspec.yaml'da asset olarak bildirilmiş (assets/glyphs/). FAZ 2d SVG işi için placeholder; SVG eklenmezse klasör+bildirim kaldırılabilir.
+- YENİ ADAY: assets/glyphs/ klasörü yalnız .gitkeep (SVG asset yok, `kSvgGlyphs` boş) ve pubspec.yaml'da asset olarak bildirilmiş (assets/glyphs/). FAZ 2d SVG işi için placeholder; SVG eklenmezse klasör+bildirim kaldırılabilir. TAMAMLANDI (2026-10-19): klasörde 34 SVG var, placeholder .gitkeep silindi.
 - TARAMA SONUCU: assets/ altındaki tüm görsel/video/json dosyaları (logo, relationship, zodiac, redesign/planets, earth_home, background, loading_1.mp4, cities.json) kodda referanslı; referanssız asset bulunamadı.
 
 ## Match v2 glyph/çip revizesi (faz-9a)

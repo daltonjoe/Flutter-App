@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 
@@ -62,7 +63,7 @@ class _StarTypingState extends State<StarTyping>
       return Align(
         alignment: Alignment.centerLeft,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.xs),
           child: Text(t(context, 'ask.typing'), style: AppTextStyles.bodySm()),
         ),
       );
@@ -71,7 +72,7 @@ class _StarTypingState extends State<StarTyping>
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.xs),
         child: AnimatedBuilder(
           animation: _c!,
           builder: (context, _) => Row(
@@ -79,7 +80,7 @@ class _StarTypingState extends State<StarTyping>
             children: [
               for (var i = 0; i < 3; i++) ...[
                 Opacity(opacity: _opacity(i), child: const AskStar(size: 8)),
-                if (i < 2) const SizedBox(width: 4),
+                if (i < 2) const SizedBox(width: AppSpacing.xs),
               ],
             ],
           ),
