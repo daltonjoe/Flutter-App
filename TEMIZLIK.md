@@ -46,7 +46,7 @@ Mevcut koddaki ölü/tekrar/gereksiz parçalar. Silme yalnızca kullanıcı ilgi
 - TAMAMLANDI (2026-10-19): lib/redesign/ask/star_typing.dart — padding 8/4 → `AppSpacing.sm`/`xs`; `SizedBox(width: 4)` → `AppSpacing.xs` (app_dimensions import eklendi).
 - TAMAMLANDI (2026-10-19): lib/main.dart:100-103 — `TOKEN=` debug logu artık token değerini yazmıyor (yalnız `present`/`null`); `kDebugMode` sarması korundu.
 - TAMAMLANDI (2026-10-19): kök tek seferlik script'ler silindi — scan-flutter.js, tools_add_keys.py, tools_add_keys_k33.py, tools_check_keys.py (kaynak referansı yok).
-- ATLANDI: lib/diag68.dart — silinmedi; 8 dosya import edip çağırıyor (main.dart, settings_page.dart, account_deletion_service.dart, active_chart_page.dart, onboarding_sign_in/register/flow/consent_page.dart).
+- TAMAMLANDI (2026-10-19): lib/diag68.dart silindi; 8 dosyadan diag68/s68 çağrıları ve importlar, ayrıca kullanılmaz kalan `r` yerel değişkenleri (onboarding_flow/register) kaldırıldı (main.dart, settings_page.dart, account_deletion_service.dart, active_chart_page.dart, onboarding_sign_in/register/flow/consent_page.dart).
 - ATLANDI (birebir/uygun token yok): ask_hero ikon 22 / glyph 16 / connector width 72, star_typing yıldız 8/10/14 + 900ms döngü + 0.30 opaklık tabanı, ask_add ikon 18.
 
 ## Faz-9a temizlik turu (FAZ 5)

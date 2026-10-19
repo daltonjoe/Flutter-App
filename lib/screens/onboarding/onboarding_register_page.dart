@@ -10,7 +10,6 @@ import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
 import "../../presentation/widgets/components/social_auth_button.dart";
 import "../../services/account_linking_service.dart";
-import "package:flutter_application/diag68.dart";
 
 class OnboardingRegisterPage extends StatefulWidget {
   const OnboardingRegisterPage({super.key});
@@ -27,11 +26,8 @@ class _OnboardingRegisterPageState extends State<OnboardingRegisterPage> {
   @override
   void initState() {
     super.initState();
-    diag68("page: register init");
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final r = ModalRoute.of(context);
-      diag68("register route", "name=${r?.settings.name} cur=${r?.isCurrent}");
     });
     _sub = Supabase.instance.client.auth.onAuthStateChange.listen((s) {
       final u = s.session?.user;

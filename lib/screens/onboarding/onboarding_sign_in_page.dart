@@ -11,7 +11,6 @@ import "../../core/theme/app_dimensions.dart";
 import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
 import "../../providers/active_profile_provider.dart";
-import "package:flutter_application/diag68.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "../../main.dart" show showNotFound70;
 
@@ -34,7 +33,6 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
   @override
   void initState() {
     super.initState();
-    diag68("page: signin init");
     _sub = Supabase.instance.client.auth.onAuthStateChange.listen((s) {
       final u = s.session?.user;
       if (u == null || u.isAnonymous) return;
@@ -69,7 +67,6 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
       if (mounted) setState(() => _err = true);
       return;
     }
-    diag68("signin after", "pid=${s68(pid)}");
     if (pid == null) {
       var empty70 = true;
       try {
@@ -478,7 +475,6 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
 
 /// 90: snackbar Sign in dogrudan Google girisi baslatir (sayfa acilmaz).
 Future<void> startOAuthSignin90(OAuthProvider p) async {
-  diag68("signin oauth start");
   final sp = await SharedPreferences.getInstance();
   await sp.setString("auth_intent", "signin");
   try {

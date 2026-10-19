@@ -16,7 +16,6 @@ import '../presentation/widgets/components/cosmic_card.dart';
 import '../presentation/widgets/components/cosmic_error_state.dart';
 import '../presentation/widgets/components/overline_text.dart';
 import '../providers/active_profile_provider.dart';
-import "package:flutter_application/diag68.dart";
 import 'legal_agreements_page.dart';
 import '../providers/language_provider.dart';
 import '../services/account_deletion_service.dart';
@@ -610,13 +609,9 @@ class _SettingsPageState extends State<SettingsPage>
     final prov = context.read<ActiveProfileProvider>();
     try {
       signingOut74 = true;
-      diag68("signout before");
       await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
       await Supabase.instance.client.auth.signInAnonymously();
-      diag68("signout after-anon");
-      diag68("signout pre-clear");
       await prov.clearActive();
-      diag68("signout post-clear");
       final sp = await SharedPreferences.getInstance();
       await sp.remove("force_consent");
       nav.pushNamedAndRemoveUntil("/onboarding/link-account", (route) => false);

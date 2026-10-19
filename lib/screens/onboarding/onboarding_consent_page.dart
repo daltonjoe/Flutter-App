@@ -3,7 +3,6 @@ import "package:supabase_flutter/supabase_flutter.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:provider/provider.dart";
 import "../../providers/active_profile_provider.dart";
-import "package:flutter_application/diag68.dart";
 import "package:url_launcher/url_launcher.dart";
 import "../../core/constants/legal_links.dart";
 import "../../core/theme/app_colors.dart";
@@ -27,7 +26,6 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
   @override
   void initState() {
     super.initState();
-    diag68("page: consent init");
     _check();
   }
 
@@ -46,13 +44,11 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
       final sp = await SharedPreferences.getInstance();
       await sp.remove("force_consent");
       final k = rows.map((r) => r["kind"]).toSet();
-      diag68("consent check", "kinds=${k.length}");
       if (k.contains("privacy") && k.contains("terms") && k.contains("ai")) {
         _home();
         return;
       }
     } catch (e) {
-      diag68("consent check ERR", "${e.runtimeType}");
       debugPrint("consent check failed: $e");
     }
     if (mounted) setState(() => _checking = false);
@@ -101,7 +97,6 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
 
   Future<void> _back() async {
     debugPrint("consent back start");
-    diag68("consent back start");
     final nav = Navigator.of(context, rootNavigator: true);
     final prov = context.read<ActiveProfileProvider>();
     var out67 = false;
@@ -120,7 +115,6 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
     }
     final uidNow69 = Supabase.instance.client.auth.currentUser?.id;
     final changed69 = uid69 != uidNow69;
-    diag68("consent back before-push", "out=$out67 changed=$changed69");
     if (out67 || changed69) {
       try {
         await prov.clearActive();

@@ -1,6 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import "package:flutter_application/diag68.dart";
 
 class AccountDeletionService {
   /// Yeni anonim uid acildiktan sonra eski uid'e ait aktif profili sil.
@@ -38,7 +37,6 @@ class AccountDeletionService {
     } catch (_) {}
     await Supabase.instance.client.auth.signInAnonymously();
     await _clearActive69();
-    diag68("delete after-anon");
   }
 
     /// Oturum sunucuda hâlâ geçerli mi? Silinmiş kullanıcıysa yerel oturumu
@@ -46,20 +44,16 @@ class AccountDeletionService {
   static Future<void> ensureValidSession() async {
     final auth = Supabase.instance.client.auth;
     if (auth.currentSession == null) return;
-    diag68("ensure pre", "exp_in_s=${(auth.currentSession?.expiresAt ?? 0) - DateTime.now().millisecondsSinceEpoch ~/ 1000}");
     try {
       await auth.getUser();
  } on AuthRetryableFetchException {
       return; // ağ hatası: oturuma dokunma
-    } on AuthException catch (e) {
-      diag68("ensure getUser FAIL", "type=${e.runtimeType} status=${e.statusCode} msg=${e.message} str=${e.toString()}");
-      diag68("ensure before-signout");
+    } on AuthException catch (_) {
       try {
         await auth.signOut(scope: SignOutScope.local);
       } catch (_) {}
       await auth.signInAnonymously();
       await _clearActive69();
-      diag68("ensure after-anon");
     }
   }
 }

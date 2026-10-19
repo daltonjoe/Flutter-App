@@ -25,7 +25,6 @@ import 'screens/streak_page.dart';
 import 'services/account_deletion_service.dart';
 import 'services/account_linking_service.dart';
 import "package:flutter_application/paywall/paywall_service.dart";
-import "package:flutter_application/diag68.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "session/resolve_entry.dart";
 import "session/session_controller.dart";
@@ -256,16 +255,13 @@ class _WebErr67State extends State<_WebErr67> {
       _webExists67 = false;
       if (!mounted) return;
       // 90: nav70 kalkti
-      diag68("web exists snackbar", "shown");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t(context, "onboarding.register.exists")),
           action: SnackBarAction(
             label: t(context, "onboarding.register.signin"),
             onPressed: () {
-              diag68("web exists signin direct");
               startOAuthSignin90(OAuthProvider.google).catchError((Object e) {
-                diag68("web exists signin ERR", "${e.runtimeType}");
               });
             },
           ),
@@ -290,7 +286,6 @@ Future<void> showNotFound70(BuildContext context) async {
 }
 
 Future<void> _showNotFound80(BuildContext context) async {
-  diag68("notfound shown");
   final yes = await showDialog<bool>(
     context: context,
     barrierDismissible: false,
@@ -312,13 +307,11 @@ Future<void> _showNotFound80(BuildContext context) async {
   if (!context.mounted) return;
   final nav = Navigator.of(context, rootNavigator: true);
   if (yes == true) {
-    diag68("notfound yes");
     if (await _yesLink89(nav)) return;
     await _ctl80?.resolveNotFound();
     nav.popUntil((r) => r.isFirst);
     return;
   }
-  diag68("notfound no");
   final prov = context.read<ActiveProfileProvider>();
   try {
     final c = Supabase.instance.client;
@@ -335,7 +328,6 @@ Future<void> _showNotFound80(BuildContext context) async {
         debugPrint("guest restore failed: $e");
       }
     }
-    diag68("notfound guest", "restored=$back84");
     if (!back84) {
       await c.auth.signInAnonymously();
       await prov.clearActive();
@@ -389,28 +381,22 @@ class _Gate80State extends State<_Gate80> {
 }
 
 Future<bool> _yesLink89(NavigatorState nav) async {
-  diag68("notfound yes link start");
   final c = Supabase.instance.client;
   final sp = await SharedPreferences.getInstance();
   final tok = sp.getString("guest_refresh");
   if (tok == null) {
-    diag68("link ERR step=notoken");
     return false;
   }
   try {
     await AccountDeletionService.deleteRemoteOnly();
-    diag68("link del ok");
   } catch (e) {
-    diag68("link ERR step=delete", "${e.runtimeType}");
     return false;
   }
   try {
     await c.auth.signOut(scope: SignOutScope.local);
     await c.auth.setSession(tok);
     await sp.remove("guest_refresh");
-    diag68("link restored=true");
   } catch (e) {
-    diag68("link ERR step=restore", "${e.runtimeType}");
     try {
       if (c.auth.currentUser == null) await c.auth.signInAnonymously();
       await _ctl80?.profiles.clearActive();
@@ -419,10 +405,9 @@ Future<bool> _yesLink89(NavigatorState nav) async {
   }
   await _ctl80?.resolveNotFound();
   try {
-    diag68("link google start");
     await AccountLinkingService.linkGoogle();
   } catch (e) {
-    diag68("link ERR step=link", "${e.runtimeType}");
+    // Hata bilerek yutuluyor.
   }
   nav.popUntil((r) => r.isFirst);
   return true;

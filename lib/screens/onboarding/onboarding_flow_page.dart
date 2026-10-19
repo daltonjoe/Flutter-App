@@ -11,7 +11,6 @@ import '../../presentation/widgets/components/onboarding_progress_bar.dart';
 import 'onboarding_birthdate_page.dart';
 import 'onboarding_language_page.dart';
 import 'package:flutter/services.dart';
-import "package:flutter_application/diag68.dart";
 
 
 
@@ -38,11 +37,8 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
   void initState() {
     super.initState();
     _step = _minStep;
-    diag68("page: flow init");
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final r = ModalRoute.of(context);
-      diag68("flow route", "name=${r?.settings.name} cur=${r?.isCurrent}");
     });
     _controller = PageController(initialPage: _minStep);
     if (!widget.isFirstProfile || widget.skipLanguage) {
