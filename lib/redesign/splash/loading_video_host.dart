@@ -1,10 +1,13 @@
 // lib/redesign/splash/loading_video_host.dart
-// Uygulama genelinde paylaşılan tek yükleme videosu controller'ı.
+// Uygulama genelinde paylaşılan tek yükleme videosu controller'ı + talep listesi.
 //
-// Amaç: ekranlar arası geçişte video yeniden başlamasın (başa sarmasın) ve
-// poster flaşı olmasın. Controller uygulama açılışında bir kez hazırlanır;
-// ekranda [LoadingVideo] olduğu sürece oynar, hiç yokken duraklar (dispose
-// edilmez, böylece yeniden açılışta anında hazırdır).
+// Video, MaterialApp.builder içindeki kalıcı [LoadingVideoLayer] katmanında
+// yaşar ve hiç unmount olmaz (web'de unmount <video>'yu DOM'dan çıkarıp
+// oynatmayı bozuyordu). Ekranlar [LoadingVideo] ile yalnız talep bildirir:
+// talep varken katman tam ekran olur ve video oynar, yokken 1x1 pikselde
+// durur ve duraklatılır.
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -12,86 +15,162 @@ import 'package:video_player/video_player.dart';
 /// Tek yükleme görseli: sessiz, döngüde oynayan video.
 const String kLoadingVideoAsset = 'assets/videos/loading_1.mp4';
 
-/// Paylaşılan video controller'ı (singleton).
+/// Yalniz gelistirme teshisi: --dart-define=FORCE_LOADING_VIDEO=true ile
+/// hareket azaltma kapisi yok sayilir. Varsayilan false: davranis degismez.
+const bool kForceLoadingVideo = bool.fromEnvironment('FORCE_LOADING_VIDEO');
+
+/// Bir ekranın "yükleme katmanı göster" talebi.
+class LoadingVideoRequest {
+  LoadingVideoRequest({this.message, this.showTexts = false});
+
+  String? message;
+  bool showTexts;
+}
+
+/// Paylaşılan video controller'ı ve talep listesi (singleton).
 class LoadingVideoHost with WidgetsBindingObserver {
   LoadingVideoHost._();
 
   static final LoadingVideoHost instance = LoadingVideoHost._();
 
   /// Hazır olduğunda initialize edilmiş controller ile dolar.
-  /// null ise henüz hazır değil (poster gösterilir).
   final ValueNotifier<VideoPlayerController?> controller =
       ValueNotifier<VideoPlayerController?>(null);
 
-  int _refs = 0;
+  /// Talep listesi değiştikçe artar (katman yeniden çizilir).
+  final ValueNotifier<int> revision = ValueNotifier<int>(0);
+
+  final List<LoadingVideoRequest> _reqs = <LoadingVideoRequest>[];
   bool _creating = false;
-  bool _errorLogged = false;
   bool _observing = false;
+  bool _recovering = false;
+  bool _changePending = false;
+  int _retries = 0;
+
+  bool get active => _reqs.isNotEmpty;
+  LoadingVideoRequest? get top => _reqs.isEmpty ? null : _reqs.last;
 
   /// Videoyu arka planda hazırlar. Beklenmez, açılışı geciktirmez;
   /// hata debugPrint ile yutulur.
   void warmUp() {
     if (controller.value != null || _creating) return;
     // Hareket azaltma açıkken video hiç hazırlanmaz (yalnız poster kalır).
-    if (WidgetsBinding
+    final reduce = WidgetsBinding
         .instance
         .platformDispatcher
         .accessibilityFeatures
-        .disableAnimations) {
-      debugPrint('LoadingVideo: reduceMotion');
-      return;
-    }
+        .disableAnimations;
+    if (reduce && !kForceLoadingVideo) return;
     _creating = true;
     _create();
   }
 
-  /// Ekranda bir [LoadingVideo] göründüğünde çağrılır.
-  void attach() {
-    _refs++;
-    warmUp();
-    if (_refs == 1) _play();
+  /// Yükleme katmanı talebi ekler.
+  LoadingVideoRequest attach({String? message, bool showTexts = false}) {
+    if (_reqs.isEmpty) _retries = 0;
+    final r = LoadingVideoRequest(message: message, showTexts: showTexts);
+    _reqs.add(r);
+    _changed();
+    return r;
   }
 
-  /// Ekrandan bir [LoadingVideo] kalktığında çağrılır.
-  void detach() {
-    if (_refs > 0) _refs--;
-    if (_refs == 0) controller.value?.pause();
+  void update(
+    LoadingVideoRequest r, {
+    String? message,
+    bool showTexts = false,
+  }) {
+    r.message = message;
+    r.showTexts = showTexts;
+    _changed();
+  }
+
+  void detach(LoadingVideoRequest r) {
+    if (_reqs.remove(r)) _changed();
+  }
+
+  // initState/dispose build sırasında çağrılır; bildirimi mikro göreve
+  // erteler (build içinde setState olmasın) ve aynı kare içindeki
+  // detach+attach çiftlerini tek bildirimde birleştirir.
+  void _changed() {
+    if (_changePending) return;
+    _changePending = true;
+    scheduleMicrotask(() {
+      _changePending = false;
+      revision.value++;
+      _sync();
+    });
+  }
+
+  void _sync() {
+    if (active) {
+      warmUp();
+      _play();
+    } else {
+      controller.value?.pause();
+    }
   }
 
   Future<void> _create() async {
     _bindObserver();
+    VideoPlayerController? c;
     try {
-      final c = VideoPlayerController.asset(
+      c = VideoPlayerController.asset(
         kLoadingVideoAsset,
         videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
       );
-      c.addListener(_onVideoValue);
       await c.initialize();
       await c.setVolume(0);
       await c.setLooping(true);
+      c.addListener(_onVideoValue);
       controller.value = c;
-      debugPrint('LoadingVideo: ready');
-      if (_refs > 0) await c.play();
+      if (active) await _play();
     } catch (e) {
       debugPrint('LoadingVideo init failed: ${e.runtimeType} $e');
+      try {
+        await c?.dispose();
+      } catch (_) {}
     } finally {
       _creating = false;
     }
   }
 
-  void _play() {
+  Future<void> _play() async {
     final c = controller.value;
-    if (c == null) return;
-    c.play();
-    debugPrint('LoadingVideo: playing');
+    if (c == null || !active) return;
+    try {
+      await c.play();
+    } catch (e) {
+      debugPrint('LoadingVideo play failed: ${e.runtimeType} $e');
+    }
   }
 
-  /// Oynatma sırasında oluşan hatayı (tek sefer) loglar.
+  /// Controller hataya düştüyse ya da boyutu 0 ise yeniden oluşturur.
   void _onVideoValue() {
     final c = controller.value;
-    if (c == null || _errorLogged || !c.value.hasError) return;
-    _errorLogged = true;
-    debugPrint('LoadingVideo value error: ${c.value.errorDescription}');
+    if (c == null) return;
+    final v = c.value;
+    if (v.hasError || (v.isInitialized && v.size == Size.zero)) {
+      unawaited(_recover());
+    }
+  }
+
+  Future<void> _recover() async {
+    if (_recovering || _retries >= 5) return;
+    _recovering = true;
+    _retries++;
+    final old = controller.value;
+    debugPrint(
+      'LoadingVideo: recreate #$_retries '
+      'error=${old?.value.errorDescription} size=${old?.value.size}',
+    );
+    controller.value = null;
+    old?.removeListener(_onVideoValue);
+    try {
+      await old?.dispose();
+    } catch (_) {}
+    _creating = false;
+    _recovering = false;
+    warmUp();
   }
 
   void _bindObserver() {
@@ -105,7 +184,7 @@ class LoadingVideoHost with WidgetsBindingObserver {
     final c = controller.value;
     if (c == null) return;
     if (state == AppLifecycleState.resumed) {
-      if (_refs > 0) c.play();
+      if (active) c.play();
     } else if (state == AppLifecycleState.detached) {
       // Uygulama kapanıyor: controller'ı serbest bırak.
       _release();

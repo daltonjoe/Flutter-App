@@ -170,7 +170,7 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
       t(context, key),
       style: Theme.of(
         context,
-      ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+      ).textTheme.bodySmall?.copyWith(color: AppColors.mist),
     ),
   );
 
@@ -184,7 +184,7 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
       appBar: AppBar(
         backgroundColor: AppColors.bgDeep,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        iconTheme: const IconThemeData(color: AppColors.starlight),
         title: Text(
           t(context, 'birth_data.title'),
           style: Theme.of(context).textTheme.titleMedium,
@@ -327,7 +327,9 @@ class _EditBirthDataPageState extends State<EditBirthDataPage> {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    const LoadingVideo(),
+                    LoadingVideo(
+                      message: t(context, 'onboarding.calculating.title'),
+                    ),
                     SafeArea(
                       child: Align(
                         alignment: AppSizes.loadingMessageAlignment,

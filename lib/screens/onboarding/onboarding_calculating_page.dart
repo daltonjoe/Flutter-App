@@ -3,7 +3,6 @@ import '../../presentation/widgets/components/cosmic_loader.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_error_state.dart';
 import '../../core/theme/app_colors.dart';
-import '../../redesign/splash/loading_video.dart';
 
 class OnboardingCalculatingPage extends StatefulWidget {
   const OnboardingCalculatingPage({
@@ -63,7 +62,6 @@ class _OnboardingCalculatingPageState extends State<OnboardingCalculatingPage> {
             ? Stack(
                 fit: StackFit.expand,
                 children: [
-                  const Positioned.fill(child: LoadingVideo()),
                   SafeArea(
                     child: CosmicErrorState(
                       message: t(context, 'onboarding.chart_save_failed'),

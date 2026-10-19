@@ -33,6 +33,7 @@ import "session/supabase_session_source.dart";
 import "presentation/widgets/components/cosmic_loader.dart";
 import "presentation/widgets/components/cosmic_error_state.dart";
 import "redesign/splash/loading_video_host.dart";
+import "redesign/splash/loading_video.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -152,7 +153,10 @@ class SoulBoundApp extends StatelessWidget {
                 textDirection: languageProvider.isRtl
                     ? TextDirection.rtl
                     : TextDirection.ltr,
-                child: child!,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [child!, const LoadingVideoLayer()],
+                ),
               ),
             ),
           ),
@@ -379,7 +383,7 @@ class _Gate80State extends State<_Gate80> {
         ),
       ),
       EntryRoute.loading => const CosmicLoadingScreen(),
-      EntryRoute.notFound => const Scaffold(backgroundColor: Colors.black),
+      EntryRoute.notFound => const Scaffold(backgroundColor: AppColors.bgVoid),
     };
   }
 }

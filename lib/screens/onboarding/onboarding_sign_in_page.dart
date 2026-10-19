@@ -14,7 +14,6 @@ import "../../providers/active_profile_provider.dart";
 import "package:flutter_application/diag68.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "../../main.dart" show showNotFound70;
-import "../../redesign/splash/splash_backdrop.dart";
 
 class OnboardingSignInPage extends StatefulWidget {
   const OnboardingSignInPage({super.key});
@@ -329,7 +328,15 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
     );
     return Stack(
       fit: StackFit.expand,
-      children: [const SplashBackdrop(), scaffold],
+      children: [
+        Positioned.fill(
+          child: Image.asset(
+            'assets/images/logo/background.jpg',
+            fit: BoxFit.cover,
+          ),
+        ),
+        scaffold,
+      ],
     );
   }
 

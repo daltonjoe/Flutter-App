@@ -12,7 +12,6 @@ import 'onboarding_birthdate_page.dart';
 import 'onboarding_language_page.dart';
 import 'package:flutter/services.dart';
 import "package:flutter_application/diag68.dart";
-import '../../redesign/splash/splash_backdrop.dart';
 
 
 
@@ -95,8 +94,6 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
             ),
           ),
 
-          // Redesign: splash arka planı (bayrak açıkken yedek görselin üstünü kapatır)
-          const Positioned.fill(child: SplashBackdrop()),
           SafeArea(
             child: Column(
               children: [
