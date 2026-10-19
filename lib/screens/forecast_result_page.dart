@@ -189,7 +189,7 @@ class _ForecastResultPageState extends State<ForecastResultPage> {
         AppSpacing.screenH,
         AppSpacing.sm,
         AppSpacing.screenH,
-        AppSizes.bottomNavInset(context),
+        AppSizes.scrollBottomPadding(context),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

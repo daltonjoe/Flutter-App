@@ -135,7 +135,7 @@ class _TransitDetailPageState extends State<TransitDetailPage> {
                 AppSpacing.screenH,
                 AppSpacing.screenH,
                 AppSpacing.screenH,
-                AppSizes.bottomNavInset(context),
+                AppSizes.scrollBottomPadding(context),
               ),
               children: [
                 Text(
@@ -143,7 +143,7 @@ class _TransitDetailPageState extends State<TransitDetailPage> {
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: AppColors.starlight,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -156,14 +156,14 @@ class _TransitDetailPageState extends State<TransitDetailPage> {
                     if (orb != null)
                       _chip(
                         '${t(context, 'transit.orb')}: ${orb.toStringAsFixed(1)}°',
-                        AppColors.textSecondary,
+                        AppColors.mist,
                       ),
                     _chip(
                       t(
                         context,
                         applying ? 'transit.applying' : 'transit.separating',
                       ),
-                      AppColors.textSecondary,
+                      AppColors.mist,
                     ),
                   ],
                 ),
@@ -176,8 +176,8 @@ class _TransitDetailPageState extends State<TransitDetailPage> {
                     fontSize: 15,
                     height: 1.5,
                     color: _failed || _body == null
-                        ? AppColors.textMuted
-                        : AppColors.textPrimary,
+                        ? AppColors.mist
+                        : AppColors.starlight,
                   ),
                 ),
                 if (widget.profileId != null && widget.day != null) ...[

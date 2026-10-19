@@ -453,7 +453,7 @@ class _MatchPageState extends State<MatchPage> {
               AppSpacing.screenH,
               AppSpacing.contentTop,
               AppSpacing.screenH,
-              AppSizes.bottomNavInset(context),
+              AppSizes.scrollBottomPadding(context),
             ),
             children: [
               Container(

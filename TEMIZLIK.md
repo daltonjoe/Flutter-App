@@ -22,11 +22,31 @@ Mevcut koddaki ölü/tekrar/gereksiz parçalar. Silme yalnızca kullanıcı ilgi
 
 ## Dipnot kaldırma + Ask balon düzleştirme
 
-- KALAN (kullanılmayan anahtar): locales/*.json → `ask.disclaimer` (8 dil). "Eğlence/öz-yansıtma; sağlık-hukuk-finans tavsiyesi değildir" notunu gösteren widget'lar bu işte kaldırıldı (ask_page.dart composer altı, today_page.dart altı); anahtar/değer locale kuralı gereği silinmedi. Silme adayı.
+- SİLİNDİ (faz-9a temizlik): locales/*.json → `ask.disclaimer` (8 dil). "Eğlence/öz-yansıtma; sağlık-hukuk-finans tavsiyesi değildir" notunu gösteren widget'lar bu işte kaldırıldı (ask_page.dart composer altı, today_page.dart altı); kodda sıfır referans doğrulandı ve 8 dilden silindi.
 
 ## Profile + Settings yeniden tasarımı (faz-9a)
 
-- KALAN (kullanılmayan anahtar): locales/*.json → `profile_switcher.add` ("Add new profile", 8 dil). Profil şeridindeki ekleme chip'i artık kısa etiket `profile_switcher.new_short` kullanıyor; uzun varyant kodda okunmuyor. Silme adayı.
-- lib/screens/settings_page.dart:962 — `MISSING TOKENS` yorum satırı artık güncel değil: skeleton rengi `bgSurface` yerine `navyRaised` kullanılıyor, divider token'ı `hairline` olarak uygulandı. Yorum güncellenebilir/silinebilir.
+- SİLİNDİ (faz-9a temizlik): locales/*.json → `profile_switcher.add` ("Add new profile", 8 dil). Profil şeridindeki ekleme chip'i artık kısa etiket `profile_switcher.new_short` kullanıyor; uzun varyant kodda okunmuyordu, 8 dilden silindi.
+- SİLİNDİ (faz-9a temizlik): lib/screens/settings_page.dart:962 — `MISSING TOKENS` yorum satırı artık güncel değildi (skeleton rengi `bgSurface` yerine `navyRaised`, divider token'ı `hairline`); sıfır kod referansı, silindi.
 - KALAN (kullanılmayan anahtar): locales/*.json → `sen.new_profile` (8 dil) kodda okunmuyor (profil ekleme akışı `profile_switcher.new_short`/onboarding rotalarını kullanıyor). Silme adayı.
+
+
+- lib/redesign/splash/splash_backdrop.dart: video_layer sonrasi referanssiz (flow ve sign-in artik kullanmiyor). Silme adayi, izin gerekir.
+
+## Ask klavye + composer revizesi (faz-9a)
+
+- SİLİNDİ (faz-9a temizlik): locales/*.json → `ask.empty_title`, `ask.empty_body`, `ask.suggest_1/2/3` (8 dil). Ask boş durumu artık moda özel `ask.empty_title.$mode`, `ask.empty_body.$mode` ve `ask.suggest.$mode.N` anahtarlarını kullanıyor; eski tekil anahtarlar kodda okunmuyordu, 8 dilden silindi.
+- SİLİNDİ: locales/*.json → `ask.disclaimer` (8 dil). Yukarıdaki "Dipnot kaldırma" bölümünde kayıtlıydı; faz-9a temizlik turunda silindi.
+- lib/screens/ask_page.dart:1340 — `/// AV: balonlar sÄ±rayla ...` yorum satırı mojibake (UTF-8 bozulması); metin düzeltmesi veya silme adayı.
+- AYRI İŞ (bu turda düzeltilmedi): lib/screens/ask_page.dart — hardcode ölçüler: kullanıcı balonu 20/14/10 (~739-744), balon genişlikleri 0.80/0.82 (~732/~795), ay seçici sheet sabitleri 12/200/40/48/16 (~329-386), composer blur 12 (~1063).
+
+## Faz-9a temizlik turu (FAZ 5)
+
+- SİLİNDİ: locales/{ar,de,en,es,fr,it,pt,tr}.json → 7 anahtar (`ask.empty_title`, `ask.empty_body`, `ask.suggest_1/2/3`, `ask.disclaimer`, `profile_switcher.add`); 8 dilde parite korundu (508 → 501). Moda özel `ask.empty_title.$mode`/`ask.empty_body.$mode`/`ask.suggest.$mode.N` aileleri korundu.
+- SİLİNDİ: lib/screens/settings_page.dart — `MISSING TOKENS` yorum satırı (güncel değildi).
+- BIRAKILDI (referanslı): lib/theme/app_theme.dart — re-export shim; 10+ dosya (main.dart, language_switcher/selector, planet_report_page, placement_content_page, natal_report_page, forecast_*_page, analysis/*) bu yolu import ediyor. Silme = çok dosyalı refaktör; bu turda dokunulmadı.
+- BIRAKILDI (kapsam dışı — DOKUNMA: lib/redesign/splash/*): lib/redesign/splash/splash_backdrop.dart — referanssız (SplashBackdrop yalnız kendi dosyasında tanımlı), ama splash klasörü dokunulmaz listede olduğu için silinmedi.
+- YENİ ADAY: lib/widgets/city_search_field.dart — `CitySearchField` kodda hiçbir yerde import/çağrılmıyor (yalnız kendi dosyası + cosmic_input_field.dart doc yorumu). Sıfır referans; silme için kullanıcı onayı bekliyor.
+- YENİ ADAY: assets/glyphs/ klasörü yalnız .gitkeep (SVG asset yok, `kSvgGlyphs` boş) ve pubspec.yaml'da asset olarak bildirilmiş (assets/glyphs/). FAZ 2d SVG işi için placeholder; SVG eklenmezse klasör+bildirim kaldırılabilir.
+- TARAMA SONUCU: assets/ altındaki tüm görsel/video/json dosyaları (logo, relationship, zodiac, redesign/planets, earth_home, background, loading_1.mp4, cities.json) kodda referanslı; referanssız asset bulunamadı.
 

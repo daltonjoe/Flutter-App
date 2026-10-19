@@ -1,12 +1,11 @@
 // Gezegen karuseli (Faz 5). Ölçekleme PageController ile animasyonlanır.
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/constants/astro_glyphs.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
@@ -14,12 +13,13 @@ import '../../i18n/app_localizations.dart';
 import '../../models/natal_chart_response.dart';
 import '../../presentation/widgets/components/cosmic_card.dart';
 import '../../presentation/widgets/components/glyph.dart';
-import '../../presentation/widgets/components/planet_glyph_icon.dart';
 import '../../services/reference_names_service.dart';
 import '../assets_map.dart';
 import '../data/planet_card_view_model.dart';
 import '../detail/redesign_detail_page.dart';
-import 'orbit_stars.dart';
+
+export 'planet_glyph_strip.dart';
+export 'planet_hero.dart';
 
 /// Burç anahtarları ([AstroGlyphs.glyphs] içinde tanımlı), 0 tabanlı burç
 /// indeksine göre sıralı: 0 = Koç … 11 = Balık.
@@ -38,28 +38,17 @@ const List<String> _zodiacKeys = <String>[
   'pisces',
 ];
 
-/// Burç indeksine göre element rengi (0 fire, 1 earth, 2 air, 3 water).
+/// Burç indeksine göre element rengi. Element→renk eşlemesinin tek kaynağı
+/// [AstroGlyphs]'tir; burada yalnız indeks→burç anahtarı çözülür.
 Color _elementColor(int signIndex) {
-  switch (signIndex % 4) {
-    case 0:
-      return AppColors.elementFire;
-    case 1:
-      return AppColors.elementEarth;
-    case 2:
-      return AppColors.elementAir;
-    default:
-      return AppColors.elementWater;
-  }
+  final key = _zodiacKeys[signIndex % _zodiacKeys.length];
+  return AstroGlyphs.elementColorFor(key) ?? AppColors.elementWater;
 }
 
 String? _zodiacKeyFor(int signIndex) =>
     (signIndex >= 0 && signIndex < _zodiacKeys.length)
     ? _zodiacKeys[signIndex]
     : null;
-
-/// PlanetHero sahnesinin yüksekliği (dp). Karusel bindirmesi bu değeri
-/// paylaşır; başka bir yerde tekrar edilmemelidir.
-const double kPlanetHeroHeight = 280;
 
 class PlanetCarousel extends StatefulWidget {
   const PlanetCarousel({
@@ -426,410 +415,4 @@ class _RetroChip extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Gezegen glyph'lerinden oluşan yatay seçim şeridi.
-///
-/// Seçili öğe altın çerçeve/dolgu ile vurgulanır ve şeritte görünür tutulur.
-class PlanetGlyphStrip extends StatefulWidget {
-  const PlanetGlyphStrip({
-    super.key,
-    required this.chartData,
-    required this.selected,
-  });
-
-  final NatalChartResponse chartData;
-
-  final ValueNotifier<int> selected;
-
-  @override
-  State<PlanetGlyphStrip> createState() => _PlanetGlyphStripState();
-}
-
-class _PlanetGlyphStripState extends State<PlanetGlyphStrip> {
-  static const double _dotSize = 36.0;
-
-  final ScrollController _scroll = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    widget.selected.addListener(_keepSelectedVisible);
-  }
-
-  @override
-  void didUpdateWidget(covariant PlanetGlyphStrip oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.selected != widget.selected) {
-      oldWidget.selected.removeListener(_keepSelectedVisible);
-      widget.selected.addListener(_keepSelectedVisible);
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.selected.removeListener(_keepSelectedVisible);
-    _scroll.dispose();
-    super.dispose();
-  }
-
-  /// Seçili öğeyi şeridin ortasına getirir (dış sayfayı kaydırmaz).
-  void _keepSelectedVisible() {
-    if (!mounted || !_scroll.hasClients) return;
-    final i = widget.selected.value;
-    final viewport = _scroll.position.viewportDimension;
-    final itemStart = AppSpacing.screenH + i * (_dotSize + AppSpacing.sm);
-    final target = (itemStart - (viewport - _dotSize) / 2).clamp(
-      0.0,
-      _scroll.position.maxScrollExtent,
-    );
-    if (MediaQuery.disableAnimationsOf(context)) {
-      _scroll.jumpTo(target);
-    } else {
-      _scroll.animateTo(
-        target,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutCubic,
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final names = context.watch<ReferenceNamesService>();
-    final items = PlanetCardViewModel.fromChart(widget.chartData, names);
-    if (items.isEmpty) return const SizedBox.shrink();
-
-    final reduceMotion = MediaQuery.disableAnimationsOf(context);
-
-    return ValueListenableBuilder<int>(
-      valueListenable: widget.selected,
-      builder: (context, active, _) {
-        return SingleChildScrollView(
-          controller: _scroll,
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsetsDirectional.symmetric(
-            horizontal: AppSpacing.screenH,
-          ),
-          child: Row(
-            children: [
-              for (int i = 0; i < items.length; i++) ...[
-                if (i > 0) const SizedBox(width: AppSpacing.sm),
-                _GlyphDot(
-                  item: items[i],
-                  selected: i == active,
-                  reduceMotion: reduceMotion,
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    widget.selected.value = i;
-                  },
-                ),
-              ],
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// Şeritteki tek gezegen glyph dairesi.
-class _GlyphDot extends StatelessWidget {
-  const _GlyphDot({
-    required this.item,
-    required this.selected,
-    required this.reduceMotion,
-    required this.onTap,
-  });
-
-  final PlanetCardViewModel item;
-  final bool selected;
-  final bool reduceMotion;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: item.name,
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: reduceMotion
-              ? Duration.zero
-              : const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: selected ? AppColors.navyRaised : Colors.transparent,
-            border: Border.all(
-              color: selected ? AppColors.gold : AppColors.hairline,
-              width: selected ? 1.5 : 1.0,
-            ),
-          ),
-          child: Center(
-            child: PlanetGlyphIcon(
-              name: item.key.toLowerCase(),
-              size: 20,
-              color: selected ? AppColors.gold : AppColors.mist,
-              decorative: true,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Seçili gezegenin sahnesi: glow, yörünge halkaları ve gezegen görseli.
-///
-/// Ekrandaki tek ambient hareket arkadaki altın glow'dur; halkalar statiktir.
-class PlanetHero extends StatefulWidget {
-  const PlanetHero({
-    super.key,
-    required this.chartData,
-    required this.selected,
-    this.pagePosition,
-  });
-
-  final NatalChartResponse chartData;
-
-  final ValueListenable<int> selected;
-
-  /// Verilirse gezegen görselleri kaydırma konumuna göre kayar.
-  final ValueListenable<double>? pagePosition;
-
-  @override
-  State<PlanetHero> createState() => _PlanetHeroState();
-}
-
-class _PlanetHeroState extends State<PlanetHero>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _glow = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 5),
-  );
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // TickerProviderStateMixin sayesinde TickerMode kapalıyken ticker askıya
-    // alınır; burada yalnızca "hareketi azalt" tercihi yönetilir.
-    if (MediaQuery.disableAnimationsOf(context)) {
-      _glow.stop();
-    } else if (!_glow.isAnimating) {
-      _glow.repeat(reverse: true);
-    }
-  }
-
-  @override
-  void dispose() {
-    _glow.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final names = context.watch<ReferenceNamesService>();
-    final items = PlanetCardViewModel.fromChart(widget.chartData, names);
-    if (items.isEmpty) return const SizedBox.shrink();
-
-    return SizedBox(
-      height: kPlanetHeroHeight,
-      child: ValueListenableBuilder<int>(
-        valueListenable: widget.selected,
-        builder: (context, index, _) {
-          final item = items[index.clamp(0, items.length - 1)];
-          // Tek RepaintBoundary: sahne birlikte boyanır. Stack sırası
-          // halkalar → yıldızlar → gezegen'dir.
-          return RepaintBoundary(
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                Positioned.fill(
-                  child: Center(
-                    child: _HeroGlow(
-                      controller: _glow,
-                      reduceMotion: reduceMotion,
-                    ),
-                  ),
-                ),
-                const Positioned.fill(
-                  child: CustomPaint(painter: _OrbitRingsPainter()),
-                ),
-                Positioned.fill(
-                  child: OrbitStars(
-                    trigger: item.key,
-                    reduceMotion: reduceMotion,
-                  ),
-                ),
-                Positioned.fill(
-                  child: _visualLayer(items, index, reduceMotion),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  /// Gezegen görselleri katmanı.
-  ///
-  /// [PlanetHero.pagePosition] verilmişse görseller kaydırma konumuna göre
-  /// yatayda kayar; verilmemişse (veya hareket azaltma açıksa) seçili görsel
-  /// çapraz geçişle gösterilir.
-  Widget _visualLayer(
-    List<PlanetCardViewModel> items,
-    int index,
-    bool reduceMotion,
-  ) {
-    final position = widget.pagePosition;
-    if (position == null || reduceMotion) {
-      final item = items[index.clamp(0, items.length - 1)];
-      final duration = reduceMotion
-          ? const Duration(milliseconds: 150)
-          : const Duration(milliseconds: 450);
-      return AnimatedSwitcher(
-        duration: duration,
-        switchInCurve: reduceMotion ? Curves.linear : Curves.easeOutExpo,
-        transitionBuilder: (child, animation) {
-          if (reduceMotion) {
-            return FadeTransition(opacity: animation, child: child);
-          }
-          return FadeTransition(
-            opacity: animation,
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.96, end: 1).animate(animation),
-              child: child,
-            ),
-          );
-        },
-        child: _planetImage(item, key: ValueKey<String>(item.key)),
-      );
-    }
-
-    return ValueListenableBuilder<double>(
-      valueListenable: position,
-      builder: (context, page, _) {
-        return ClipRect(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final double sceneWidth = constraints.maxWidth;
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  for (int i = 0; i < items.length; i++)
-                    if ((i - page).abs() < 1.5)
-                      _slidingImage(context, items[i], i - page, sceneWidth),
-                ],
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  /// Tek gezegen görselini kaydırma konumuna göre kaydırır, ölçekler ve
-  /// soldurur.
-  Widget _slidingImage(
-    BuildContext context,
-    PlanetCardViewModel item,
-    double d,
-    double sceneWidth,
-  ) {
-    // t: kenara yaklastikca 0 -> 1 (easeOut).
-    final double t = Curves.easeOut.transform(d.abs().clamp(0.0, 1.0));
-    final double scale = 1.0 - 0.45 * t; // lerp(1.0, 0.55, t)
-    final double opacity = 1 - 0.7 * t;
-    // RTL'de kayma yonu ters cevrilir.
-    final bool rtl = Directionality.of(context) == TextDirection.rtl;
-    return Transform.translate(
-      offset: Offset(d * sceneWidth * 0.55 * (rtl ? -1 : 1), 0),
-      child: Opacity(
-        opacity: opacity,
-        child: Transform.scale(scale: scale, child: _planetImage(item)),
-      ),
-    );
-  }
-
-  /// Gezegen görseli; asset yüklenemezse emoji'ye düşer.
-  Widget _planetImage(PlanetCardViewModel item, {Key? key}) {
-    return Image.asset(
-      RdAssets.planetImage(item.key),
-      key: key,
-      height: 220,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) =>
-          Text(item.emoji, style: AppTextStyles.displayLarge()),
-    );
-  }
-}
-
-/// Arkadaki tek altın glow: 5 sn'lik nefes (opaklık 0.25 ↔ 0.38).
-class _HeroGlow extends StatelessWidget {
-  const _HeroGlow({required this.controller, required this.reduceMotion});
-
-  final AnimationController controller;
-  final bool reduceMotion;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, _) {
-        final double alpha = reduceMotion
-            ? 0.30
-            : 0.25 + 0.13 * Curves.easeInOutSine.transform(controller.value);
-        return Container(
-          width: 260,
-          height: 260,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: [
-                AppColors.gold.withValues(alpha: alpha),
-                AppColors.gold.withValues(alpha: alpha * 0.4),
-                AppColors.gold.withValues(alpha: 0),
-              ],
-              stops: const [0.0, 0.55, 1.0],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.gold.withValues(alpha: alpha * 0.5),
-                blurRadius: 32,
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// Statik eş merkezli altın yörünge halkaları. Çaplar [kRingDiameters] ile
-/// OrbitStars ile paylaşılır (yarıçaplar 100 / 125 / 150 dp).
-class _OrbitRingsPainter extends CustomPainter {
-  const _OrbitRingsPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1
-      ..color = AppColors.gold.withValues(alpha: 0.15);
-    for (final d in kRingDiameters) {
-      canvas.drawCircle(center, d / 2, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _OrbitRingsPainter oldDelegate) => false;
 }

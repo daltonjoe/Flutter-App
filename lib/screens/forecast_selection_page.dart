@@ -145,7 +145,7 @@ class ForecastSelectionPage extends StatelessWidget {
               Expanded(
                 child: ListView.separated(
                   padding: EdgeInsets.only(
-                    bottom: AppSizes.bottomNavInset(context),
+                    bottom: AppSizes.scrollBottomPadding(context),
                   ),
                   itemCount: _options.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),

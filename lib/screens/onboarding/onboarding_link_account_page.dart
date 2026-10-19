@@ -7,7 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 
 class OnboardingLinkAccountPage extends StatefulWidget {
-const OnboardingLinkAccountPage({super.key});
+  const OnboardingLinkAccountPage({super.key});
 
   @override
   State<OnboardingLinkAccountPage> createState() =>
@@ -27,7 +27,7 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
     super.initState();
     // Google/Apple OAuth tarayıcı akışı dönünce (deep-link) buradan yakalanır.
     _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((state) {
-  if (!mounted) return;
+      if (!mounted) return;
       final user = state.session?.user;
       if (user == null || user.isAnonymous) return;
       _goHome();
@@ -43,12 +43,14 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
   }
 
   bool _navigated = false;
-    void _goHome() {
-      if (_navigated || !mounted) return;
-      _navigated = true;
-  Navigator.of(context, rootNavigator: true)
-    .pushNamedAndRemoveUntil('/onboarding/consent', (route) => false);
-    }
+  void _goHome() {
+    if (_navigated || !mounted) return;
+    _navigated = true;
+    Navigator.of(
+      context,
+      rootNavigator: true,
+    ).pushNamedAndRemoveUntil('/onboarding/consent', (route) => false);
+  }
 
   Future<void> _onSave() async {
     if (!_formKey.currentState!.validate()) return;
@@ -62,8 +64,7 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
           password: _passwordController.text,
         );
 
-
-   _emailAlreadyLinked = true;
+        _emailAlreadyLinked = true;
       } on AuthException catch (e) {
         if (!mounted) return;
         setState(() => _isSubmitting = false);
@@ -78,8 +79,6 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
           ),
         );
         return;
-
-
       } catch (_) {
         if (!mounted) return;
         setState(() => _isSubmitting = false);
@@ -121,91 +120,114 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
             padding: const EdgeInsets.all(24),
             child: Form(
               key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    t(context, 'onboarding.link_account.description'),
-                                                 style: AppTextStyles.bodyMd(color: AppColors.textPrimary),
-                  ),
-                  const SizedBox(height: 24),
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: t(
-                        context,
-                        'onboarding.link_account.email_label',
-                      ),
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      t(context, 'onboarding.link_account.description'),
+                      style: AppTextStyles.bodyMd(color: AppColors.textPrimary),
                     ),
-                    validator: (value) {
-                      if (value == null || !value.contains('@')) {
-                        return t(
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: t(
                           context,
-                          'onboarding.link_account.email_invalid',
-                        );
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: t(
-                        context,
-                        'onboarding.link_account.password_label',
+                          'onboarding.link_account.email_label',
+                        ),
                       ),
+                      validator: (value) {
+                        if (value == null || !value.contains('@')) {
+                          return t(
+                            context,
+                            'onboarding.link_account.email_invalid',
+                          );
+                        }
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value.length < 6) {
-                        return t(
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: t(
                           context,
-                          'onboarding.link_account.password_too_short',
-                        );
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _isSubmitting ? null : _onSave,
-                    child: _isSubmitting
-                                 ? SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.textPrimary,
+                          'onboarding.link_account.password_label',
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.length < 6) {
+                          return t(
+                            context,
+                            'onboarding.link_account.password_too_short',
+                          );
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: _isSubmitting ? null : _onSave,
+                      child: _isSubmitting
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.textPrimary,
+                              ),
+                            )
+                          : Text(
+                              t(context, 'onboarding.link_account.save_button'),
                             ),
-                          )
-                        : Text(t(context, 'onboarding.link_account.save_button')),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(children: [
-                    const Expanded(child: Divider()),
-                    Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text(t(context, 'onboarding.link_account.or_divider'))),
-                    const Expanded(child: Divider()),
-                  ]),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.g_mobiledata),
-                    label: Text(t(context, 'onboarding.link_account.google_button')),
-                    onPressed: _isSubmitting ? null : () => _onOAuth(AccountLinkingService.linkGoogle),
-                  ),
-                  const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.apple),
-                    label: Text(t(context, 'onboarding.link_account.apple_button')),
-                    onPressed: _isSubmitting ? null : () => _onOAuth(AccountLinkingService.linkApple),
-                  ),
-                  const SizedBox(height: 8),
-                  TextButton(
-                    onPressed: _isSubmitting ? null : _goHome,
-                    child: Text(t(context, 'onboarding.link_account.skip_button')),
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        const Expanded(child: Divider()),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            t(context, 'onboarding.link_account.or_divider'),
+                          ),
+                        ),
+                        const Expanded(child: Divider()),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.g_mobiledata),
+                      label: Text(
+                        t(context, 'onboarding.link_account.google_button'),
+                      ),
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => _onOAuth(AccountLinkingService.linkGoogle),
+                    ),
+                    const SizedBox(height: 8),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.apple),
+                      label: Text(
+                        t(context, 'onboarding.link_account.apple_button'),
+                      ),
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => _onOAuth(AccountLinkingService.linkApple),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: _isSubmitting ? null : _goHome,
+                      child: Text(
+                        t(context, 'onboarding.link_account.skip_button'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

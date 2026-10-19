@@ -958,5 +958,3 @@ class _SettingsPageState extends State<SettingsPage>
     );
   }
 }
-
-// MISSING TOKENS: skeleton/placeholder color (used AppColors.bgSurface), explicit minTapHeight constant (inline 48dp), dedicated section-divider token

@@ -349,7 +349,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
       );
       slivers.add(
         SliverToBoxAdapter(
-          child: SizedBox(height: AppSizes.bottomNavInset(context)),
+          child: SizedBox(height: AppSizes.scrollBottomPadding(context)),
         ),
       );
     }

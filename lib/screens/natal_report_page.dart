@@ -159,7 +159,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
             SliverAppBar(
               pinned: true,
               backgroundColor: AppTheme.bgDeep,
-              iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+              iconTheme: const IconThemeData(color: AppColors.starlight),
               title: Text(
                 t(
                   context,
@@ -167,7 +167,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
                   args: {'name': widget.userName},
                 ),
                 style: const TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: AppColors.starlight,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -176,7 +176,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
                 IconButton(
                   icon: const Icon(
                     Icons.refresh_rounded,
-                    color: AppTheme.textSecondary,
+                    color: AppColors.mist,
                   ),
                   onPressed: _fetchReport,
                   tooltip: t(context, 'natal_report.refresh'),
@@ -195,7 +195,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
                   20,
                   12,
                   20,
-                  AppSizes.bottomNavInset(context),
+                  AppSizes.scrollBottomPadding(context),
                 ),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
@@ -253,7 +253,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
                         args: {'name': widget.userName},
                       ),
                       style: const TextStyle(
-                        color: AppTheme.textPrimary,
+                        color: AppColors.starlight,
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.2,
@@ -263,7 +263,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
                       Text(
                         '📍 ${location.cityResolved}',
                         style: const TextStyle(
-                          color: AppTheme.textSecondary,
+                          color: AppColors.mist,
                           fontSize: 12,
                         ),
                       ),
@@ -314,7 +314,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
           Text(
             label,
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: AppColors.starlight,
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -365,7 +365,7 @@ class _NatalReportPageState extends State<NatalReportPage> {
         Text(
           t(context, 'natal_report.footer_tagline'),
           style: const TextStyle(
-            color: AppTheme.textMuted,
+            color: AppColors.mist,
             fontSize: 12,
             fontStyle: FontStyle.italic,
           ),

@@ -88,7 +88,7 @@ class _StreakPageState extends State<StreakPage> {
             ),
           ],
         ),
-        body: SafeArea(child: _body(context)),
+        body: SafeArea(bottom: false, child: _body(context)),
       ),
     );
   }
@@ -163,9 +163,8 @@ class _StreakPageState extends State<StreakPage> {
           AppSpacing.screenH,
           AppSpacing.contentTop,
           AppSpacing.screenH,
-          // SafeArea(bottom: true) alt güvenli alanı zaten ekliyor; burada
-          // yalnızca çubuk yüksekliği kadar boşluk bırakılır.
-          AppSizes.bottomNavHeight,
+          // Yüzen çubuk bölgesi + alt güvenli alan + nefes payı.
+          AppSizes.scrollBottomPadding(context),
         ),
         children: [
           Container(
@@ -208,9 +207,8 @@ class _StreakPageState extends State<StreakPage> {
         AppSpacing.screenH,
         AppSpacing.contentTop,
         AppSpacing.screenH,
-        // SafeArea(bottom: true) alt güvenli alanı zaten ekliyor; burada
-        // yalnızca çubuk yüksekliği kadar boşluk bırakılır.
-        AppSizes.bottomNavHeight,
+        // Yüzen çubuk bölgesi + alt güvenli alan + nefes payı.
+        AppSizes.scrollBottomPadding(context),
       ),
       children: [
         Container(
