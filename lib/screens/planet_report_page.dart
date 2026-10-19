@@ -172,7 +172,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
   @override
   Widget build(BuildContext context) {
     final m = _meta[widget.planetName];
-    final color = (m?['color'] as Color?) ?? AppTheme.violet;
+    final color = (m?['color'] as Color?) ?? AppColors.gold;
     final emoji = m?['emoji'] as String? ?? '✦';
     final pd = widget.chartData.planets?[widget.planetName];
     final names = context.watch<ReferenceNamesService>();
@@ -184,11 +184,11 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+          iconTheme: const IconThemeData(color: AppColors.starlight),
           title: Text(
             t(context, 'planet_report.title', args: {'name': planetLabel}),
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: AppColors.starlight,
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
@@ -199,7 +199,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
               IconButton(
                 icon: const Icon(
                   Icons.refresh_rounded,
-                  color: AppTheme.textSecondary,
+                  color: AppColors.mist,
                   size: 20,
                 ),
                 onPressed: _fetch,
@@ -242,7 +242,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
         AppSpacing.screenH,
         AppSpacing.contentTop,
         AppSpacing.screenH,
-        AppSizes.bottomNavInset(context),
+        AppSizes.scrollBottomPadding(context),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +327,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
                           '${pd.house > 0 ? '  ·  ${t(context, 'planet_report.house', args: {'number': pd.house.toString()})}' : ''}'
                           '${pd.retrograde ? '  ·  ${t(context, 'planet_report.retrograde')}' : ''}',
                           style: const TextStyle(
-                            color: AppTheme.textSecondary,
+                            color: AppColors.mist,
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
@@ -357,7 +357,7 @@ class _PlanetReportPageState extends State<PlanetReportPage> {
             Text(
               t(context, 'planet_report.time_unknown'),
               style: const TextStyle(
-                color: AppTheme.textSecondary,
+                color: AppColors.mist,
                 fontSize: 14,
                 height: 1.5,
               ),

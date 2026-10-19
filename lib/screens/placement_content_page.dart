@@ -105,19 +105,19 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+            iconTheme: const IconThemeData(color: AppColors.starlight),
             title: Text(
               t(context, 'placement.title'),
               style: const TextStyle(
-                color: AppTheme.textPrimary,
+                color: AppColors.starlight,
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
               ),
             ),
             bottom: TabBar(
-              indicatorColor: AppTheme.violet,
-              labelColor: AppTheme.violet,
-              unselectedLabelColor: AppTheme.textMuted,
+              indicatorColor: AppColors.gold,
+              labelColor: AppColors.gold,
+              unselectedLabelColor: AppColors.mist,
               tabs: [for (final tab in _tabs) Tab(text: t(context, tab.$2))],
             ),
           ),
@@ -138,7 +138,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
           children: [
             Text(
               t(context, 'placement.error'),
-              style: const TextStyle(color: AppTheme.textSecondary),
+              style: const TextStyle(color: AppColors.mist),
             ),
             const SizedBox(height: 12),
             TextButton(
@@ -220,7 +220,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
       return Center(
         child: Text(
           t(context, 'placement.empty'),
-          style: const TextStyle(color: AppTheme.textSecondary),
+          style: const TextStyle(color: AppColors.mist),
         ),
       );
     }
@@ -232,7 +232,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
             20,
             20,
             20,
-            AppSizes.bottomNavInset(context),
+            AppSizes.scrollBottomPadding(context),
           ),
           itemCount: items.length,
           separatorBuilder: (_, _) => const SizedBox(height: 12),
@@ -251,7 +251,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
         child: ExpansionTile(
           initiallyExpanded: c.themeOrder == 1,
           iconColor: themeColor,
-          collapsedIconColor: AppTheme.textMuted,
+          collapsedIconColor: AppColors.mist,
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           expandedCrossAxisAlignment: CrossAxisAlignment.start,
@@ -281,7 +281,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
             child: Text(
               c.title,
               style: const TextStyle(
-                color: AppTheme.textPrimary,
+                color: AppColors.starlight,
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),
@@ -292,7 +292,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
               Text(
                 c.shortDescription!,
                 style: const TextStyle(
-                  color: AppTheme.textSecondary,
+                  color: AppColors.mist,
                   fontSize: 13,
                   fontStyle: FontStyle.italic,
                 ),
@@ -302,7 +302,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
               Text(
                 c.content!,
                 style: const TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: AppColors.starlight,
                   fontSize: 14,
                   height: 1.5,
                 ),
@@ -350,7 +350,7 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
           Text(
             t(context, titleKey),
             style: const TextStyle(
-              color: AppTheme.textPrimary,
+              color: AppColors.starlight,
               fontSize: 13,
               fontWeight: FontWeight.w700,
             ),
@@ -362,12 +362,12 @@ class _PlacementContentPageState extends State<PlacementContentPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('• ', style: TextStyle(color: AppTheme.violet)),
+                  const Text('• ', style: TextStyle(color: AppColors.gold)),
                   Expanded(
                     child: Text(
                       s,
                       style: const TextStyle(
-                        color: AppTheme.textSecondary,
+                        color: AppColors.mist,
                         fontSize: 13,
                         height: 1.4,
                       ),

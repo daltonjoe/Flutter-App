@@ -45,8 +45,9 @@ Mevcut koddaki ölü/tekrar/gereksiz parçalar. Silme yalnızca kullanıcı ilgi
 - SİLİNDİ: locales/{ar,de,en,es,fr,it,pt,tr}.json → 7 anahtar (`ask.empty_title`, `ask.empty_body`, `ask.suggest_1/2/3`, `ask.disclaimer`, `profile_switcher.add`); 8 dilde parite korundu (508 → 501). Moda özel `ask.empty_title.$mode`/`ask.empty_body.$mode`/`ask.suggest.$mode.N` aileleri korundu.
 - SİLİNDİ: lib/screens/settings_page.dart — `MISSING TOKENS` yorum satırı (güncel değildi).
 - BIRAKILDI (referanslı): lib/theme/app_theme.dart — re-export shim; 10+ dosya (main.dart, language_switcher/selector, planet_report_page, placement_content_page, natal_report_page, forecast_*_page, analysis/*) bu yolu import ediyor. Silme = çok dosyalı refaktör; bu turda dokunulmadı.
-- BIRAKILDI (kapsam dışı — DOKUNMA: lib/redesign/splash/*): lib/redesign/splash/splash_backdrop.dart — referanssız (SplashBackdrop yalnız kendi dosyasında tanımlı), ama splash klasörü dokunulmaz listede olduğu için silinmedi.
-- YENİ ADAY: lib/widgets/city_search_field.dart — `CitySearchField` kodda hiçbir yerde import/çağrılmıyor (yalnız kendi dosyası + cosmic_input_field.dart doc yorumu). Sıfır referans; silme için kullanıcı onayı bekliyor.
+- SİLİNDİ (2026-10-19, sıfır kod referansı): lib/redesign/splash/splash_backdrop.dart — `SplashBackdrop` kodda hiçbir yerde import/çağrılmıyor (yalnız kendi dosyası; TEMIZLIK.md dokümanı hariç). Silindi.
+- SİLİNDİ (2026-10-19, sıfır kod referansı): lib/widgets/city_search_field.dart — `CitySearchField` kodda hiçbir yerde import/çağrılmıyor (yalnız kendi dosyası + cosmic_input_field.dart:62 doc yorumu). Silindi.
+- ADAY (yetim kaldı): assets/images/redesign/earth_home.jpg + lib/redesign/assets_map.dart:5 `RdAssets.earthHome` — tek kullanıcı splash_backdrop.dart:75 idi ve silindi; asset dosyası ve pubspec.yaml kaydı yerinde kaldı (pubspec DOKUNMA). Kullanılmıyor; temizlik adayı.
 - YENİ ADAY: assets/glyphs/ klasörü yalnız .gitkeep (SVG asset yok, `kSvgGlyphs` boş) ve pubspec.yaml'da asset olarak bildirilmiş (assets/glyphs/). FAZ 2d SVG işi için placeholder; SVG eklenmezse klasör+bildirim kaldırılabilir.
 - TARAMA SONUCU: assets/ altındaki tüm görsel/video/json dosyaları (logo, relationship, zodiac, redesign/planets, earth_home, background, loading_1.mp4, cities.json) kodda referanslı; referanssız asset bulunamadı.
 
