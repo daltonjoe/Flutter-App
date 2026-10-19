@@ -55,6 +55,7 @@ class AskPage extends StatefulWidget {
 class _AskPageState extends State<AskPage> {
   final TextEditingController _ctl = TextEditingController();
   late final FocusNode _inputFocus = FocusNode(onKeyEvent: _onInputKey);
+  final ScrollController _scroll = ScrollController();
   final List<_Msg> _messages = [];
   bool _waiting = false;
   bool _failed = false;
@@ -78,6 +79,7 @@ class _AskPageState extends State<AskPage> {
     askDraft.addListener(_onDraft);
     askMode.addListener(_onMode);
     askBridgeReq.addListener(_onBridge);
+    _inputFocus.addListener(_onFocus);
     WidgetsBinding.instance.addPostFrameCallback((_) => _onBridge());
     UserSettingsService.isFlagEnabled('ask_avatars').then((v) {
       if (!mounted) return;
@@ -180,8 +182,10 @@ class _AskPageState extends State<AskPage> {
     askDraft.removeListener(_onDraft);
     askMode.removeListener(_onMode);
     askBridgeReq.removeListener(_onBridge);
+    _inputFocus.removeListener(_onFocus);
     _ctl.dispose();
     _inputFocus.dispose();
+    _scroll.dispose();
     super.dispose();
   }
 
@@ -257,6 +261,26 @@ class _AskPageState extends State<AskPage> {
     return KeyEventResult.ignored;
   }
 
+  /// Girişe odaklanınca listenin en yeni mesaja kayması (B4).
+  void _onFocus() {
+    if (!_inputFocus.hasFocus) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
+  }
+
+  /// B4: liste `reverse` olduğu için en yeni mesaj offset 0'dadır.
+  void _scrollToLatest() {
+    if (!mounted || !_scroll.hasClients) return;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _scroll.jumpTo(0);
+      return;
+    }
+    _scroll.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   Future<void> _send([String? override]) async {
     final text = (override ?? _ctl.text).trim();
     if (text.isEmpty || _waiting) return;
@@ -278,6 +302,7 @@ class _AskPageState extends State<AskPage> {
       _failed = false;
       _langReset = false;
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
     try {
       final r = await _reply(text);
       if (!mounted || gen != _gen) return;
@@ -285,6 +310,7 @@ class _AskPageState extends State<AskPage> {
         _messages.add(r);
         _waiting = false;
       });
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
     } catch (e) {
       debugPrint('AskPage reply failed: $e');
       if (!mounted || gen != _gen) return;
@@ -1023,27 +1049,28 @@ class _AskPageState extends State<AskPage> {
   Widget _composer(BuildContext context) {
     final reduce = MediaQuery.disableAnimationsOf(context);
     return Padding(
+      // Alt boşluk composer sütunundaki son SizedBox'a bırakıldı (B2).
       padding: const EdgeInsetsDirectional.fromSTEB(
         AppSpacing.md,
         AppSpacing.xs,
         AppSpacing.md,
-        AppSpacing.sm,
+        0,
       ),
       // Sayfadaki tek BackdropFilter: cam hap.
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: AppRadius.pillBr,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Container(
             padding: const EdgeInsetsDirectional.fromSTEB(
               AppSpacing.md,
-              2,
+              0,
               6,
-              2,
+              0,
             ),
             decoration: BoxDecoration(
               color: AppColors.navyDeep.withValues(alpha: 0.80),
-              borderRadius: BorderRadius.circular(26),
+              borderRadius: AppRadius.pillBr,
               border: Border.all(color: AppColors.hairline),
             ),
             child: Row(
@@ -1143,6 +1170,8 @@ class _AskPageState extends State<AskPage> {
         ),
         body: SafeArea(
           top: false,
+          // Alt güvenli alan bottomNavInset içinde sayılıyor (B2): çift sayım olmasın.
+          bottom: false,
           child: Column(
             children: [
               Padding(
@@ -1179,36 +1208,42 @@ class _AskPageState extends State<AskPage> {
                   ],
                 ),
               ),
-              if (_av)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.md,
-                    AppSpacing.sm,
-                    AppSpacing.md,
-                    0,
-                  ),
-                  child: AnimatedSwitcher(
-                    duration: reduce
-                        ? Duration.zero
-                        : const Duration(milliseconds: 200),
-                    child: Text(
-                      t(context, 'ask.avatar.$_mode.tag'),
-                      key: ValueKey<String>(_mode),
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.bodySm(color: AppColors.mist),
-                    ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  AppSpacing.sm,
+                  AppSpacing.md,
+                  0,
+                ),
+                child: AnimatedSwitcher(
+                  duration: reduce
+                      ? Duration.zero
+                      : const Duration(milliseconds: 200),
+                  child: Text(
+                    t(context, 'ask.avatar.$_mode.tag'),
+                    key: ValueKey<String>(_mode),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.bodySm(color: AppColors.mist),
                   ),
                 ),
+              ),
               Expanded(
                 child: (_messages.isEmpty && !_waiting)
-                    ? _empty(context)
+                    ? GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () => FocusScope.of(context).unfocus(),
+                        child: _empty(context),
+                      )
                     : ListView.builder(
+                        controller: _scroll,
                         reverse: true,
-                        padding: EdgeInsets.fromLTRB(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        padding: const EdgeInsets.fromLTRB(
                           AppSpacing.md,
                           AppSpacing.sm,
                           AppSpacing.md,
-                          AppSizes.scrollBottomPadding(context),
+                          AppSpacing.md,
                         ),
                         itemCount: msgs.length + extra,
                         itemBuilder: (c, i) {
@@ -1256,10 +1291,13 @@ class _AskPageState extends State<AskPage> {
                 ),
               _contextStrip(context),
               _composer(context),
-              // Klavye kapalıyken yüzen çubuğun üstünde kalması için boşluk;
-              // klavye açıkken yalnız kısa bir pay bırakılır.
+              // Klavye kapalıyken yüzen çubuğun üstünde 12 px boşluk bırakır
+              // (bottomNavInset güvenli alanı da içerir); klavye açıkken
+              // Scaffold inset'i klavyeyi karşılar, yalnız 12 px pay kalır.
               SizedBox(
-                height: keyboardOpen ? 12 : AppSizes.bottomNavInset(context),
+                height: keyboardOpen
+                    ? AppSpacing.cardGap
+                    : AppSizes.bottomNavInset(context) + AppSpacing.cardGap,
               ),
             ],
           ),
