@@ -8,6 +8,7 @@ import "../../core/constants/legal_links.dart";
 import "../../core/theme/app_colors.dart";
 import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
+import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../presentation/widgets/components/cosmic_loader.dart';
 
 class OnboardingConsentPage extends StatefulWidget {
@@ -137,7 +138,7 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.mist),
+        border: Border.all(color: AppColors.borderSubtle),
         borderRadius: BorderRadius.circular(16),
       ),
       child: CheckboxListTile(
@@ -195,10 +196,10 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
               _box("onboarding.consent.terms_link", "onboarding.consent.terms_check",
                   kTermsUrl, _terms, (b) => setState(() => _terms = b)),
               const SizedBox(height: 24),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(56)),
-                onPressed: (_priv && _terms && !_saving) ? _go : null,
-                child: Text(t(context, "onboarding.consent.cta")),
+              CosmicCtaButton(
+                label: t(context, "onboarding.consent.cta"),
+                disabled: !(_priv && _terms) || _saving,
+                onTap: _go,
               ),
             ],
           ),

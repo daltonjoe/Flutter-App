@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/app_colors.dart';
 import '../../models/onboarding_data.dart';
 import '../../services/astro_service.dart';
 import '../../services/chart_persistence_service.dart';
@@ -206,11 +207,11 @@ class _OnboardingRelationshipPageState
                       child: Text(
                         _generalError!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
+                        style: const TextStyle(color: AppColors.statusDanger),
                       ),
                     ),
                   _isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
                       : CosmicCtaButton(
                           label: t(
                             context,

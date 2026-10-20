@@ -195,12 +195,12 @@ class _PaywallPageState extends State<PaywallPage>
 
     final y = _offer?.yearly;
     final m = _offer?.monthly;
-    final w = _offer?.weekly;
+    
 
     // Prices and trial days
     final double yRaw = y?.storeProduct.price ?? PaywallFallbackPrices.yearly;
     final double mRaw = m?.storeProduct.price ?? PaywallFallbackPrices.monthly;
-    final double wRaw = w?.storeProduct.price ?? PaywallFallbackPrices.weekly;
+    
 
     final String symbol =
         y?.storeProduct.priceString.replaceAll(RegExp(r'[0-9.,\s]'), '') ??
@@ -223,11 +223,12 @@ class _PaywallPageState extends State<PaywallPage>
     );
     final String mMonthPrice =
         m?.storeProduct.priceString ?? "$symbol${mRaw.round()}";
-    final String wWeekPrice =
-        w?.storeProduct.priceString ?? "$symbol${wRaw.round()}";
+    
 
     final int yd = 7;
     final int md = 1;
+    final String yPriceStr =
+        y?.storeProduct.priceString ?? "$symbol${yRaw.round()}";
 
     final int discount = ((1 - (yRaw / 12) / mRaw) * 100).round();
 
@@ -266,13 +267,33 @@ class _PaywallPageState extends State<PaywallPage>
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              _t("paywall.title"),
+                              _t(widget.source == PaywallSource.onboarding ? "paywall.title_onboarding" : "paywall.title"),
                               textAlign: TextAlign.center,
                               style: AppTextStyles.h1(
                                 color: AppColors.starlight,
                               ),
                             ),
-                            const SizedBox(height: AppSpacing.xl * 1.5),
+                            const SizedBox(height: 8),
+                            Text(
+                              _t("paywall.subtitle"),
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.bodyMd(color: AppColors.mist),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.check_circle_outline, size: 18, color: AppColors.gold),
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    _t("paywall.feature"),
+                                    style: AppTextStyles.bodySm(color: AppColors.starlight),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: AppSpacing.xl),
                             _buildPlanCard(
                               index: 0,
                               label: _t("paywall.plan.yearly"),
@@ -293,12 +314,7 @@ class _PaywallPageState extends State<PaywallPage>
                               ),
                               price: "$mMonthPrice${_t("paywall.per_month")}",
                             ),
-                            const SizedBox(height: AppSpacing.md),
-                            _buildPlanCard(
-                              index: 2,
-                              label: _t("paywall.plan.weekly"),
-                              price: "$wWeekPrice${_t("paywall.per_week")}",
-                            ),
+                            
                           ],
                         ),
                       ),
@@ -325,9 +341,7 @@ class _PaywallPageState extends State<PaywallPage>
                       ),
                     ),
                   Text(
-                    _getCommitText(
-                      _selIdx == 0 ? yd : (_selIdx == 1 ? md : null),
-                    ),
+                    _commitText(_selIdx == 0 ? yd : md, _selIdx == 0 ? yPriceStr : mMonthPrice),
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodySm(color: AppColors.mist),
                   ),
@@ -344,11 +358,15 @@ class _PaywallPageState extends State<PaywallPage>
     );
   }
 
-  String _getCommitText(int? trialDays) {
-    if (trialDays != null) {
-      return _t("paywall.free_trial_cancel_anytime");
-    }
-    return _t("paywall.cancel_anytime");
+  String _commitText(int days, String price) {
+    final key = _selIdx == 0
+        ? "paywall.commit.yearly"
+        : "paywall.commit.monthly";
+    final end = MaterialLocalizations.of(context)
+        .formatMediumDate(DateTime.now().add(Duration(days: days)));
+    final head = _t(key, args: {"days": "$days", "price": price});
+    final ends = _t("paywall.trial.ends", args: {"date": end});
+    return "$head\n$ends ${_t("paywall.cancel_anytime")}";
   }
 
   Widget _buildPlanCard({

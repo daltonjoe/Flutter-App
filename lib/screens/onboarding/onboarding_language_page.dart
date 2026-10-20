@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import '../../models/onboarding_data.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import 'package:provider/provider.dart';
@@ -98,18 +99,18 @@ void _onSelected(int index) {
                   const Text(
                     'Choose Your Language',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: AppColors.starlight),
                   ),
                   const SizedBox(height: 8),
                   const Text(
                     'Align your natal cosmic frequency & daily celestial readings',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: Colors.white70),
+                    style: TextStyle(fontSize: 13, color: AppColors.mist),
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    '⌃ SWIPE WHEEL',
-                    style: TextStyle(fontSize: 11, letterSpacing: 1.5, color: Colors.white38),
+                    'SWIPE WHEEL',
+                    style: TextStyle(fontSize: 11, letterSpacing: 1.5, color: AppColors.mist),
                   ),
                   Expanded(
                     child: ListWheelScrollView.useDelegate(
@@ -130,22 +131,22 @@ void _onSelected(int index) {
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
-                                color: Colors.white.withOpacity(isSelected ? 0.06 : 0.02),
+                                color: Colors.white.withValues(alpha: isSelected ? 0.06 : 0.02),
                                 border: Border.all(
                                   color: isSelected
                                       ? lang.color
-                                      : lang.color.withOpacity(0.25),
+                                      : lang.color.withValues(alpha: 0.25),
                                   width: isSelected ? 2 : 1,
                                 ),
                                 boxShadow: isSelected
-                                    ? [BoxShadow(color: lang.color.withOpacity(0.5), blurRadius: 16, spreadRadius: 1)]
+                                    ? [BoxShadow(color: lang.color.withValues(alpha: 0.5), blurRadius: 16, spreadRadius: 1)]
                                     : null,
                               ),
                               child: Row(
                                 children: [
                                   CircleAvatar(
                                     radius: 18,
-                                    backgroundColor: lang.color.withOpacity(0.2),
+                                    backgroundColor: lang.color.withValues(alpha: 0.2),
                                     child: Text(
                                       lang.code.toUpperCase(),
                                       style: TextStyle(color: lang.color, fontWeight: FontWeight.w700, fontSize: 12),
@@ -161,7 +162,7 @@ void _onSelected(int index) {
                                             Text(
                                               lang.nativeName,
                                               style: TextStyle(
-                                                color: Colors.white,
+                                                color: AppColors.starlight,
                                                 fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                                                 fontSize: isSelected ? 17 : 15,
                                               ),
@@ -175,12 +176,12 @@ void _onSelected(int index) {
                                                   borderRadius: BorderRadius.circular(10),
                                                 ),
                                                 child: const Text('ACTIVE',
-                                                    style: TextStyle(fontSize: 9, color: Colors.black, fontWeight: FontWeight.w700)),
+                                                    style: TextStyle(fontSize: 9, color: AppColors.onGold, fontWeight: FontWeight.w700)),
                                               ),
                                             ],
                                           ],
                                         ),
-                                        Text(lang.name, style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                                        Text(lang.name, style: const TextStyle(color: AppColors.mist, fontSize: 12)),
                                       ],
                                     ),
                                   ),
@@ -191,7 +192,7 @@ void _onSelected(int index) {
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: lang.color,
-                                        boxShadow: [BoxShadow(color: lang.color.withOpacity(0.7), blurRadius: 8)],
+                                        boxShadow: [BoxShadow(color: lang.color.withValues(alpha: 0.7), blurRadius: 8)],
                                       ),
                                     ),
                                 ],

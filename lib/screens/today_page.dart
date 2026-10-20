@@ -51,6 +51,7 @@ import '../models/ask_context.dart';
 import '../providers/ask_context_provider.dart';
 
 import '../widgets/ask_add.dart';
+import "main_shell.dart" show shellTab;
 
 import '../presentation/widgets/components/cosmic_loader.dart';
 
@@ -97,7 +98,11 @@ class _TodayPageState extends State<TodayPage> {
 
   static const String _kRitualDismissed = 'today_ritual_dismissed';
 
+  static const String _kAskInvitePending = "home_ask_invite_pending";
+
   bool _ritualDismissed = false;
+
+  bool _askInvite = false;
 
   bool _notificationsFlagEnabled = false;
 
@@ -139,6 +144,29 @@ class _TodayPageState extends State<TodayPage> {
     unawaited(_loadRitualState());
 
     unawaited(_loadStreakFlag());
+
+    unawaited(_loadAskInvite());
+  }
+
+  Future<void> _loadAskInvite() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final pending = prefs.getBool(_kAskInvitePending) ?? false;
+      if (mounted && pending) setState(() => _askInvite = true);
+    } catch (e) {
+      debugPrint("ask invite load failed: $e");
+    }
+  }
+
+  Future<void> _closeAskInvite({bool open = false}) async {
+    setState(() => _askInvite = false);
+    if (open) shellTab.value = kAskTab;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_kAskInvitePending, false);
+    } catch (e) {
+      debugPrint("ask invite persist failed: $e");
+    }
   }
 
   Future<void> _loadStreakFlag() async {
@@ -1389,6 +1417,49 @@ class _TodayPageState extends State<TodayPage> {
         _weekStrip(loc),
 
         const SizedBox(height: 8),
+
+        if (_askInvite && isToday)
+          ValueListenableBuilder<bool>(
+            valueListenable: askEnabled,
+            builder: (ctx, on, _) => !on
+                ? const SizedBox.shrink()
+                : Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: CosmicCard(
+                      blur: true,
+                      padding: const EdgeInsets.all(AppSpacing.cardPadding),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => _closeAskInvite(open: true),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.auto_awesome_outlined,
+                                    size: 18,
+                                    color: AppColors.gold,
+                                  ),
+                                  const SizedBox(width: AppSpacing.sm),
+                                  Expanded(
+                                    child: Text(
+                                      _t("today.ask_invite"),
+                                      style: AppTextStyles.bodyMd(color: AppColors.starlight),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, size: 18, color: AppColors.mist),
+                            onPressed: () => _closeAskInvite(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+          ),
 
         if (isToday && _cachedAt != null) ...[
           Text(
