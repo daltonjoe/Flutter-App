@@ -33,6 +33,11 @@ const Set<String> kSvgGlyphs = <String>{
   'square',
   'trine',
   'opposition',
+  // ── Elementler ──
+  'fire',
+  'earth',
+  'air',
+  'water',
 };
 
 /// Astroloji sembolü gösteren widget.
@@ -80,15 +85,15 @@ class Glyph extends StatelessWidget {
     final glyph = AstroGlyphs.glyphFor(name);
 
     final Widget child;
-    if (glyph == null) {
-      child = SizedBox(width: size, height: size);
-    } else if (kSvgGlyphs.contains(name)) {
+    if (kSvgGlyphs.contains(name)) {
       child = SvgPicture.asset(
         'assets/glyphs/$name.svg',
         width: size,
         height: size,
         colorFilter: ColorFilter.mode(resolved, BlendMode.srcIn),
       );
+    } else if (glyph == null) {
+      child = SizedBox(width: size, height: size);
     } else if (glyph.isTextLabel) {
       child = Text(
         glyph.character,

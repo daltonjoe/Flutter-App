@@ -72,3 +72,19 @@ Mevcut koddaki ölü/tekrar/gereksiz parçalar. Silme yalnızca kullanıcı ilgi
 - lib/screens/forecast_result_page.dart:37-42 + :288-295 ve lib/screens/forecast_selection_page.dart:22-43 — dönem (`🌅🗓️🌙✨`) ve kategori (`❤️💼💰🏥`) emojileri; astrolojik anahtar yok, dönüştürülmedi (süs/metafor).
 
 
+
+## Match başlık + gradyan + glyph asset temizliği (2026-10-19)
+
+- TAMAMLANDI (2026-10-19): lib/screens/match_page.dart:29, :453 — `ProfileAvatarButton` AppBar actions listesine eklendi (today_page/ask_page ile aynı kullanım biçimi; import satırı 29).
+- TAMAMLANDI (2026-10-19): lib/screens/match_page.dart:456-510 — gövde `Stack` içine alındı; alt kenara 40px transparent→`AppColors.bgVoid` gradyan maskesi (`IgnorePointer`) eklendi; `scrollBottomPadding` korundu.
+- TAMAMLANDI (2026-10-19): assets/glyphs/mc.svg ve assets/glyphs/quincunx.svg silindi (sıfır kod referansı). `mc` yalnız lib/core/constants/astro_glyphs.dart:50 satırında metin etiketi (SVG render edilmiyor); `quincunx` hiçbir dosyada tanımlı değil.
+- ATLANDI (2026-10-19): element dağılımı satırlarına element SVG glyph ekleme; element anahtarları (fire/earth/air/water) `kSvgGlyphs` içinde değil, `glyph.dart` dokunulamaz ve `elementColorFor` yalnız burç anahtarı çözer. Beklemede.
+
+## Onboarding B1+B2 görsel token turu (2026-10-19)
+
+- KALAN (kullanılmayan anahtar): locales/*.json → `onboarding.language.continue`, `onboarding.link_account.email_sent`, `onboarding.relationship.dating` (8 dilde mevcut; `lib/` içinde sıfır kod referansı, grep ile doğrulandı). Silme adayı; bu turda locale dosyalarına dokunulmadı.
+## Element glyph + yetim anahtar turu (2026-10-19)
+
+- ADAY (silinmedi): assets/glyphs/ altindaki 10 gezegen SVG'si (sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto) + asc.svg hicbir kod yolundan referansli degil; `kSvgGlyphs` (lib/presentation/widgets/components/glyph.dart) yalniz 12 burc + 5 aci + 4 element iceriyor, gezegenler `PlanetGlyphIcon` ile vektor ciziliyor. `mc.svg`/`quincunx.svg` daha once silindi. Silme izne bagli.
+- SILINDI (2026-10-19): locales/*.json -> `planet_report.title` (8 dil); kodda sifir referans, referans taramasi (t/_t, ham string, test, dinamik anahtar) temiz.
+- ADAY (kapsam disi): locales/*.json -> `chart.planet_report` (8 dil) kodda sifir referans; `planet_report.*` kapsaminda olmadigi icin bu turda silinmedi.

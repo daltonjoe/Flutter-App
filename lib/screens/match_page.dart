@@ -26,6 +26,7 @@ import '../presentation/widgets/components/glyph.dart';
 import '../presentation/widgets/components/planet_glyph_icon.dart';
 import '../presentation/widgets/components/cosmic_chip.dart';
 import '../presentation/widgets/components/overline_text.dart';
+import '../presentation/widgets/components/profile_avatar_button.dart';
 
 class _ProfileEntry {
   final String id;
@@ -449,42 +450,64 @@ class _MatchPageState extends State<MatchPage> {
                 }
               },
             ),
+            const ProfileAvatarButton(),
           ],
         ),
         body: SafeArea(
           bottom: false,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.screenH,
-              AppSpacing.contentTop,
-              AppSpacing.screenH,
-              AppSizes.scrollBottomPadding(context),
-            ),
+          child: Stack(
             children: [
-              Container(
-                decoration: AppDecorations.cosmicCard(),
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  children: [
-                    Row(
+              ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(
+                  AppSpacing.screenH,
+                  AppSpacing.contentTop,
+                  AppSpacing.screenH,
+                  AppSizes.scrollBottomPadding(context),
+                ),
+                children: [
+                  Container(
+                    decoration: AppDecorations.cosmicCard(),
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Column(
                       children: [
-                        _selector(isA: true),
-                        const SizedBox(width: AppSpacing.sm),
-                        Icon(
-                          Icons.favorite_border,
-                          size: 20,
-                          color: AppColors.gold,
+                        Row(
+                          children: [
+                            _selector(isA: true),
+                            const SizedBox(width: AppSpacing.sm),
+                            Icon(
+                              Icons.favorite_border,
+                              size: 20,
+                              color: AppColors.gold,
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            _selector(isA: false),
+                          ],
                         ),
-                        const SizedBox(width: AppSpacing.sm),
-                        _selector(isA: false),
                       ],
                     ),
-                  ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _body(noAnim, l),
+                ],
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: IgnorePointer(
+                  child: Container(
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, AppColors.bgVoid],
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: AppSpacing.md),
-              _body(noAnim, l),
             ],
           ),
         ),

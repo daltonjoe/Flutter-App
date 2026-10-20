@@ -11,6 +11,7 @@ import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../models/natal_chart_response.dart';
 import '../../presentation/widgets/components/cosmic_card.dart';
+import '../../presentation/widgets/components/glyph.dart';
 import '../../presentation/widgets/components/overline_text.dart';
 
 /// Element kodu sırası (0 ateş, 1 toprak, 2 hava, 3 su).
@@ -106,6 +107,7 @@ class ChartBalanceSection extends StatelessWidget {
           'elements.${_kElementOrder[i]}',
           elementPct[i],
           AstroGlyphs.elementColors[_kElementOrder[i]]!,
+          glyphKey: _kElementOrder[i],
         ),
     ];
 
@@ -357,14 +359,22 @@ class _LegendRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
+        if (segment.glyphKey != null)
+          Glyph(
+            segment.glyphKey!,
+            size: 12,
             color: segment.color,
+            decorative: true,
+          )
+        else
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: segment.color,
+            ),
           ),
-        ),
         const SizedBox(width: AppSpacing.xs),
         Expanded(
           child: Text(
@@ -389,21 +399,25 @@ class _LegendRow extends StatelessWidget {
 
 /// Halka dilimi: etiket anahtarı, tam sayı yüzde ve renk.
 class _Segment {
-  const _Segment(this.labelKey, this.percent, this.color);
+  const _Segment(this.labelKey, this.percent, this.color, {this.glyphKey});
 
   final String labelKey;
   final int percent;
   final Color color;
+
+  /// Varsa, lejant noktasi yerine cizilen glyph anahtari (element kodu).
+  final String? glyphKey;
 
   @override
   bool operator ==(Object other) =>
       other is _Segment &&
       other.labelKey == labelKey &&
       other.percent == percent &&
-      other.color == color;
+      other.color == color &&
+      other.glyphKey == glyphKey;
 
   @override
-  int get hashCode => Object.hash(labelKey, percent, color);
+  int get hashCode => Object.hash(labelKey, percent, color, glyphKey);
 }
 
 /// Segmentleri halka üzerine çizen ressam; animasyon `progress` ile sürülür.

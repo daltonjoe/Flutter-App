@@ -1,43 +1,36 @@
-# Ephemerai redesign: ilerleme ve çalışma kuralları
-Branch: redesign/faz-9a. UI_ENHANCED.MD'yi Trae ile uyguluyoruz.
+# Ephemerai redesign: ilerleme
+Branch: redesign/faz-9a. UI_ENHANCED.MD uygulandi (Today, Chart, Ask, Profile, Settings, Match, hap menu, Glyph, token gecisi). Kurallar: DEVIR_TESLIM.md.
+Baseline: analyze 38 info/0/0, test 49, locale 504 (8 dil).
 
-## Çalışma düzeni (Trae için)
-- Tek seferde TEK prompt. Rapor kısa olsun (ne yapıldı, silme yok, emin olunmayan nokta).
-- Promptlardaki dosya yolları "#" ile başlar (#lib/...); dosyayı aramadan doğrudan oku.
-- Dart dosyaları CRLF, locale json (./locales/*.json) LF: korunmalı.
-- Yeni i18n anahtarı 8 dile eklenir (ar,de,en,es,fr,it,pt,tr). AppLocalizations eksik anahtarda anahtarın kendisini gösterir (İngilizce fallback yok).
-- Gereksiz dosya üretme. Silmeden önce izin iste; adayları TEMIZLIK.md'ye yaz. Silme izni verilmişse bile önce referans taraması yap; referans varsa silme, raporla.
-- Dokunulmaz: route/argüman, Supabase, session, paywall, silme akışları, onboarding mantığı, Ask güvenlik/kota/notlar/rapor akışları.
-- Doğrulama: flutter analyze (önce/sonra issue sayısı) + json doğrulama + CRLF/LF kontrolü.
+## Yapildi (ozet)
+Tum ekran redesign'lari, alias->token (app_theme shim, eski alias'lar, planet_report/placement_content, diag68, splash_backdrop, kok artiklar silindi), emoji->glyph (planet_hero, redesign_detail, natal hero chip), Match v2 (burc karti, glyph uclusu, akis/surtunme cubugu, CosmicChip, ProfileAvatarButton, alt gradyan maskesi), Ask spacing tokenlari, token log maskeleme, mc/quincunx SVG silindi.
 
-## Yapılanlar
-Token'lar, global zemin, ortak bileşenler, hap alt menü, Glyph altyapısı (commit'lendi).
-Today tamam (4 prompt + mini). OverlineText, CosmicChip dolduruldu.
-Chart tamam: 5 prompt + Düzeltme A, B, C. Chip sekmeler, gezegen glyph şeridi (PlanetGlyphIcon, tek renk), hero sahnesi (glow, 3 halka, OrbitStars 15 yıldız), karusel (0.80, kart 168, nokta göstergesi), gezegen kartı (burç PNG opaklık 0.60, 12°36′, "7. Ev", Rx), açılır "7. Ev nedir?", Chart Points, tek kartta Element + Polarity + Modality halkaları (+ çıkarım cümlesi), Rx sheet, CTA düzeni.
-Chart kapanış silmeleri (izinli) büyük kısmı yapıldı: _valenceIcon, mloc, 7 locale anahtarı, _OrbitDot*, eski _element* zinciri.
-Ask tamam: mod chip'leri CosmicSegmented (natal/forecast/synastry, altın lens), AskHero (boş durum, mod başlığı; natal chip'leri artık ActiveProfile özetinden Güneş/Ay/Yükselen; forecast ay seçici chip; synastry iki avatar + altın bağ), öneri kartları (CosmicCard compact + Glyph + kademeli fade), cam hap composer (tek blur, 40px gönder dairesi), mesajlar (kullanıcı sağda Navy Raised hap; asistan balonsuz + ✦ yalnız ilk balonda, aksiyon satırı Hatırla/Kopyala + rapor linki), StarTyping, CosmicChip tabanlı context strip, ilk-kez bilgi kartı (shared_preferences 'ask_first_note_seen'). Mantık (güvenlik/kota/not/rapor/bridge/draft) korundu.
-ActiveProfile özeti + avatar: ActiveProfileProvider'a `ActiveProfileSummary` (id, name, sun/moon/asc sign id, birthTimeKnown) tek satır select ile eklendi; RefIds.signIndex ile 0 tabanlı burç indeksi. `ProfileAvatarButton` (32px, navyRaised, gold@%60 çerçeve, Güneş burcu PNG / baş harf) Today, Chart ve Ask başlık satırlarına eklendi; dokununca Profile sekmesi (kProfileTab=2). main_shell'e `kProfileTab` sabiti eklendi.
-Profile (profile_switcher_page) tamam: kimlik kartı (Güneş·Ay·Yükselen glyph satırı + 600ms altın çizgi, Cormorant ad, "Güneş · Yengeç" chip'leri, arkada Güneş burcu PNG %4→%7 nefes), Güneş-burcu PNG'li profil şeridi (altın halka, aktif 2px gold + "Aktif", "Yeni" chip'i), doğum kartı (tek blur; 2 sütun, localized tarih, saat rozeti Kesin/Bilinmiyor + time_hint, kalem ikonu → edit_birth_data), yolculuk kartı (CheckinService 60 gün; seri + ruh hali sayısı, 600ms CountUp → StreakPage), tek "Ayarlar" satırı, kart dışı silme metin butonu + bottom-sheet onay (Vazgeç gold / Sil statusDanger). Supabase okuma/silme mantığı aynen.
-Settings (settings_page) tamam: token eşlemesi (Switch onGold/gold, hairline divider, gold seçili/aktif, navyDeep sheet'ler, statusDanger, mist@%50 disabled), satırlara 20px mist ikon, skeleton navyRaised, `_sectionLabel` → OverlineText, scrollBottomPadding. Dil seçici davranışı (Arapça gizli) korundu; hold-to-delete/AccountDeletionService/signOut/UserSettingsService mantığı aynen.
+## KULLANICI ISLERI (once)
+1. Son tur commit + push: `git add -A -- . ":!CLAUDE.md"` ; commit ; `git push origin redesign/faz-9a`. (Match B1/B2, mc/quincunx silme, TEMIZLIK.md bekliyor olabilir; `git status --short` ile dogrula.)
+2. Cihaz kontrolu: Match (cubuk centigi gorunur mu, saatsiz profil rozeti, Arapca RTL, alt maske, avatar), Chart hero fallback glyph, Detay gezegen karti, loader renkleri, Ask (balon/genislik/ay secici/typing), forecast secim ay ikonu, Profile (rozet, silme sheet), Settings hold-to-delete, hesap silme akisi (diag68 kalkti), acilis/giris/onboarding.
+3. Sorun yoksa PR ac: redesign/faz-9a -> main (once `git fetch`, `git log main..origin/main` bos olmali). main'e dogrudan push YOK.
+4. Cormorant + Inter font dosyalarini ver (pubspec asset; once sor), native splash zemin rengi karari.
 
-## Kalan
-Profile + Settings TAMAM. Kalan: Prompt 10 temizlik, Match.
-Bu aşamadan kalan kararlar: ad çakışması uyarısı, Yaklaşık doğum saati kesinliği (backend), Premium kartı, "Yöntem" satırı, Arapça dil seçici görünürlüğü kararı.
-Faz 9a temizlik (Bölüm A) tamam: chart_page.dart, AstroGlyphs gezegen kayıtları (sun…pluto) ve SoulBoundAssets silindi; prefernottosay.png yolu düzeltildi; background2.* + 4 italik font silindi; ar.json paritesi (496 anahtar) sağlandı.
-Cihaz görsel doğrulaması bekleyen: Düzeltme C (şerit ikonları, iç halka yıldızları, 3 halkalı kart dar ekran/Arapça).
+## Kalan kod isleri (kucuk)
+- TAMAMLANDI (2026-10-19): Element SVG wiring - kSvgGlyphs'e fire/earth/air/water eklendi; glyph.dart cizim sirasi duzeltildi (kSvgGlyphs once, null sonra) ki SVG gercekten cizilsin. chart_balance_section.dart element lejantinda Glyph kullaniyor (renk element tokeni). 10 gezegen SVG'si (sun..pluto) + asc.svg referanssiz; TEMIZLIK.md'ye eklendi, silinmedi.
+- TAMAMLANDI (2026-10-19): Yetim locale anahtari `planet_report.title` 8 dilden silindi (504 -> 503). Diger planet_report.* (house/retrograde/loading/unexpected_error/time_unknown) hala referansli. `chart.planet_report` de referanssiz ama kapsam disi (silinmedi).
+- Anahtarsiz emojiler (forecast_result/selection donem+kategori, natal _keywordIcons/_getIconForTitle, redesign_detail '✦'): karar bekliyor, istenirse ayri tur.
+- match_v2 bayragi Supabase feature_flags'ten (varsayilan false). Kalici acilirsa v1 (_aspectRow, v1 _body) silinir.
+- Cihazda cubuk kisa kalirsa Match flow cubugu `v` olcekleme (sqrt). Duzeltme D (cihaz goruntuleriyle).
+- TEMIZLIK.md: kalan acik maddeler orada; CRLF/LF uyarisi zararsiz.
 
-## Güncel token/bileşen adları
-AppColors: bgVoid, navyDeep, navyRaised, hairline, gold, goldGlow, goldDeep, starlight, mist, dim, info, onGold, statusSupportive, statusChallenging, statusDanger, statusNeutral, themeLove/Career/Identity/Health, elementFire/Earth/Air/Water, borderStrong, textDisabled(eski).
-AppSizes: bottomNavInset, bottomNavHeight, scrollBottomPadding(context), ctaHeight 52. AppShadows: cardShadow, glow(color,blur,alpha). AppRadius.card 24, md 16.
-Bileşenler: CosmicCard(blur; sayfa başına en fazla 2-3 blur), CosmicCtaButton, CosmicOutlineButton, CosmicChip(label,selected,onTap), CosmicSegmented(items,selected,onChanged), OverlineText, Glyph(name,size,color,decorative) (gezegen adları PlanetGlyphIcon'a yönlenir). Chart: PlanetCarousel, PlanetGlyphStrip, PlanetHero, OrbitStars, HouseMeaningPanel, ChartExtras, ChartBalanceSection.
-Varlıklar: RdAssets.planetImage, RdAssets.signIcon (assets/images/zodiac/*.png), assets/images/redesign/planets/*.png, assets/fonts/NotoSansSymbols2-Regular.ttf.
-Ask modları kodda: natal (Haritam/Öz) | forecast (Öngörü/Seyir) | synastry (Köprü). kAskTab=4. Tab sırası: Today0, Chart1, Ask4, Match3(flag), Profile2.
+## Backlog (yeni chat, sirayla istenirse)
+Today: hafta seridi mood mini ikonu, hero glow nefes, bildirim izni on metni, SVG mood yuzleri, Story karti, aksam yansitma, gun noktasi anlami, today.* ceviri gozden gecirme.
+Chart: gezegen karti tek cumle yorum, sayi sayma, natal cark/transit.
+Profile: ad cakismasi uyarisi, Premium karti, Yontem satiri, yolculuk karti kayitli yorum sayisi, harf fallback Turkce i.
+Ask: + baglam butonu, sohbet gecmisi, dipnot satiri (8 dil yeni anahtar).
+Token'siz Ask sabitleri (radius 20, 14/10, 0.80/0.82, sheet 200/40/48) BILINCLI kalir, tekrar acma.
 
-## Açık işler
-- Ekranlar bottomNavInset → scrollBottomPadding'e geçecek: streak, match, natal_report, planet_report, placement_content, transit_detail, forecast_result/selection, edit_birth_data, redesign_detail (today, redesign_chart, ask_page, settings ve profile_switcher yapıldı).
-- SVG glyph'ler sonra (kSvgGlyphs boş; element SVG'leri yok). Cormorant/Inter assets'e paketlenecek.
-- dim (3.4:1) ve textMuted gövde metninde kullanılıyorsa düzelt. Colors.black: EntryRoute.notFound Scaffold (main.dart).
-- Today açık işleri: mood mini ikonu hafta şeridinde, hero glow nefes, bildirim priming, SVG mood yüzleri, Story paylaşım kartı, akşam yansıtma, gün noktası açıklaması.
-- Chart açık işleri: gezegen kartı tek cümle yorum (içerik kaynağı yok), element glyph SVG, ASC/MC sembol, natal çark/transit, doğum saati üç kademeli kesinlik (backend, kullanıcıya sor). (Başlıktaki aktif profil avatarı yapıldı.)
-- Prompt 10: planet_carousel.dart'ı kart/şerit/hero dosyalarına böl (onaylandı), burç→element renk eşlemesini tek yere al, eski token sayımı.
-- Locale: 8 dil = 508 anahtar. Ask: 4 anahtar (first_note.body/ok, copy, copied). Profile+Settings: 8 anahtar (profile_switcher.active/new_short/time_exact/time_unknown/time_hint/journey.title/journey.streak/journey.moods). Parite tam; placeholder yok.
+## Backend gerektirenler
+Ask kaynak chip JSON + response_type; birth_time_accuracy (kademeli saat rozeti); pair-seviyesi Ask baglami (yeni type); uyum yuzdesi (karar: eklenmiyor).
+
+## Acik kararlar
+Arapca dil secicide gizli: acilsin mi. Yontem satiri icin gercek ev sistemi/efemeris. Anahtarsiz emojiler. Native splash rengi.
+
+## SIRADAKI PROJE: ONBOARDING
+Redesign bittiginde onboarding'e gec. Dosyalar: lib/screens/onboarding/* (consent, language, name, sign_in, register, flow, link_account), main.dart EntryRoute. Onboarding artik kapsamda; mantik/route/auth/session/Supabase yazma yine DOKUNMA (yalniz acik izinle). Ilk adim: salt okunur Asama A (ekran goruntuleri + akis haritasi), sonra tek faz plani. Cinsiyet gorseli ve onboarding_link_account kaydirma cihaz dogrulamasi hala acik.
