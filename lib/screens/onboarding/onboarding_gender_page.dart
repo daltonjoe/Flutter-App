@@ -59,7 +59,7 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
             child: Column(
               children: [
                 Align(
-                  alignment: Alignment.centerLeft,
+                  alignment: AlignmentDirectional.centerStart,
                   child: IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: widget.onBack,

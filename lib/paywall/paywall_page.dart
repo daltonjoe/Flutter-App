@@ -430,7 +430,7 @@ class _PaywallPageState extends State<PaywallPage>
             ),
           ),
           if (discount != null)
-            Positioned(left: 16, top: -12, child: _buildSaveBadge(discount)),
+            PositionedDirectional(start: 16, top: -12, child: _buildSaveBadge(discount)),
         ],
       ),
     );
