@@ -9,12 +9,11 @@ const String kCreditsProductId = 'sb_msgs_50';
 const String kProEntitlement = 'pro';
 
 class PaywallOffer {
-  const PaywallOffer({this.yearly, this.monthly, this.weekly, this.credits});
+  const PaywallOffer({this.yearly, this.monthly, this.credits});
   final Package? yearly;
   final Package? monthly;
-  final Package? weekly;
   final StoreProduct? credits;
-  bool get hasPlans => yearly != null || monthly != null || weekly != null;
+  bool get hasPlans => yearly != null || monthly != null;
 }
 
 class PaywallService {
@@ -65,7 +64,6 @@ class PaywallService {
       return PaywallOffer(
         yearly: cur?.annual,
         monthly: cur?.monthly,
-        weekly: cur?.weekly,
         credits: credits,
       );
     } catch (e) {

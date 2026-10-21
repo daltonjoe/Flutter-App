@@ -38,14 +38,4 @@ class EntitlementService {
       rethrow;
     }
   }
-
-  static Future<DateTime> startTrial() async {
-    try {
-      final res = await Supabase.instance.client.rpc('start_trial');
-      return DateTime.parse(res.toString()).toLocal();
-    } catch (e) {
-      debugPrint('start_trial error: $e');
-      rethrow;
-    }
-  }
 }

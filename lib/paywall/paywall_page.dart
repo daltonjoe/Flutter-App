@@ -26,7 +26,7 @@ class _PaywallPageState extends State<PaywallPage>
     with SingleTickerProviderStateMixin {
   bool _loading = true;
   bool _busy = false;
-  int _selIdx = 0; // 0: Yearly, 1: Monthly, 2: Weekly
+  int _selIdx = 0; // 0: Yearly, 1: Monthly
   String? _errKey;
   PaywallOffer? _offer;
 
@@ -127,8 +127,7 @@ class _PaywallPageState extends State<PaywallPage>
 
   Future<void> _buy() async {
     final p = _selIdx == 0
-        ? _offer?.yearly
-        : (_selIdx == 1 ? _offer?.monthly : _offer?.weekly);
+        ? _offer?.yearly : _offer?.monthly;
     if (p == null) {
       setState(() => _errKey = "paywall.unavailable");
       return;
