@@ -5,6 +5,8 @@ import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../i18n/app_localizations.dart';
 import 'dart:math' as math;
 import '../../presentation/widgets/components/cosmic_alert_dialog.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 
 
 class OnboardingNamePage extends StatefulWidget {
@@ -66,7 +68,6 @@ class _OnboardingNamePageState extends State<OnboardingNamePage>
 
   @override
   Widget build(BuildContext context) {
-    final descColor = Theme.of(context).textTheme.bodyMedium?.color;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -91,10 +92,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage>
                           Text(
                             t(context, 'onboarding.name.subtitle'),
                             textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(color: descColor),
+                            style: AppTextStyles.bodyMd(color: AppColors.mist),
                           ),
                           const SizedBox(height: 24),
 

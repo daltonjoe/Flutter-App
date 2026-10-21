@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 
 class OnboardingProgressBar extends StatelessWidget {
   final int currentStep; // 0-indexed
@@ -22,7 +23,7 @@ class OnboardingProgressBar extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 3),
               height: 4,
               decoration: BoxDecoration(
-                color: active ? Colors.deepPurpleAccent : Colors.white24,
+                color: active ? AppColors.gold : Colors.white24,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),

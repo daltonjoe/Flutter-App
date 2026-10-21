@@ -1,15 +1,19 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_dimensions.dart';
+import '../../core/theme/app_typography.dart';
 import '../../models/onboarding_data.dart';
 import '../../services/astro_service.dart';
 import '../../services/chart_persistence_service.dart';
+import '../../presentation/widgets/components/cosmic_card.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../i18n/app_localizations.dart';
-import '../../presentation/widgets/components/cosmic_wheel_picker.dart';
 import '../../providers/language_provider.dart';
 import '../../providers/active_profile_provider.dart';
+import 'onboarding_chat_page.dart';
 
 class OnboardingRelationshipPage extends StatefulWidget {
   final OnboardingData data;
@@ -48,33 +52,29 @@ class _OnboardingRelationshipPageState
     'prefer_not_to_say',
   ];
 
-  List<String> get _optionKeys =>
-      _options.map((o) => 'onboarding.relationship.$o').toList();
-
-  static const Map<String, WheelTone> _tones = {
-    'single': WheelTone.neutral,
-    'in_relationship': WheelTone.female,
-    'engaged': WheelTone.male,
-    'married': WheelTone.gold,
-    'divorced': WheelTone.purple,
-    'separated': WheelTone.indigo,
-    'prefer_not_to_say': WheelTone.neutral,
+  static const Map<String, String> _images = {
+    'single': 'assets/images/onboarding/rel_single.png',
+    'in_relationship': 'assets/images/onboarding/rel_in_relationship.png',
+    'engaged': 'assets/images/onboarding/rel_engaged.png',
+    'married': 'assets/images/onboarding/rel_married.png',
+    'divorced': 'assets/images/onboarding/rel_divorced.png',
+    'separated': 'assets/images/onboarding/rel_separated.png',
+    'prefer_not_to_say': 'assets/images/onboarding/rel_prefer_not_to_say.png',
   };
-
-  String? get _imagePath => _selected != null
-      ? 'assets/images/relationship/${_selected == 'separated' ? 'seperated' : _selected}.png'
-      : null;
 
   @override
   void initState() {
     super.initState();
-    _selected = widget.data.relationshipStatus == 'dating'
+    final fromData = widget.data.relationshipStatus == 'dating'
         ? 'in_relationship'
         : widget.data.relationshipStatus;
+    _selected = _options.contains(fromData) ? fromData : _options.first;
     widget.data.relationshipStatus = _selected;
   }
 
   void _select(String value) {
+    if (_selected == value) return;
+    HapticFeedback.selectionClick();
     setState(() {
       _selected = value;
       widget.data.relationshipStatus = value;
@@ -110,16 +110,25 @@ class _OnboardingRelationshipPageState
       locale: locale,
       activeProfileProvider: activeProfileProvider,
     );
-  if (!mounted) return;
+    if (!mounted) return;
     setState(() => _isLoading = false);
 
-    await Navigator.pushNamed(
-      context,
-      '/onboarding/calculating',
-      arguments: {
-        'setupFactory': setupFactory,
-        'isFirstProfile': widget.isFirstProfile,
-      },
+    // S10 çıkışı → S10c sohbeti. Sohbet bitince hesaplama adımına geçilir.
+    final navigator = Navigator.of(context);
+    await navigator.push(
+      MaterialPageRoute<void>(
+        builder: (_) => OnboardingChatPage(
+          onDone: () {
+            navigator.pushReplacementNamed(
+              '/onboarding/calculating',
+              arguments: {
+                'setupFactory': setupFactory,
+                'isFirstProfile': widget.isFirstProfile,
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -154,76 +163,125 @@ class _OnboardingRelationshipPageState
   @override
   Widget build(BuildContext context) {
     final descColor = Theme.of(context).textTheme.bodyMedium?.color;
+    final reduce = MediaQuery.disableAnimationsOf(context);
+    final imageHeight = (MediaQuery.sizeOf(context).height * 0.24)
+        .clamp(130.0, 220.0)
+        .toDouble();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: widget.onBack,
-                    ),
-                  ),
-                  Text(
-                    t(context, 'onboarding.relationship.title'),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleLarge?.copyWith(color: descColor),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 250,
-                    child: _imagePath != null
-                        ? Image.asset(
-                            _imagePath!,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const SizedBox.shrink(),
-                          )
-                        : null,
-                  ),
-                  Expanded(
-                    child: CosmicWheelPicker(
-                      options: List.generate(
-                        _options.length,
-                        (i) => WheelOption(
-                          _options[i],
-                          t(context, _optionKeys[i]),
-                          _tones[_options[i]]!,
-                        ),
-                      ),
-                      selected: _selected,
-                      onSelected: _select,
-                    ),
-                  ),
-                  if (_generalError != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        _generalError!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.statusDanger),
-                      ),
-                    ),
-                  _isLoading
-                      ? const Center(child: CircularProgressIndicator(color: AppColors.gold))
-                      : CosmicCtaButton(
-                          label: t(
-                            context,
-                            'common.next',
-                          ), // diğer sayfalarda kullandığınız Next key'i neyse onu yazın
-                          disabled: _selected == null,
-                          onTap: widget.isLast ? _onSubmit : widget.onNext,
-                        ),
-                  const SizedBox(height: 24),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: [
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: widget.onBack,
+                ),
               ),
-            ),
+              Text(
+                t(context, 'onboarding.relationship.title'),
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(color: descColor),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: imageHeight,
+                width: double.infinity,
+                child: AnimatedSwitcher(
+                  duration: reduce
+                      ? Duration.zero
+                      : const Duration(milliseconds: 250),
+                  child: _selected == null
+                      ? const SizedBox.shrink()
+                      : Image.asset(
+                          _images[_selected]!,
+                          key: ValueKey(_selected),
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const SizedBox.shrink(),
+                        ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Expanded(
+                child: ListView.separated(
+                  padding: EdgeInsets.zero,
+                  itemCount: _options.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: AppSpacing.sm),
+                  itemBuilder: (context, i) {
+                    final value = _options[i];
+                    final isSelected = value == _selected;
+                    final label = t(context, 'onboarding.relationship.$value');
+                    return Semantics(
+                      selected: isSelected,
+                      button: true,
+                      label: label,
+                      child: CosmicCard(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.xs,
+                        ),
+                        borderColor: isSelected ? AppColors.gold : null,
+                        onTap: () => _select(value),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 48),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  label,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTextStyles.bodyMd(
+                                    color: AppColors.starlight,
+                                  ),
+                                ),
+                              ),
+                              if (isSelected) ...[
+                                const SizedBox(width: AppSpacing.sm),
+                                const Icon(
+                                  Icons.check,
+                                  size: 20,
+                                  color: AppColors.gold,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              if (_generalError != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    _generalError!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppColors.statusDanger),
+                  ),
+                ),
+              _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: AppColors.gold),
+                    )
+                  : CosmicCtaButton(
+                      label: t(context, 'common.next'),
+                      disabled: _selected == null,
+                      onTap: widget.isLast ? _onSubmit : widget.onNext,
+                    ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -88,3 +88,11 @@ Mevcut koddaki ölü/tekrar/gereksiz parçalar. Silme yalnızca kullanıcı ilgi
 - ADAY (silinmedi): assets/glyphs/ altindaki 10 gezegen SVG'si (sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto) + asc.svg hicbir kod yolundan referansli degil; `kSvgGlyphs` (lib/presentation/widgets/components/glyph.dart) yalniz 12 burc + 5 aci + 4 element iceriyor, gezegenler `PlanetGlyphIcon` ile vektor ciziliyor. `mc.svg`/`quincunx.svg` daha once silindi. Silme izne bagli.
 - SILINDI (2026-10-19): locales/*.json -> `planet_report.title` (8 dil); kodda sifir referans, referans taramasi (t/_t, ham string, test, dinamik anahtar) temiz.
 - ADAY (kapsam disi): locales/*.json -> `chart.planet_report` (8 dil) kodda sifir referans; `planet_report.*` kapsaminda olmadigi icin bu turda silinmedi.
+
+## K26-A: S13 salt okunur akis (2026-10-21)
+
+- lib/screens/onboarding/onboarding_first_question_page.dart:18,21,166 - `_Line.sample` alani ve `_ask` icindeki `sample: true` argumani artik hicbir tuketici tarafindan okunmuyor (ornek yanit etiketi kaldirildi); silme adayi.
+- lib/screens/onboarding/onboarding_first_question_page.dart:149 - `reply_generic` dali K26-A sonrasi erisilemez (salt okunur kutu hep hazir soruyu gonderir); olu kod, talimat geregi korundu.
+- lib/screens/onboarding/onboarding_first_question_page.dart:30,31,35,36 - `sunSign`/`moonSign` alanlari ve `onboarding.first_question.chip_sun/chip_moon/chip_sky` anahtarlari artik kodda kullanilmiyor (rota argumani DOKUNMA geregi korundu).
+- locales/*.json - `onboarding.first_question.free_hint` kodda referansli ama kutu yalniz hazir soru varken gosterildigi icin hic gorunmuyor; silme adayi.
+- locales/*.json - `onboarding.first_question.sample_label` hala 8 dilde duruyor (widget onceki turda kaldirilmisti); kural geregi silinmedi.

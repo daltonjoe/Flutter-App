@@ -5,6 +5,8 @@ import '../../i18n/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../presentation/widgets/components/cosmic_alert_dialog.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
 
 class OnboardingBirthtimePage extends StatefulWidget {
   final OnboardingData data;
@@ -117,7 +119,7 @@ class OnboardingBirthtimePage extends StatefulWidget {
                           Text(
                             t(context, 'onboarding.birthtime.subtitle'),
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: descColor),
+                            style: AppTextStyles.bodyMd(color: AppColors.mist),
                           ),
                           const SizedBox(height: 24),                   
                           SizedBox(

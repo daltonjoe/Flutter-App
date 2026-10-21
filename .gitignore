@@ -53,3 +53,10 @@ supabase/.temp/
 run.log
 
 *.bak
+.env
+*.jks
+*.keystore
+*.p12
+*.pem
+
+

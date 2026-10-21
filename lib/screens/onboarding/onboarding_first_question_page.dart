@@ -51,6 +51,7 @@ class _OnboardingFirstQuestionPageState
   bool _loaded = false;
   String? _noteId;
   String? _deepText;
+  List<String> _chipIds = const [];
   String? _full;
   int _shown = 0;
 
@@ -80,21 +81,26 @@ class _OnboardingFirstQuestionPageState
       debugPrint('Onboarding note id read failed: $e');
     }
     if (!mounted) return;
-    final nid = id;
-    if (nid != null && _pool.contains(nid)) {
-      final q = t(context, '${_k}deep_$nid');
-      setState(() {
-        _loaded = true;
-        _noteId = nid;
+    final nid = (id != null && _pool.contains(id)) ? id : null;
+    // S13'te serbest metin yok (K26-A): cevaplar yalniz hazir konu ciplerinden
+    // gelir; secilen konu cipin disinda kalan 3 konu alternatif olur.
+    final chips = (List<String>.of(_pool)..shuffle())
+        .where((e) => e != nid)
+        .take(3)
+        .toList();
+    setState(() {
+      _loaded = true;
+      _noteId = nid;
+      _chipIds = chips;
+      if (nid != null) {
+        final q = t(context, '${_k}deep_$nid');
         _deepText = q;
         _ctl.value = TextEditingValue(
           text: q,
           selection: TextSelection.collapsed(offset: q.length),
         );
-      });
-    } else {
-      setState(() => _loaded = true);
-    }
+      }
+    });
   }
 
   void _scrollEnd() {
@@ -132,11 +138,15 @@ class _OnboardingFirstQuestionPageState
     if (_full != null && mounted) setState(() => _full = null);
   }
 
-  void _ask(String raw) {
+  /// [replyKey] verilirse (konu cipleri) dogrudan o statik yanit doner.
+  /// Verilmezse salt okunur kutudaki hazir soru `reply_<not>` dalina gider;
+  /// serbest metin reply_generic yolu korunur ama artik erisilemez.
+  void _ask(String raw, {String? replyKey}) {
     final text = raw.trim();
     if (text.isEmpty || _busy || _canContinue) return;
     final deep = _noteId != null && text == _deepText;
-    final key = deep ? '${_k}reply_$_noteId' : '${_k}reply_generic';
+    final key =
+        replyKey ?? (deep ? '${_k}reply_$_noteId' : '${_k}reply_generic');
     HapticFeedback.selectionClick();
     _ctl.clear();
     _finishTyping();
@@ -162,34 +172,22 @@ class _OnboardingFirstQuestionPageState
     );
   }
 
-  List<String> _chipTexts() {
-    final out = <String>[];
-    if (widget.sunSign.isNotEmpty) {
-      out.add(t(context, '${_k}chip_sun').replaceAll('{sign}', widget.sunSign));
-    }
-    if (widget.moonSign.isNotEmpty) {
-      out.add(
-          t(context, '${_k}chip_moon').replaceAll('{sign}', widget.moonSign));
-    }
-    out.add(t(context, '${_k}chip_sky'));
-    return out;
-  }
-
-  Widget _chip(String text) {
+  Widget _chip(String id) {
+    final label = t(context, 'onboarding.memory.chip_$id');
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
-        onTap: _busy ? null : () => _ask(text),
+        onTap: _busy ? null : () => _ask(label, replyKey: '${_k}reply_$id'),
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             color: AppColors.gold.withValues(alpha: 0.08),
             border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
           ),
           child: Text(
-            text,
+            label,
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyMd(color: AppColors.starlight),
           ),
@@ -211,11 +209,11 @@ class _OnboardingFirstQuestionPageState
               style: AppTextStyles.heroTitle(),
             ),
             const SizedBox(height: 24),
-            if (_loaded && _noteId == null)
-              for (final c in _chipTexts())
+            if (_loaded)
+              for (final id in _chipIds)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: _chip(c),
+                  child: _chip(id),
                 ),
           ],
         ),
@@ -256,12 +254,6 @@ class _OnboardingFirstQuestionPageState
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (l.sample)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Text(t(context, '${_k}sample_label'),
-                          style: AppTextStyles.bodySm(color: AppColors.gold)),
-                    ),
                   Text(text,
                       style: AppTextStyles.bodyMd(color: AppColors.starlight)),
                 ],
@@ -284,17 +276,22 @@ class _OnboardingFirstQuestionPageState
   }
 
   Widget _input() {
-    if (_canContinue) return const SizedBox.shrink();
+    // Hazir soru yoksa (S14'te konu secilmediyse) kutu gosterilmez.
+    if (_canContinue || _noteId == null) return const SizedBox.shrink();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(
-          child: CosmicInputField(
-            label: t(context, '${_k}free_label'),
-            icon: Icons.auto_awesome_outlined,
-            controller: _ctl,
-            hint: t(context, '${_k}free_hint'),
-            onChanged: (_) {},
+          // K26-A: serbest metin yok. Klavye acilmaz, odak/cursor olmaz;
+          // S14'te secilen notun derinlestirici sorusu hazir gorunur.
+          child: ExcludeFocus(
+            child: CosmicInputField(
+              label: t(context, '${_k}free_label'),
+              icon: Icons.auto_awesome_outlined,
+              controller: _ctl,
+              readOnly: true,
+              hint: t(context, '${_k}free_hint'),
+            ),
           ),
         ),
         IconButton(
