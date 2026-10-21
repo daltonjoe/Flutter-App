@@ -1,30 +1,28 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_background.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../presentation/widgets/components/cosmic_input_field.dart';
-import '../../providers/active_profile_provider.dart';
-import '../../providers/language_provider.dart';
 import '../../redesign/ask/star_typing.dart';
-import '../../services/ai_consent_service.dart';
-import '../../services/ask_service.dart';
-import '../../services/astro_service.dart';
 
 const String _k = 'onboarding.first_question.';
+const String _prefNoteId = 'onboarding_note_id';
+const List<String> _pool = ['job', 'relationship', 'move', 'decision', 'goal'];
 
 class _Line {
-  const _Line(this.mine, this.text, {this.system = false});
+  const _Line(this.mine, this.text, {this.sample = false});
   final bool mine;
   final String text;
-  final bool system;
+  final bool sample;
 }
 
-/// S13 — İlk soru ve AI cevabı. Sohbet bellekte tutulur, kalıcı değildir.
+/// S13: ilk soru. API yok (K4): cevap statik ve "Ornek yanit" etiketlidir.
+/// S14'te secilen notun derinlestirici sorusu (K7) mesaj alanina gelir.
 class OnboardingFirstQuestionPage extends StatefulWidget {
   const OnboardingFirstQuestionPage({
     super.key,
@@ -47,27 +45,56 @@ class _OnboardingFirstQuestionPageState
   final TextEditingController _ctl = TextEditingController();
   final ScrollController _scroll = ScrollController();
   final List<_Line> _lines = [];
-  final Stopwatch _sw = Stopwatch();
-  Timer? _tick;
+  Timer? _wait;
   Timer? _type;
   bool _busy = false;
-  bool _consented = false;
-  bool _consentRetried = false;
-  bool _quotaHit = false;
-  String? _errKey;
-  String? _lastText;
+  bool _loaded = false;
+  String? _noteId;
+  String? _deepText;
   String? _full;
   int _shown = 0;
 
-  bool get _canContinue => _quotaHit || _lines.any((l) => !l.mine);
+  bool get _canContinue => _lines.any((l) => !l.mine);
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNote();
+  }
 
   @override
   void dispose() {
-    _tick?.cancel();
+    _wait?.cancel();
     _type?.cancel();
     _ctl.dispose();
     _scroll.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadNote() async {
+    String? id;
+    try {
+      final p = await SharedPreferences.getInstance();
+      id = p.getString(_prefNoteId);
+    } catch (e) {
+      debugPrint('Onboarding note id read failed: $e');
+    }
+    if (!mounted) return;
+    final nid = id;
+    if (nid != null && _pool.contains(nid)) {
+      final q = t(context, '${_k}deep_$nid');
+      setState(() {
+        _loaded = true;
+        _noteId = nid;
+        _deepText = q;
+        _ctl.value = TextEditingValue(
+          text: q,
+          selection: TextSelection.collapsed(offset: q.length),
+        );
+      });
+    } else {
+      setState(() => _loaded = true);
+    }
   }
 
   void _scrollEnd() {
@@ -76,21 +103,6 @@ class _OnboardingFirstQuestionPageState
         _scroll.jumpTo(_scroll.position.maxScrollExtent);
       }
     });
-  }
-
-  void _startTick() {
-    _sw
-      ..reset()
-      ..start();
-    _tick?.cancel();
-    _tick = Timer.periodic(const Duration(milliseconds: 500), (_) {
-      if (mounted && _busy) setState(() {});
-    });
-  }
-
-  void _stopTick() {
-    _tick?.cancel();
-    _sw.stop();
   }
 
   void _startTyping(String text) {
@@ -120,162 +132,34 @@ class _OnboardingFirstQuestionPageState
     if (_full != null && mounted) setState(() => _full = null);
   }
 
-  Future<bool> _consentSheet() async {
-    final ok = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.bgDeep,
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(t(ctx, 'consent.ai.title'), style: AppTextStyles.h2()),
-              const SizedBox(height: 12),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Text(t(ctx, 'consent.ai.body'),
-                      style: AppTextStyles.bodyMd(color: AppColors.mist)),
-                ),
-              ),
-              const SizedBox(height: 20),
-              CosmicCtaButton(
-                label: t(ctx, 'consent.ai.accept'),
-                onTap: () async {
-                  final g = await AiConsentService.grantAi();
-                  if (ctx.mounted) Navigator.pop(ctx, g);
-                },
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: Text(t(ctx, 'consent.ai.decline'),
-                    style: AppTextStyles.ctaSecondary()),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    return ok ?? false;
-  }
-
-  Future<bool> _ensureConsent() async {
-    if (_consented) return true;
-    final has = await AiConsentService.hasAi();
-    if (!mounted) return false;
-    if (has) {
-      _consented = true;
-      return true;
-    }
-    final ok = await _consentSheet();
-    if (!mounted) return false;
-    if (ok) {
-      _consented = true;
-      return true;
-    }
-    widget.onDone();
-    return false;
-  }
-
-  Future<void> _ask(String raw) async {
+  void _ask(String raw) {
     final text = raw.trim();
-    if (text.isEmpty || _busy) return;
-    if (!await _ensureConsent()) return;
-    if (!mounted) return;
-    final loc = context.read<LanguageProvider>().locale.languageCode;
-    final pid = context.read<ActiveProfileProvider>().activeProfileId;
-    final safe = <String, String>{
-      'crisis': t(context, 'ask.safety.crisis'),
-      'redirect': t(context, 'ask.safety.redirect'),
-      'fallback': t(context, 'ask.safety.fallback'),
-    };
-    final retry = _errKey != null &&
-        _lines.isNotEmpty &&
-        _lines.last.mine &&
-        _lastText == text;
-    final base =
-        retry ? _lines.sublist(0, _lines.length - 1) : List<_Line>.of(_lines);
-    final kept = base.where((l) => !l.system).toList();
-    final recent = kept.length > 6 ? kept.sublist(kept.length - 6) : kept;
+    if (text.isEmpty || _busy || _canContinue) return;
+    final deep = _noteId != null && text == _deepText;
+    final key = deep ? '${_k}reply_$_noteId' : '${_k}reply_generic';
     HapticFeedback.selectionClick();
     _ctl.clear();
     _finishTyping();
     setState(() {
-      if (!retry) _lines.add(_Line(true, text));
+      _lines.add(_Line(true, text));
       _busy = true;
-      _errKey = null;
-      _lastText = text;
     });
-    _startTick();
     _scrollEnd();
-    try {
-      final res = await AskService.send(
-        message: text,
-        contexts: const <Map<String, dynamic>>[],
-        locale: loc,
-        history: [
-          for (final l in recent)
-            {'role': l.mine ? 'user' : 'assistant', 'text': l.text},
-        ],
-        profileId: pid,
-        mode: 'natal',
-      );
-      if (!mounted) return;
-      _stopTick();
-      final s = res.safety;
-      final rp = res.reply;
-      String reply;
-      var sys = false;
-      if (s != null) {
-        reply = rp ?? (safe[s] ?? safe['fallback']!);
-        sys = true;
-      } else if (rp == null || rp.trim().isEmpty) {
-        reply = safe['fallback']!;
-        sys = true;
-      } else {
-        reply = rp;
-      }
-      setState(() {
-        _lines.add(_Line(false, reply, system: sys));
-        _busy = false;
-      });
-      _scrollEnd();
-      if (!sys) _startTyping(reply);
-    } catch (e) {
-      debugPrint('FirstQuestion ask failed: $e');
-      if (!mounted) return;
-      _stopTick();
-      final code = e is AstroServiceException ? e.code : '';
-      if (code == 'CONSENT' && !_consentRetried) {
-        _consentRetried = true;
-        _consented = false;
-        setState(() => _busy = false);
-        final ok = await _consentSheet();
+    final reduce = MediaQuery.disableAnimationsOf(context);
+    _wait?.cancel();
+    _wait = Timer(
+      reduce ? Duration.zero : const Duration(milliseconds: 1400),
+      () {
         if (!mounted) return;
-        if (ok) {
-          _consented = true;
-          _errKey = 'ask.error';
-          await _ask(text);
-          return;
-        }
-        widget.onDone();
-        return;
-      }
-      setState(() {
-        _busy = false;
-        _lastText = text;
-        if (code == 'QUOTA') {
-          _quotaHit = true;
-          _errKey = '${_k}quota';
-        } else if (code == 'RATE_LIMITED') {
-          _errKey = 'ask.error.rate';
-        } else {
-          _errKey = 'ask.error';
-        }
-      });
-    }
+        final reply = t(context, key);
+        setState(() {
+          _lines.add(_Line(false, reply, sample: true));
+          _busy = false;
+        });
+        _scrollEnd();
+        _startTyping(reply);
+      },
+    );
   }
 
   List<String> _chipTexts() {
@@ -327,11 +211,12 @@ class _OnboardingFirstQuestionPageState
               style: AppTextStyles.heroTitle(),
             ),
             const SizedBox(height: 24),
-            for (final c in _chipTexts())
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _chip(c),
-              ),
+            if (_loaded && _noteId == null)
+              for (final c in _chipTexts())
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _chip(c),
+                ),
           ],
         ),
       ),
@@ -367,8 +252,20 @@ class _OnboardingFirstQuestionPageState
                     : AppColors.bgSurface,
                 border: Border.all(color: AppColors.hairline),
               ),
-              child: Text(text,
-                  style: AppTextStyles.bodyMd(color: AppColors.starlight)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (l.sample)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Text(t(context, '${_k}sample_label'),
+                          style: AppTextStyles.bodySm(color: AppColors.gold)),
+                    ),
+                  Text(text,
+                      style: AppTextStyles.bodyMd(color: AppColors.starlight)),
+                ],
+              ),
             ),
           ),
         );
@@ -377,51 +274,17 @@ class _OnboardingFirstQuestionPageState
   }
 
   Widget _waiting() {
-    final s = _sw.elapsed.inSeconds;
-    final key = s >= 20
-        ? 'slow'
-        : s < 3
-            ? 'status1'
-            : s < 8
-                ? 'status2'
-                : 'status3';
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          const StarTyping(),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(t(context, '$_k$key'),
-                style: AppTextStyles.bodySm(color: AppColors.mist)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _error() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(t(context, _errKey!),
-                style: AppTextStyles.bodySm(color: AppColors.mist)),
-          ),
-          if (!_quotaHit && _lastText != null)
-            TextButton(
-              onPressed: _busy ? null : () => _ask(_lastText!),
-              child: Text(t(context, 'ask.retry'),
-                  style: AppTextStyles.ctaSecondary()),
-            ),
-        ],
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: StarTyping(),
       ),
     );
   }
 
   Widget _input() {
-    if (_quotaHit) return const SizedBox.shrink();
+    if (_canContinue) return const SizedBox.shrink();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -430,8 +293,7 @@ class _OnboardingFirstQuestionPageState
             label: t(context, '${_k}free_label'),
             icon: Icons.auto_awesome_outlined,
             controller: _ctl,
-            hint: t(context,
-                _lines.isEmpty ? '${_k}free_hint' : '${_k}more_hint'),
+            hint: t(context, '${_k}free_hint'),
             onChanged: (_) {},
           ),
         ),
@@ -471,7 +333,6 @@ class _OnboardingFirstQuestionPageState
                 children: [
                   Expanded(child: _lines.isEmpty ? _intro() : _chat()),
                   if (_busy) _waiting(),
-                  if (_errKey != null) _error(),
                   _input(),
                   const SizedBox(height: 12),
                   _bottom(),

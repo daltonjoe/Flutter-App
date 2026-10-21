@@ -117,13 +117,13 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
     }
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => OnboardingFirstQuestionPage(
-          sunSign: _sun,
-          moonSign: _moon,
+        builder: (_) => OnboardingMemoryPage(
           onDone: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute<void>(
-                builder: (_) => OnboardingMemoryPage(
+                builder: (_) => OnboardingFirstQuestionPage(
+                  sunSign: _sun,
+                  moonSign: _moon,
                   onDone: () {
                     Navigator.of(context).pop();
                     _afterAi();

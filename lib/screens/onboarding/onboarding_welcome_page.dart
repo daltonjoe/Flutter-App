@@ -1,9 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
+import '../legal_agreements_page.dart';
 
 /// S02 — Karşılama. Marka konseptini kısa bir sahneyle kurar.
 /// Ekrana dokunmak sahneyi son duruma geçirir; reduce motion açıkken statik.
@@ -21,10 +23,16 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
   late final AnimationController _scene;
   late final AnimationController _breath;
   bool _started = false;
+  late final TapGestureRecognizer _termsTap;
+  late final TapGestureRecognizer _privacyTap;
 
   @override
   void initState() {
     super.initState();
+    _termsTap = TapGestureRecognizer()
+      ..onTap = () => _openLegal('settings.privacy.terms', 'legal.terms.body');
+    _privacyTap = TapGestureRecognizer()
+      ..onTap = () => _openLegal('settings.privacy.policy', 'legal.privacy.body');
     _scene = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 3600));
     _breath = AnimationController(
@@ -49,7 +57,17 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
   void dispose() {
     _scene.dispose();
     _breath.dispose();
+    _termsTap.dispose();
+    _privacyTap.dispose();
     super.dispose();
+  }
+
+  void _openLegal(String titleKey, String bodyKey) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LegalTextPage(titleKey: titleKey, bodyKey: bodyKey),
+      ),
+    );
   }
 
   void _skip() {
@@ -152,10 +170,28 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
                           style: AppTextStyles.ctaSecondary(),
                         ),
                       ),
-                      Text(
-                        t(context, 'onboarding.welcome.legal'),
+                      Text.rich(
+                        TextSpan(
+                          style: AppTextStyles.bodyXs(color: AppColors.mist),
+                          children: [
+                            TextSpan(text: t(context, 'onboarding.welcome.legal_a')),
+                            TextSpan(
+                              text: t(context, 'onboarding.welcome.legal_terms'),
+                              style: AppTextStyles.bodyXs(color: AppColors.starlight)
+                                  .copyWith(decoration: TextDecoration.underline),
+                              recognizer: _termsTap,
+                            ),
+                            TextSpan(text: t(context, 'onboarding.welcome.legal_b')),
+                            TextSpan(
+                              text: t(context, 'onboarding.welcome.legal_privacy'),
+                              style: AppTextStyles.bodyXs(color: AppColors.starlight)
+                                  .copyWith(decoration: TextDecoration.underline),
+                              recognizer: _privacyTap,
+                            ),
+                            TextSpan(text: t(context, 'onboarding.welcome.legal_c')),
+                          ],
+                        ),
                         textAlign: TextAlign.center,
-                        style: AppTextStyles.bodyXs(color: AppColors.mist),
                       ),
                     ],
                   ),

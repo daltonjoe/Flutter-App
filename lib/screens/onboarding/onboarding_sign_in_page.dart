@@ -105,7 +105,21 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
         arguments: {"isFirstProfile": true},
       );
     } else {
-      nav.pushNamedAndRemoveUntil("/onboarding/consent", (r) => false);
+      var consented81 = false;
+      try {
+        final rows81 = await Supabase.instance.client
+            .from("user_consents")
+            .select("kind")
+            .inFilter("kind", ["privacy", "terms", "ai"]);
+        final kinds81 = rows81.map((r) => r["kind"]).toSet();
+        consented81 = kinds81.containsAll(["privacy", "terms", "ai"]);
+      } catch (e) {
+        debugPrint("signin consent check failed: $e");
+      }
+      nav.pushNamedAndRemoveUntil(
+        consented81 ? "/home" : "/onboarding/consent",
+        (r) => false,
+      );
     }
   }
 
