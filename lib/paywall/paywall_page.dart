@@ -7,8 +7,8 @@ import "package:flutter_application/core/theme/app_shadows.dart";
 import "package:flutter_application/i18n/app_localizations.dart";
 import "package:flutter_application/screens/legal_agreements_page.dart";
 import "package:flutter_application/services/user_settings_service.dart";
+import "package:purchases_flutter/purchases_flutter.dart";
 import "paywall_service.dart";
-import "paywall_fallback_prices.dart";
 import '../presentation/widgets/components/cosmic_loader.dart';
 
 enum PaywallSource { onboarding, quota, settings }
@@ -121,6 +121,7 @@ class _PaywallPageState extends State<PaywallPage>
     setState(() {
       _offer = offer;
       _loading = false;
+      if (offer?.yearly == null && offer?.monthly != null) _selIdx = 1;
     });
   }
 
@@ -195,42 +196,14 @@ class _PaywallPageState extends State<PaywallPage>
 
     final y = _offer?.yearly;
     final m = _offer?.monthly;
-    
-
-    // Prices and trial days
-    final double yRaw = y?.storeProduct.price ?? PaywallFallbackPrices.yearly;
-    final double mRaw = m?.storeProduct.price ?? PaywallFallbackPrices.monthly;
-    
-
-    final String symbol =
-        y?.storeProduct.priceString.replaceAll(RegExp(r'[0-9.,\s]'), '') ??
-        PaywallFallbackPrices.currencySymbol;
-
-    String formatPrice(double price, String? originalString) {
-      if (originalString != null && originalString.contains(RegExp(r'[0-9]'))) {
-        // Try to replace numbers in original string with our calculated value
-        return originalString.replaceAll(
-          RegExp(r'[0-9.,]+'),
-          price.round().toString(),
-        );
-      }
-      return "$symbol${price.round()}";
-    }
-
-    final String yMonthPrice = formatPrice(
-      yRaw / 12,
-      y?.storeProduct.priceString,
-    );
-    final String mMonthPrice =
-        m?.storeProduct.priceString ?? "$symbol${mRaw.round()}";
-    
-
-    final int yd = 7;
-    final int md = 1;
-    final String yPriceStr =
-        y?.storeProduct.priceString ?? "$symbol${yRaw.round()}";
-
-    final int discount = ((1 - (yRaw / 12) / mRaw) * 100).round();
+    final int? yd = y == null ? null : _trialDays(y.storeProduct);
+    final int? md = m == null ? null : _trialDays(m.storeProduct);
+    final String? yPriceStr = y?.storeProduct.priceString;
+    final String? mPriceStr = m?.storeProduct.priceString;
+    final int? discount = (y != null && m != null && m.storeProduct.price > 0)
+        ? ((1 - (y.storeProduct.price / 12) / m.storeProduct.price) * 100).round()
+        : null;
+    final bool hasSel = _selIdx == 0 ? y != null : m != null;
 
     return Scaffold(
       backgroundColor: AppColors.bgDeep,
@@ -294,26 +267,27 @@ class _PaywallPageState extends State<PaywallPage>
                               ],
                             ),
                             const SizedBox(height: AppSpacing.xl),
-                            _buildPlanCard(
-                              index: 0,
-                              label: _t("paywall.plan.yearly"),
-                              trial: _t(
-                                "paywall.trial_days",
-                                args: {"days": "$yd"},
+                            if (y != null)
+                              _buildPlanCard(
+                                index: 0,
+                                label: _t("paywall.plan.yearly"),
+                                trial: yd == null
+                                    ? null
+                                    : _t("paywall.trial_days", args: {"days": "$yd"}),
+                                price: _t("paywall.plan.per_year", args: {"price": yPriceStr!}),
+                                discount: (discount != null && discount > 0) ? discount : null,
                               ),
-                              price: "$yMonthPrice${_t("paywall.per_month")}",
-                              discount: discount > 0 ? discount : null,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            _buildPlanCard(
-                              index: 1,
-                              label: _t("paywall.plan.monthly"),
-                              trial: _t(
-                                "paywall.trial_days",
-                                args: {"days": "$md"},
+                            if (y != null && m != null)
+                              const SizedBox(height: AppSpacing.md),
+                            if (m != null)
+                              _buildPlanCard(
+                                index: 1,
+                                label: _t("paywall.plan.monthly"),
+                                trial: md == null
+                                    ? null
+                                    : _t("paywall.trial_days", args: {"days": "$md"}),
+                                price: _t("paywall.plan.per_month", args: {"price": mPriceStr!}),
                               ),
-                              price: "$mMonthPrice${_t("paywall.per_month")}",
-                            ),
                             
                           ],
                         ),
@@ -341,12 +315,20 @@ class _PaywallPageState extends State<PaywallPage>
                       ),
                     ),
                   Text(
-                    _commitText(_selIdx == 0 ? yd : md, _selIdx == 0 ? yPriceStr : mMonthPrice),
+                    hasSel
+                        ? _commitText(
+                            _selIdx == 0 ? yd : md,
+                            (_selIdx == 0 ? yPriceStr : mPriceStr) ?? "",
+                          )
+                        : _t("paywall.unavailable"),
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodySm(color: AppColors.mist),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  _buildCtaButton(),
+                  _buildCtaButton(
+                    enabled: hasSel,
+                    days: hasSel ? (_selIdx == 0 ? yd : md) : null,
+                  ),
                   const SizedBox(height: AppSpacing.lg),
                   _buildFooterLinks(),
                 ],
@@ -358,10 +340,38 @@ class _PaywallPageState extends State<PaywallPage>
     );
   }
 
-  String _commitText(int days, String price) {
-    final key = _selIdx == 0
-        ? "paywall.commit.yearly"
-        : "paywall.commit.monthly";
+  /// Mağaza paketinin ücretsiz deneme süresi (gün); teklif yoksa null.
+  /// iOS: tanıtım teklifi (fiyat 0); Android: ücretsiz faz. Yalnız PnD ve PnW çözülür.
+  int? _trialDays(StoreProduct p) {
+    String? iso;
+    int cycles = 1;
+    final intro = p.introductoryPrice;
+    if (intro != null && intro.price == 0) {
+      iso = intro.period;
+      cycles = intro.cycles;
+    } else {
+      final free = p.defaultOption?.freePhase;
+      iso = free?.billingPeriod?.iso8601;
+      cycles = free?.billingCycleCount ?? 1;
+    }
+    if (iso == null || cycles < 1) return null;
+    final m = RegExp(r'^P(\d+)([DW])$').firstMatch(iso);
+    if (m == null) return null;
+    final n = int.parse(m.group(1)!);
+    final days = m.group(2) == 'W' ? n * 7 : n;
+    return days * cycles;
+  }
+
+  String _commitText(int? days, String price) {
+    final yearly = _selIdx == 0;
+    if (days == null) {
+      final paid = _t(
+        yearly ? "paywall.commit.yearly_paid" : "paywall.commit.monthly_paid",
+        args: {"price": price},
+      );
+      return "$paid\n${_t("paywall.cancel_anytime")}";
+    }
+    final key = yearly ? "paywall.commit.yearly" : "paywall.commit.monthly";
     final end = MaterialLocalizations.of(context)
         .formatMediumDate(DateTime.now().add(Duration(days: days)));
     final head = _t(key, args: {"days": "$days", "price": price});
@@ -505,17 +515,14 @@ class _PaywallPageState extends State<PaywallPage>
     );
   }
 
-  Widget _buildCtaButton() {
-    String label;
-    if (_selIdx == 0) {
-      label = _t("paywall.cta_trial_days", args: {"days": "7"});
-    } else if (_selIdx == 1) {
-      label = _t("paywall.cta_trial_days", args: {"days": "1"});
-    } else {
-      label = _t("paywall.cta_continue");
-    }
+  Widget _buildCtaButton({required bool enabled, int? days}) {
+    final String label = days == null
+        ? _t("paywall.cta_continue")
+        : _t("paywall.cta_trial_days", args: {"days": "$days"});
 
-    return Container(
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.4,
+      child: Container(
       width: double.infinity,
       height: AppSizes.ctaHeight,
       decoration: BoxDecoration(
@@ -527,7 +534,7 @@ class _PaywallPageState extends State<PaywallPage>
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppRadius.pill),
-          onTap: _busy ? null : _buy,
+          onTap: (_busy || !enabled) ? null : _buy,
           child: Center(
             child: _busy
                 ? const SizedBox(
@@ -542,6 +549,7 @@ class _PaywallPageState extends State<PaywallPage>
           ),
         ),
       ),
+    ),
     );
   }
 
