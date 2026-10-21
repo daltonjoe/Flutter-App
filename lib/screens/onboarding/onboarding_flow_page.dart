@@ -108,7 +108,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
               listenable: _res,
               builder: (context, _) => TweenAnimationBuilder<double>(
                 tween: Tween<double>(end: _res.value),
-                duration: AppMotion.resolution,
+                duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : AppMotion.resolution,
                 curve: AppMotion.resolutionCurve,
                 builder: (context, v, child) {
                   final sigma = lerpDouble(18, 0, v)!;
@@ -119,10 +119,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
                     child: child,
                   );
                 },
-                child: Image.asset(
-                  'assets/images/logo/background.jpg',
-                  fit: BoxFit.cover,
-                ),
+                child: RepaintBoundary(child: Image.asset('assets/images/logo/background.jpg', fit: BoxFit.cover)),
               ),
             ),
           ),

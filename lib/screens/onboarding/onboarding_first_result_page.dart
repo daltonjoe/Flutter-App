@@ -188,8 +188,7 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
                 Positioned.fill(
                   child: AnimatedBuilder(
                     animation: _scene,
-                    child: Image.asset('assets/images/logo/background.jpg',
-                        fit: BoxFit.cover),
+                    child: RepaintBoundary(child: Image.asset('assets/images/logo/background.jpg', fit: BoxFit.cover)),
                     builder: (context, child) {
                       final p =
                           ((_scene.value * _totalMs - 3900) / 1400).clamp(0.0, 1.0);
