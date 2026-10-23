@@ -112,7 +112,7 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
             .select("kind")
             .inFilter("kind", ["privacy", "terms", "ai"]);
         final kinds81 = rows81.map((r) => r["kind"]).toSet();
-        consented81 = kinds81.containsAll(["privacy", "terms", "ai"]);
+        consented81 = kinds81.containsAll(["privacy", "terms"]);
       } catch (e) {
         debugPrint("signin consent check failed: $e");
       }

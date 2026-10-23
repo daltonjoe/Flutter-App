@@ -23,6 +23,49 @@ class AskService {
     return '';
   }
 
+  /// Maps an /ask response (status, detail) to a client error code.
+  /// Returns null when unmapped (caller falls back to ``HTTP_<status>``).
+  static String? mapAskError(int status, String? detail) {
+    final d = detail ?? '';
+    if (status == 429) {
+      switch (d) {
+        case 'credits_empty':
+          return 'CREDITS_EMPTY';
+        case 'daily_limit_trial':
+          return 'DAILY_LIMIT_TRIAL';
+        case 'daily_limit_pro':
+          return 'DAILY_LIMIT_PRO';
+        case 'quota':
+          return 'QUOTA';
+        default:
+          return 'RATE_LIMITED';
+      }
+    }
+    if (status == 503 && d == 'credit_unavailable') return 'CREDIT_UNAVAILABLE';
+    if (status == 403 && d == 'consent') return 'CONSENT';
+    return null;
+  }
+
+  /// Maps a client error code to the locale key shown in the error row.
+  static String errKeyFor(String code) {
+    switch (code) {
+      case 'RATE_LIMITED':
+        return 'ask.error.rate';
+      case 'QUOTA':
+        return 'ask.error.quota';
+      case 'CREDITS_EMPTY':
+        return 'ask.error.credits';
+      case 'DAILY_LIMIT_TRIAL':
+        return 'ask.error.daily_trial';
+      case 'DAILY_LIMIT_PRO':
+        return 'ask.error.daily_pro';
+      case 'CREDIT_UNAVAILABLE':
+        return 'ask.error.credit_unavailable';
+      default:
+        return 'ask.error';
+    }
+  }
+
   /// POST /ask {message, contexts, locale, history} (sÃ¶zleÅŸme: handoff.md)
   static Future<AskResult> send({
     required String message,
@@ -63,14 +106,10 @@ class AskService {
       throw AstroServiceException(
           code: 'NETWORK_ERROR', message: 'Sunucuya baÄŸlanÄ±lamadÄ±.');
     }
-    if (r.statusCode == 429) {
-      if (_detail(r) == 'quota') {
-        throw AstroServiceException(code: 'QUOTA', message: 'GÃ¼nlÃ¼k hak doldu.');
-      }
-      throw AstroServiceException(code: 'RATE_LIMITED', message: 'Ã‡ok fazla istek.');
-    }
-    if (r.statusCode == 403 && _detail(r) == 'consent') {
-      throw AstroServiceException(code: 'CONSENT', message: 'consent required');
+    final mapped = mapAskError(r.statusCode, _detail(r));
+    if (mapped != null) {
+      throw AstroServiceException(
+          code: mapped, message: 'ask error ${r.statusCode}');
     }
     if (r.statusCode != 200) {
       throw AstroServiceException(

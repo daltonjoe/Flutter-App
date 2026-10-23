@@ -25,7 +25,7 @@ class _Src implements SessionDataSource {
   SessionKind kind = SessionKind.user;
   String? id = "a";
   List<String>? ids = <String>["p1"];
-  Set<String>? kinds = <String>{"privacy", "terms", "ai"};
+  Set<String>? kinds = <String>{"privacy", "terms"};
   EntryIntent intent = EntryIntent.none;
   int cleared = 0;
   @override
@@ -62,7 +62,11 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     src = _Src();
     prov = _Prov();
-    c = SessionController(source: src, profiles: prov, language: LanguageProvider());
+    c = SessionController(
+      source: src,
+      profiles: prov,
+      language: LanguageProvider(),
+    );
   });
   test("1 uid degisince clearActive", () async {
     await c.refresh();
@@ -112,5 +116,15 @@ void main() {
     await prov.setActive("zz");
     await c.refresh();
     expect(prov.sets.last, "p1");
+  });
+  test("9 profil var privacy+terms -> home", () async {
+    src.kinds = <String>{"privacy", "terms"};
+    await c.refresh();
+    expect(c.route, EntryRoute.home);
+  });
+  test("10 profil var yalniz privacy -> consent", () async {
+    src.kinds = <String>{"privacy"};
+    await c.refresh();
+    expect(c.route, EntryRoute.consent);
   });
 }

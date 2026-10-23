@@ -11,6 +11,13 @@ class AppMotion {
   static const hero = Duration(milliseconds: 700);
   static const chipFill = Duration(milliseconds: 260);
 
+  /// Eya (AskPage) typewriter step: this many chars every typewriterTick.
+  static const typewriterTick = Duration(milliseconds: 30);
+  static const typewriterCharsPerTick = 2;
+
+  /// Eya (AskPage) gap between sequential bubbles.
+  static const bubbleGap = Duration(milliseconds: 450);
+
   static const enterCurve = Curves.easeOutCubic;
   static const resolutionCurve = Curves.easeInOutCubic;
 }

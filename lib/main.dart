@@ -96,9 +96,11 @@ void main() async {
       debugPrint("paywall init failed: $e");
     }
   }
-if (kDebugMode) {
-  debugPrint('TOKEN=${Supabase.instance.client.auth.currentSession?.accessToken == null ? "null" : "present"}');
-}
+  if (kDebugMode) {
+    debugPrint(
+      'TOKEN=${Supabase.instance.client.auth.currentSession?.accessToken == null ? "null" : "present"}',
+    );
+  }
   runApp(
     MultiProvider(
       providers: [
@@ -196,15 +198,18 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
   }
   if (settings.name == '/onboarding/link-account') {
     return MaterialPageRoute(builder: (_) => const OnboardingRegisterPage());
-    }
-    if (settings.name == '/onboarding/email') {
-      return MaterialPageRoute(builder: (_) => const OnboardingLinkAccountPage());
-    }
-    if (settings.name == '/onboarding/consent') {
-      return MaterialPageRoute(builder: (_) => const OnboardingConsentPage());
-    }
-    if (settings.name == '/signin') {
-      return MaterialPageRoute(settings: settings, builder: (_) => const OnboardingSignInPage());
+  }
+  if (settings.name == '/onboarding/email') {
+    return MaterialPageRoute(builder: (_) => const OnboardingLinkAccountPage());
+  }
+  if (settings.name == '/onboarding/consent') {
+    return MaterialPageRoute(builder: (_) => const OnboardingConsentPage());
+  }
+  if (settings.name == '/signin') {
+    return MaterialPageRoute(
+      settings: settings,
+      builder: (_) => const OnboardingSignInPage(),
+    );
   }
   if (settings.name == '/home') {
     return MaterialPageRoute(builder: (_) => const MainShell());
@@ -261,13 +266,17 @@ class _WebErr67State extends State<_WebErr67> {
           action: SnackBarAction(
             label: t(context, "onboarding.register.signin"),
             onPressed: () {
-              startOAuthSignin90(OAuthProvider.google).catchError((Object e) {
-              });
+              startOAuthSignin90(
+                OAuthProvider.google,
+              ).catchError((Object e) {});
             },
           ),
         ),
       );
-      SystemNavigator.routeInformationUpdated(uri: Uri.parse("/"), replace: true);
+      SystemNavigator.routeInformationUpdated(
+        uri: Uri.parse("/"),
+        replace: true,
+      );
     });
   }
 

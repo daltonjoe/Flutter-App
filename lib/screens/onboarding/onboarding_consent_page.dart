@@ -32,8 +32,10 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
 
   void _home() {
     if (!mounted) return;
-    Navigator.of(context, rootNavigator: true)
-        .pushNamedAndRemoveUntil("/home", (r) => false);
+    Navigator.of(
+      context,
+      rootNavigator: true,
+    ).pushNamedAndRemoveUntil("/home", (r) => false);
   }
 
   Future<void> _check() async {
@@ -45,7 +47,7 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
       final sp = await SharedPreferences.getInstance();
       await sp.remove("force_consent");
       final k = rows.map((r) => r["kind"]).toSet();
-      if (k.contains("privacy") && k.contains("terms") && k.contains("ai")) {
+      if (k.contains("privacy") && k.contains("terms")) {
         _home();
         return;
       }
@@ -78,12 +80,13 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (uid == null) return;
     setState(() => _saving = true);
-    final ok = await _ins(uid, "privacy") && await _ins(uid, "terms") && await _ins(uid, "ai");
+    final ok = await _ins(uid, "privacy") && await _ins(uid, "terms");
     if (!mounted) return;
     if (!ok) {
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(t(context, "ask.error"))));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(t(context, "ask.error"))));
       return;
     }
     try {
@@ -134,7 +137,13 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
     }
   }
 
-  Widget _box(String linkKey, String checkKey, String url, bool v, ValueChanged<bool> on) {
+  Widget _box(
+    String linkKey,
+    String checkKey,
+    String url,
+    bool v,
+    ValueChanged<bool> on,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -150,12 +159,20 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
           children: [
             GestureDetector(
               onTap: url.isEmpty ? null : () => _open(url),
-              child: Text(t(context, linkKey),
-                  style: AppTextStyles.bodyMd(color: AppColors.starlight).copyWith(
-                      decoration: TextDecoration.underline, fontWeight: FontWeight.bold)),
+              child: Text(
+                t(context, linkKey),
+                style: AppTextStyles.bodyMd(color: AppColors.starlight)
+                    .copyWith(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
             ),
             const SizedBox(height: 4),
-            Text(t(context, checkKey), style: AppTextStyles.bodyMd(color: AppColors.mist)),
+            Text(
+              t(context, checkKey),
+              style: AppTextStyles.bodyMd(color: AppColors.mist),
+            ),
           ],
         ),
       ),
@@ -183,18 +200,34 @@ class _OnboardingConsentPageState extends State<OnboardingConsentPage> {
             padding: const EdgeInsets.all(24),
             children: [
               const SizedBox(height: 48),
-              Text(t(context, "onboarding.consent.title"),
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.bodyLg(color: AppColors.starlight).copyWith(fontSize: 30)),
+              Text(
+                t(context, "onboarding.consent.title"),
+                textAlign: TextAlign.center,
+                style: AppTextStyles.bodyLg(
+                  color: AppColors.starlight,
+                ).copyWith(fontSize: 30),
+              ),
               const SizedBox(height: 16),
-              Text(t(context, "onboarding.consent.body"),
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.bodyMd(color: AppColors.mist)),
+              Text(
+                t(context, "onboarding.consent.body"),
+                textAlign: TextAlign.center,
+                style: AppTextStyles.bodyMd(color: AppColors.mist),
+              ),
               const SizedBox(height: 32),
-              _box("onboarding.consent.privacy_link", "onboarding.consent.privacy_check",
-                  kPrivacyPolicyUrl, _priv, (b) => setState(() => _priv = b)),
-              _box("onboarding.consent.terms_link", "onboarding.consent.terms_check",
-                  kTermsUrl, _terms, (b) => setState(() => _terms = b)),
+              _box(
+                "onboarding.consent.privacy_link",
+                "onboarding.consent.privacy_check",
+                kPrivacyPolicyUrl,
+                _priv,
+                (b) => setState(() => _priv = b),
+              ),
+              _box(
+                "onboarding.consent.terms_link",
+                "onboarding.consent.terms_check",
+                kTermsUrl,
+                _terms,
+                (b) => setState(() => _terms = b),
+              ),
               const SizedBox(height: 24),
               CosmicCtaButton(
                 label: t(context, "onboarding.consent.cta"),

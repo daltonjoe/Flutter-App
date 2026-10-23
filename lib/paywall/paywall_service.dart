@@ -5,14 +5,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 const String _kIosKey = String.fromEnvironment('RC_IOS_KEY');
 const String _kAndroidKey = String.fromEnvironment('RC_ANDROID_KEY');
-const String kCreditsProductId = 'sb_msgs_50';
 const String kProEntitlement = 'pro';
 
 class PaywallOffer {
-  const PaywallOffer({this.yearly, this.monthly, this.credits});
+  const PaywallOffer({this.yearly, this.monthly});
   final Package? yearly;
   final Package? monthly;
-  final StoreProduct? credits;
   bool get hasPlans => yearly != null || monthly != null;
 }
 
@@ -52,19 +50,9 @@ class PaywallService {
     try {
       final offerings = await Purchases.getOfferings();
       final cur = offerings.current;
-      StoreProduct? credits;
-      try {
-        final ps = await Purchases.getProducts([
-          kCreditsProductId,
-        ], productCategory: ProductCategory.nonSubscription);
-        if (ps.isNotEmpty) credits = ps.first;
-      } catch (e) {
-        debugPrint('paywall credits product error: $e');
-      }
       return PaywallOffer(
         yearly: cur?.annual,
         monthly: cur?.monthly,
-        credits: credits,
       );
     } catch (e) {
       debugPrint('paywall offerings error: $e');
@@ -88,17 +76,6 @@ class PaywallService {
     } catch (e) {
       if (_cancelled(e)) return false;
       debugPrint('paywall purchase error: $e');
-      rethrow;
-    }
-  }
-
-  static Future<bool> buyCredits(StoreProduct p) async {
-    try {
-      await Purchases.purchaseStoreProduct(p);
-      return true;
-    } catch (e) {
-      if (_cancelled(e)) return false;
-      debugPrint('paywall credits purchase error: $e');
       rethrow;
     }
   }

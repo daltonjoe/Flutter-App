@@ -14,7 +14,7 @@ enum EntryRoute {
   home,
 }
 
-const Set<String> kRequiredConsents = {"privacy", "terms", "ai"};
+const Set<String> kRequiredConsents = {"privacy", "terms"};
 
 EntryRoute resolveEntry({
   required SessionKind session,

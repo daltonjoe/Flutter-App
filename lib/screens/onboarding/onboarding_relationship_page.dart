@@ -14,6 +14,7 @@ import '../../i18n/app_localizations.dart';
 import '../../providers/language_provider.dart';
 import '../../providers/active_profile_provider.dart';
 import 'onboarding_chat_page.dart';
+import 'onboarding_notes_intro_page.dart';
 
 class OnboardingRelationshipPage extends StatefulWidget {
   final OnboardingData data;
@@ -113,19 +114,37 @@ class _OnboardingRelationshipPageState
     if (!mounted) return;
     setState(() => _isLoading = false);
 
-    // S10 çıkışı → S10c sohbeti. Sohbet bitince hesaplama adımına geçilir.
+    // S10 çıkışı → S10c sohbeti. İlk profilde notlar boş değilse araya S10d
+    // Notlarım tanıtımı girer; ardından hesaplama adımına geçilir.
     final navigator = Navigator.of(context);
+    void openCalculating() {
+      navigator.pushReplacementNamed(
+        '/onboarding/calculating',
+        arguments: {
+          'setupFactory': setupFactory,
+          'isFirstProfile': widget.isFirstProfile,
+        },
+      );
+    }
+
+    List<String> notes = const [];
     await navigator.push(
       MaterialPageRoute<void>(
         builder: (_) => OnboardingChatPage(
+          onNotes: (n) => notes = n,
           onDone: () {
-            navigator.pushReplacementNamed(
-              '/onboarding/calculating',
-              arguments: {
-                'setupFactory': setupFactory,
-                'isFirstProfile': widget.isFirstProfile,
-              },
-            );
+            if (widget.isFirstProfile && notes.isNotEmpty) {
+              navigator.pushReplacement(
+                MaterialPageRoute<void>(
+                  builder: (_) => OnboardingNotesIntroPage(
+                    notes: notes,
+                    onDone: openCalculating,
+                  ),
+                ),
+              );
+              return;
+            }
+            openCalculating();
           },
         ),
       ),

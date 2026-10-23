@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../providers/ask_bridge.dart';
 import 'package:flutter/services.dart';
 import '../services/reference_names_service.dart';
+import '../core/motion/app_motion.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_dimensions.dart';
 import '../core/theme/app_typography.dart';
@@ -13,6 +14,7 @@ import '../i18n/app_localizations.dart';
 import '../providers/ask_context_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/ask_service.dart';
+import '../services/ad_service.dart';
 import '../services/astro_service.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/ask_draft.dart';
@@ -21,6 +23,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 import '../services/user_settings_service.dart';
 import '../presentation/widgets/components/cosmic_background.dart';
 import '../presentation/widgets/components/cosmic_card.dart';
+import '../presentation/widgets/components/cosmic_cta_button.dart';
 import '../presentation/widgets/components/cosmic_segmented.dart';
 import '../presentation/widgets/components/glyph.dart';
 import '../presentation/widgets/components/profile_avatar_button.dart';
@@ -46,6 +49,10 @@ class _Msg {
   });
 }
 
+/// `credit_status` yanıtı: bakiye ve bugün kalan reklam hakkı (`ad_left_today`).
+/// `adLeft` null ise alan yok/ayrıştırılamadı → bilinmiyor, reklam açık kalır.
+typedef _CreditStatus = ({int? balance, int? adLeft});
+
 class AskPage extends StatefulWidget {
   const AskPage({super.key});
   @override
@@ -59,6 +66,7 @@ class _AskPageState extends State<AskPage> {
   final List<_Msg> _messages = [];
   bool _waiting = false;
   bool _failed = false;
+  bool _creditsDialogOpen = false; // tek aktif reklam akışı kilidi
   String _lastText = '';
   String _errKey = 'ask.error';
   String? _loc;
@@ -314,17 +322,14 @@ class _AskPageState extends State<AskPage> {
     } catch (e) {
       debugPrint('AskPage reply failed: $e');
       if (!mounted || gen != _gen) return;
+      final code = e is AstroServiceException ? e.code : '';
       setState(() {
         _waiting = false;
         _failed = true;
         _lastText = text;
-        _errKey = (e is AstroServiceException && e.code == 'RATE_LIMITED')
-            ? 'ask.error.rate'
-            : (e is AstroServiceException && e.code == 'QUOTA')
-            ? 'ask.error.quota'
-            : 'ask.error';
+        _errKey = AskService.errKeyFor(code);
       });
-      if (e is AstroServiceException && e.code == 'QUOTA') {
+      if (code == 'QUOTA' || code == 'DAILY_LIMIT_TRIAL') {
         UserSettingsService.isFlagEnabled('paywall').then((on) {
           if (on && mounted) {
             Navigator.of(context, rootNavigator: true).push(
@@ -334,8 +339,82 @@ class _AskPageState extends State<AskPage> {
             );
           }
         });
+      } else if (code == 'CREDITS_EMPTY') {
+        _showCreditsEmptyDialog();
       }
     }
+  }
+
+  /// Kredi bittiğinde geçici diyalog (kredi ekranları gelene kadar).
+  /// Tek aktif akış: kilit bayrağı ile yeniden açılış engellenir.
+  Future<void> _showCreditsEmptyDialog() async {
+    if (_creditsDialogOpen) return;
+    _creditsDialogOpen = true;
+    try {
+      await showDialog<void>(
+        context: context,
+        builder: (_) => _CreditsEmptyDialog(
+          readStatus: _readCreditStatus,
+          onGoPremium: _goPremium,
+          onSignIn: _goLinkAccount,
+          onCredited: _onRewardCredited,
+        ),
+      );
+    } finally {
+      _creditsDialogOpen = false;
+    }
+  }
+
+  /// Sunucu kredi durumunu okur: bakiye + bugün kalan reklam hakkı
+  /// (`ad_left_today`). İstemci krediyi ASLA kendi eklemez; yalnızca sunucu
+  /// değerini yansıtır. Alan yok/ayrıştırılamazsa null döner (bilinmiyor).
+  Future<_CreditStatus> _readCreditStatus() async {
+    try {
+      final r = await Supabase.instance.client.rpc('credit_status');
+      final m = r is Map
+          ? r
+          : (r is List && r.isNotEmpty && r.first is Map ? r.first : null);
+      if (m is Map) {
+        final b = m['balance'];
+        final a = m['ad_left_today'];
+        return (
+          balance: b is int ? b : (b == null ? null : int.tryParse('$b')),
+          adLeft: a is int ? a : (a == null ? null : int.tryParse('$a')),
+        );
+      }
+    } catch (e) {
+      debugPrint('AskPage credit_status failed: $e');
+    }
+    return (balance: null, adLeft: null);
+  }
+
+  void _goPremium() {
+    UserSettingsService.isFlagEnabled('paywall').then((on) {
+      if (on && mounted) {
+        Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute<void>(
+            builder: (_) => const PaywallPage(source: PaywallSource.quota),
+          ),
+        );
+      }
+    });
+  }
+
+  void _goLinkAccount() {
+    Navigator.of(
+      context,
+      rootNavigator: true,
+    ).pushNamed('/onboarding/link-account');
+  }
+
+  /// Ödül sunucuda doğrulandığında: hata satırını temizleyip girişe odaklanır.
+  void _onRewardCredited() {
+    if (!mounted) return;
+    setState(() {
+      _failed = false;
+      _errKey = 'ask.error';
+    });
+    _inputFocus.requestFocus();
   }
 
   Future<void> _pickMonth() async {
@@ -1267,7 +1346,10 @@ class _AskPageState extends State<AskPage> {
                           ),
                         ),
                       ),
-                      if (_errKey != 'ask.error.quota')
+                      if (_errKey != 'ask.error.quota' &&
+                          _errKey != 'ask.error.credits' &&
+                          _errKey != 'ask.error.daily_trial' &&
+                          _errKey != 'ask.error.daily_pro')
                         TextButton(
                           onPressed: () => _send(_lastText),
                           child: Text(t(context, 'ask.retry')),
@@ -1338,9 +1420,9 @@ class _TypewriterState extends State<_Typewriter> {
       WidgetsBinding.instance.addPostFrameCallback((_) => widget.onDone());
       return;
     }
-    _timer = Timer.periodic(const Duration(milliseconds: 30), (_) {
+    _timer = Timer.periodic(AppMotion.typewriterTick, (_) {
       if (!mounted) return;
-      var next = _n + 2;
+      var next = _n + AppMotion.typewriterCharsPerTick;
       if (next >= widget.text.length) {
         _finish();
         return;
@@ -1425,7 +1507,7 @@ class _BubbleSeqState extends State<_BubbleSeq> {
       return;
     }
     _gap?.cancel();
-    _gap = Timer(const Duration(milliseconds: 450), () {
+    _gap = Timer(AppMotion.bubbleGap, () {
       if (mounted) setState(() => _shown++);
     });
   }
@@ -1451,5 +1533,184 @@ class _BubbleSeqState extends State<_BubbleSeq> {
           ),
       ],
     );
+  }
+}
+
+/// Geçici "kredi bitti" diyaloğu (21c kredi ekranları gelene kadar).
+///
+/// Desteklenen platform (kayıtlı veya misafir): ödüllü reklam; misafire ayrıca
+/// "giriş yap" seçeneği sunulur. Web/masaüstü: yalnızca Premium. Kredi hiçbir
+/// durumda istemcide eklenmez; yalnızca sunucu bakiyesi yoklanır.
+class _CreditsEmptyDialog extends StatefulWidget {
+  final Future<_CreditStatus> Function() readStatus;
+  final VoidCallback onGoPremium;
+  final VoidCallback onSignIn;
+  final VoidCallback onCredited;
+  const _CreditsEmptyDialog({
+    required this.readStatus,
+    required this.onGoPremium,
+    required this.onSignIn,
+    required this.onCredited,
+  });
+
+  @override
+  State<_CreditsEmptyDialog> createState() => _CreditsEmptyDialogState();
+}
+
+class _CreditsEmptyDialogState extends State<_CreditsEmptyDialog> {
+  bool _busy = false; // reklam gösteriliyor / ödül doğrulanıyor
+  String? _noteKey; // 'ask.ad.unavailable' | 'ask.credits.verifying'
+  int? _adLeft; // bugün kalan reklam hakkı; null = bilinmiyor
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshAdLeft();
+  }
+
+  /// Tek seferlik okuma: kalan reklam hakkını öğrenip butonu buna göre kilitler.
+  /// Yoklama DÖNGÜSÜ değildir; yalnızca açılışta bir kez okunur.
+  Future<void> _refreshAdLeft() async {
+    final st = await widget.readStatus();
+    if (!mounted || st.adLeft == null) return;
+    setState(() => _adLeft = st.adLeft);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = Supabase.instance.client.auth.currentUser;
+    final isGuest = user?.isAnonymous ?? true;
+    // Misafir de kayıtlı gibi reklam izler (K6); giriş yönlendirmesi ek seçenek.
+    final canAd = AdService.supported && user?.id != null;
+    final guestAd = AdService.supported && isGuest && user?.id != null;
+    // Günlük reklam hakkı dolduysa reklam yolu kapanır (Premium/giriş açık).
+    final adBlocked = canAd && _adLeft == 0;
+    final primaryKey = canAd
+        ? 'ask.credits.watch_ad'
+        : 'ask.credits.go_premium';
+    final noteKey = _noteKey ?? (adBlocked ? 'ask.credits.ad_limit' : null);
+
+    return AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(t(context, 'ask.error.credits'), style: AppTextStyles.bodyLg()),
+          if (noteKey != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              t(context, noteKey),
+              style: AppTextStyles.bodySm(color: AppColors.mist),
+            ),
+          ],
+          const SizedBox(height: AppSpacing.md),
+          CosmicCtaButton(
+            label: t(context, primaryKey),
+            disabled: _busy || adBlocked,
+            onTap: () {
+              if (canAd) {
+                _watchAd();
+              } else {
+                Navigator.of(context).pop();
+                widget.onGoPremium();
+              }
+            },
+          ),
+          if (canAd) ...[
+            const SizedBox(height: AppSpacing.xs),
+            TextButton(
+              onPressed: _busy
+                  ? null
+                  : () {
+                      Navigator.of(context).pop();
+                      widget.onGoPremium();
+                    },
+              style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+              child: Text(
+                t(context, 'ask.credits.go_premium'),
+                style: AppTextStyles.bodySm(color: AppColors.gold),
+              ),
+            ),
+          ],
+          // Misafir: reklamın yanında giriş yönlendirmesi (ek seçenek).
+          if (guestAd) ...[
+            TextButton(
+              onPressed: _busy
+                  ? null
+                  : () {
+                      Navigator.of(context).pop();
+                      widget.onSignIn();
+                    },
+              style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+              child: Text(
+                t(context, 'ask.credits.signin_for_ad'),
+                style: AppTextStyles.bodySm(color: AppColors.gold),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _watchAd() async {
+    if (_busy) return;
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) return;
+    setState(() {
+      _busy = true;
+      _noteKey = null;
+    });
+    final st0 = await widget.readStatus();
+    if (!mounted) return;
+    final before = st0.balance;
+    if (st0.adLeft != null) _adLeft = st0.adLeft;
+    RewardedResult res;
+    try {
+      res = await AdService.showRewarded(userId: uid);
+    } catch (e) {
+      debugPrint('AskPage rewarded failed: $e');
+      res = RewardedResult.error;
+    }
+    if (!mounted) return;
+    if (res == RewardedResult.unavailable) {
+      setState(() {
+        _busy = false;
+        _noteKey = 'ask.ad.unavailable';
+      });
+      return;
+    }
+    if (res != RewardedResult.shown) {
+      setState(() => _busy = false);
+      return;
+    }
+    // Kredi istemcide EKLENMEZ: sunucu SSV ile verir; bakiyeyi kısa aralıklarla
+    // en fazla 6 kez (1.5 sn) yokla; artarsa diyalog kapanır.
+    setState(() => _noteKey = 'ask.credits.verifying');
+    var credited = false;
+    for (var i = 0; i < 6; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 1500));
+      if (!mounted) return;
+      final st = await widget.readStatus();
+      if (st.adLeft != null) _adLeft = st.adLeft;
+      final now = st.balance;
+      if (before != null && now != null && now > before) {
+        credited = true;
+        break;
+      }
+    }
+    if (!mounted) return;
+    if (credited) {
+      Navigator.of(context).pop();
+      widget.onCredited();
+      return;
+    }
+    setState(() {
+      _busy = false;
+      // Limit dolduysa (bakiye artmadı, hak kalmadı) doğrulama yerine limit metni.
+      _noteKey = _adLeft == 0
+          ? 'ask.credits.ad_limit'
+          : 'ask.credits.verifying';
+    });
   }
 }

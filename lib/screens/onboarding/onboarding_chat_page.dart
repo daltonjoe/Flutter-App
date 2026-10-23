@@ -19,6 +19,7 @@ import '../../models/onboarding_profile.dart';
 import '../../presentation/widgets/components/cosmic_background.dart';
 import '../../presentation/widgets/components/cosmic_chip.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
+import '../../services/ad_service.dart';
 
 // ── Sabit anahtar tabloları (id → tam anahtar; birleştirme yok) ──────────
 
@@ -147,6 +148,54 @@ const Map<String, String> _closeByTone = {
   'direct': 'onboarding.chat.close.direct',
 };
 
+/// Notlarım'a yazılan cümleler: alan → seçenek id → anahtar. C7 (ton) ve
+/// bildirim tercihi yazılmaz; C1 "other" için not yok.
+const Map<String, String> _noteC1 = {
+  'self': 'onboarding.chat.note.c1.self',
+  'intentions': 'onboarding.chat.note.c1.intentions',
+  'soulmate': 'onboarding.chat.note.c1.soulmate',
+  'love': 'onboarding.chat.note.c1.love',
+  'horoscope': 'onboarding.chat.note.c1.horoscope',
+  'learn': 'onboarding.chat.note.c1.learn',
+};
+
+const Map<String, String> _noteC2 = {
+  'love': 'onboarding.chat.note.c2.love',
+  'career': 'onboarding.chat.note.c2.career',
+  'money': 'onboarding.chat.note.c2.money',
+  'family': 'onboarding.chat.note.c2.family',
+  'confidence': 'onboarding.chat.note.c2.confidence',
+  'decision': 'onboarding.chat.note.c2.decision',
+};
+
+const Map<String, String> _noteC3 = {
+  'act': 'onboarding.chat.note.c3.act',
+  'wait': 'onboarding.chat.note.c3.wait',
+  'consult': 'onboarding.chat.note.c3.consult',
+  'withdraw': 'onboarding.chat.note.c3.withdraw',
+};
+
+const Map<String, String> _noteC5 = {
+  'hard_days': 'onboarding.chat.note.c5.hard_days',
+  'regret': 'onboarding.chat.note.c5.regret',
+  'right_time': 'onboarding.chat.note.c5.right_time',
+  'all': 'onboarding.chat.note.c5.all',
+};
+
+/// Yazım sırası C1, C2, C3, C5 (map literal sırası korunur).
+const Map<String, Map<String, String>> _noteByField = {
+  'goal': _noteC1,
+  'area': _noteC2,
+  'reaction': _noteC3,
+  'alert': _noteC5,
+};
+
+/// Notlarım'ı açıklayan balon (ton C7'de seçilir).
+const Map<String, String> _notesExplainByTone = {
+  'soft': 'onboarding.chat.notes.explain.soft',
+  'direct': 'onboarding.chat.notes.explain.direct',
+};
+
 const String _kWelcome = 'onboarding.chat.c0.welcome';
 const String _kIntro = 'onboarding.chat.c0.intro';
 const String _kTyping = 'onboarding.chat.typing';
@@ -219,10 +268,14 @@ class _Step {
 }
 
 class _Msg {
-  const _Msg(this.mine, this.text);
+  _Msg(this.mine, this.text, {this.animate = false});
 
   final bool mine;
   final String text;
+
+  /// Only a newly added guide bubble is revealed character by character; the
+  /// flag is cleared once the reveal finishes.
+  bool animate;
 }
 
 class _Opt {
@@ -239,6 +292,8 @@ class OnboardingChatPage extends StatefulWidget {
     required this.onDone,
     this.requestNotificationPermission,
     this.requestReview,
+    this.initAds,
+    this.onNotes,
   });
 
   /// Sohbet bittiğinde (close.continue) çağrılır.
@@ -250,6 +305,14 @@ class OnboardingChatPage extends StatefulWidget {
 
   /// Test için enjekte edilebilir; varsayılan gerçek inceleme isteği.
   final Future<void> Function()? requestReview;
+
+  /// Test için enjekte edilebilir; varsayılan `AdService.init`.
+  /// Bildirim adımı bittikten sonra await edilir (30 sn üst sınırla).
+  final Future<void> Function()? initAds;
+
+  /// Sohbet bitince üretilen not metinleriyle (kayıt sırasıyla) çağrılır.
+  /// Not yoksa boş liste gelir; yalnızca tanıtım içindir, kaydedilmez.
+  final void Function(List<String> notes)? onNotes;
 
   @override
   State<OnboardingChatPage> createState() => _OnboardingChatPageState();
@@ -286,8 +349,9 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
     super.dispose();
   }
 
-  Duration get _delay =>
-      MediaQuery.disableAnimationsOf(context) ? Duration.zero : AppMotion.enter;
+  bool get _reduce => MediaQuery.disableAnimationsOf(context);
+
+  Duration get _delay => _reduce ? Duration.zero : AppMotion.enter;
 
   void _scrollEnd() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -299,6 +363,16 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
 
   /// Kısa "yazıyor" arasından sonra rehber balonunu ekler.
   void _reveal(String key, {required VoidCallback after}) {
+    final text = t(context, key);
+    if (_reduce) {
+      setState(() {
+        _typing = false;
+        _lines.add(_Msg(false, text));
+      });
+      _scrollEnd();
+      after();
+      return;
+    }
     setState(() => _typing = true);
     _scrollEnd();
     _timer?.cancel();
@@ -306,7 +380,7 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
       if (!mounted) return;
       setState(() {
         _typing = false;
-        _lines.add(_Msg(false, t(context, key)));
+        _lines.add(_Msg(false, text, animate: true));
       });
       _scrollEnd();
       after();
@@ -359,7 +433,7 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
     // Web'de bildirim ve puan adımları atlanır; izin sorulmadı.
     if (kIsWeb) {
       _answers['notif'] = 'skipped';
-      _closeStep();
+      _startAdsThen(_closeStep);
       return;
     }
     _notifStep();
@@ -395,7 +469,7 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
       granted == true
           ? _notifGrantedByTone[_tone]!
           : _notifDeniedByTone[_tone]!,
-      after: _reviewStep,
+      after: () => _startAdsThen(_reviewStep),
     );
   }
 
@@ -406,7 +480,29 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
       _options = <_Opt>[];
       _answers['notif'] = 'denied';
     });
-    _reveal(_notifDeniedByTone[_tone]!, after: _reviewStep);
+    _reveal(
+      _notifDeniedByTone[_tone]!,
+      after: () => _startAdsThen(_reviewStep),
+    );
+  }
+
+  /// Bildirim adımı bittiğinde (granted/denied/skipped) reklam SDK'sını
+  /// başlatır (UMP -> ATT -> initialize); hazır olunca [next] çağrılır.
+  /// UMP formu kullanıcı etkileşimi bekleyebildiği için 30 sn üst sınır konur;
+  /// üst sınır aşılırsa veya init hata verirse akış yine de [next] ile sürer.
+  /// Zaman aşımı init'i iptal ETMEZ (init idempotent, arka planda tamamlanır).
+  Future<void> _startAdsThen(VoidCallback next) async {
+    try {
+      await (widget.initAds ?? AdService.init)().timeout(
+        const Duration(seconds: 30),
+      );
+    } on TimeoutException catch (e) {
+      debugPrint('onboarding AdService.init timed out: $e');
+    } catch (e) {
+      debugPrint('onboarding AdService.init failed: $e');
+    }
+    if (!mounted) return;
+    next();
   }
 
   void _reviewStep() {
@@ -442,7 +538,10 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
   void _closeStep() {
     _reveal(
       _closeByTone[_tone]!,
-      after: () => setState(() => _canFinish = true),
+      after: () => _reveal(
+        _notesExplainByTone[_tone]!,
+        after: () => setState(() => _canFinish = true),
+      ),
     );
   }
 
@@ -489,9 +588,23 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
     }
   }
 
+  /// C1, C2, C3, C5 seçimlerinden tanıtımda gösterilecek not anahtarları (aynı
+  /// sıra; seçim yoksa atlanır). C7 (ton) ve bildirim tercihi not sayılmaz.
+  List<String> _noteKeys() {
+    final keys = <String>[];
+    for (final field in _noteByField.keys) {
+      final id = _answers[field];
+      final key = id == null ? null : _noteByField[field]![id];
+      if (key == null) continue;
+      keys.add(key);
+    }
+    return keys;
+  }
+
   Future<void> _finish() async {
     if (_saving) return;
     setState(() => _saving = true);
+    final notes = [for (final k in _noteKeys()) t(context, k)];
     try {
       await OnboardingProfile(
         goal: _answers['goal'] ?? '',
@@ -505,6 +618,7 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
       debugPrint('Onboarding profile save failed: $e');
     }
     if (!mounted) return;
+    widget.onNotes?.call(notes);
     widget.onDone();
   }
 
@@ -563,10 +677,18 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
                   : AppColors.bgSurface,
               border: Border.all(color: AppColors.hairline),
             ),
-            child: Text(
-              line.text,
-              style: AppTextStyles.bodyMd(color: AppColors.starlight),
-            ),
+            child: line.animate
+                ? _RevealText(
+                    key: ObjectKey(line),
+                    text: line.text,
+                    style: AppTextStyles.bodyMd(color: AppColors.starlight),
+                    onTick: _scrollEnd,
+                    onDone: () => setState(() => line.animate = false),
+                  )
+                : Text(
+                    line.text,
+                    style: AppTextStyles.bodyMd(color: AppColors.starlight),
+                  ),
           ),
         );
       },
@@ -707,6 +829,76 @@ class _TypingDotsState extends State<_TypingDots>
       ),
     );
   }
+}
+
+/// Reveals a guide message character by character with the same AppMotion step
+/// as Eya (AskPage); reduce-motion shows the full text at once.
+class _RevealText extends StatefulWidget {
+  const _RevealText({
+    super.key,
+    required this.text,
+    required this.style,
+    required this.onDone,
+    this.onTick,
+  });
+
+  final String text;
+  final TextStyle? style;
+  final VoidCallback onDone;
+
+  /// Called on every reveal step so the list can keep the last bubble visible.
+  final VoidCallback? onTick;
+
+  @override
+  State<_RevealText> createState() => _RevealTextState();
+}
+
+class _RevealTextState extends State<_RevealText> {
+  Timer? _timer;
+  int _n = 0;
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    if (MediaQuery.of(context).disableAnimations || widget.text.isEmpty) {
+      _n = widget.text.length;
+      WidgetsBinding.instance.addPostFrameCallback((_) => widget.onDone());
+      return;
+    }
+    _timer = Timer.periodic(AppMotion.typewriterTick, (_) {
+      if (!mounted) return;
+      var next = _n + AppMotion.typewriterCharsPerTick;
+      if (next >= widget.text.length) {
+        _finish();
+        return;
+      }
+      // Do not split a surrogate pair (emoji).
+      final c = widget.text.codeUnitAt(next - 1);
+      if (c >= 0xD800 && c <= 0xDBFF) next++;
+      setState(() => _n = next.clamp(0, widget.text.length));
+      widget.onTick?.call();
+    });
+  }
+
+  void _finish() {
+    _timer?.cancel();
+    if (_n != widget.text.length) setState(() => _n = widget.text.length);
+    widget.onTick?.call();
+    widget.onDone();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      Text(widget.text.substring(0, _n), style: widget.style);
 }
 
 class _Dot extends StatelessWidget {

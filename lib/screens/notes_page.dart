@@ -198,29 +198,10 @@ class _NotesPageState extends State<NotesPage> {
         separatorBuilder: (_, _) => const SizedBox(height: 8),
         itemBuilder: (c, i) {
           final r = _rows[i];
-          return Container(
-            decoration: AppDecorations.cosmicCard(),
-            padding: const EdgeInsets.fromLTRB(14, 8, 4, 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '${r['body'] ?? ''}',
-                    style: AppTextStyles.bodyMd(),
-                  ),
-                ),
-                IconButton(
-                  tooltip: t(c, 'notes.edit'),
-                  icon: const Icon(Icons.edit_outlined, size: 20),
-                  onPressed: () => _edit(r),
-                ),
-                IconButton(
-                  tooltip: t(c, 'notes.delete'),
-                  icon: const Icon(Icons.delete_outline, size: 20),
-                  onPressed: () => _delete(r),
-                ),
-              ],
-            ),
+          return NotesRowCard(
+            body: '${r['body'] ?? ''}',
+            onEdit: () => _edit(r),
+            onDelete: () => _delete(r),
           );
         },
       );
@@ -254,6 +235,44 @@ class _NotesPageState extends State<NotesPage> {
         ],
       ),
       body: SafeArea(child: body),
+    );
+  }
+}
+
+/// Notlarım satır kartı: gövde metni + düzenle/sil düğmeleri.
+/// Tanıtım ekranı (K30) aynı görünümü etkileşimsiz kopyalamak için kullanır.
+class NotesRowCard extends StatelessWidget {
+  const NotesRowCard({
+    super.key,
+    required this.body,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final String body;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: AppDecorations.cosmicCard(),
+      padding: const EdgeInsets.fromLTRB(14, 8, 4, 8),
+      child: Row(
+        children: [
+          Expanded(child: Text(body, style: AppTextStyles.bodyMd())),
+          IconButton(
+            tooltip: t(context, 'notes.edit'),
+            icon: const Icon(Icons.edit_outlined, size: 20),
+            onPressed: onEdit,
+          ),
+          IconButton(
+            tooltip: t(context, 'notes.delete'),
+            icon: const Icon(Icons.delete_outline, size: 20),
+            onPressed: onDelete,
+          ),
+        ],
+      ),
     );
   }
 }

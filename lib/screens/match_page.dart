@@ -670,24 +670,9 @@ class _MatchPageState extends State<MatchPage> {
     );
   }
 
-  void _addAspect(MatchAspect a) {
-    final pa = _profileA;
-    final pb = _profileB;
-    if (pa == null || pb == null) return;
-    final s = ReferenceNamesService.instance;
-    addToAsk(
-      context,
-      AskContext.synastry(
-        profileA: pa,
-        profileB: pb,
-        bodyA: a.bodyAId,
-        bodyB: a.bodyBId,
-        aspectTypeId: a.aspectTypeId,
-        label:
-            '${s.planet(a.bodyAId)} · ${s.aspect(a.aspectTypeId)} · ${s.planet(a.bodyBId)}',
-      ),
-    );
-  }
+  // K35: bağlamı ekler, soruyu taslağa yazar (gönderilmez).
+  Future<void> _addAspect(MatchAspect a) =>
+      _askSynRaw(a.bodyAId, a.bodyBId, a.aspectTypeId, 'match.ask.q1', ' · ');
 
   Widget _aspectRow(MatchAspect a, bool isLast, String? text) {
     final svc = ReferenceNamesService.instance;
@@ -1087,8 +1072,15 @@ class _MatchPageState extends State<MatchPage> {
     }
   }
 
-  // M3: bağlamı ekler, soruyu taslağa yazar (gönderilmez).
-  Future<void> _askSyn(WeightedAspect x, String qKey) async {
+  // M3/K35: bağlamı ekler, soruyu taslağa yazar (gönderilmez); köprü açıksa
+  // köprüyü kullanır. [sep] iki çağrı yerinin label biçim farkıdır.
+  Future<void> _askSynRaw(
+    int bodyA,
+    int bodyB,
+    int aspectTypeId,
+    String qKey,
+    String sep,
+  ) async {
     final pa = _profileA, pb = _profileB;
     if (pa == null || pb == null) return;
     final s = ReferenceNamesService.instance;
@@ -1104,14 +1096,20 @@ class _MatchPageState extends State<MatchPage> {
       AskContext.synastry(
         profileA: pa,
         profileB: pb,
-        bodyA: x.a,
-        bodyB: x.b,
-        aspectTypeId: x.asp,
-        label: '${s.planet(x.a)} ${s.aspect(x.asp)} ${s.planet(x.b)}',
+        bodyA: bodyA,
+        bodyB: bodyB,
+        aspectTypeId: aspectTypeId,
+        label:
+            '${s.planet(bodyA)}$sep'
+            '${s.aspect(aspectTypeId)}$sep${s.planet(bodyB)}',
       ),
     );
     if (ok) askAbout(q);
   }
+
+  // M3: bağlamı ekler, soruyu taslağa yazar (gönderilmez).
+  Future<void> _askSyn(WeightedAspect x, String qKey) =>
+      _askSynRaw(x.a, x.b, x.asp, qKey, ' ');
 
   Widget _askBlock(WeightedAspect x) {
     return ValueListenableBuilder<bool>(

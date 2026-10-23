@@ -1,7 +1,7 @@
 import "package:flutter_test/flutter_test.dart";
 import "package:flutter_application/session/resolve_entry.dart";
 
-const _all = {"privacy", "terms", "ai"};
+const _all = {"privacy", "terms"};
 const _part = {"privacy"};
 
 EntryRoute _r({
@@ -11,15 +11,14 @@ EntryRoute _r({
   bool si = false,
   EntryIntent i = EntryIntent.none,
   bool lang = false,
-}) =>
-    resolveEntry(
-      session: s,
-      profileCount: n,
-      consentKinds: c,
-      showSignin: si,
-      intent: i,
-      languageChosen: lang,
-    );
+}) => resolveEntry(
+  session: s,
+  profileCount: n,
+  consentKinds: c,
+  showSignin: si,
+  intent: i,
+  languageChosen: lang,
+);
 
 void main() {
   test("01 session none -> loading", () {
@@ -62,6 +61,15 @@ void main() {
     expect(_r(c: <String>{}), EntryRoute.consent);
   });
   test("14 session none retry ve signin den once gelir", () {
-    expect(_r(s: SessionKind.none, n: null, c: null, si: true), EntryRoute.loading);
+    expect(
+      _r(s: SessionKind.none, n: null, c: null, si: true),
+      EntryRoute.loading,
+    );
+  });
+  test("15 profil var privacy+terms -> home", () {
+    expect(_r(n: 1, c: {"privacy", "terms"}), EntryRoute.home);
+  });
+  test("16 profil var yalniz privacy -> consent", () {
+    expect(_r(n: 1, c: {"privacy"}), EntryRoute.consent);
   });
 }

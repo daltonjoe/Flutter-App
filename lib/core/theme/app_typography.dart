@@ -1,8 +1,8 @@
 // lib/core/theme/app_typography.dart
 // Ephemerai — typography system
 //
-// Font strategy (google_fonts):
-//   • Display / headings → 'Cormorant Garamond' w600
+// Font strategy (google_fonts): single global family; Arabic text falls back to 'Noto Sans Arabic'.
+//   • Display / headings → 'Inter' w600
 //   • Body / UI / numbers → 'Inter'
 //
 // Sizes (size/line-height):
@@ -23,7 +23,7 @@ import 'app_colors.dart';
 class AppFonts {
   AppFonts._();
 
-  static const String heading = 'Cormorant Garamond';
+  static const String heading = 'Inter';
   static const String body = 'Inter';
 }
 
@@ -31,10 +31,36 @@ class AppFonts {
 class AppTextStyles {
   AppTextStyles._();
 
+  /// Global family ('Inter') has no Arabic glyphs, so 'ar' text falls back to
+  /// an Arabic-capable Google Font family (no extra package).
+  static final List<String> _fallbackFamilies = <String>[
+    AppFonts.body,
+    GoogleFonts.notoSansArabic().fontFamily ?? 'NotoSansArabic_regular',
+  ];
+
+  /// Single entry point for every text style: the global font family and its
+  /// fallbacks are defined here only once.
+  static TextStyle _font({
+    required double fontSize,
+    double? height,
+    FontWeight? fontWeight,
+    double? letterSpacing,
+    Color? color,
+    List<FontFeature>? fontFeatures,
+  }) =>
+      GoogleFonts.inter(
+        fontSize: fontSize,
+        height: height,
+        fontWeight: fontWeight,
+        letterSpacing: letterSpacing,
+        color: color,
+        fontFeatures: fontFeatures,
+      ).copyWith(fontFamilyFallback: _fallbackFamilies);
+
   // ── Display / Hero ──────────────────────────────────────────────────
-  /// Display — Cormorant Garamond 34/40, w600.
+  /// Display — Inter 34/40, w600.
   static TextStyle display({Color color = AppColors.starlight}) =>
-      GoogleFonts.cormorantGaramond(
+      _font(
         fontSize: 34,
         height: 40 / 34,
         fontWeight: FontWeight.w600,
@@ -46,9 +72,9 @@ class AppTextStyles {
   static TextStyle heroTitle({Color color = AppColors.starlight}) =>
       display(color: color);
 
-  /// H1 — Cormorant Garamond 28/34, w600.
+  /// H1 — Inter 28/34, w600.
   static TextStyle displayLarge({Color color = AppColors.starlight}) =>
-      GoogleFonts.cormorantGaramond(
+      _font(
         fontSize: 28,
         height: 34 / 28,
         fontWeight: FontWeight.w600,
@@ -56,10 +82,10 @@ class AppTextStyles {
         color: color,
       );
 
-  // ── Headings (Cormorant Garamond) ───────────────────────────────────
+  // ── Headings (Inter) ───────────────────────────────────
   /// H2 — 22/28, w600.
   static TextStyle h1({Color color = AppColors.starlight}) =>
-      GoogleFonts.cormorantGaramond(
+      _font(
         fontSize: 22,
         height: 28 / 22,
         fontWeight: FontWeight.w600,
@@ -68,7 +94,7 @@ class AppTextStyles {
 
   /// Heading — 18/24, w600.
   static TextStyle h2({Color color = AppColors.starlight}) =>
-      GoogleFonts.cormorantGaramond(
+      _font(
         fontSize: 18,
         height: 24 / 18,
         fontWeight: FontWeight.w600,
@@ -77,7 +103,7 @@ class AppTextStyles {
 
   /// Heading — 16/22, w600.
   static TextStyle h3({Color color = AppColors.starlight}) =>
-      GoogleFonts.cormorantGaramond(
+      _font(
         fontSize: 16,
         height: 22 / 16,
         fontWeight: FontWeight.w600,
@@ -87,7 +113,7 @@ class AppTextStyles {
   // ── Planet / accent names ───────────────────────────────────────────
   /// Planet name in header card — 22/28, w600, accent coloured.
   static TextStyle planetName({Color color = AppColors.gold}) =>
-      GoogleFonts.cormorantGaramond(
+      _font(
         fontSize: 22,
         height: 28 / 22,
         fontWeight: FontWeight.w600,
@@ -98,7 +124,7 @@ class AppTextStyles {
   // ── Body (Inter) ────────────────────────────────────────────────────
   /// Body — Inter 15/24.
   static TextStyle bodyLg({Color color = AppColors.starlight}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 15,
         height: 24 / 15,
         color: color,
@@ -106,7 +132,7 @@ class AppTextStyles {
 
   /// Body small — Inter 14/22.
   static TextStyle bodyMd({Color color = AppColors.mist}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 14,
         height: 22 / 14,
         color: color,
@@ -114,7 +140,7 @@ class AppTextStyles {
 
   /// Caption — Inter 13/18.
   static TextStyle bodySm({Color color = AppColors.mist}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 13,
         height: 18 / 13,
         color: color,
@@ -122,7 +148,7 @@ class AppTextStyles {
 
   /// Extra-small / hint — Inter 12/16.
   static TextStyle bodyXs({Color color = AppColors.mist}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 12,
         height: 16 / 12,
         color: color,
@@ -131,7 +157,7 @@ class AppTextStyles {
   // ── Labels & chips ──────────────────────────────────────────────────
   /// Overline — Inter 11/16, w500, tracked. Caller must uppercase the text.
   static TextStyle overline({Color color = AppColors.mist}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 11,
         height: 16 / 11,
         fontWeight: FontWeight.w500,
@@ -141,7 +167,7 @@ class AppTextStyles {
 
   /// Input field label — Inter 11, w500, tracked.
   static TextStyle fieldLabel({Color color = AppColors.mist}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 11,
         height: 16 / 11,
         fontWeight: FontWeight.w500,
@@ -151,7 +177,7 @@ class AppTextStyles {
 
   /// Small chip / pill label — Inter 12/16, w600.
   static TextStyle chip({Color color = AppColors.starlight}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 12,
         height: 16 / 12,
         fontWeight: FontWeight.w600,
@@ -160,7 +186,7 @@ class AppTextStyles {
 
   /// Mini tag (ASC / MC labels) — Inter 10, w600.
   static TextStyle miniTag({Color color = AppColors.gold}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 10,
         fontWeight: FontWeight.w600,
         color: color,
@@ -168,7 +194,7 @@ class AppTextStyles {
 
   /// Tiny label (house "ev" text) — Inter 8.
   static TextStyle tinyLabel({Color color = AppColors.mist}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 8,
         color: color,
       );
@@ -176,7 +202,7 @@ class AppTextStyles {
   // ── Buttons ─────────────────────────────────────────────────────────
   /// Primary CTA button label — Inter 16, w600. Text colour follows the
   /// gold CTA fill ([AppColors.onGold]).
-  static TextStyle get ctaPrimary => GoogleFonts.inter(
+  static TextStyle get ctaPrimary => _font(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: AppColors.onGold,
@@ -185,7 +211,7 @@ class AppTextStyles {
 
   /// Secondary / outline button label — Inter 15, w600.
   static TextStyle ctaSecondary({Color color = AppColors.gold}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 15,
         fontWeight: FontWeight.w600,
         color: color,
@@ -197,7 +223,7 @@ class AppTextStyles {
     double size = 15,
     Color color = AppColors.starlight,
   }) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: size,
         fontWeight: FontWeight.w600,
         color: color,
@@ -205,7 +231,7 @@ class AppTextStyles {
 
   // ── Branding ────────────────────────────────────────────────────────
   /// Footer brand line — Inter 10, w600, tracked (gold @ 50 %).
-  static TextStyle get brandFooter => GoogleFonts.inter(
+  static TextStyle get brandFooter => _font(
         fontSize: 10,
         fontWeight: FontWeight.w600,
         color: const Color(0x80D9B36A),
@@ -215,7 +241,7 @@ class AppTextStyles {
   // ── Numeric / degree values ─────────────────────────────────────────
   /// Degree readout — Inter 11, bold, tabular figures.
   static TextStyle degreeLabel({Color color = AppColors.gold}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 11,
         fontWeight: FontWeight.bold,
         color: color,
@@ -224,7 +250,7 @@ class AppTextStyles {
 
   /// Large numeric (house number) — Inter 16, w700, tabular figures.
   static TextStyle houseNumber({Color color = AppColors.gold}) =>
-      GoogleFonts.inter(
+      _font(
         fontSize: 16,
         fontWeight: FontWeight.w700,
         color: color,

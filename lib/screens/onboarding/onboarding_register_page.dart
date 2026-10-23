@@ -5,11 +5,12 @@ import "package:url_launcher/url_launcher.dart";
 import "../../core/constants/legal_links.dart";
 import "../../core/theme/app_colors.dart";
 import "../../core/theme/app_dimensions.dart";
-import "../../core/theme/app_gradients.dart";
 import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
+import "../../presentation/widgets/components/cosmic_background.dart";
 import "../../presentation/widgets/components/social_auth_button.dart";
 import "../../services/account_linking_service.dart";
+import "../../services/consent_service.dart";
 
 class OnboardingRegisterPage extends StatefulWidget {
   const OnboardingRegisterPage({super.key});
@@ -42,13 +43,15 @@ class _OnboardingRegisterPageState extends State<OnboardingRegisterPage> {
     super.dispose();
   }
 
-  void _next() {
+  Future<void> _next() async {
     if (_went || !mounted) return;
     _went = true;
-    Navigator.of(
-      context,
-      rootNavigator: true,
-    ).pushNamedAndRemoveUntil("/onboarding/consent", (r) => false);
+    final ok = await ConsentService.hasRequired();
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+      ok ? "/home" : "/onboarding/consent",
+      (r) => false,
+    );
   }
 
   Future<void> _oauth(Future<void> Function() f) async {
@@ -97,12 +100,9 @@ class _OnboardingRegisterPageState extends State<OnboardingRegisterPage> {
     final btn = TextButton.styleFrom(minimumSize: const Size(48, 48));
     final double hPad = AppSpacing.screenH + AppSpacing.lg;
     return Scaffold(
-      // Arka plan "Giriş yap" ekranıyla birebir aynı.
+      // Arka plan: ortak yıldızlı CosmicBackground.
       backgroundColor: AppColors.bgDeep,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppGradients.heroHeader),
+      body: CosmicBackground(
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {

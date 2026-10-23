@@ -2,10 +2,16 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Yalnız izin isteği için (bildirim gönderilmiyor/zamanlanmıyor). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Google Mobile Ads SDK: reklam kimliği erişimi (birleşik manifestte açıkça sabitlendi). -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
     <application
         android:label="Ephemerai"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- TEST App ID: release öncesi gerçek AdMob App ID ile değiştirilmeli. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

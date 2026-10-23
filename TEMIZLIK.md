@@ -96,3 +96,19 @@ Mevcut koddaki ölü/tekrar/gereksiz parçalar. Silme yalnızca kullanıcı ilgi
 - lib/screens/onboarding/onboarding_first_question_page.dart:30,31,35,36 - `sunSign`/`moonSign` alanlari ve `onboarding.first_question.chip_sun/chip_moon/chip_sky` anahtarlari artik kodda kullanilmiyor (rota argumani DOKUNMA geregi korundu).
 - locales/*.json - `onboarding.first_question.free_hint` kodda referansli ama kutu yalniz hazir soru varken gosterildigi icin hic gorunmuyor; silme adayi.
 - locales/*.json - `onboarding.first_question.sample_label` hala 8 dilde duruyor (widget onceki turda kaldirilmisti); kural geregi silinmedi.
+
+## Faz 13: Global font tekilleştirme (2026-10-21)
+
+- lib/core/theme/app_typography.dart:26 — 'Cormorant Garamond' (google_fonts) kullanımı bu turda kaldırıldı (tek global font 'Inter'); kodda ve pubspec'te sıfır referans, silinecek dosya yok, kayıt amaçlı listelendi.
+
+## Faz 14: Daktilo sabitleri (2026-10-21)
+
+- lib/screens/onboarding/onboarding_chat_page.dart:737 — yeni `_RevealText` daktilosu, lib/screens/ask_page.dart:1312 `_Typewriter` ile aynı adım mantığını (tick, karakter adımı, surrogate koruması) tekrarlıyor; bu fazda bilinçli kopya (ortak tek widget'a çıkarılabilir).
+
+## Faz 19: Onboarding AI/memory temizliği (2026-10-22)
+
+- lib/screens/onboarding/onboarding_consent_page.dart:46 — `_check()` inFilter hâlâ `["privacy", "terms", "ai"]`; rıza kapısı {privacy, terms} olduğundan `ai` satırları gereksiz sorgulanıyor (bu turda kapsam dışı bırakıldı, silinmedi).
+
+## AdMob altyapısı (2026-10-22)
+
+- Release öncesi değiştirilecek: Android/iOS App ID (test → gerçek) ve birim ID dart-define'ları (ADMOB_REWARDED_ANDROID/IOS, ADMOB_BANNER_ANDROID/IOS). Ayrıca ios/Runner/*.lproj/InfoPlist.strings dosyaları Xcode projesine (project.pbxproj) manuel eklenmeli; aksi halde ATT metinleri pakete girmez.

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../core/motion/app_motion.dart';
@@ -5,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
+import '../../services/consent_service.dart';
 import '../legal_agreements_page.dart';
 
 /// S02 — Karşılama. Marka konseptini kısa bir sahneyle kurar.
@@ -32,11 +34,16 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
     _termsTap = TapGestureRecognizer()
       ..onTap = () => _openLegal('settings.privacy.terms', 'legal.terms.body');
     _privacyTap = TapGestureRecognizer()
-      ..onTap = () => _openLegal('settings.privacy.policy', 'legal.privacy.body');
+      ..onTap = () =>
+          _openLegal('settings.privacy.policy', 'legal.privacy.body');
     _scene = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 3600));
+      vsync: this,
+      duration: const Duration(milliseconds: 3600),
+    );
     _breath = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 3200));
+      vsync: this,
+      duration: const Duration(milliseconds: 3200),
+    );
   }
 
   @override
@@ -79,11 +86,15 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
       animation: _scene,
       child: child,
       builder: (context, child) {
-        final v = AppMotion.enterCurve
-            .transform(((_scene.value - a) / (b - a)).clamp(0.0, 1.0));
+        final v = AppMotion.enterCurve.transform(
+          ((_scene.value - a) / (b - a)).clamp(0.0, 1.0),
+        );
         return Opacity(
           opacity: v,
-          child: Transform.translate(offset: Offset(0, 16 * (1 - v)), child: child),
+          child: Transform.translate(
+            offset: Offset(0, 16 * (1 - v)),
+            child: child,
+          ),
         );
       },
     );
@@ -119,10 +130,12 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
                                   height: 120,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    gradient: RadialGradient(colors: [
-                                      AppColors.gold.withValues(alpha: 0.9),
-                                      AppColors.gold.withValues(alpha: 0.0),
-                                    ]),
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        AppColors.gold.withValues(alpha: 0.9),
+                                        AppColors.gold.withValues(alpha: 0.0),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -145,7 +158,9 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
                             Text(
                               t(context, 'onboarding.welcome.subtitle'),
                               textAlign: TextAlign.center,
-                              style: AppTextStyles.bodyMd(color: AppColors.mist),
+                              style: AppTextStyles.bodyMd(
+                                color: AppColors.mist,
+                              ),
                             ),
                           ),
                         ],
@@ -160,7 +175,11 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
                     children: [
                       CosmicCtaButton(
                         label: t(context, 'onboarding.welcome.cta'),
-                        onTap: widget.onNext,
+                        onTap: () {
+                          // "İleri" = privacy + terms onayı; UI beklemez.
+                          unawaited(ConsentService.recordAccept());
+                          widget.onNext();
+                        },
                       ),
                       TextButton(
                         onPressed: () =>
@@ -174,21 +193,35 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
                         TextSpan(
                           style: AppTextStyles.bodyXs(color: AppColors.mist),
                           children: [
-                            TextSpan(text: t(context, 'onboarding.welcome.legal_a')),
                             TextSpan(
-                              text: t(context, 'onboarding.welcome.legal_terms'),
-                              style: AppTextStyles.bodyXs(color: AppColors.starlight)
-                                  .copyWith(decoration: TextDecoration.underline),
+                              text: t(context, 'onboarding.welcome.legal_a'),
+                            ),
+                            TextSpan(
+                              text: t(
+                                context,
+                                'onboarding.welcome.legal_terms',
+                              ),
+                              style: AppTextStyles.bodyXs(
+                                color: AppColors.starlight,
+                              ).copyWith(decoration: TextDecoration.underline),
                               recognizer: _termsTap,
                             ),
-                            TextSpan(text: t(context, 'onboarding.welcome.legal_b')),
                             TextSpan(
-                              text: t(context, 'onboarding.welcome.legal_privacy'),
-                              style: AppTextStyles.bodyXs(color: AppColors.starlight)
-                                  .copyWith(decoration: TextDecoration.underline),
+                              text: t(context, 'onboarding.welcome.legal_b'),
+                            ),
+                            TextSpan(
+                              text: t(
+                                context,
+                                'onboarding.welcome.legal_privacy',
+                              ),
+                              style: AppTextStyles.bodyXs(
+                                color: AppColors.starlight,
+                              ).copyWith(decoration: TextDecoration.underline),
                               recognizer: _privacyTap,
                             ),
-                            TextSpan(text: t(context, 'onboarding.welcome.legal_c')),
+                            TextSpan(
+                              text: t(context, 'onboarding.welcome.legal_c'),
+                            ),
                           ],
                         ),
                         textAlign: TextAlign.center,

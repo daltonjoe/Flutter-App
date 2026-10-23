@@ -10,8 +10,10 @@ import 'today_page.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_dimensions.dart';
 import '../i18n/app_localizations.dart';
+import '../services/ad_service.dart';
 import '../services/user_settings_service.dart';
 import '../widgets/navigation/cosmic_bottom_nav.dart';
+import '../widgets/navigation/nav_tour_overlay.dart';
 import '../redesign/splash/splash_overlay.dart';
 
 final ValueNotifier<int> shellTab = ValueNotifier<int>(1);
@@ -52,8 +54,13 @@ class _MainShellState extends State<MainShell>
   ).animate(CurvedAnimation(parent: _fade, curve: Curves.easeOutCubic));
   int _index = 1; // Today hazır olana kadar varsayılan: Harita
   final _keys = List.generate(5, (_) => GlobalKey<NavigatorState>());
+  final _navKey = GlobalKey();
   bool _matchTabEnabled = false;
   bool _matchTabLoaded = false;
+
+  /// İlk açılış navigasyon turu (K34).
+  bool _tourOn = false;
+  List<int> _tourTabs = const [];
 
   bool get _askOn => askEnabled.value;
   bool get _matchOn => _matchTabLoaded && _matchTabEnabled;
@@ -77,8 +84,64 @@ class _MainShellState extends State<MainShell>
       if (shellTab.value != 1) shellTab.value = 1;
     });
     mapPopToRoot.addListener(_onPopMap);
-    unawaited(_loadMatchFlag());
-    unawaited(_loadAskFlag());
+    unawaited(_maybeStartTour());
+  }
+
+  /// İki sekme bayrağı da yüklendikten sonra, tur henüz gösterilmediyse
+  /// başlatır. Bayraklar henüz yüklenmemişken başlatmak, kapalı sekmeleri
+  /// yanlışlıkla gösterebilir.
+  Future<void> _maybeStartTour() async {
+    await Future.wait([_loadMatchFlag(), _loadAskFlag()]);
+    if (!mounted) return;
+    if (await navTourSeen()) {
+      unawaited(_initAds()); // tur yok: yedek başlatma hemen
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _tourTabs = List<int>.of(_visible);
+      _tourOn = true;
+    });
+  }
+
+  /// Yedek reklam başlatma (K5): onboarding'i bu sürümden önce bitirmiş
+  /// kullanıcılar için. AdService.init() idempotent olduğundan sohbet
+  /// çağrısıyla çakışmaz; hata sohbeti/kabuğu durdurmaz.
+  Future<void> _initAds() async {
+    try {
+      await AdService.init();
+    } catch (e) {
+      debugPrint('MainShell AdService.init failed: $e');
+    }
+  }
+
+  /// Alt çubuk pilinin global (ekran) koordinatındaki dikdörtgeni.
+  Rect _pillRect() {
+    final box = _navKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null) return Rect.zero;
+    final o = box.localToGlobal(Offset.zero);
+    return Rect.fromLTWH(
+      o.dx + AppSpacing.screenH,
+      o.dy,
+      box.size.width - 2 * AppSpacing.screenH,
+      AppSizes.navBarHeight,
+    );
+  }
+
+  /// Tur adımının açıklama metni (sekme indeksine göre).
+  String _tourBody(int tab) {
+    switch (tab) {
+      case 0:
+        return t(context, 'tour.today');
+      case 1:
+        return t(context, 'tour.chart');
+      case 3:
+        return t(context, 'tour.match');
+      case kProfileTab:
+        return t(context, 'tour.profile');
+      default:
+        return t(context, 'tour.ask');
+    }
   }
 
   Future<void> _loadMatchFlag() async {
@@ -222,6 +285,7 @@ class _MainShellState extends State<MainShell>
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
+        if (_tourOn) return;
         final nav = _keys[idx].currentState;
         if (nav != null && nav.canPop()) nav.pop();
       },
@@ -288,6 +352,7 @@ class _MainShellState extends State<MainShell>
                     curve: Curves.easeInOutCubic,
                     opacity: navHidden ? 0.0 : 1.0,
                     child: CosmicBottomNav(
+                      key: _navKey,
                       items: items,
                       selectedIndex: selected,
                       onTap: (tab) {
@@ -298,6 +363,28 @@ class _MainShellState extends State<MainShell>
                 ),
               ),
             ),
+            // İlk açılış navigasyon turu (K34): alt çubuğu tanıtır.
+            if (_tourOn)
+              Positioned.fill(
+                child: NavTourOverlay(
+                  steps: [
+                    for (var i = 0; i < _tourTabs.length; i++)
+                      NavTourStep(
+                        slot: i,
+                        title: _navItem(_tourTabs[i], context).label,
+                        body: _tourBody(_tourTabs[i]),
+                      ),
+                  ],
+                  pillRect: _pillRect,
+                  onStep: (i) => shellTab.value = _tourTabs[i],
+                  onDone: () {
+                    unawaited(navTourMarkSeen());
+                    setState(() => _tourOn = false);
+                    shellTab.value = 1;
+                    unawaited(_initAds()); // tur bitti: yedek başlatma
+                  },
+                ),
+              ),
             const Positioned.fill(child: SplashOverlay()),
           ],
         ),

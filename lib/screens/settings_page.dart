@@ -19,6 +19,7 @@ import '../providers/active_profile_provider.dart';
 import 'legal_agreements_page.dart';
 import '../providers/language_provider.dart';
 import '../services/account_deletion_service.dart';
+import '../services/ad_service.dart';
 import '../services/user_settings_service.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -693,20 +694,38 @@ class _SettingsPageState extends State<SettingsPage>
           children: [
             _sectionLabel('settings.section.privacy'),
             CosmicCard(
-              child: _buildRow(
-                icon: Icons.description_outlined,
-                leading: Text(
-                  t(context, 'settings.legal.row'),
-                  style: AppTextStyles.bodyLg(color: AppColors.starlight),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                ),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const LegalAgreementsPage(),
+              child: Column(
+                children: [
+                  _buildRow(
+                    icon: Icons.description_outlined,
+                    leading: Text(
+                      t(context, 'settings.legal.row'),
+                      style: AppTextStyles.bodyLg(color: AppColors.starlight),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const LegalAgreementsPage(),
+                      ),
+                    ),
                   ),
-                ),
+                  if (AdService.privacyOptionsRequired) ...[
+                    const Divider(height: 1, color: AppColors.hairline),
+                    _buildRow(
+                      icon: Icons.privacy_tip_outlined,
+                      leading: Text(
+                        t(context, 'settings.ads_privacy'),
+                        style: AppTextStyles.bodyLg(color: AppColors.starlight),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                      onTap: () => AdService.showPrivacyOptionsForm(),
+                    ),
+                  ],
+                ],
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
