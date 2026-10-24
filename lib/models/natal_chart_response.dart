@@ -17,12 +17,14 @@ class NatalChartResponse {
   final String? message;
   final String? suggestion;
   final Map<String, HouseData>? houses;
+  final ChartDistribution? distribution;
 
   NatalChartResponse({
     required this.status,
     required this.requestId,
     this.input,
     this.houses,
+    this.distribution,
     this.location,
     this.summary,
     this.planets,
@@ -133,6 +135,56 @@ class ChartLocation {
         timezone: json['timezone'] ?? '',
         utcOffset: json['utc_offset'] ?? '',
       );
+}
+
+/// Sunucu dagilimi (POST /chart-distribution): agirlikli ham puan ve yuzde.
+class DistributionShare {
+  const DistributionShare(this.raw, this.pct);
+  final int raw;
+  final int pct;
+}
+
+class ChartDistribution {
+  const ChartDistribution({
+    required this.elements,
+    required this.modalities,
+    required this.polarity,
+    required this.birthTimeKnown,
+  });
+
+  final Map<String, DistributionShare> elements;
+  final Map<String, DistributionShare> modalities;
+  final Map<String, DistributionShare> polarity;
+  final bool birthTimeKnown;
+
+  static Map<String, DistributionShare>? _group(dynamic src, List<String> keys) {
+    if (src is! Map) return null;
+    final out = <String, DistributionShare>{};
+    for (final k in keys) {
+      final v = src[k];
+      if (v is! Map || v['raw'] is! num || v['pct'] is! num) return null;
+      out[k] = DistributionShare(
+        (v['raw'] as num).toInt(),
+        (v['pct'] as num).toInt(),
+      );
+    }
+    return out;
+  }
+
+  /// Bozuk ya da eksik yanit -> null (Harita bolumu gizlenir).
+  static ChartDistribution? tryParse(dynamic json) {
+    if (json is! Map) return null;
+    final el = _group(json['elements'], const ['fire', 'earth', 'air', 'water']);
+    final mo = _group(json['modalities'], const ['cardinal', 'fixed', 'mutable']);
+    final po = _group(json['polarity'], const ['active', 'passive']);
+    if (el == null || mo == null || po == null) return null;
+    return ChartDistribution(
+      elements: el,
+      modalities: mo,
+      polarity: po,
+      birthTimeKnown: json['birth_time_known'] != false,
+    );
+  }
 }
 
 const _elementCodeToTr = {

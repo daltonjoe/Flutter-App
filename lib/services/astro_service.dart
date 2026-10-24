@@ -115,6 +115,30 @@ class AstroService {
     return NatalChartResponse.fromJson(json);
   }
 
+  // POST /chart-distribution; hata ya da bos yanit -> null (Harita bolumu gizlenir).
+  static Future<ChartDistribution?> fetchChartDistribution(
+    String profileId,
+  ) async {
+    try {
+      final token = await _getToken();
+      final response = await http
+          .post(
+            Uri.parse('$_kBaseUrl/chart-distribution'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode({'profile_id': profileId}),
+          )
+          .timeout(const Duration(seconds: 8));
+      if (response.statusCode != 200) return null;
+      final json = jsonDecode(utf8.decode(response.bodyBytes));
+      return ChartDistribution.tryParse(json is Map ? json['distribution'] : null);
+    } catch (_) {
+      return null;
+    }
+  }
+
   // ── generateAstroReport ──────────────────────────────────────────────
   static Future<String> generateAstroReport({
     required String birthDate,

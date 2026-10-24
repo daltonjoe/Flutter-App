@@ -45,29 +45,13 @@ String elementInferenceText(BuildContext context, Map<String, int> counts) {
   return t(context, 'rd.chart.element_dominant_one', args: {'a': a});
 }
 
-/// Haritadaki gezegenlerin element, kutupluluk (polarity) ve nitelik
-/// (modality) dağılımını tek kartta üç halka hâlinde gösteren bölüm.
-///
-/// Üç dağılım da aynı gezegen kümesinden (Sun…Pluto; doğum saati
-/// bilinmiyorsa Moon hariç) hesaplanır. Kartın altında element çıkarım
-/// cümlesi yer alır.
+/// Element, kutupluluk (aktif/pasif) ve nitelik dagilimini tek kartta
+/// uc halka halinde gosteren bolum. Degerler sunucudan gelir
+/// ([NatalChartResponse.distribution]); yoksa bolum gizlenir.
 class ChartBalanceSection extends StatelessWidget {
   const ChartBalanceSection({super.key, required this.chartData});
 
   final NatalChartResponse chartData;
-
-  static const List<String> _planetOrder = <String>[
-    'Sun',
-    'Moon',
-    'Mercury',
-    'Venus',
-    'Mars',
-    'Jupiter',
-    'Saturn',
-    'Uranus',
-    'Neptune',
-    'Pluto',
-  ];
 
   /// Bu genişliğin altında Element üstte tek satır, Polarity ve Modality
   /// altta iki sütun olur.
@@ -75,37 +59,18 @@ class ChartBalanceSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final planets = chartData.planets ?? const <String, PlanetData>{};
-    final birthTimeKnown = chartData.input?.birthTimeKnown == true;
+    final dist = chartData.distribution;
+    if (dist == null) return const SizedBox.shrink();
 
-    final element = <int>[0, 0, 0, 0]; // [ateş, toprak, hava, su]
-    final polarity = <int>[0, 0]; // [eril, dişil]
-    final modality = <int>[0, 0, 0]; // [öncü, sabit, değişken]
-    var count = 0;
-    for (final key in _planetOrder) {
-      if (!birthTimeKnown && key == 'Moon') continue;
-      final data = planets[key];
-      if (data == null) continue;
-      count++;
-      element[data.signIndex % 4] += 1;
-      polarity[data.signIndex % 2 == 0 ? 0 : 1] += 1;
-      modality[data.signIndex % 3] += 1;
-    }
-    if (count == 0) return const SizedBox.shrink();
-
-    final elementPct = _toPercent(element);
-    final polarityPct = _toPercent(polarity);
-    final modalityPct = _toPercent(modality);
     final elementCounts = <String, int>{
-      for (var i = 0; i < _kElementOrder.length; i++)
-        _kElementOrder[i]: element[i],
+      for (final code in _kElementOrder) code: dist.elements[code]!.raw,
     };
 
     final elementSegments = <_Segment>[
       for (var i = 0; i < _kElementOrder.length; i++)
         _Segment(
           'elements.${_kElementOrder[i]}',
-          elementPct[i],
+          dist.elements[_kElementOrder[i]]!.pct,
           AstroGlyphs.elementColors[_kElementOrder[i]]!,
           glyphKey: _kElementOrder[i],
         ),
@@ -133,10 +98,14 @@ class ChartBalanceSection extends StatelessWidget {
               final polarityColumn = _BalanceColumn(
                 titleKey: 'rd.chart.polarity',
                 segments: [
-                  _Segment('rd.chart.masculine', polarityPct[0], AppColors.gold),
                   _Segment(
-                    'rd.chart.feminine',
-                    polarityPct[1],
+                    'rd.chart.active',
+                    dist.polarity['active']!.pct,
+                    AppColors.gold,
+                  ),
+                  _Segment(
+                    'rd.chart.passive',
+                    dist.polarity['passive']!.pct,
                     AppColors.elementWater,
                   ),
                 ],
@@ -145,11 +114,19 @@ class ChartBalanceSection extends StatelessWidget {
               final modalityColumn = _BalanceColumn(
                 titleKey: 'rd.chart.modality',
                 segments: [
-                  _Segment('rd.chart.cardinal', modalityPct[0], AppColors.gold),
-                  _Segment('rd.chart.fixed', modalityPct[1], AppColors.mist),
+                  _Segment(
+                    'rd.chart.cardinal',
+                    dist.modalities['cardinal']!.pct,
+                    AppColors.gold,
+                  ),
+                  _Segment(
+                    'rd.chart.fixed',
+                    dist.modalities['fixed']!.pct,
+                    AppColors.mist,
+                  ),
                   _Segment(
                     'rd.chart.mutable',
-                    modalityPct[2],
+                    dist.modalities['mutable']!.pct,
                     AppColors.elementAir,
                   ),
                 ],
@@ -201,27 +178,6 @@ class ChartBalanceSection extends StatelessWidget {
   /// Sütun genişliğinden halka boyutu: (genişlik − 8) ve 76–104 dp arası.
   static double _ringSize(double columnWidth) =>
       (columnWidth - AppSpacing.sm).clamp(76.0, 104.0);
-
-  /// En büyük kalan yöntemiyle yüzdeleri tam sayıya çevirir; toplam 100 olur.
-  static List<int> _toPercent(List<int> counts) {
-    final total = counts.fold<int>(0, (a, b) => a + b);
-    if (total == 0) return List<int>.filled(counts.length, 0);
-    final exact = <double>[for (final c in counts) c / total * 100];
-    final out = <int>[for (final e in exact) e.floor()];
-    var remainder = 100 - out.fold<int>(0, (a, b) => a + b);
-    final order = List<int>.generate(counts.length, (i) => i)
-      ..sort((a, b) {
-        final diff = (exact[b] - out[b]).compareTo(exact[a] - out[a]);
-        return diff != 0 ? diff : a - b;
-      });
-    var k = 0;
-    while (remainder > 0) {
-      out[order[k % order.length]] += 1;
-      remainder--;
-      k++;
-    }
-    return out;
-  }
 }
 
 /// Tek dağılım sütunu: başlık, halka, lejant satırları.

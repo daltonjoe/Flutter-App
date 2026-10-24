@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/reference_ids.dart';
 import '../models/natal_chart_response.dart';
+import 'astro_service.dart';
 import 'reference_names_service.dart';
 
 class ChartRepository {
@@ -45,6 +46,7 @@ class ChartRepository {
       housesFuture,
       placementsFuture,
       aspectsFuture,
+      AstroService.fetchChartDistribution(profileId),
     ]);
     final profile = Map<String, dynamic>.from(results[0] as Map);
     final birthTimeKnown = profile['birth_time_known'] != false;
@@ -179,6 +181,7 @@ class ChartRepository {
       aspects: aspects,
       houses: houses,
       angles: angles,
+      distribution: results[4] as ChartDistribution?,
     );
     return (chart: chart, name: profile['display_name']?.toString() ?? '');
   }
