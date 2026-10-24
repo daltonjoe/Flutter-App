@@ -832,7 +832,7 @@ class _PlacementCard extends StatelessWidget {
 /// içeriği. Veri yükleme sayfa durumunda (RedesignChartPage) yapılır; bu widget
 /// yalnızca önceden yüklenmiş bölümleri gösterir. Böylece sekme geçişinde
 /// yeniden fetch/loader oluşmaz.
-class PlacementInlineContent extends StatefulWidget {
+class PlacementInlineContent extends StatelessWidget {
   const PlacementInlineContent({
     super.key,
     required this.chartData,
@@ -842,92 +842,49 @@ class PlacementInlineContent extends StatefulWidget {
 
   final NatalChartResponse chartData;
 
-  /// 'sun' | 'moon' | 'ascendant'
+  /// 'ascendant'
   final String placementKey;
 
-  /// Önceden yüklenmiş bölümler (boş olabilir).
+  /// Onceden yuklenmis bolumler; yalniz love temasi gosterilir (bos olabilir).
   final List<DetailSection> sections;
 
-  @override
-  State<PlacementInlineContent> createState() => _PlacementInlineContentState();
-}
-
-class _PlacementInlineContentState extends State<PlacementInlineContent> {
-  String? _selectedCode;
-
-  bool get _birthTimeKnown => widget.chartData.input?.birthTimeKnown == true;
-
-  @override
-  void didUpdateWidget(covariant PlacementInlineContent oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Sekme değişiminde tema seçimi sıfırlanır; veri yüklemesi yapılmaz.
-    if (oldWidget.placementKey != widget.placementKey) {
-      _selectedCode = null;
-    }
-  }
-
-  void _onThemeSelected(int index) {
-    final codes = _themeCodes(_sortedSections(widget.sections));
-    if (index < 0 || index >= codes.length) return;
-    setState(() {
-      _selectedCode = codes[index];
-    });
-  }
+  bool get _birthTimeKnown => chartData.input?.birthTimeKnown == true;
 
   @override
   Widget build(BuildContext context) {
     final names = context.watch<ReferenceNamesService>();
-    final key = widget.placementKey;
-    final sections = _sortedSections(widget.sections);
-    final codes = _themeCodes(sections);
-    final selectedIndex = _indexForCode(codes, _selectedCode);
-    final selectedCode = codes.isEmpty ? null : codes[selectedIndex];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (codes.isNotEmpty) ...[
-          DetailTabBar(
-            themeCodes: codes,
-            selectedIndex: selectedIndex,
-            onSelected: _onThemeSelected,
+    return Padding(
+      padding: const EdgeInsetsDirectional.symmetric(
+        horizontal: AppSpacing.screenH,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            t(context, 'chart.$placementKey'),
+            style: AppTextStyles.h1(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          _metaLine(
+            context,
+            names: names,
+            signIndex: placementSignIndex(chartData, placementKey),
+            planetData: _placementPlanetData(chartData, placementKey),
+            birthTimeKnown: _birthTimeKnown,
           ),
           const SizedBox(height: AppSpacing.md),
+          _placementAskButton(
+            context,
+            chartData: chartData,
+            placementKey: placementKey,
+            birthTimeKnown: _birthTimeKnown,
+            names: names,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _sectionsColumn(context, _sortedSections(sections), 'love'),
         ],
-        Padding(
-          padding: const EdgeInsetsDirectional.symmetric(
-            horizontal: AppSpacing.screenH,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                t(context, 'chart.$key'),
-                style: AppTextStyles.h1(),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              _metaLine(
-                context,
-                names: names,
-                signIndex: placementSignIndex(widget.chartData, key),
-                planetData: _placementPlanetData(widget.chartData, key),
-                birthTimeKnown: _birthTimeKnown,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              _placementAskButton(
-                context,
-                chartData: widget.chartData,
-                placementKey: key,
-                birthTimeKnown: _birthTimeKnown,
-                names: names,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              _sectionsColumn(context, sections, selectedCode),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
