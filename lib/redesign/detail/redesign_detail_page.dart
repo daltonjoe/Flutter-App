@@ -726,13 +726,6 @@ class _PlacementCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (section.title.isNotEmpty)
-            Text(
-              section.title,
-              style: AppTextStyles.h2(color: color),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
           if (short != null && short.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -748,38 +741,9 @@ class _PlacementCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(body, style: AppTextStyles.bodyMd()),
           ],
-          if (section.keywords.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.md),
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: [
-                for (final keyword in section.keywords) _chip(keyword, color),
-              ],
-            ),
-          ],
           _bullets(context, 'placement.strengths', section.strengths, color),
           _bullets(context, 'placement.challenges', section.challenges, color),
         ],
-      ),
-    );
-  }
-
-  Widget _chip(String label, Color color) {
-    return Container(
-      padding: const EdgeInsetsDirectional.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: AppRadius.smBr,
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.bodyXs(color: color),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
       ),
     );
   }
