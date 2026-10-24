@@ -1,4 +1,4 @@
-// Kategori çubuğu: Hepsi · Güneş · Ay · Yükselen (chip satırı).
+// Kategori cubugu: Tumu + Yukselen (chip satiri).
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_dimensions.dart';
@@ -15,7 +15,7 @@ class ChartCategoryBar extends StatelessWidget {
 
   final bool birthTimeKnown;
 
-  /// Seçili sekme anahtarı: 'all' | 'sun' | 'moon' | 'ascendant'.
+  /// Seçili sekme anahtarı: 'all' | 'ascendant'.
   final String selectedKey;
 
   final ValueChanged<String> onSelect;
@@ -33,19 +33,6 @@ class ChartCategoryBar extends StatelessWidget {
             label: t(context, 'rd.tab.all'),
             selected: selectedKey == 'all',
             onTap: () => onSelect('all'),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          _chip(
-            label: t(context, 'chart.sun'),
-            selected: selectedKey == 'sun',
-            onTap: () => onSelect('sun'),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          _chip(
-            label: t(context, 'chart.moon'),
-            selected: selectedKey == 'moon',
-            enabled: birthTimeKnown,
-            onTap: () => onSelect('moon'),
           ),
           const SizedBox(width: AppSpacing.sm),
           _chip(

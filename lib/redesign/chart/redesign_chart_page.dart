@@ -47,7 +47,7 @@ class _RedesignChartPageState extends State<RedesignChartPage> {
   /// Karusel kaydırma konumu; hero görsellerinin kaymasını sürer.
   final ValueNotifier<double> _pagePosition = ValueNotifier<double>(0);
 
-  /// Seçili sekme: 'all' | 'sun' | 'moon' | 'ascendant'.
+  /// Seçili sekme: 'all' | 'ascendant'.
   String _tab = 'all';
 
   /// locale → (placementKey → bölümler). Sayfa açılışında üç yerleşim tek
@@ -67,7 +67,7 @@ class _RedesignChartPageState extends State<RedesignChartPage> {
   bool get _birthTimeKnown => widget.chartData.input?.birthTimeKnown == true;
 
   bool get _isPlacementTab =>
-      _tab == 'sun' || _tab == 'moon' || _tab == 'ascendant';
+      _tab == 'ascendant';
 
   List<DetailSection>? _sectionsFor(String key) => _cache[_shownLocale]?[key];
 
@@ -96,10 +96,16 @@ class _RedesignChartPageState extends State<RedesignChartPage> {
       _error = null;
     });
     final placements = <String, String>{
-      'sun': _signCode('sun'),
-      if (_birthTimeKnown) 'moon': _signCode('moon'),
       if (_birthTimeKnown) 'ascendant': _signCode('ascendant'),
     };
+    if (placements.isEmpty) {
+      _cache[loc] = <String, List<DetailSection>>{};
+      setState(() {
+        _shownLocale = loc;
+        _loading = false;
+      });
+      return;
+    }
     try {
       final result = await PlacementContentService.fetch(
         placements: placements,
