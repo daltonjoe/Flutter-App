@@ -670,12 +670,10 @@ class _ProfileSwitcherPageState extends State<ProfileSwitcherPage>
   Widget _addChip() {
     return GestureDetector(
       onTap: () {
-        final nav = Navigator.of(context, rootNavigator: true);
-        if (Supabase.instance.client.auth.currentUser?.isAnonymous == true) {
-          nav.pushNamed('/onboarding/link-account');
-        } else {
-          nav.pushNamed('/onboarding', arguments: {'isFirstProfile': false});
-        }
+        Navigator.of(context, rootNavigator: true).pushNamed(
+          '/onboarding',
+          arguments: {'isFirstProfile': false},
+        );
       },
       behavior: HitTestBehavior.opaque,
       child: SizedBox(

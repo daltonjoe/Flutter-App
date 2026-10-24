@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_dimensions.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_background.dart';
@@ -294,10 +295,15 @@ class _OnboardingFirstQuestionPageState
             ),
           ),
         ),
-        IconButton(
-          tooltip: t(context, 'ask.send'),
-          onPressed: _busy ? null : () => _ask(_ctl.text),
-          icon: const Icon(Icons.arrow_upward, color: AppColors.gold),
+        Padding(
+          padding: EdgeInsets.only(
+            bottom: AppSpacing.fieldBottomGap + (AppSizes.inputHeight - 48) / 2,
+          ),
+          child: IconButton(
+            tooltip: t(context, 'ask.send'),
+            onPressed: _busy ? null : () => _ask(_ctl.text),
+            icon: const Icon(Icons.arrow_upward, color: AppColors.gold),
+          ),
         ),
       ],
     );

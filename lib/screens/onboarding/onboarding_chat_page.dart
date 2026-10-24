@@ -268,7 +268,10 @@ class _Step {
 }
 
 class _Msg {
-  _Msg(this.mine, this.text, {this.animate = false});
+  _Msg(this.mine, this.text, {this.animate = false, this.after});
+
+  /// Runs once the reveal finishes (sequential reveal).
+  final VoidCallback? after;
 
   final bool mine;
   final String text;
@@ -380,10 +383,9 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
       if (!mounted) return;
       setState(() {
         _typing = false;
-        _lines.add(_Msg(false, text, animate: true));
+        _lines.add(_Msg(false, text, animate: true, after: after));
       });
       _scrollEnd();
-      after();
     });
   }
 
@@ -683,7 +685,10 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
                     text: line.text,
                     style: AppTextStyles.bodyMd(color: AppColors.starlight),
                     onTick: _scrollEnd,
-                    onDone: () => setState(() => line.animate = false),
+                    onDone: () {
+                      setState(() => line.animate = false);
+                      line.after?.call();
+                    },
                   )
                 : Text(
                     line.text,

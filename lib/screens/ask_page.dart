@@ -51,7 +51,7 @@ class _Msg {
 
 /// `credit_status` yanıtı: bakiye ve bugün kalan reklam hakkı (`ad_left_today`).
 /// `adLeft` null ise alan yok/ayrıştırılamadı → bilinmiyor, reklam açık kalır.
-typedef _CreditStatus = ({int? balance, int? adLeft});
+typedef _CreditStatus = ({int? balance, int? adLeft, String? tier, int? dailyLeft});
 
 class AskPage extends StatefulWidget {
   const AskPage({super.key});
@@ -79,6 +79,7 @@ class _AskPageState extends State<AskPage> {
   String? _partnerName;
   List<Map<String, dynamic>> _partners = [];
   bool _partnersLoaded = false;
+  _CreditStatus? _credit; // K39 kalan hak notu
   bool _showFirstNote = false; // B7: boş durumda bir kez göster
 
   @override
@@ -88,6 +89,7 @@ class _AskPageState extends State<AskPage> {
     askMode.addListener(_onMode);
     askBridgeReq.addListener(_onBridge);
     _inputFocus.addListener(_onFocus);
+    _refreshCredit();
     WidgetsBinding.instance.addPostFrameCallback((_) => _onBridge());
     UserSettingsService.isFlagEnabled('ask_avatars').then((v) {
       if (!mounted) return;
@@ -157,6 +159,7 @@ class _AskPageState extends State<AskPage> {
       _fMonth = null;
       _messages.clear();
       _waiting = false;
+      _refreshCredit();
       _failed = false;
       _langReset = false;
       _lastText = '';
@@ -179,6 +182,7 @@ class _AskPageState extends State<AskPage> {
       _gen++;
       _messages.clear();
       _waiting = false;
+      _refreshCredit();
       _failed = false;
       _langReset = true;
     }
@@ -317,6 +321,7 @@ class _AskPageState extends State<AskPage> {
       setState(() {
         _messages.add(r);
         _waiting = false;
+        _refreshCredit();
       });
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
     } catch (e) {
@@ -325,6 +330,7 @@ class _AskPageState extends State<AskPage> {
       final code = e is AstroServiceException ? e.code : '';
       setState(() {
         _waiting = false;
+        _refreshCredit();
         _failed = true;
         _lastText = text;
         _errKey = AskService.errKeyFor(code);
@@ -377,15 +383,21 @@ class _AskPageState extends State<AskPage> {
       if (m is Map) {
         final b = m['balance'];
         final a = m['ad_left_today'];
+        final dlRaw = m['daily_limit'];
+        final duRaw = m['daily_used'];
+        final dl = int.tryParse('$dlRaw');
+        final du = int.tryParse('$duRaw');
         return (
           balance: b is int ? b : (b == null ? null : int.tryParse('$b')),
           adLeft: a is int ? a : (a == null ? null : int.tryParse('$a')),
+          tier: m['tier'] is String ? m['tier'] as String : null,
+          dailyLeft: (dl == null || du == null) ? null : (dl - du < 0 ? 0 : dl - du),
         );
       }
     } catch (e) {
       debugPrint('AskPage credit_status failed: $e');
     }
-    return (balance: null, adLeft: null);
+    return (balance: null, adLeft: null, tier: null, dailyLeft: null);
   }
 
   void _goPremium() {
@@ -409,6 +421,7 @@ class _AskPageState extends State<AskPage> {
 
   /// Ödül sunucuda doğrulandığında: hata satırını temizleyip girişe odaklanır.
   void _onRewardCredited() {
+    _refreshCredit();
     if (!mounted) return;
     setState(() {
       _failed = false;
@@ -506,6 +519,7 @@ class _AskPageState extends State<AskPage> {
       _gen++;
       _messages.clear();
       _waiting = false;
+      _refreshCredit();
       _failed = false;
     });
   }
@@ -956,6 +970,7 @@ class _AskPageState extends State<AskPage> {
       _gen++;
       _messages.clear();
       _waiting = false;
+      _refreshCredit();
       _failed = false;
     });
   }
@@ -1125,7 +1140,53 @@ class _AskPageState extends State<AskPage> {
     );
   }
 
+  Future<void> _refreshCredit() async {
+    final s = await _readCreditStatus();
+    if (!mounted) return;
+    setState(() => _credit = s);
+  }
+
+  Widget _creditNote(BuildContext context) {
+    final c = _credit;
+    if (c == null) return const SizedBox.shrink();
+    String? key;
+    int? n;
+    if (c.tier == 'free' || c.balance != null) {
+      if ((c.balance ?? 0) > 0) {
+        key = 'ask.credits.left';
+        n = c.balance;
+      } else if (c.balance == 0 && c.adLeft != null) {
+        key = 'ask.credits.left_ads';
+        n = c.adLeft;
+      }
+    } else if (c.dailyLeft != null) {
+      key = 'ask.credits.left_daily';
+      n = c.dailyLeft;
+    }
+    if (key == null || n == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(
+        AppSpacing.md,
+        AppSpacing.xs,
+        AppSpacing.md,
+        0,
+      ),
+      child: Text(
+        t(context, key).replaceAll('{n}', '$n'),
+        style: Theme.of(context).textTheme.bodySmall,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
   Widget _composer(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [_creditNote(context), _composerPill(context)],
+    );
+  }
+
+  Widget _composerPill(BuildContext context) {
     final reduce = MediaQuery.disableAnimationsOf(context);
     return Padding(
       // Alt boşluk composer sütunundaki son SizedBox'a bırakıldı (B2).
