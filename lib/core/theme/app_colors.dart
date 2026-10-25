@@ -50,6 +50,9 @@ class AppColors {
   /// gold @ 0 % — transparent end stop for glow gradients.
   static const Color goldGlowClear = Color(0x00D9B36A);
 
+  /// gold @ 10 % - AI bubble fill.
+  static const Color goldTint = Color(0x1AD9B36A);
+
   // Legacy "violet / primary" names → gold.
   static const Color violetSoft = goldSoft;
 

@@ -1175,8 +1175,11 @@ class _AskPageState extends State<AskPage> {
           children: [
             const AskStar(size: 14),
             const SizedBox(height: AppSpacing.xs),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: maxW),
+            _aiBubble(
+              maxW: maxW,
+              text: m.text,
+              style: AppTextStyles.bodyLg(),
+              animate: m.animate,
               child: m.animate
                   ? _Typewriter(
                       key: ObjectKey(m),
@@ -1223,8 +1226,11 @@ class _AskPageState extends State<AskPage> {
                 ? const AskStar(size: 14)
                 : const SizedBox(width: 14, height: 14),
             const SizedBox(height: AppSpacing.xs),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: maxW),
+            _aiBubble(
+              maxW: maxW,
+              text: text,
+              style: AppTextStyles.bodyMd(),
+              animate: animate,
               child: animate
                   ? _Typewriter(
                       text: text,
@@ -1236,6 +1242,34 @@ class _AskPageState extends State<AskPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _aiBubble({
+    required double maxW,
+    required String text,
+    required TextStyle style,
+    required bool animate,
+    required Widget child,
+  }) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: maxW),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.goldTint,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.goldGlowSm),
+      ),
+      child: animate
+          ? Stack(
+              children: [
+                ExcludeSemantics(
+                  child: Opacity(opacity: 0, child: Text(text, style: style)),
+                ),
+                child,
+              ],
+            )
+          : child,
     );
   }
 
