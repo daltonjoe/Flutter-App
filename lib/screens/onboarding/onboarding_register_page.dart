@@ -10,7 +10,6 @@ import "../../i18n/app_localizations.dart";
 import "../../presentation/widgets/components/cosmic_background.dart";
 import "../../presentation/widgets/components/social_auth_button.dart";
 import "../../services/account_linking_service.dart";
-import "../../services/consent_service.dart";
 
 class OnboardingRegisterPage extends StatefulWidget {
   const OnboardingRegisterPage({super.key});
@@ -46,10 +45,8 @@ class _OnboardingRegisterPageState extends State<OnboardingRegisterPage> {
   Future<void> _next() async {
     if (_went || !mounted) return;
     _went = true;
-    final ok = await ConsentService.hasRequired();
-    if (!mounted) return;
     Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-      ok ? "/home" : "/onboarding/consent",
+      "/home",
       (r) => false,
     );
   }

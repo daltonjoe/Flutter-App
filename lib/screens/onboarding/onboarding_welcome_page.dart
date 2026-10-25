@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
+import '../../services/ai_consent_service.dart';
 import '../../services/consent_service.dart';
 import '../legal_agreements_page.dart';
 
@@ -67,6 +68,12 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
     _termsTap.dispose();
     _privacyTap.dispose();
     super.dispose();
+  }
+
+  /// Ilerle: privacy, terms ve ai (not) rizasi sessizce yazilir; UI beklemez.
+  Future<void> _accept() async {
+    await ConsentService.recordAccept();
+    await AiConsentService.grantAi();
   }
 
   void _openLegal(String titleKey, String bodyKey) {
@@ -177,7 +184,7 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
                         label: t(context, 'onboarding.welcome.cta'),
                         onTap: () {
                           // "İleri" = privacy + terms onayı; UI beklemez.
-                          unawaited(ConsentService.recordAccept());
+                          unawaited(_accept());
                           widget.onNext();
                         },
                       ),

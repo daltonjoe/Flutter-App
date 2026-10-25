@@ -49,7 +49,7 @@ class _OnboardingLinkAccountPageState extends State<OnboardingLinkAccountPage> {
     Navigator.of(
       context,
       rootNavigator: true,
-    ).pushNamedAndRemoveUntil('/onboarding/consent', (route) => false);
+    ).pushNamedAndRemoveUntil('/home', (route) => false);
   }
 
   Future<void> _onSave() async {

@@ -45,18 +45,4 @@ class ConsentService {
     }
   }
 
-  /// privacy + terms tamam mı; hata halinde false.
-  static Future<bool> hasRequired() async {
-    try {
-      final rows = await Supabase.instance.client
-          .from('user_consents')
-          .select('kind')
-          .inFilter('kind', ['privacy', 'terms']);
-      final kinds = rows.map((r) => r['kind']).toSet();
-      return kinds.contains('privacy') && kinds.contains('terms');
-    } catch (e) {
-      debugPrint('ConsentService.hasRequired failed: $e');
-      return false;
-    }
-  }
 }

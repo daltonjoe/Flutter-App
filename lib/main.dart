@@ -30,6 +30,7 @@ import "session/resolve_entry.dart";
 import "session/session_controller.dart";
 import "session/supabase_session_source.dart";
 import "presentation/widgets/components/cosmic_loader.dart";
+import "presentation/widgets/components/cosmic_alert_dialog.dart";
 import "presentation/widgets/components/cosmic_error_state.dart";
 import "redesign/splash/loading_video_host.dart";
 import "redesign/splash/loading_video.dart";
@@ -69,6 +70,7 @@ void main() async {
       debugPrint('Anonymous Supabase sign-in failed: $e');
     }
   }
+  _netFail80 = Supabase.instance.client.auth.currentSession == null;
 
   await activeProfileProvider.load();
   final sessionController = SessionController(
@@ -230,6 +232,8 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
 }
 
 bool _webExists67 = false;
+bool _netFail80 = false;
+bool _netOpen80 = false;
 bool _nfOpen80 = false;
 SessionController? _ctl80;
 
@@ -348,6 +352,58 @@ Future<void> _showNotFound80(BuildContext context) async {
   nav.popUntil((r) => r.isFirst);
 }
 
+Future<void> showNetError80(BuildContext context) async {
+  if (_netOpen80) return;
+  _netOpen80 = true;
+  try {
+    await showCosmicAlert(
+      context,
+      title: t(context, 'net.title'),
+      message: t(context, 'net.body'),
+      actions: [
+        CosmicAlertAction(
+          label: t(context, 'net.retry'),
+          onTap: _netRetry80,
+        ),
+        CosmicAlertAction(
+          label: t(context, 'net.logout'),
+          primary: false,
+          onTap: _netLogout80,
+        ),
+      ],
+    );
+  } finally {
+    _netOpen80 = false;
+  }
+}
+
+Future<void> _netRetry80() async {
+  final c = Supabase.instance.client;
+  if (c.auth.currentSession == null) {
+    try {
+      await c.auth.signInAnonymously();
+    } catch (e) {
+      debugPrint('net retry sign-in failed: $e');
+    }
+  }
+  _netFail80 = c.auth.currentSession == null;
+  try {
+    await _ctl80?.refresh();
+  } catch (e) {
+    debugPrint('net retry refresh failed: $e');
+  }
+}
+
+Future<void> _netLogout80() async {
+  try {
+    await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
+    await _ctl80?.profiles.clearActive();
+  } catch (e) {
+    debugPrint('net logout failed: $e');
+  }
+  await _netRetry80();
+}
+
 class _Gate80 extends StatefulWidget {
   const _Gate80();
   @override
@@ -363,6 +419,13 @@ class _Gate80State extends State<_Gate80> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         showNotFound70(context);
+      });
+    }
+    if ((r == EntryRoute.retry || (r == EntryRoute.loading && _netFail80)) &&
+        !_netOpen80) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        showNetError80(context);
       });
     }
     return switch (r) {
