@@ -1102,9 +1102,20 @@ class _AskPageState extends State<AskPage> {
     }
   }
 
+  /// Y4: cevabi bos satirla ayrilan paragraflara boler.
+  static List<String> _paragraphs(String s) => [
+    for (final p in s.split(RegExp(r'\n\s*\n')))
+      if (p.trim().isNotEmpty) p.trim(),
+  ];
+
   Widget _bubbleCore(BuildContext context, _Msg m) {
-    if (!m.mine && m.bubbles != null && m.bubbles!.isNotEmpty) {
-      return _bubbleSeq(context, m);
+    if (!m.mine) {
+      final seq = (m.bubbles != null && m.bubbles!.isNotEmpty)
+          ? m.bubbles!
+          : _paragraphs(m.text);
+      if (seq.length > 1 || (m.bubbles?.isNotEmpty ?? false)) {
+        return _bubbleSeq(context, m, seq);
+      }
     }
     if (m.mine && _av) {
       return GestureDetector(
@@ -1162,10 +1173,10 @@ class _AskPageState extends State<AskPage> {
     );
   }
 
-  Widget _bubbleSeq(BuildContext context, _Msg m) {
+  Widget _bubbleSeq(BuildContext context, _Msg m, List<String> texts) {
     return _BubbleSeq(
       key: ObjectKey(m),
-      texts: m.bubbles!,
+      texts: texts,
       animate: m.animate,
       onAllDone: () => m.animate = false,
       item: (i, txt, anim, done, k) => _box(context, i, txt, anim, done, k),
