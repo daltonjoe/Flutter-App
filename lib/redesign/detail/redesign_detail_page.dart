@@ -22,7 +22,6 @@ import '../../providers/active_profile_provider.dart';
 import '../../providers/ask_context_provider.dart';
 import '../../providers/language_provider.dart';
 import '../../services/astro_service.dart';
-import '../../services/placement_content_service.dart';
 import '../../services/reference_names_service.dart';
 import '../../widgets/ask_add.dart';
 import '../assets_map.dart';
@@ -34,22 +33,12 @@ class RedesignDetailPage extends StatefulWidget {
     super.key,
     required this.chartData,
     required String planetKey,
-  }) : modeKey = planetKey,
-       isPlanet = true;
-
-  const RedesignDetailPage.placement({
-    super.key,
-    required this.chartData,
-    required String placementKey,
-  }) : modeKey = placementKey,
-       isPlanet = false;
+  }) : modeKey = planetKey;
 
   final NatalChartResponse chartData;
 
-  /// Gezegen modunda 'Sun'..'Pluto', yerleşim modunda 'sun'|'moon'|'ascendant'.
+  /// Gezegen anahtari: Sun..Pluto.
   final String modeKey;
-
-  final bool isPlanet;
 
   @override
   State<RedesignDetailPage> createState() => _RedesignDetailPageState();
@@ -95,11 +84,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
     final locale = context.read<LanguageProvider>().locale.languageCode;
     _loc = locale;
     final myToken = ++_token;
-    if (widget.isPlanet) {
-      await _loadPlanet(locale, myToken);
-    } else {
-      await _loadPlacement(locale, myToken);
-    }
+    await _loadPlanet(locale, myToken);
   }
 
   /// PlanetReportPage._fetch() ile aynı sorgu ve aynı AI yedeği.
@@ -172,69 +157,19 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
     }
   }
 
-  /// PlacementContentPage._load() ile aynı servis çağrısı ve burç kodu türetimi.
-  Future<void> _loadPlacement(String locale, int myToken) async {
-    final key = widget.modeKey;
-    if (key == 'moon' && !_birthTimeKnown) {
-      if (!mounted || myToken != _token) return;
-      setState(() {
-        _sections = const <DetailSection>[];
-        _loading = false;
-      });
-      return;
-    }
-
-    try {
-      final int? signIndex = placementSignIndex(widget.chartData, key);
-      final result = await PlacementContentService.fetch(
-        placements: <String, String>{
-          key: signIndex == null ? '' : (RefIds.signCode(signIndex) ?? ''),
-        },
-        locale: locale,
-      );
-      if (!mounted || myToken != _token) return;
-      final rows = result[key] ?? const <PlacementContent>[];
-      setState(() {
-        _sections = [for (final row in rows) DetailSection.fromPlacement(row)];
-        _loading = false;
-      });
-    } catch (e) {
-      debugPrint('redesign detail placement fetch error: $e');
-      if (!mounted || myToken != _token) return;
-      setState(() {
-        _errorMessage = t(context, 'placement.error');
-        _loading = false;
-      });
-    }
-  }
-
   // ── Türetilmiş veriler ────────────────────────────────────────────────
   PlanetData? get _planetData {
-    final planets = widget.chartData.planets;
-    if (widget.isPlanet) return planets?[widget.modeKey];
-    if (widget.modeKey == 'sun') return planets?['Sun'];
-    if (widget.modeKey == 'moon') return planets?['Moon'];
-    return null;
+    return widget.chartData.planets?[widget.modeKey];
   }
 
   int? get _signIndex {
-    final pd = _planetData;
-    if (pd != null) return pd.signIndex;
-    if (widget.modeKey == 'ascendant') {
-      return widget.chartData.houses?['house_1']?.signIndex;
-    }
-    return null;
+    return _planetData?.signIndex;
   }
 
   /// Görsel için gezegen anahtarı; yükselen burçta görsel yok.
-  String? get _assetKey {
-    if (widget.isPlanet) return widget.modeKey;
-    if (widget.modeKey == 'sun') return 'Sun';
-    if (widget.modeKey == 'moon') return 'Moon';
-    return null;
-  }
+  String get _assetKey => widget.modeKey;
 
-  bool get _timeUnknown => widget.isPlanet && (_planetData?.house ?? 1) <= 0;
+  bool get _timeUnknown => (_planetData?.house ?? 1) <= 0;
 
   void _onThemeSelected(int index) {
     final codes = _themeCodes(_sortedSections(_sections));
@@ -245,7 +180,6 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
   }
 
   String _displayName(ReferenceNamesService names) {
-    if (!widget.isPlanet) return t(context, 'chart.${widget.modeKey}');
     final id = RefIds.planets[widget.modeKey];
     return id == null ? widget.modeKey : names.planet(id);
   }
@@ -279,9 +213,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
       slivers.add(
         SliverFillRemaining(
           hasScrollBody: false,
-          child: widget.isPlanet
-              ? CosmicLoader(message: t(context, 'planet_report.loading'))
-              : const CosmicLoader(),
+          child: CosmicLoader(message: t(context, 'planet_report.loading')),
         ),
       );
     } else if (_errorMessage != null) {
@@ -291,10 +223,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
           child: CosmicErrorState(
             message: _errorMessage!,
             onRetry: _reload,
-            retryLabel: t(
-              context,
-              widget.isPlanet ? 'natal_report.retry' : 'placement.retry',
-            ),
+            retryLabel: t(context, 'natal_report.retry'),
           ),
         ),
       );
@@ -360,8 +289,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
 
   Widget _topRow(BuildContext context) {
     final bool rtl = Directionality.of(context) == TextDirection.rtl;
-    final bool canRefresh =
-        widget.isPlanet && !_loading && _errorMessage == null;
+    final bool canRefresh = !_loading && _errorMessage == null;
     return Row(
       children: [
         IconButton(
@@ -408,7 +336,7 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
           planetData: _planetData,
           birthTimeKnown: _birthTimeKnown,
         ),
-        if (widget.isPlanet && pd != null) ...[
+        if (pd != null) ...[
           const SizedBox(height: AppSpacing.xs),
           Text(
             '${pd.degreeInSign.toStringAsFixed(2)}°',
@@ -426,17 +354,6 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
   Widget _image(ReferenceNamesService names) {
     final assetKey = _assetKey;
     final double height = MediaQuery.sizeOf(context).height * 0.28;
-    if (assetKey == null) {
-      return SizedBox(
-        height: height,
-        child: Center(
-          child: Text(
-            '✦',
-            style: AppTextStyles.displayLarge(color: AppColors.gold),
-          ),
-        ),
-      );
-    }
     return SizedBox(
       height: height,
       child: FractionallySizedBox(
@@ -458,16 +375,6 @@ class _RedesignDetailPageState extends State<RedesignDetailPage> {
   }
 
   Widget _askSection(ReferenceNamesService names) {
-    if (!widget.isPlanet) {
-      return _placementAskButton(
-        context,
-        chartData: widget.chartData,
-        placementKey: widget.modeKey,
-        birthTimeKnown: _birthTimeKnown,
-        names: names,
-      );
-    }
-
     final pd = _planetData;
     final pid = RefIds.planets[widget.modeKey];
     if (pd == null || pid == null) return const SizedBox.shrink();
