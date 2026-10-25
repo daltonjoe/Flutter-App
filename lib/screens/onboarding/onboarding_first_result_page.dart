@@ -1,4 +1,5 @@
 import 'package:flutter_application/paywall/paywall_page.dart';
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter, lerpDouble;
 import 'package:flutter/material.dart';
@@ -48,14 +49,11 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
   late Future<({NatalChartResponse chart, String name})> _future;
 
   static const int _totalMs = 7200;
-  static const int _msSun = 400;
-  static const int _msMoon = 2000;
-  static const int _msRise = 3600;
-  static const int _msHint = 4400;
-  static const int _msFinal = 6000;
-  static const int _msCta = 6800;
   late final AnimationController _scene;
-  bool _hSun = false, _hMoon = false, _hRise = false;
+  Timer? _timer;
+  int _step = 0;
+  int _n = 4;
+  bool _cta = false;
   bool _timeKnown = true;
   String _sun = '';
   String _moon = '';
@@ -65,7 +63,6 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
     super.initState();
     _scene = AnimationController(
         vsync: this, duration: const Duration(milliseconds: _totalMs));
-    _scene.addListener(_haptics);
     _future = _load();
     _play();
   }
@@ -78,58 +75,91 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
 
   @override
   void dispose() {
+    _timer?.cancel();
     _scene.dispose();
     super.dispose();
   }
 
   /// Veri yuklenince sahneyi baslatir (reduce motion: statik son durum).
   void _play() {
-    _future.then((_) {
+    _timer?.cancel();
+    _step = 0;
+    _cta = false;
+    _scene.value = 0;
+    _future.then((r) {
       if (!mounted) return;
+      _timeKnown = (r.chart.summary?.ascendantSign ?? '').isNotEmpty;
+      _n = _timeKnown ? 4 : 3;
       if (MediaQuery.disableAnimationsOf(context)) {
-        _hSun = _hMoon = _hRise = true;
+        setState(() {
+          _step = _n;
+          _cta = true;
+        });
         _scene.value = 1;
       } else {
-        _scene.forward(from: 0);
+        _arm();
       }
     }, onError: (_) {});
   }
 
-  void _haptics() {
-    final ms = _scene.value * _totalMs;
-    if (!_hSun && ms >= _msSun) {
-      _hSun = true;
+  /// Sirayi bekler: son adima kadar 2 sn arayla ilerler, sonra CTA acilir.
+  void _arm() {
+    _timer?.cancel();
+    if (_step >= _n) {
+      if (!_cta) {
+        _timer = Timer(const Duration(milliseconds: 600), () {
+          if (mounted) setState(() => _cta = true);
+        });
+      }
+      return;
+    }
+    _timer = Timer(const Duration(seconds: 2), _next);
+  }
+
+  /// Yalniz siradaki adimi acar; haptic adim acilisina baglidir.
+  void _next() {
+    if (!mounted || _step >= _n) return;
+    final s = _step + 1;
+    setState(() => _step = s);
+    if (s == 1 || (s == 2 && _timeKnown)) {
       HapticFeedback.lightImpact();
+    } else if (s == 3 && _timeKnown) {
+      HapticFeedback.mediumImpact();
     }
-    if (!_hMoon && ms >= _msMoon) {
-      _hMoon = true;
-      if (_timeKnown) HapticFeedback.lightImpact();
-    }
-    if (!_hRise && ms >= _msRise) {
-      _hRise = true;
-      if (_timeKnown) HapticFeedback.mediumImpact();
+    unawaited(
+      _scene.animateTo(
+        s / _n,
+        duration: AppMotion.hero,
+        curve: AppMotion.enterCurve,
+      ),
+    );
+    _arm();
+  }
+
+  /// Dokunus: siradaki adimi hemen acar; son adimdan sonra CTA yi hemen gosterir.
+  void _tap() {
+    if (_step < _n) {
+      _next();
+    } else if (!_cta) {
+      _timer?.cancel();
+      setState(() => _cta = true);
     }
   }
 
-  void _skip() {
-    _hSun = _hMoon = _hRise = true;
-    if (_scene.value < 1) _scene.value = 1;
-  }
-
-  Widget _at(int ms, Widget child, {int dur = 420}) {
-    final a = ms / _totalMs;
-    final b = (ms + dur) / _totalMs;
-    return AnimatedBuilder(
-      animation: _scene,
+  Widget _at(int step, Widget child) {
+    final reduce = MediaQuery.disableAnimationsOf(context);
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(end: _step >= step ? 1.0 : 0.0),
+      duration: reduce ? Duration.zero : AppMotion.enter,
+      curve: AppMotion.enterCurve,
       child: child,
-      builder: (context, child) {
-        final v = AppMotion.enterCurve
-            .transform(((_scene.value - a) / (b - a)).clamp(0.0, 1.0));
-        return Opacity(
-          opacity: v,
-          child: Transform.translate(offset: Offset(0, 16 * (1 - v)), child: child),
-        );
-      },
+      builder: (context, v, child) => Opacity(
+        opacity: v,
+        child: Transform.translate(
+          offset: Offset(0, 16 * (1 - v)),
+          child: child,
+        ),
+      ),
     );
   }
 
@@ -284,7 +314,7 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
     final tt = Theme.of(context).textTheme;
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTap: _skip,
+      onTap: _tap,
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -318,18 +348,18 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
                               ),
                             ),
                             const SizedBox(height: 24),
-                            _at(_msSun,
+                            _at(1,
                                 _block('${_fr}sun', '${_fr}what_sun', _sun)),
                             if (timeKnown) ...[
-                              _at(_msMoon,
+                              _at(2,
                                   _block('${_fr}moon', '${_fr}what_moon', _moon)),
                               _at(
-                                  _msRise,
+                                  3,
                                   _block('${_fr}rising', '${_fr}what_rising',
                                       summary?.ascendantSign ?? '')),
                             ] else ...[
                               _at(
-                                _msRise,
+                                2,
                                 ImageFiltered(
                                   imageFilter:
                                       ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -352,7 +382,7 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
                                 ),
                               ),
                               _at(
-                                _msHint,
+                                2,
                                 Padding(
                                   padding: const EdgeInsets.only(top: 12),
                                   child: Text(
@@ -365,13 +395,12 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
                             ],
                             const SizedBox(height: 16),
                             _at(
-                              _msFinal,
+                              _n,
                               Text(
                                 t(context, '${_fr}final_angles'),
                                 textAlign: TextAlign.center,
                                 style: tt.titleMedium,
                               ),
-                              dur: 600,
                             ),
                           ],
                         ),
@@ -379,18 +408,19 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
                     ),
                   ),
                 ),
-                AnimatedBuilder(
-                  animation: _scene,
-                  builder: (context, child) => IgnorePointer(
-                      ignoring: _scene.value < _msCta / _totalMs, child: child),
-                  child: _at(
-                    _msCta,
-                    CosmicCtaButton(
+                IgnorePointer(
+                  ignoring: !_cta,
+                  child: AnimatedOpacity(
+                    opacity: _cta ? 1.0 : 0.0,
+                    duration: MediaQuery.disableAnimationsOf(context)
+                        ? Duration.zero
+                        : AppMotion.enter,
+                    curve: AppMotion.enterCurve,
+                    child: CosmicCtaButton(
                       label: t(context, '${_fr}cta'),
                       disabled: false,
                       onTap: _continue,
                     ),
-                    dur: 400,
                   ),
                 ),
                 const SizedBox(height: 24),
