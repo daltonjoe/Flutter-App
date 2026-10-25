@@ -22,4 +22,10 @@ void main() {
     ];
     expect(topThemes(l), ['feel', 'pull']);
   });
+  test('yon korunur', () {
+    const x = WeightedAspect(1, 4, 1, 2, 'pull', fromA: 4, fromB: 1);
+    expect(x.fromA, 4);
+    expect(x.fromB, 1);
+    expect(const WeightedAspect(1, 4, 1, 2, 'pull').fromA, 0);
+  });
 }

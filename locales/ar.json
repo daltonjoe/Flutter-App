@@ -371,6 +371,7 @@
   "match.filter.all": "الكل",
   "match.filter.harmony": "انسجام",
   "match.filter.tension": "توتّر",
+  "match.dir.title": "{a} (\u0623\u0646\u062a) - {b} (\u0647\u0648), {asp}",
   "match.ask.cta": "اسأل الذكاء الاصطناعي",
   "match.ask.q1": "كيف يبدو هذا بيننا؟",
   "match.ask.q2": "أين قد يُحدث هذا احتكاكًا؟",

@@ -371,6 +371,7 @@
   "match.filter.all": "Tümü",
   "match.filter.harmony": "Uyum",
   "match.filter.tension": "Gerilim",
+  "match.dir.title": "{a} (sen) - {b} (o), {asp}",
   "match.ask.cta": "AI'ya sor",
   "match.ask.q1": "Bu aramızda nasıl hissettirir?",
   "match.ask.q2": "Bu nerede sürtüşme yaratabilir?",

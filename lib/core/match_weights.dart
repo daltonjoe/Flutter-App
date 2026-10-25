@@ -8,7 +8,10 @@ class WeightedAspect {
   final int a, b, asp;
   final double w;
   final String theme;
-  const WeightedAspect(this.a, this.b, this.asp, this.w, this.theme);
+  /// A ve B tarafinin gezegen id (yon); verilmezse 0.
+  final int fromA, fromB;
+  const WeightedAspect(this.a, this.b, this.asp, this.w, this.theme,
+      {this.fromA = 0, this.fromB = 0});
 }
 
 const _imp = {1: 3, 2: 3, 4: 3, 5: 3, 3: 2, 6: 2, 7: 2, 8: 1, 9: 1, 10: 1};

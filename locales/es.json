@@ -371,6 +371,7 @@
   "match.filter.all": "All",
   "match.filter.harmony": "Harmony",
   "match.filter.tension": "Tension",
+  "match.dir.title": "{a} (t\u00fa) - {b} (la otra persona), {asp}",
   "match.ask.cta": "Ask AI",
   "match.ask.q1": "How does this feel between us?",
   "match.ask.q2": "Where could this create friction?",

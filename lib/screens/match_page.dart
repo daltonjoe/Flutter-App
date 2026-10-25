@@ -567,7 +567,7 @@ class _MatchPageState extends State<MatchPage> {
       if (prev == null || x.orb < prev.orb) dedup[k] = x;
     }
     final aspects = dedup.values.take(40).toList();
-    if (_v2) return _v2Body(r, dedup.values.toList(), note);
+    if (_v2) return _v2Body(r, r.aspects, note);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -780,6 +780,18 @@ class _MatchPageState extends State<MatchPage> {
     );
   }
 
+  static String _dirKey(int a, int b, int asp) => '$a>$b-$asp';
+
+  // Yonlu baslik: sen = A, o = B.
+  String _dirTitle(WeightedAspect x) {
+    final s = ReferenceNamesService.instance;
+    return t(context, 'match.dir.title', args: {
+      'a': s.planet(x.fromA),
+      'asp': s.aspect(x.asp),
+      'b': s.planet(x.fromB),
+    });
+  }
+
   List<WeightedAspect> _weighted(List<MatchAspect> l) {
     final out = <WeightedAspect>[];
     for (final x in l) {
@@ -795,6 +807,8 @@ class _MatchPageState extends State<MatchPage> {
           x.aspectTypeId,
           aspectWeight(lo, hi, x.aspectTypeId, x.tightness, m.intensity),
           themeOf(lo, hi),
+          fromA: x.bodyAId,
+          fromB: x.bodyBId,
         ),
       );
     }
@@ -1109,7 +1123,7 @@ class _MatchPageState extends State<MatchPage> {
 
   // M3: bağlamı ekler, soruyu taslağa yazar (gönderilmez).
   Future<void> _askSyn(WeightedAspect x, String qKey) =>
-      _askSynRaw(x.a, x.b, x.asp, qKey, ' ');
+      _askSynRaw(x.fromA, x.fromB, x.asp, qKey, ' ');
 
   Widget _askBlock(WeightedAspect x) {
     return ValueListenableBuilder<bool>(
@@ -1160,10 +1174,9 @@ class _MatchPageState extends State<MatchPage> {
   }
 
   Widget _v2List(List<MatchAspect> all) {
-    final svc = ReferenceNamesService.instance;
     final byKey = <String, MatchAspect>{};
     for (final x in all) {
-      byKey[MatchService.textKey(x.bodyAId, x.bodyBId, x.aspectTypeId)] = x;
+      byKey[_dirKey(x.bodyAId, x.bodyBId, x.aspectTypeId)] = x;
     }
     String keyOf(WeightedAspect x) => MatchService.textKey(x.a, x.b, x.asp);
     String vOf(WeightedAspect x) =>
@@ -1208,7 +1221,7 @@ class _MatchPageState extends State<MatchPage> {
     );
 
     Widget card(WeightedAspect x) {
-      final asp = byKey[keyOf(x)];
+      final asp = byKey[_dirKey(x.fromA, x.fromB, x.asp)];
       final col = _valColor(vOf(x));
       final bar = asp == null ? 0.0 : (1 - asp.tightness).clamp(0.0, 1.0);
       return Padding(
@@ -1240,11 +1253,11 @@ class _MatchPageState extends State<MatchPage> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  _aspectTrio(x.a, x.asp, x.b, 16),
+                  _aspectTrio(x.fromA, x.asp, x.fromB, 16),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
-                      '${svc.planet(x.a)} ${svc.aspect(x.asp)} ${svc.planet(x.b)}',
+                      _dirTitle(x),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.bodyMd(color: AppColors.starlight),
@@ -1337,7 +1350,6 @@ class _MatchPageState extends State<MatchPage> {
         ],
       ),
     );
-    final svc = ReferenceNamesService.instance;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1399,11 +1411,11 @@ class _MatchPageState extends State<MatchPage> {
                   children: [
                     Row(
                       children: [
-                        _aspectTrio(x.a, x.asp, x.b, 20),
+                        _aspectTrio(x.fromA, x.asp, x.fromB, 20),
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: Text(
-                            '${svc.planet(x.a)} ${svc.aspect(x.asp)} ${svc.planet(x.b)}',
+                            _dirTitle(x),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTextStyles.bodyLg(color: AppColors.gold),
