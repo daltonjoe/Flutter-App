@@ -14,6 +14,7 @@ import '../i18n/app_localizations.dart';
 import '../providers/ask_context_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/ask_service.dart';
+import '../services/chat_store.dart';
 import '../services/ad_service.dart';
 import '../services/astro_service.dart';
 import '../providers/active_profile_provider.dart';
@@ -77,6 +78,8 @@ class _AskPageState extends State<AskPage> {
   bool _av = false; // feature_flags.ask_avatars
   String? _partnerId;
   String? _partnerName;
+  String? _act; // V3: aktif profil degisimini izler
+  bool _actSet = false;
   List<Map<String, dynamic>> _partners = [];
   bool _partnersLoaded = false;
   _CreditStatus? _credit; // K39 kalan hak notu
@@ -98,6 +101,7 @@ class _AskPageState extends State<AskPage> {
       if (v && _mode == 'synastry') _autoPartner();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => _onDraft());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadChat());
     SharedPreferences.getInstance().then((p) {
       if (!mounted) return;
       if (!(p.getBool('ask_first_note_seen') ?? false)) {
@@ -164,6 +168,85 @@ class _AskPageState extends State<AskPage> {
       _langReset = false;
       _lastText = '';
     });
+    _loadChat();
+  }
+
+  /// V3: sohbet anahtari (hesap, mod, profil veya sirali cift); null = saklama yok.
+  String? _chatKey() {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    final act = context.read<ActiveProfileProvider>().activeProfileId;
+    if (uid == null || act == null) {
+      return null;
+    }
+    if (_mode == 'synastry') {
+      return _pairOk() ? ChatStore.key(uid, _mode, '${act}_$_partnerId') : null;
+    }
+    return ChatStore.key(uid, _mode, act);
+  }
+
+  void _persist() {
+    final k = _chatKey();
+    if (k == null || _messages.isEmpty) {
+      return;
+    }
+    unawaited(
+      ChatStore.save(
+        k,
+        ChatRecord(
+          msgs: [
+            for (final m in _messages)
+              {'m': m.mine, 't': m.text, 'b': m.bubbles, 's': m.system},
+          ],
+          loc: _loc ?? '',
+          updated: DateTime.now().millisecondsSinceEpoch,
+          month: _fMonth,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _loadChat() async {
+    final k = _chatKey();
+    final gen = _gen;
+    final rec = k == null ? null : await ChatStore.load(k);
+    if (!mounted || gen != _gen || rec == null || rec.loc != _loc) {
+      return;
+    }
+    setState(() {
+      _messages
+        ..clear()
+        ..addAll([
+          for (final m in rec.msgs)
+            _Msg(
+              m['m'] == true,
+              '${m['t']}',
+              bubbles: (m['b'] as List?)?.map((e) => '$e').toList(),
+              system: m['s'] == true,
+            ),
+        ]);
+      if (_mode == 'forecast') {
+        _fMonth = rec.month;
+      }
+    });
+  }
+
+  Future<String?> _lastPartnerId() {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    final act = context.read<ActiveProfileProvider>().activeProfileId;
+    if (uid == null || act == null) {
+      return Future<String?>.value(null);
+    }
+    return ChatStore.lastPartner(uid, act);
+  }
+
+  void _rememberPartner() {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    final act = context.read<ActiveProfileProvider>().activeProfileId;
+    final pid = _partnerId;
+    if (uid == null || act == null || pid == null) {
+      return;
+    }
+    unawaited(ChatStore.setLastPartner(uid, act, pid));
   }
 
   void _onDraft() {
@@ -185,7 +268,34 @@ class _AskPageState extends State<AskPage> {
       _refreshCredit();
       _failed = false;
       _langReset = true;
+      final ck = _chatKey();
+      if (ck != null) {
+        unawaited(ChatStore.remove(ck));
+      }
     }
+    final act = Provider.of<ActiveProfileProvider>(context).activeProfileId;
+    if (_actSet && act != _act) {
+      _gen++;
+      _messages.clear();
+      _waiting = false;
+      _failed = false;
+      _fMonth = null;
+      _partnerId = null;
+      _partnerName = null;
+      _partners = [];
+      _partnersLoaded = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        _loadChat();
+        if (_mode == 'synastry') {
+          _autoPartner();
+        }
+      });
+    }
+    _act = act;
+    _actSet = true;
     _loc = loc;
   }
 
@@ -314,6 +424,7 @@ class _AskPageState extends State<AskPage> {
       _failed = false;
       _langReset = false;
     });
+    _persist();
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
     try {
       final r = await _reply(text);
@@ -323,6 +434,7 @@ class _AskPageState extends State<AskPage> {
         _waiting = false;
         _refreshCredit();
       });
+      _persist();
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
     } catch (e) {
       debugPrint('AskPage reply failed: $e');
@@ -516,12 +628,8 @@ class _AskPageState extends State<AskPage> {
     if (v == _fMonth) return;
     setState(() {
       _fMonth = v;
-      _gen++;
-      _messages.clear();
-      _waiting = false;
-      _refreshCredit();
-      _failed = false;
     });
+    _persist();
   }
 
   /// Öneri kartlarının solundaki gezegen glyph'i — moda göre.
@@ -973,6 +1081,8 @@ class _AskPageState extends State<AskPage> {
       _refreshCredit();
       _failed = false;
     });
+    _loadChat();
+    _rememberPartner();
   }
 
   Future<void> _autoPartner() async {
@@ -982,7 +1092,16 @@ class _AskPageState extends State<AskPage> {
       _partners = l;
       _partnersLoaded = true;
     });
-    if (l.length == 1 && !_pairOk()) _setPartner(l.first);
+    if (_pairOk()) return;
+    final lastId = await _lastPartnerId();
+    if (!mounted) return;
+    for (final p in l) {
+      if ('${p['id']}' == lastId) {
+        _setPartner(p);
+        return;
+      }
+    }
+    if (l.length == 1) _setPartner(l.first);
   }
 
   Future<void> _pickPartner() async {
