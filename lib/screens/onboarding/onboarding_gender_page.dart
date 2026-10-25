@@ -1,3 +1,4 @@
+import 'dart:ui' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../models/onboarding_data.dart';
@@ -116,7 +117,7 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
                 style: AppTextStyles.bodyMd(color: AppColors.mist),
               ),
               Expanded(
-                child: PageView.builder(
+                child: ScrollConfiguration(behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse}), child: PageView.builder(
                   controller: _controller,
                   onPageChanged: _onPageChanged,
                   itemCount: _options.length,
@@ -174,7 +175,7 @@ class _OnboardingGenderPageState extends State<OnboardingGenderPage> {
                       ),
                     );
                   },
-                ),
+                )),
               ),
               const SizedBox(height: AppSpacing.md),
               Row(
