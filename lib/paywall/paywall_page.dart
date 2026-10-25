@@ -10,6 +10,7 @@ import "package:flutter_application/services/user_settings_service.dart";
 import "package:purchases_flutter/purchases_flutter.dart";
 import "paywall_service.dart";
 import '../presentation/widgets/components/cosmic_loader.dart';
+import '../presentation/widgets/components/cosmic_background.dart';
 
 enum PaywallSource { onboarding, quota, settings }
 
@@ -204,8 +205,8 @@ class _PaywallPageState extends State<PaywallPage>
         : null;
     final bool hasSel = _selIdx == 0 ? y != null : m != null;
 
-    return Scaffold(
-      backgroundColor: AppColors.bgDeep,
+    return CosmicBackground(child: Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -336,7 +337,7 @@ class _PaywallPageState extends State<PaywallPage>
           ],
         ),
       ),
-    );
+    ));
   }
 
   /// Mağaza paketinin ücretsiz deneme süresi (gün); teklif yoksa null.
