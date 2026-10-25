@@ -42,12 +42,16 @@ class _Msg {
 
   /// Güvenlik / kota / hata kaynaklı sistem mesajı: aksiyon satırı gösterilmez.
   final bool system;
+
+  /// V4c2: mesaj zamani (ms); eski kayitlarda null.
+  int? ts;
   _Msg(
     this.mine,
     this.text, {
     this.animate = false,
     this.bubbles,
     this.system = false,
+    this.ts,
   });
 }
 
@@ -243,6 +247,29 @@ class _AskPageState extends State<AskPage> {
     if (ak != null) await ChatStore.setPv(ak, cur, _sid);
   }
 
+  /// V4c2: msgs ters sirali; j. mesaj onceki mesajdan farkli gunde mi.
+  bool _newDay(List<_Msg> ms, int j) {
+    if (j + 1 >= ms.length) return false;
+    final a = ms[j].ts;
+    final p = ms[j + 1].ts;
+    if (a == null || p == null) return false;
+    final x = DateTime.fromMillisecondsSinceEpoch(a);
+    final y = DateTime.fromMillisecondsSinceEpoch(p);
+    return x.year != y.year || x.month != y.month || x.day != y.day;
+  }
+
+  Widget _daySep(int ts) {
+    final d = DateTime.fromMillisecondsSinceEpoch(ts);
+    final dd = d.day.toString().padLeft(2, '0');
+    final mm = d.month.toString().padLeft(2, '0');
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      child: Center(
+        child: Text('$dd.$mm.${d.year}', style: AppTextStyles.bodySm(color: AppColors.mist)),
+      ),
+    );
+  }
+
   String? _chatKey() {
     final uid = Supabase.instance.client.auth.currentUser?.id;
     final act = _a();
@@ -266,7 +293,7 @@ class _AskPageState extends State<AskPage> {
     return ChatRecord(
       msgs: [
         for (final m in _messages)
-          {'m': m.mine, 't': m.text, 'b': m.bubbles, 's': m.system},
+          {'m': m.mine, 't': m.text, 'b': m.bubbles, 's': m.system, 'ts': m.ts},
       ],
       loc: _loc ?? '',
       updated: DateTime.now().millisecondsSinceEpoch,
@@ -521,7 +548,7 @@ class _AskPageState extends State<AskPage> {
     final gen = _gen;
     final retry = override != null && _failed;
     setState(() {
-      if (!retry) _messages.add(_Msg(true, text));
+      if (!retry) {_messages.add(_Msg(true, text, ts: DateTime.now().millisecondsSinceEpoch));}
       _waiting = true;
       _failed = false;
       _langReset = false;
@@ -532,7 +559,7 @@ class _AskPageState extends State<AskPage> {
       final r = await _reply(text);
       if (!mounted || gen != _gen) return;
       setState(() {
-        _messages.add(r);
+        _messages.add(r..ts = DateTime.now().millisecondsSinceEpoch);
         _waiting = false;
         _refreshCredit();
       });
@@ -1234,6 +1261,7 @@ class _AskPageState extends State<AskPage> {
           '${m['t']}',
           bubbles: (m['b'] as List?)?.map((e) => '$e').toList(),
           system: m['s'] == true,
+          ts: (m['ts'] as num?)?.toInt(),
         ),
     ];
   }
@@ -1800,7 +1828,15 @@ class _AskPageState extends State<AskPage> {
                         itemCount: msgs.length + extra,
                         itemBuilder: (c, i) {
                           if (_waiting && i == 0) return const StarTyping();
-                          return _bubble(c, msgs[i - extra]);
+                          final m = msgs[i - extra];
+                          final bub = _bubble(c, m);
+                          if (_mode != 'forecast' || !_newDay(msgs, i - extra)) {
+                            return bub;
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [_daySep(m.ts!), bub],
+                          );
                         },
                       ),
               ),
