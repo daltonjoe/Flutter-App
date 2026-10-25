@@ -792,7 +792,7 @@ class _PlacementCard extends StatelessWidget {
   }
 }
 
-/// Harita sayfasındaki Sun/Moon/Ascendant sekmeleri için satır içi yerleşim
+/// Harita sayfasındaki Ascendant sekmesi için satır içi yerleşim
 /// içeriği. Veri yükleme sayfa durumunda (RedesignChartPage) yapılır; bu widget
 /// yalnızca önceden yüklenmiş bölümleri gösterir. Böylece sekme geçişinde
 /// yeniden fetch/loader oluşmaz.
