@@ -119,6 +119,81 @@ class ChatStore {
     }
   }
 
+  /// V4b: bir moda ait arsiv kayitlari, son mesaj tarihine gore yeni once.
+  static Future<List<MapEntry<String, ChatRecord>>> listArch(
+    String uid,
+    String mode,
+  ) async {
+    final out = <MapEntry<String, ChatRecord>>[];
+    try {
+      final p = await SharedPreferences.getInstance();
+      final pre = key(uid, mode, 'arch.');
+      for (final k in p.getKeys().toList()) {
+        if (!k.startsWith(pre)) continue;
+        final r = await load(k);
+        if (r != null) out.add(MapEntry(k, r));
+      }
+    } catch (e) {
+      debugPrint('ChatStore listArch failed: $e');
+    }
+    out.sort((a, b) => b.value.updated.compareTo(a.value.updated));
+    return out;
+  }
+
+  /// V4b: kayitli sohbetin ayni sid ile tutulan aktif kaydinin anahtari, yoksa null.
+  static Future<String?> _activeOf(
+    String uid,
+    String mode,
+    String sid,
+    ChatRecord r,
+  ) async {
+    final pa = r.pa;
+    if (pa == null) return null;
+    final k = key(uid, mode, r.pb == null ? pa : '${pa}_${r.pb}');
+    final a = await load(k);
+    return (a != null && a.sid == sid) ? k : null;
+  }
+
+  static ChatRecord _titled(ChatRecord r, String title) {
+    return ChatRecord(
+      msgs: r.msgs,
+      loc: r.loc,
+      updated: r.updated,
+      month: r.month,
+      sid: r.sid,
+      title: title,
+      pa: r.pa,
+      pb: r.pb,
+      pn: r.pn,
+    );
+  }
+
+  /// V4b: arsiv kaydini ve ayni sid li aktif kaydi siler (geri alinamaz).
+  static Future<void> deleteSaved(String uid, String mode, String sid) async {
+    final ak = archKey(uid, mode, sid);
+    final r = await load(ak);
+    await remove(ak);
+    if (r == null) return;
+    final k = await _activeOf(uid, mode, sid, r);
+    if (k != null) await remove(k);
+  }
+
+  /// V4b: basligi arsivde ve ayni sid li aktif kayitta gunceller; tarih degismez.
+  static Future<void> rename(
+    String uid,
+    String mode,
+    String sid,
+    String title,
+  ) async {
+    final ak = archKey(uid, mode, sid);
+    final r = await load(ak);
+    if (r == null) return;
+    final k = await _activeOf(uid, mode, sid, r);
+    final a = k == null ? null : await load(k);
+    await save(ak, _titled(r, title));
+    if (k != null && a != null) await save(k, _titled(a, title));
+  }
+
   static Future<String?> lastPartner(String uid, String act) async {
     try {
       return (await SharedPreferences.getInstance())

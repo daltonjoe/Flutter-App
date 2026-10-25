@@ -32,6 +32,7 @@ import '../redesign/ask/ask_hero.dart';
 import '../redesign/ask/star_typing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'notes_page.dart';
+import 'chat_history_page.dart';
 
 class _Msg {
   final bool mine;
@@ -75,6 +76,10 @@ class _AskPageState extends State<AskPage> {
   String? _sid; // V4: kayitliysa sohbet kimligi
   String? _title;
   bool _purged = false;
+  String? _ovA; // V4b: acilan kayitli sohbetin profilleri (global profil degismez)
+  String? _ovB;
+  String? _ovName;
+  bool _ro = false; // V4b: silinmis kisi, yalniz okunur
   int _gen = 0;
   String _mode = askMode.value;
   String? _fMonth; // YYYY-MM
@@ -163,6 +168,7 @@ class _AskPageState extends State<AskPage> {
     setState(() {
       _gen++;
       _mode = m;
+      _clearOv();
       _fMonth = null;
       _messages.clear();
       _waiting = false;
@@ -177,17 +183,18 @@ class _AskPageState extends State<AskPage> {
   /// V3: sohbet anahtari (hesap, mod, profil veya sirali cift); null = saklama yok.
   String? _chatKey() {
     final uid = Supabase.instance.client.auth.currentUser?.id;
-    final act = context.read<ActiveProfileProvider>().activeProfileId;
+    final act = _a();
     if (uid == null || act == null) {
       return null;
     }
     if (_mode == 'synastry') {
-      return _pairOk() ? ChatStore.key(uid, _mode, '${act}_$_partnerId') : null;
+      return _pairOk() ? ChatStore.key(uid, _mode, '${act}_${_b()}') : null;
     }
     return ChatStore.key(uid, _mode, act);
   }
 
   String _chatNames() {
+    if (_ovName != null) return _ovName!;
     final a = context.read<ActiveProfileProvider>().summary?.name ?? '';
     if (_mode != 'synastry') return a;
     return '$a \u2192 ${_partnerName ?? ''}';
@@ -204,8 +211,8 @@ class _AskPageState extends State<AskPage> {
       month: _fMonth,
       sid: _sid,
       title: _title,
-      pa: context.read<ActiveProfileProvider>().activeProfileId,
-      pb: _mode == 'synastry' ? _partnerId : null,
+      pa: _a(),
+      pb: _mode == 'synastry' ? _b() : null,
       pn: _chatNames(),
     );
   }
@@ -248,15 +255,7 @@ class _AskPageState extends State<AskPage> {
     setState(() {
       _messages
         ..clear()
-        ..addAll([
-          for (final m in rec.msgs)
-            _Msg(
-              m['m'] == true,
-              '${m['t']}',
-              bubbles: (m['b'] as List?)?.map((e) => '$e').toList(),
-              system: m['s'] == true,
-            ),
-        ]);
+        ..addAll(_msgsOf(rec));
       if (_mode == 'forecast') {
         _fMonth = rec.month;
       }
@@ -303,6 +302,7 @@ class _AskPageState extends State<AskPage> {
       _refreshCredit();
       _failed = false;
       _langReset = true;
+      _clearOv();
       _sid = null;
       _title = null;
       final ck = _chatKey();
@@ -317,6 +317,7 @@ class _AskPageState extends State<AskPage> {
       _waiting = false;
       _failed = false;
       _fMonth = null;
+      _clearOv();
       _partnerId = null;
       _partnerName = null;
       _partners = [];
@@ -367,10 +368,8 @@ class _AskPageState extends State<AskPage> {
               {
                 'type': 'synastry_pair',
                 'refs': {
-                  'profile_a': context
-                      .read<ActiveProfileProvider>()
-                      .activeProfileId,
-                  'profile_b': _partnerId,
+                  'profile_a': _a(),
+                  'profile_b': _b(),
                 },
               },
             ]
@@ -381,7 +380,7 @@ class _AskPageState extends State<AskPage> {
         for (final m in last)
           {'role': m.mine ? 'user' : 'assistant', 'text': m.text},
       ],
-      profileId: context.read<ActiveProfileProvider>().activeProfileId,
+      profileId: _a(),
       mode: _mode,
       forecastMonth: _mode == 'forecast' ? _fMonth : null,
     );
@@ -1098,8 +1097,9 @@ class _AskPageState extends State<AskPage> {
   }
 
   void _resetChat() {
-    final k = _chatKey();
+    final k = _ovA == null ? _chatKey() : null;
     setState(() {
+      _clearOv();
       _gen++;
       _messages.clear();
       _waiting = false;
@@ -1147,9 +1147,107 @@ class _AskPageState extends State<AskPage> {
     _resetChat();
   }
 
+  String? _a() =>
+      _ovA ?? context.read<ActiveProfileProvider>().activeProfileId;
+
+  String? _b() => _ovB ?? _partnerId;
+
+  void _clearOv() {
+    _ovA = null;
+    _ovB = null;
+    _ovName = null;
+    _ro = false;
+  }
+
+  List<_Msg> _msgsOf(ChatRecord r) {
+    return [
+      for (final m in r.msgs)
+        _Msg(
+          m['m'] == true,
+          '${m['t']}',
+          bubbles: (m['b'] as List?)?.map((e) => '$e').toList(),
+          system: m['s'] == true,
+        ),
+    ];
+  }
+
+  /// V4b: gecmisten secilen kayitli sohbeti, global profili degistirmeden acar.
+  void _openSaved(HistoryPick p) {
+    final r = p.rec;
+    setState(() {
+      _gen++;
+      _waiting = false;
+      _failed = false;
+      _langReset = false;
+      _lastText = '';
+      _ovA = r.pa;
+      _ovB = r.pb;
+      _ovName = r.pn;
+      _ro = p.deleted;
+      _sid = r.sid;
+      _title = r.title;
+      if (_mode == 'forecast') _fMonth = r.month;
+      _messages
+        ..clear()
+        ..addAll(_msgsOf(r));
+    });
+  }
+
+  Future<void> _openHistory() async {
+    if (_messages.isNotEmpty && _sid == null) {
+      await _newChat();
+      if (!mounted || (_messages.isNotEmpty && _sid == null)) return;
+    }
+    final nav = Navigator.of(context);
+    final pick = await nav.push<HistoryPick>(
+      MaterialPageRoute<HistoryPick>(
+        builder: (_) => ChatHistoryPage(mode: _mode),
+      ),
+    );
+    if (!mounted) return;
+    if (pick != null) {
+      _openSaved(pick);
+      return;
+    }
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    final sid = _sid;
+    if (uid == null || sid == null) return;
+    final rec = await ChatStore.load(ChatStore.archKey(uid, _mode, sid));
+    if (!mounted) return;
+    if (rec == null) {
+      _resetChat();
+    } else {
+      setState(() => _title = rec.title);
+    }
+  }
+
+  Widget _roNote(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.sm,
+        AppSpacing.md,
+        AppSpacing.md,
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.visibility_outlined, size: 18),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Text(
+              t(context, 'ask.person_deleted'),
+              style: AppTextStyles.bodyMd(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   bool _pairOk() {
-    final act = context.read<ActiveProfileProvider>().activeProfileId;
-    return _partnerId != null && act != null && _partnerId != act;
+    final a = _a();
+    final b = _b();
+    return b != null && a != null && b != a;
   }
 
   Future<List<Map<String, dynamic>>> _loadPartners() async {
@@ -1172,6 +1270,7 @@ class _AskPageState extends State<AskPage> {
 
   void _setPartner(Map<String, dynamic> p) {
     setState(() {
+      _clearOv();
       _partnerId = '${p['id']}';
       _partnerName = '${p['display_name'] ?? ''}';
       _gen++;
@@ -1515,6 +1614,11 @@ class _AskPageState extends State<AskPage> {
         appBar: AppBar(
           title: Text(t(context, 'ask.title')),
           actions: [
+            IconButton(
+              tooltip: t(context, 'ask.history'),
+              icon: const Icon(Icons.history_rounded),
+              onPressed: _openHistory,
+            ),
             if (_av)
               IconButton(
                 tooltip: t(context, 'notes.title'),
@@ -1672,7 +1776,7 @@ class _AskPageState extends State<AskPage> {
                   ),
                 ),
               _contextStrip(context),
-              _composer(context),
+              _ro ? _roNote(context) : _composer(context),
               // Klavye kapalıyken yüzen çubuğun üstünde 12 px boşluk bırakır
               // (bottomNavInset güvenli alanı da içerir); klavye açıkken
               // Scaffold inset'i klavyeyi karşılar, yalnız 12 px pay kalır.

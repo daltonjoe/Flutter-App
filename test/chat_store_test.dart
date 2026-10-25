@@ -98,4 +98,60 @@ void main() {
     expect(await ChatStore.load(e), isNotNull);
     expect(await ChatStore.lastPartner('u1', 'p1'), 'p2');
   });
+
+  ChatRecord rec(
+    int updated, {
+    String? sid,
+    String? title,
+    String? pa,
+    String? pb,
+  }) {
+    return ChatRecord(
+      msgs: const [],
+      loc: 'tr',
+      updated: updated,
+      sid: sid,
+      title: title,
+      pa: pa,
+      pb: pb,
+    );
+  }
+
+  test('listArch is per mode and newest first', () async {
+    await ChatStore.save(ChatStore.archKey('u1', 'natal', 'a'), rec(1, sid: 'a'));
+    await ChatStore.save(ChatStore.archKey('u1', 'natal', 'b'), rec(9, sid: 'b'));
+    await ChatStore.save(ChatStore.archKey('u1', 'forecast', 'c'), rec(5, sid: 'c'));
+    await ChatStore.save(ChatStore.archKey('u2', 'natal', 'd'), rec(7, sid: 'd'));
+    final l = await ChatStore.listArch('u1', 'natal');
+    expect([for (final e in l) e.value.sid], ['b', 'a']);
+  });
+
+  test('deleteSaved removes the archive and the matching active record', () async {
+    await ChatStore.save(ChatStore.archKey('u1', 'natal', 's1'), rec(1, sid: 's1', pa: 'p1'));
+    await ChatStore.save(ChatStore.key('u1', 'natal', 'p1'), rec(2, sid: 's1', pa: 'p1'));
+    await ChatStore.save(ChatStore.archKey('u1', 'natal', 's2'), rec(1, sid: 's2', pa: 'p2'));
+    await ChatStore.save(ChatStore.key('u1', 'natal', 'p2'), rec(2, sid: 'x', pa: 'p2'));
+    await ChatStore.save(ChatStore.archKey('u1', 'synastry', 's3'), rec(1, sid: 's3', pa: 'p1', pb: 'p2'));
+    await ChatStore.save(ChatStore.key('u1', 'synastry', 'p1_p2'), rec(2, sid: 's3', pa: 'p1', pb: 'p2'));
+    await ChatStore.deleteSaved('u1', 'natal', 's1');
+    await ChatStore.deleteSaved('u1', 'natal', 's2');
+    await ChatStore.deleteSaved('u1', 'synastry', 's3');
+    expect(await ChatStore.load(ChatStore.archKey('u1', 'natal', 's1')), isNull);
+    expect(await ChatStore.load(ChatStore.key('u1', 'natal', 'p1')), isNull);
+    expect(await ChatStore.load(ChatStore.archKey('u1', 'natal', 's2')), isNull);
+    final other = await ChatStore.load(ChatStore.key('u1', 'natal', 'p2'));
+    expect(other!.sid, 'x');
+    expect(await ChatStore.load(ChatStore.key('u1', 'synastry', 'p1_p2')), isNull);
+  });
+
+  test('rename updates archive and active record and keeps the date', () async {
+    await ChatStore.save(ChatStore.archKey('u1', 'natal', 's1'), rec(4, sid: 's1', title: 'Old', pa: 'p1'));
+    await ChatStore.save(ChatStore.key('u1', 'natal', 'p1'), rec(4, sid: 's1', title: 'Old', pa: 'p1'));
+    await ChatStore.rename('u1', 'natal', 's1', 'New');
+    final a = await ChatStore.load(ChatStore.archKey('u1', 'natal', 's1'));
+    final k = await ChatStore.load(ChatStore.key('u1', 'natal', 'p1'));
+    expect(a!.title, 'New');
+    expect(a.updated, 4);
+    expect(k!.title, 'New');
+  });
 }
