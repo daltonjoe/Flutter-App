@@ -264,6 +264,7 @@ class ChartExtras extends StatelessWidget {
     final body = t(context, 'rd.chart.rx_info');
 
     showModalBottomSheet<void>(
+      useRootNavigator: true,
       context: context,
 
       backgroundColor: AppColors.navyRaised,

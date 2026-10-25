@@ -1069,6 +1069,7 @@ class _AskPageState extends State<AskPage> {
 
   Future<void> _reportReply(_Msg m) async {
     final reason = await showModalBottomSheet<String>(
+      useRootNavigator: true,
       context: context,
       builder: (ctx) => SafeArea(
         child: Column(
@@ -1478,6 +1479,7 @@ class _AskPageState extends State<AskPage> {
       return;
     }
     final p = await showModalBottomSheet<Map<String, dynamic>>(
+      useRootNavigator: true,
       context: context,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       builder: (ctx) => SafeArea(
