@@ -18,6 +18,18 @@ class AppMotion {
   /// Eya (AskPage) gap between sequential bubbles.
   static const bubbleGap = Duration(milliseconds: 450);
 
+  /// Onboarding yaziyor gostergesi suresi: baz + karakter basina, alt ve ust sinirli.
+  static const int typingBaseMs = 400;
+  static const int typingPerCharMs = 20;
+  static const int typingMinMs = 800;
+  static const int typingMaxMs = 3500;
+
+  static Duration typingFor(int chars) => Duration(
+    milliseconds: (typingBaseMs + typingPerCharMs * chars)
+        .clamp(typingMinMs, typingMaxMs)
+        .toInt(),
+  );
+
   static const enterCurve = Curves.easeOutCubic;
   static const resolutionCurve = Curves.easeInOutCubic;
 }

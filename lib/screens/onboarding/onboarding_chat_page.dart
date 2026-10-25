@@ -19,6 +19,7 @@ import '../../models/onboarding_profile.dart';
 import '../../presentation/widgets/components/cosmic_background.dart';
 import '../../presentation/widgets/components/cosmic_chip.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
+import '../../redesign/ask/star_typing.dart';
 import '../../services/ad_service.dart';
 
 // ── Sabit anahtar tabloları (id → tam anahtar; birleştirme yok) ──────────
@@ -198,7 +199,6 @@ const Map<String, String> _notesExplainByTone = {
 
 const String _kWelcome = 'onboarding.chat.c0.welcome';
 const String _kIntro = 'onboarding.chat.c0.intro';
-const String _kTyping = 'onboarding.chat.typing';
 const String _kCta = 'onboarding.chat.close.continue';
 const String _kNotifAllow = 'onboarding.chat.notif.allow';
 const String _kNotifLater = 'onboarding.chat.notif.later';
@@ -354,8 +354,6 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
 
   bool get _reduce => MediaQuery.disableAnimationsOf(context);
 
-  Duration get _delay => _reduce ? Duration.zero : AppMotion.enter;
-
   void _scrollEnd() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) {
@@ -379,7 +377,7 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
     setState(() => _typing = true);
     _scrollEnd();
     _timer?.cancel();
-    _timer = Timer(_delay, () {
+    _timer = Timer(AppMotion.typingFor(text.length), () {
       if (!mounted) return;
       setState(() {
         _typing = false;
@@ -662,7 +660,7 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
       padding: const EdgeInsetsDirectional.only(top: AppSpacing.md),
       itemCount: count,
       itemBuilder: (context, i) {
-        if (i == _lines.length) return _typingBubble();
+        if (i == _lines.length) return const StarTyping();
         final line = _lines[i];
         return Align(
           alignment: line.mine
@@ -700,31 +698,6 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
     );
   }
 
-  Widget _typingBubble() {
-    final reduce = MediaQuery.disableAnimationsOf(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Align(
-        alignment: AlignmentDirectional.centerStart,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm + AppSpacing.xs,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.innerBr,
-            color: AppColors.bgSurface,
-            border: Border.all(color: AppColors.hairline),
-          ),
-          child: Semantics(
-            label: t(context, _kTyping),
-            child: _TypingDots(animate: !reduce),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _optionsArea() {
     if (_options.isEmpty) return const SizedBox.shrink();
     return ConstrainedBox(
@@ -758,79 +731,6 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
             child: CosmicChip(label: label),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Yazıyor göstergesi — harekete duyarlı kullanıcıda sabit kalır.
-class _TypingDots extends StatefulWidget {
-  const _TypingDots({required this.animate});
-
-  final bool animate;
-
-  @override
-  State<_TypingDots> createState() => _TypingDotsState();
-}
-
-class _TypingDotsState extends State<_TypingDots>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-    vsync: this,
-    duration: AppMotion.resolution,
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.animate) _c.repeat();
-  }
-
-  @override
-  void didUpdateWidget(covariant _TypingDots oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.animate && !_c.isAnimating) {
-      _c.repeat();
-    } else if (!widget.animate && _c.isAnimating) {
-      _c.stop();
-    }
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  double _alpha(int i) {
-    final phase = (_c.value - i * 0.2) % 1.0;
-    return 0.35 + 0.55 * (1 - (phase * 2 - 1).abs());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!widget.animate) {
-      return const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _Dot(0.7),
-          SizedBox(width: AppSpacing.xs),
-          _Dot(0.7),
-          SizedBox(width: AppSpacing.xs),
-          _Dot(0.7),
-        ],
-      );
-    }
-    return AnimatedBuilder(
-      animation: _c,
-      builder: (context, _) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < 3; i++) ...[
-            if (i > 0) const SizedBox(width: AppSpacing.xs),
-            _Dot(_alpha(i)),
-          ],
-        ],
       ),
     );
   }
@@ -904,22 +804,4 @@ class _RevealTextState extends State<_RevealText> {
   @override
   Widget build(BuildContext context) =>
       Text(widget.text.substring(0, _n), style: widget.style);
-}
-
-class _Dot extends StatelessWidget {
-  const _Dot(this.alpha);
-
-  final double alpha;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: AppSpacing.sm,
-      height: AppSpacing.sm,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.gold.withValues(alpha: alpha),
-      ),
-    );
-  }
 }
