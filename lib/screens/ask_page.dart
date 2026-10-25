@@ -72,6 +72,9 @@ class _AskPageState extends State<AskPage> {
   String _errKey = 'ask.error';
   String? _loc;
   bool _langReset = false;
+  String? _sid; // V4: kayitliysa sohbet kimligi
+  String? _title;
+  bool _purged = false;
   int _gen = 0;
   String _mode = askMode.value;
   String? _fMonth; // YYYY-MM
@@ -184,28 +187,58 @@ class _AskPageState extends State<AskPage> {
     return ChatStore.key(uid, _mode, act);
   }
 
-  void _persist() {
-    final k = _chatKey();
-    if (k == null || _messages.isEmpty) {
-      return;
-    }
-    unawaited(
-      ChatStore.save(
-        k,
-        ChatRecord(
-          msgs: [
-            for (final m in _messages)
-              {'m': m.mine, 't': m.text, 'b': m.bubbles, 's': m.system},
-          ],
-          loc: _loc ?? '',
-          updated: DateTime.now().millisecondsSinceEpoch,
-          month: _fMonth,
-        ),
-      ),
+  String _chatNames() {
+    final a = context.read<ActiveProfileProvider>().summary?.name ?? '';
+    if (_mode != 'synastry') return a;
+    return '$a \u2192 ${_partnerName ?? ''}';
+  }
+
+  ChatRecord _record() {
+    return ChatRecord(
+      msgs: [
+        for (final m in _messages)
+          {'m': m.mine, 't': m.text, 'b': m.bubbles, 's': m.system},
+      ],
+      loc: _loc ?? '',
+      updated: DateTime.now().millisecondsSinceEpoch,
+      month: _fMonth,
+      sid: _sid,
+      title: _title,
+      pa: context.read<ActiveProfileProvider>().activeProfileId,
+      pb: _mode == 'synastry' ? _partnerId : null,
+      pn: _chatNames(),
     );
   }
 
+  String? _archKey() {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    final sid = _sid;
+    if (uid == null || sid == null) return null;
+    return ChatStore.archKey(uid, _mode, sid);
+  }
+
+  /// Aktif kaydi ve (kayitliysa) arsiv kaydini yazar.
+  Future<void> _flush() async {
+    final k = _chatKey();
+    if (k == null || _messages.isEmpty) return;
+    final r = _record();
+    await ChatStore.save(k, r);
+    final ak = _archKey();
+    if (ak != null) await ChatStore.save(ak, r);
+  }
+
+  void _persist() {
+    unawaited(_flush());
+  }
+
   Future<void> _loadChat() async {
+    _sid = null;
+    _title = null;
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (!_purged && uid != null) {
+      _purged = true;
+      await ChatStore.purgeStale(uid, DateTime.now());
+    }
     final k = _chatKey();
     final gen = _gen;
     final rec = k == null ? null : await ChatStore.load(k);
@@ -227,6 +260,8 @@ class _AskPageState extends State<AskPage> {
       if (_mode == 'forecast') {
         _fMonth = rec.month;
       }
+      _sid = rec.sid;
+      _title = rec.title;
     });
   }
 
@@ -268,6 +303,8 @@ class _AskPageState extends State<AskPage> {
       _refreshCredit();
       _failed = false;
       _langReset = true;
+      _sid = null;
+      _title = null;
       final ck = _chatKey();
       if (ck != null) {
         unawaited(ChatStore.remove(ck));
@@ -1048,6 +1085,68 @@ class _AskPageState extends State<AskPage> {
     );
   }
 
+  /// V4: sohbeti kaydedildi olarak isaretler; baslik ilk sorunun ilk 40 karakteri.
+  void _markSaved() {
+    if (_messages.isEmpty) return;
+    final first =
+        _messages.firstWhere((m) => m.mine, orElse: () => _messages.first).text;
+    final s = first.replaceAll(RegExp(r'\s+'), ' ').trim();
+    setState(() {
+      _sid ??= DateTime.now().microsecondsSinceEpoch.toString();
+      _title ??= s.length > 40 ? '${s.substring(0, 40).trimRight()}...' : s;
+    });
+  }
+
+  void _resetChat() {
+    final k = _chatKey();
+    setState(() {
+      _gen++;
+      _messages.clear();
+      _waiting = false;
+      _failed = false;
+      _langReset = false;
+      _lastText = '';
+      _sid = null;
+      _title = null;
+    });
+    if (k != null) {
+      unawaited(ChatStore.remove(k));
+    }
+  }
+
+  Future<void> _newChat() async {
+    if (_messages.isEmpty || _waiting) return;
+    if (_sid == null) {
+      final r = await showDialog<String>(
+        context: context,
+        builder: (c) => AlertDialog(
+          content: Text(t(c, 'ask.unsaved')),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(c),
+              child: Text(t(c, 'common.cancel')),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(c, 'del'),
+              child: Text(t(c, 'ask.delete')),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(c, 'save'),
+              child: Text(t(c, 'ask.save')),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || r == null) return;
+      if (r == 'save') {
+        _markSaved();
+        await _flush();
+      }
+    }
+    if (!mounted) return;
+    _resetChat();
+  }
+
   bool _pairOk() {
     final act = context.read<ActiveProfileProvider>().activeProfileId;
     return _partnerId != null && act != null && _partnerId != act;
@@ -1423,6 +1522,27 @@ class _AskPageState extends State<AskPage> {
                 onPressed: () => Navigator.of(
                   context,
                 ).push(MaterialPageRoute(builder: (_) => const NotesPage())),
+              ),
+            if (_messages.isNotEmpty)
+              IconButton(
+                tooltip: t(context, _sid == null ? 'ask.save' : 'ask.saved'),
+                icon: Icon(
+                  _sid == null
+                      ? Icons.save_outlined
+                      : Icons.check_circle_outline_rounded,
+                ),
+                onPressed: _sid == null
+                    ? () {
+                        _markSaved();
+                        _persist();
+                      }
+                    : null,
+              ),
+            if (_messages.isNotEmpty)
+              IconButton(
+                tooltip: t(context, 'ask.new_chat'),
+                icon: const Icon(Icons.add_comment_outlined),
+                onPressed: _waiting ? null : _newChat,
               ),
             const ProfileAvatarButton(),
           ],

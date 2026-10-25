@@ -10,6 +10,11 @@ class ChatRecord {
     required this.loc,
     required this.updated,
     this.month,
+    this.sid,
+    this.title,
+    this.pa,
+    this.pb,
+    this.pn,
   });
 
   /// Her mesaj: m (benim mi), t (metin), b (balonlar), s (sistem).
@@ -17,6 +22,13 @@ class ChatRecord {
   final String loc;
   final int updated;
   final String? month;
+
+  /// V4: kayitli sohbet kimligi (null = kaydedilmemis), baslik, profil kimlikleri, gorunen ad.
+  final String? sid;
+  final String? title;
+  final String? pa;
+  final String? pb;
+  final String? pn;
 }
 
 /// Anahtar: chat.v1.UID.MOD.PROFIL (iliskide PROFIL = a_b). Hata olursa sessizce null doner.
@@ -26,6 +38,31 @@ class ChatStore {
 
   static String _partnerKey(String uid, String act) =>
       'chat.v1.$uid.synastry.last.$act';
+
+  /// V4: kayitli sohbetin arsiv anahtari.
+  static String archKey(String uid, String mode, String sid) =>
+      key(uid, mode, 'arch.$sid');
+
+  /// V4: kaydedilmemis ve onceki gunden kalan aktif sohbetleri siler.
+  static Future<void> purgeStale(String uid, DateTime now) async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      final pre = 'chat.v1.$uid.';
+      for (final k in p.getKeys().toList()) {
+        if (!k.startsWith(pre) || k.contains('.arch.') || k.contains('.last.')) {
+          continue;
+        }
+        final r = await load(k);
+        if (r == null || r.sid != null) continue;
+        final d = DateTime.fromMillisecondsSinceEpoch(r.updated);
+        if (d.year != now.year || d.month != now.month || d.day != now.day) {
+          await p.remove(k);
+        }
+      }
+    } catch (e) {
+      debugPrint('ChatStore purgeStale failed: $e');
+    }
+  }
 
   static Future<ChatRecord?> load(String k) async {
     try {
@@ -40,6 +77,11 @@ class ChatStore {
         loc: '${m['loc'] ?? ''}',
         updated: (m['updated'] as num?)?.toInt() ?? 0,
         month: m['month'] as String?,
+        sid: m['sid'] as String?,
+        title: m['title'] as String?,
+        pa: m['pa'] as String?,
+        pb: m['pb'] as String?,
+        pn: m['pn'] as String?,
       );
     } catch (e) {
       debugPrint('ChatStore load failed: $e');
@@ -57,6 +99,11 @@ class ChatStore {
           'loc': r.loc,
           'updated': r.updated,
           'month': r.month,
+          'sid': r.sid,
+          'title': r.title,
+          'pa': r.pa,
+          'pb': r.pb,
+          'pn': r.pn,
         }),
       );
     } catch (e) {

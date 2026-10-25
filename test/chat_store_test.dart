@@ -50,4 +50,52 @@ void main() {
     expect(await ChatStore.lastPartner('u1', 'p1'), 'p2');
     expect(await ChatStore.lastPartner('u1', 'p3'), isNull);
   });
+
+  test('archive key and saved fields roundtrip', () async {
+    final k = ChatStore.archKey('u1', 'natal', 's1');
+    expect(k, 'chat.v1.u1.natal.arch.s1');
+    await ChatStore.save(
+      k,
+      const ChatRecord(
+        msgs: [],
+        loc: 'tr',
+        updated: 1,
+        sid: 's1',
+        title: 'T',
+        pa: 'p1',
+        pb: 'p2',
+        pn: 'A',
+      ),
+    );
+    final r = await ChatStore.load(k);
+    expect(r!.sid, 's1');
+    expect(r.title, 'T');
+    expect(r.pa, 'p1');
+    expect(r.pb, 'p2');
+    expect(r.pn, 'A');
+  });
+
+  test('purgeStale removes only old unsaved active chats', () async {
+    final now = DateTime(2026, 10, 25, 12);
+    final old = DateTime(2026, 10, 24, 23).millisecondsSinceEpoch;
+    final today = DateTime(2026, 10, 25, 1).millisecondsSinceEpoch;
+    final a = ChatStore.key('u1', 'natal', 'p1');
+    final b = ChatStore.key('u1', 'forecast', 'p1');
+    final c = ChatStore.key('u1', 'natal', 'p2');
+    final d = ChatStore.archKey('u1', 'natal', 's9');
+    final e = ChatStore.key('u2', 'natal', 'p1');
+    await ChatStore.save(a, ChatRecord(msgs: [], loc: 'tr', updated: old));
+    await ChatStore.save(b, ChatRecord(msgs: [], loc: 'tr', updated: old, sid: 's2'));
+    await ChatStore.save(c, ChatRecord(msgs: [], loc: 'tr', updated: today));
+    await ChatStore.save(d, ChatRecord(msgs: [], loc: 'tr', updated: old));
+    await ChatStore.save(e, ChatRecord(msgs: [], loc: 'tr', updated: old));
+    await ChatStore.setLastPartner('u1', 'p1', 'p2');
+    await ChatStore.purgeStale('u1', now);
+    expect(await ChatStore.load(a), isNull);
+    expect(await ChatStore.load(b), isNotNull);
+    expect(await ChatStore.load(c), isNotNull);
+    expect(await ChatStore.load(d), isNotNull);
+    expect(await ChatStore.load(e), isNotNull);
+    expect(await ChatStore.lastPartner('u1', 'p1'), 'p2');
+  });
 }
