@@ -137,6 +137,7 @@ class _AskPageState extends State<AskPage> {
     final r = askBridgeReq.value;
     if (r == null || r.length < 3 || !mounted) return;
     askBridgeReq.value = null;
+    if (_locked) return;
     final act = context.read<ActiveProfileProvider>().activeProfileId;
     if (act == null || act != r[0]) {
       askMode.value = 'natal';
@@ -163,9 +164,26 @@ class _AskPageState extends State<AskPage> {
     }();
   }
 
+  /// Y1: cevap beklenirken ve yazilirken mod sekmeleri kilitli.
+  bool get _locked =>
+      _waiting ||
+      (_messages.isNotEmpty && !_messages.last.mine && _messages.last.animate);
+
+  /// Y1: yazimi biten mesaj kilidi acar; yeniden cizim istenir.
+  void _animDone(_Msg m) {
+    m.animate = false;
+    Future<void>.microtask(() {
+      if (mounted) setState(() {});
+    });
+  }
+
   void _onMode() {
     final m = askMode.value;
     if (!mounted || m == _mode) return;
+    if (_locked) {
+      askMode.value = _mode;
+      return;
+    }
     if (m == 'synastry') {
       WidgetsBinding.instance.addPostFrameCallback((_) => _autoPartner());
     }
@@ -1163,7 +1181,7 @@ class _AskPageState extends State<AskPage> {
                       key: ObjectKey(m),
                       text: m.text,
                       style: AppTextStyles.bodyLg(),
-                      onDone: () => m.animate = false,
+                      onDone: () => _animDone(m),
                     )
                   : Text(m.text, style: AppTextStyles.bodyLg()),
             ),
@@ -1178,7 +1196,7 @@ class _AskPageState extends State<AskPage> {
       key: ObjectKey(m),
       texts: texts,
       animate: m.animate,
-      onAllDone: () => m.animate = false,
+      onAllDone: () => _animDone(m),
       item: (i, txt, anim, done, k) => _box(context, i, txt, anim, done, k),
     );
   }
@@ -1804,7 +1822,7 @@ class _AskPageState extends State<AskPage> {
                   AppSpacing.md,
                   0,
                 ),
-                child: CosmicSegmented<String>(
+                child: IgnorePointer(ignoring: _locked, child: AnimatedOpacity(opacity: _locked ? 0.5 : 1.0, duration: AppMotion.chipFill, child: CosmicSegmented<String>(
                   selected: _mode,
                   onChanged: (v) => askMode.value = v, // sıfırlama _onMode'da
                   items: [
@@ -1829,7 +1847,7 @@ class _AskPageState extends State<AskPage> {
                         label: t(context, 'ask.avatar.synastry.name'),
                       ),
                   ],
-                ),
+                ))),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(
