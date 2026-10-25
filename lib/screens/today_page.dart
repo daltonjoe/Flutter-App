@@ -46,6 +46,8 @@ import 'edit_birth_data_page.dart';
 
 import 'transit_detail_page.dart';
 
+import 'cosmic_pulse_card.dart';
+
 import '../models/ask_context.dart';
 
 import '../providers/ask_context_provider.dart';
@@ -1475,6 +1477,12 @@ class _TodayPageState extends State<TodayPage> {
 
         if (head != null) ...[
           _headlineSection(head, tag, loc),
+
+          const SizedBox(height: 20),
+        ],
+
+        if (isToday) ...[
+          const CosmicPulseCard(),
 
           const SizedBox(height: 20),
         ],
