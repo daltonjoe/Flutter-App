@@ -318,7 +318,9 @@ class _AskPageState extends State<AskPage> {
   Future<void> _flush() async {
     final k = _chatKey();
     if (k == null || _messages.isEmpty) return;
-    _pv ??= await _pvNow();
+    final pv = _pv ?? await _pvNow();
+    if (k != _chatKey() || _messages.isEmpty) return;
+    _pv ??= pv;
     final r = _record();
     await ChatStore.save(k, r);
     final ak = _archKey();
@@ -334,24 +336,21 @@ class _AskPageState extends State<AskPage> {
   Future<void> _lateReply(String? ck, String md, _Msg r) async {
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (ck == null || uid == null) return;
-    final n = await ChatStore.appendMsg(ck, uid, md, {
+    if (_ovA == null && md == _mode && _chatKey() == ck) {
+      setState(() {
+        _messages.add(r);
+      });
+      _persist();
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
+      return;
+    }
+    await ChatStore.appendMsg(ck, uid, md, {
       'm': r.mine,
       't': r.text,
       'b': r.bubbles,
       's': r.system,
       'ts': r.ts,
     });
-    if (n == null || !mounted || _waiting || _ovA != null || _chatKey() != ck) {
-      return;
-    }
-    setState(() {
-      _messages
-        ..clear()
-        ..addAll(_msgsOf(n));
-      _sid = n.sid;
-      _title = n.title;
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
   }
 
   Future<void> _loadChat() async {
