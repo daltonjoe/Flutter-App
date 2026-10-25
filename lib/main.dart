@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/cosmic_theme.dart';
@@ -70,7 +71,9 @@ void main() async {
       debugPrint('Anonymous Supabase sign-in failed: $e');
     }
   }
-  _netFail80 = Supabase.instance.client.auth.currentSession == null;
+  _netFail80 =
+      Supabase.instance.client.auth.currentSession == null ||
+      !await _reachable80();
 
   await activeProfileProvider.load();
   final sessionController = SessionController(
@@ -352,6 +355,21 @@ Future<void> _showNotFound80(BuildContext context) async {
   nav.popUntil((r) => r.isFirst);
 }
 
+Future<bool> _reachable80() async {
+  try {
+    await http
+        .get(
+          Uri.parse('${SupabaseConfig.url}/auth/v1/health'),
+          headers: {'apikey': SupabaseConfig.anonKey},
+        )
+        .timeout(const Duration(seconds: 4));
+    return true;
+  } catch (e) {
+    debugPrint('net check failed: $e');
+    return false;
+  }
+}
+
 Future<void> showNetError80(BuildContext context) async {
   if (_netOpen80) return;
   _netOpen80 = true;
@@ -386,7 +404,7 @@ Future<void> _netRetry80() async {
       debugPrint('net retry sign-in failed: $e');
     }
   }
-  _netFail80 = c.auth.currentSession == null;
+  _netFail80 = c.auth.currentSession == null || !await _reachable80();
   try {
     await _ctl80?.refresh();
   } catch (e) {
