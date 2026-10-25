@@ -1,3 +1,5 @@
+import '../../services/ai_consent_service.dart';
+import '../../services/ask_service.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -134,6 +136,7 @@ class _OnboardingRelationshipPageState
           onNotes: (n) => notes = n,
           onDone: () {
             if (widget.isFirstProfile && notes.isNotEmpty) {
+              _saveNotes(notes).ignore();
               navigator.pushReplacement(
                 MaterialPageRoute<void>(
                   builder: (_) => OnboardingNotesIntroPage(
@@ -149,6 +152,19 @@ class _OnboardingRelationshipPageState
         ),
       ),
     );
+  }
+
+  /// Y5: onboarding notlari Notlarim a yazilir; hata sessiz, limit asilirsa durur.
+  Future<void> _saveNotes(List<String> notes) async {
+    await AiConsentService.grantAi();
+    for (final n in notes) {
+      try {
+        await AskService.memoryAdd(n);
+      } catch (e) {
+        debugPrint('onboarding note save failed: $e');
+        if (AskService.memoryErrKey(e) == 'notes.limit') break;
+      }
+    }
   }
 
   Future<void> _generateAndSaveChart({

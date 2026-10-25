@@ -314,7 +314,7 @@ class OnboardingChatPage extends StatefulWidget {
   final Future<void> Function()? initAds;
 
   /// Sohbet bitince üretilen not metinleriyle (kayıt sırasıyla) çağrılır.
-  /// Not yoksa boş liste gelir; yalnızca tanıtım içindir, kaydedilmez.
+  /// Not yoksa bos liste gelir.
   final void Function(List<String> notes)? onNotes;
 
   @override
