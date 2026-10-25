@@ -711,6 +711,7 @@ class _AskPageState extends State<AskPage> {
     final yc = FixedExtentScrollController(initialItem: y - y0);
     final ok = await showModalBottomSheet<bool>(
       context: context,
+      useRootNavigator: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       builder: (ctx) => SafeArea(
         child: Column(
