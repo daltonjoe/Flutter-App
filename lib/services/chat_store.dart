@@ -117,6 +117,33 @@ class ChatStore {
     }
   }
 
+  /// V9a: kayda mesaj ekler (aktif kayit ve varsa arsiv); kayit yoksa null.
+  static Future<ChatRecord?> appendMsg(
+    String k,
+    String uid,
+    String mode,
+    Map<String, dynamic> msg,
+  ) async {
+    final rec = await load(k);
+    if (rec == null) return null;
+    final n = ChatRecord(
+      msgs: [...rec.msgs, msg],
+      loc: rec.loc,
+      updated: DateTime.now().millisecondsSinceEpoch,
+      month: rec.month,
+      sid: rec.sid,
+      title: rec.title,
+      pa: rec.pa,
+      pb: rec.pb,
+      pn: rec.pn,
+      pv: rec.pv,
+    );
+    await save(k, n);
+    final sid = rec.sid;
+    if (sid != null) await save(archKey(uid, mode, sid), n);
+    return n;
+  }
+
   static Future<void> remove(String k) async {
     try {
       await (await SharedPreferences.getInstance()).remove(k);

@@ -329,6 +329,31 @@ class _AskPageState extends State<AskPage> {
     unawaited(_flush());
   }
 
+  /// V9a: cevap istegi baslatan sohbetin kaydina yazilir; kullanici hala
+  /// o sohbetteyse ekrana da duser.
+  Future<void> _lateReply(String? ck, String md, _Msg r) async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (ck == null || uid == null) return;
+    final n = await ChatStore.appendMsg(ck, uid, md, {
+      'm': r.mine,
+      't': r.text,
+      'b': r.bubbles,
+      's': r.system,
+      'ts': r.ts,
+    });
+    if (n == null || !mounted || _waiting || _ovA != null || _chatKey() != ck) {
+      return;
+    }
+    setState(() {
+      _messages
+        ..clear()
+        ..addAll(_msgsOf(n));
+      _sid = n.sid;
+      _title = n.title;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
+  }
+
   Future<void> _loadChat() async {
     _sid = null;
     _title = null;
@@ -546,6 +571,8 @@ class _AskPageState extends State<AskPage> {
     HapticFeedback.selectionClick();
     _ctl.clear();
     final gen = _gen;
+    final ck = _chatKey();
+    final md = _mode;
     final retry = override != null && _failed;
     setState(() {
       if (!retry) {_messages.add(_Msg(true, text, ts: DateTime.now().millisecondsSinceEpoch));}
@@ -557,7 +584,12 @@ class _AskPageState extends State<AskPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToLatest());
     try {
       final r = await _reply(text);
-      if (!mounted || gen != _gen) return;
+      if (!mounted) return;
+      if (gen != _gen) {
+        r.ts = DateTime.now().millisecondsSinceEpoch;
+        await _lateReply(ck, md, r);
+        return;
+      }
       setState(() {
         _messages.add(r..ts = DateTime.now().millisecondsSinceEpoch);
         _waiting = false;
