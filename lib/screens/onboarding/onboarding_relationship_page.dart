@@ -129,6 +129,11 @@ class _OnboardingRelationshipPageState
       );
     }
 
+    if (!widget.isFirstProfile) {
+      openCalculating();
+      return;
+    }
+
     List<String> notes = const [];
     await navigator.push(
       MaterialPageRoute<void>(
