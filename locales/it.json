@@ -374,7 +374,7 @@
   "match.filter.all": "All",
   "match.filter.harmony": "Harmony",
   "match.filter.tension": "Tension",
-  "match.dir.title": "{a} (tu) - {b} (altro), {asp}",
+  "match.dir.title": "{a} (tu) - {b} (l'altra persona), {asp}",
   "match.ask.cta": "Ask AI",
   "match.ask.q1": "How does this feel between us?",
   "match.ask.q2": "Where could this create friction?",
