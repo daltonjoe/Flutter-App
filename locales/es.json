@@ -331,6 +331,8 @@
   "ask.history_empty": "A\u00fan no hay chats guardados.",
   "ask.history_note": "Los chats se guardan en este dispositivo y no se transfieren al cambiar de dispositivo.",
   "ask.person_deleted": "Persona eliminada",
+  "ask.profile_updated": "Perfil actualizado. Los mensajes anteriores no cambian; las nuevas respuestas usan los datos actuales.",
+  "ask.profile_updated_ok": "Aceptar",
   "ask.select": "Seleccionar",
   "ask.delete_confirm": "\u00bfEliminar los chats seleccionados? Esta acci\u00f3n no se puede deshacer.",
   "ask.rename": "Cambiar nombre",

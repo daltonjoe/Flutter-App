@@ -331,6 +331,8 @@
   "ask.history_empty": "Nenhum chat salvo ainda.",
   "ask.history_note": "Os chats ficam salvos neste dispositivo e n\u00e3o s\u00e3o transferidos ao trocar de dispositivo.",
   "ask.person_deleted": "Pessoa exclu\u00edda",
+  "ask.profile_updated": "Perfil atualizado. As mensagens anteriores n\u00e3o mudam; as novas respostas usam os dados atuais.",
+  "ask.profile_updated_ok": "OK",
   "ask.select": "Selecionar",
   "ask.delete_confirm": "Excluir os chats selecionados? Esta a\u00e7\u00e3o n\u00e3o pode ser desfeita.",
   "ask.rename": "Renomear",

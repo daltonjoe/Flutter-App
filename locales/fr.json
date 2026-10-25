@@ -331,6 +331,8 @@
   "ask.history_empty": "Aucune discussion enregistr\u00e9e pour l\u0027instant.",
   "ask.history_note": "Les discussions sont stock\u00e9es sur cet appareil et ne sont pas transf\u00e9r\u00e9es si tu changes d\u0027appareil.",
   "ask.person_deleted": "Personne supprim\u00e9e",
+  "ask.profile_updated": "Profil mis \u00e0 jour. Les anciens messages restent inchang\u00e9s, les nouvelles r\u00e9ponses utilisent les donn\u00e9es actuelles.",
+  "ask.profile_updated_ok": "OK",
   "ask.select": "S\u00e9lectionner",
   "ask.delete_confirm": "Supprimer les discussions s\u00e9lectionn\u00e9es ? Cette action est irr\u00e9versible.",
   "ask.rename": "Renommer",

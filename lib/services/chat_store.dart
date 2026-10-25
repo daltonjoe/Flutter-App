@@ -15,6 +15,7 @@ class ChatRecord {
     this.pa,
     this.pb,
     this.pn,
+    this.pv,
   });
 
   /// Her mesaj: m (benim mi), t (metin), b (balonlar), s (sistem).
@@ -29,6 +30,9 @@ class ChatRecord {
   final String? pa;
   final String? pb;
   final String? pn;
+
+  /// V4c: gorulen profil dogum bilgisi surumu (null = eski kayit).
+  final String? pv;
 }
 
 /// Anahtar: chat.v1.UID.MOD.PROFIL (iliskide PROFIL = a_b). Hata olursa sessizce null doner.
@@ -82,6 +86,7 @@ class ChatStore {
         pa: m['pa'] as String?,
         pb: m['pb'] as String?,
         pn: m['pn'] as String?,
+        pv: m['pv'] as String?,
       );
     } catch (e) {
       debugPrint('ChatStore load failed: $e');
@@ -104,6 +109,7 @@ class ChatStore {
           'pa': r.pa,
           'pb': r.pb,
           'pn': r.pn,
+          'pv': r.pv,
         }),
       );
     } catch (e) {
@@ -165,6 +171,7 @@ class ChatStore {
       pa: r.pa,
       pb: r.pb,
       pn: r.pn,
+      pv: r.pv,
     );
   }
 
@@ -192,6 +199,27 @@ class ChatStore {
     final a = k == null ? null : await load(k);
     await save(ak, _titled(r, title));
     if (k != null && a != null) await save(k, _titled(a, title));
+  }
+
+  /// V4c: gorulen profil surumunu yazar; tarih ve mesajlar degismez, sid eslesmezse yazmaz.
+  static Future<void> setPv(String k, String pv, String? sid) async {
+    final r = await load(k);
+    if (r == null || r.sid != sid) return;
+    await save(
+      k,
+      ChatRecord(
+        msgs: r.msgs,
+        loc: r.loc,
+        updated: r.updated,
+        month: r.month,
+        sid: r.sid,
+        title: r.title,
+        pa: r.pa,
+        pb: r.pb,
+        pn: r.pn,
+        pv: pv,
+      ),
+    );
   }
 
   static Future<String?> lastPartner(String uid, String act) async {

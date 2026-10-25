@@ -331,6 +331,8 @@
   "ask.history_empty": "Hen\u00fcz kaydedilmi\u015f sohbet yok.",
   "ask.history_note": "Sohbetler bu cihazda saklan\u0131r, cihaz de\u011fi\u015fince ta\u015f\u0131nmaz.",
   "ask.person_deleted": "Ki\u015fi silindi",
+  "ask.profile_updated": "Profil g\u00fcncellendi. Eski mesajlar de\u011fi\u015fmez, yeni cevaplar g\u00fcncel bilgiyle verilir.",
+  "ask.profile_updated_ok": "Tamam",
   "ask.select": "Se\u00e7",
   "ask.delete_confirm": "Se\u00e7ili sohbetler silinsin mi? Bu i\u015flem geri al\u0131namaz.",
   "ask.rename": "Yeniden adland\u0131r",

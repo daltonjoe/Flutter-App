@@ -331,6 +331,8 @@
   "ask.history_empty": "Noch keine gespeicherten Chats.",
   "ask.history_note": "Chats werden auf diesem Ger\u00e4t gespeichert und beim Ger\u00e4tewechsel nicht \u00fcbertragen.",
   "ask.person_deleted": "Person gel\u00f6scht",
+  "ask.profile_updated": "Profil aktualisiert. Fr\u00fchere Nachrichten bleiben unver\u00e4ndert, neue Antworten nutzen die aktuellen Angaben.",
+  "ask.profile_updated_ok": "OK",
   "ask.select": "Ausw\u00e4hlen",
   "ask.delete_confirm": "Ausgew\u00e4hlte Chats l\u00f6schen? Das l\u00e4sst sich nicht r\u00fcckg\u00e4ngig machen.",
   "ask.rename": "Umbenennen",

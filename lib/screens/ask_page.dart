@@ -181,6 +181,68 @@ class _AskPageState extends State<AskPage> {
   }
 
   /// V3: sohbet anahtari (hesap, mod, profil veya sirali cift); null = saklama yok.
+  /// V4c: kayitli sohbetin gorulen profil surumu.
+  String? _pv;
+
+  /// V4c: birth_date, birth_time, birth_time_known, latitude, longitude, timezone birlesimi; okunamazsa null.
+  Future<String?> _pvNow() async {
+    const cols = <String>[
+      'birth_date',
+      'birth_time',
+      'birth_time_known',
+      'latitude',
+      'longitude',
+      'timezone',
+    ];
+    try {
+      final ids = <String?>[_a(), if (_mode == 'synastry') _b()];
+      final parts = <String>[];
+      for (final id in ids) {
+        if (id == null) return null;
+        final row = await Supabase.instance.client
+            .from('user_profiles')
+            .select(cols.join(', '))
+            .eq('id', id)
+            .maybeSingle();
+        if (row == null) return null;
+        parts.add([for (final k in cols) '${row[k]}'].join('|'));
+      }
+      return parts.join('#');
+    } catch (e) {
+      debugPrint('AskPage pv failed: $e');
+      return null;
+    }
+  }
+
+  /// V4c: kayitli surum guncelden farkliysa bir kez uyarir; eski mesajlar degismez.
+  Future<void> _checkPv() async {
+    if (_ro) return;
+    final old = _pv;
+    final gen = _gen;
+    final cur = await _pvNow();
+    if (!mounted || gen != _gen || cur == null || cur == old) return;
+    if (old != null) {
+      await showDialog<void>(
+        context: context,
+        builder: (c) => AlertDialog(
+          content: Text(t(c, 'ask.profile_updated')),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(c),
+              child: Text(t(c, 'ask.profile_updated_ok')),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || gen != _gen) return;
+    }
+    _pv = cur;
+    final k = _chatKey();
+    final ak = _archKey();
+    if (k != null) await ChatStore.setPv(k, cur, _sid);
+    if (ak != null) await ChatStore.setPv(ak, cur, _sid);
+  }
+
   String? _chatKey() {
     final uid = Supabase.instance.client.auth.currentUser?.id;
     final act = _a();
@@ -214,6 +276,7 @@ class _AskPageState extends State<AskPage> {
       pa: _a(),
       pb: _mode == 'synastry' ? _b() : null,
       pn: _chatNames(),
+      pv: _pv,
     );
   }
 
@@ -228,6 +291,7 @@ class _AskPageState extends State<AskPage> {
   Future<void> _flush() async {
     final k = _chatKey();
     if (k == null || _messages.isEmpty) return;
+    _pv ??= await _pvNow();
     final r = _record();
     await ChatStore.save(k, r);
     final ak = _archKey();
@@ -261,7 +325,9 @@ class _AskPageState extends State<AskPage> {
       }
       _sid = rec.sid;
       _title = rec.title;
+      _pv = rec.pv;
     });
+    await _checkPv();
   }
 
   Future<String?> _lastPartnerId() {
@@ -1153,6 +1219,7 @@ class _AskPageState extends State<AskPage> {
   String? _b() => _ovB ?? _partnerId;
 
   void _clearOv() {
+    _pv = null;
     _ovA = null;
     _ovB = null;
     _ovName = null;
@@ -1186,11 +1253,13 @@ class _AskPageState extends State<AskPage> {
       _ro = p.deleted;
       _sid = r.sid;
       _title = r.title;
+      _pv = r.pv;
       if (_mode == 'forecast') _fMonth = r.month;
       _messages
         ..clear()
         ..addAll(_msgsOf(r));
     });
+    unawaited(_checkPv());
   }
 
   Future<void> _openHistory() async {

@@ -331,6 +331,8 @@
   "ask.history_empty": "No saved chats yet.",
   "ask.history_note": "Chats are stored on this device and do not move when you change devices.",
   "ask.person_deleted": "Person deleted",
+  "ask.profile_updated": "Profile updated. Earlier messages stay as they are; new answers use the current details.",
+  "ask.profile_updated_ok": "OK",
   "ask.select": "Select",
   "ask.delete_confirm": "Delete the selected chats? This cannot be undone.",
   "ask.rename": "Rename",
