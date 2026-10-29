@@ -454,7 +454,7 @@
   "onboarding.register.trouble": "تواجه مشكلة في إنشاء الحساب؟",
   "onboarding.register.contact": "اتصل بنا",
   "onboarding.consent.title": "الشروط وسياسة الخصوصية",
-  "onboarding.consent.body": "قبل أن تبدأ، يرجى قراءة شروط الاستخدام وسياسة الخصوصية والموافقة عليها.",
+  "onboarding.consent.body": "قبل أن تبدأ، يرجى قراءة شروط الاستخدام وسياسة الخصوصية والموافقة عليها. ما تشاركه في المحادثة يُحفظ تلقائيًا لتخصيص إجاباتك.",
   "onboarding.consent.privacy_link": "سياسة الخصوصية",
   "onboarding.consent.privacy_check": "لقد قرأت سياسة الخصوصية وأوافق عليها",
   "onboarding.consent.terms_link": "شروط الاستخدام",

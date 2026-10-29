@@ -454,7 +454,7 @@
   "onboarding.register.trouble": "Having trouble signing up?",
   "onboarding.register.contact": "Contact us",
   "onboarding.consent.title": "Términos y Política de privacidad",
-  "onboarding.consent.body": "Antes de empezar, lee y acepta los Términos de uso y la Política de privacidad.",
+  "onboarding.consent.body": "Antes de empezar, lee y acepta los Términos de uso y la Política de privacidad. Lo que compartes en el chat se guarda automáticamente para personalizar tus respuestas.",
   "onboarding.consent.privacy_link": "Privacy Policy",
   "onboarding.consent.privacy_check": "I have read and accept the Privacy Policy",
   "onboarding.consent.terms_link": "Terms of Use",

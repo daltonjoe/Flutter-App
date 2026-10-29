@@ -454,7 +454,7 @@
   "onboarding.register.trouble": "Kayıt olurken sorun mu yaşıyorsun?",
   "onboarding.register.contact": "Bize ulaş",
   "onboarding.consent.title": "Şartlar ve Gizlilik Politikası",
-  "onboarding.consent.body": "Başlamadan önce Kullanıcı Sözleşmesi'ni ve Gizlilik Politikası'nı oku ve onayla.",
+  "onboarding.consent.body": "Başlamadan önce Kullanıcı Sözleşmesi'ni ve Gizlilik Politikası'nı oku ve onayla. Sohbette paylaştıkların, cevapları sana göre kişiselleştirmek için otomatik olarak kaydedilir.",
   "onboarding.consent.privacy_link": "Gizlilik Politikası",
   "onboarding.consent.privacy_check": "Gizlilik Politikası’nı okudum ve kabul ediyorum",
   "onboarding.consent.terms_link": "Kullanıcı Sözleşmesi",
