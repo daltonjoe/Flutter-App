@@ -98,6 +98,8 @@ class AskService {
               'profile_id': ?profileId,
               'mode': ?mode,
               'forecast_month': ?forecastMonth,
+              'tz_offset_min': DateTime.now().timeZoneOffset.inMinutes,
+              'client_now': DateTime.now().toIso8601String(),
               if (bubbles) 'bubbles': true,
             }),
           )

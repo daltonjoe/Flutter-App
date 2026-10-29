@@ -468,6 +468,7 @@
   "auth.signin.notfound.body": "Bu girişle eşleşen bir hesap bulunamadı. Kayıt olmak ister misin?",
   "auth.signin.notfound.yes": "Kayıt ol",
   "auth.signin.notfound.no": "Hayır, misafir olarak devam et",
+  "settings.memory.count": "Bellek: {n} kayıt",
   "settings.legal.row": "Kullanıcı Sözleşmeleri",
   "settings.ads_privacy": "Reklam gizliliği seçenekleri",
   "legal.privacy.body": "Gizlilik Politikası metni burada yayınlanacak.",

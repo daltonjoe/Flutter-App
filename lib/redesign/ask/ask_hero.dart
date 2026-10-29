@@ -61,7 +61,7 @@ class AskHero extends StatelessWidget {
           textAlign: TextAlign.center,
           style: AppTextStyles.bodySm(color: AppColors.mist),
         ),
-        if (mode == 'forecast') ...[
+        if (mode == 'forecast' && onPickMonth != null) ...[
           const SizedBox(height: AppSpacing.md),
           CosmicChip(
             label: month == null

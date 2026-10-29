@@ -577,10 +577,6 @@ class _AskPageState extends State<AskPage> {
   Future<void> _send([String? override]) async {
     final text = (override ?? _ctl.text).trim();
     if (text.isEmpty || _waiting) return;
-    if (_mode == 'forecast' && _fMonth == null) {
-      _pickMonth();
-      return;
-    }
     if (_mode == 'synastry' && !_pairOk()) {
       _pickPartner();
       return;
@@ -852,8 +848,6 @@ class _AskPageState extends State<AskPage> {
                     AskHero(
                       mode: _mode,
                       summary: context.watch<ActiveProfileProvider>().summary,
-                      month: _fMonth,
-                      onPickMonth: _pickMonth,
                       partnerName: _partnerName,
                       partnersEmpty: _partnersLoaded && _partners.isEmpty,
                       onPickPartner: _pickPartner,

@@ -468,6 +468,7 @@
   "auth.signin.notfound.body": "لم نتمكن من العثور على حساب لعملية تسجيل الدخول هذه. هل ترغب في إنشاء حساب؟",
   "auth.signin.notfound.yes": "إنشاء حساب",
   "auth.signin.notfound.no": "لا، تابع كضيف",
+  "settings.memory.count": "الذاكرة: {n} سجل",
   "settings.legal.row": "اتفاقيات المستخدم",
   "settings.ads_privacy": "خيارات خصوصية الإعلانات",
   "legal.privacy.body": "سيُنشر نص سياسة الخصوصية هنا.",

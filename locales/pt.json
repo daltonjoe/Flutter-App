@@ -468,6 +468,7 @@
   "auth.signin.notfound.body": "Não conseguimos encontrar uma conta para este início de sessão. Queres registar-te?",
   "auth.signin.notfound.yes": "Registar",
   "auth.signin.notfound.no": "Não, continuar como convidado",
+  "settings.memory.count": "Memória: {n} registros",
   "settings.legal.row": "User Agreements",
   "settings.ads_privacy": "Opções de privacidade de anúncios",
   "legal.privacy.body": "The Privacy Policy text will be published here.",

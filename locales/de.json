@@ -468,6 +468,7 @@
   "auth.signin.notfound.body": "Wir konnten für diese Anmeldung kein Konto finden. Möchtest du dich registrieren?",
   "auth.signin.notfound.yes": "Registrieren",
   "auth.signin.notfound.no": "Nein, als Gast fortfahren",
+  "settings.memory.count": "Gedächtnis: {n} Einträge",
   "settings.legal.row": "User Agreements",
   "settings.ads_privacy": "Datenschutzoptionen für Anzeigen",
   "legal.privacy.body": "The Privacy Policy text will be published here.",

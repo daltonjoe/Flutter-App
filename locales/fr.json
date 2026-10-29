@@ -468,6 +468,7 @@
   "auth.signin.notfound.body": "Nous n'avons pas trouvé de compte pour cette connexion. Voulez-vous vous inscrire ?",
   "auth.signin.notfound.yes": "S'inscrire",
   "auth.signin.notfound.no": "Non, continuer en tant qu'invité",
+  "settings.memory.count": "Mémoire : {n} éléments",
   "settings.legal.row": "User Agreements",
   "settings.ads_privacy": "Options de confidentialité des annonces",
   "legal.privacy.body": "The Privacy Policy text will be published here.",

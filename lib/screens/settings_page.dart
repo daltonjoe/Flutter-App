@@ -41,6 +41,8 @@ class _SettingsPageState extends State<SettingsPage>
 
   String? _appVersion;
 
+  int? _memCount; // ask_auto_memory_count RPC (TEKNIK_BELLEK 6), read-only
+
   bool _deleting = false;
   bool _holdTriggered = false;
   bool _showConfirmForA11y = false;
@@ -62,6 +64,16 @@ class _SettingsPageState extends State<SettingsPage>
       if (mounted) setState(() {});
     });
     _loadAll();
+    _loadMemCount();
+  }
+
+  Future<void> _loadMemCount() async {
+    try {
+      final n = await Supabase.instance.client.rpc('ask_auto_memory_count');
+      if (mounted) setState(() => _memCount = (n as num).toInt());
+    } catch (e) {
+      debugPrint('memory count failed: $e');
+    }
   }
 
   @override
@@ -711,6 +723,20 @@ class _SettingsPageState extends State<SettingsPage>
                       ),
                     ),
                   ),
+                  if (_memCount != null) ...[
+                    const Divider(height: 1, color: AppColors.hairline),
+                    _buildRow(
+                      icon: Icons.memory_outlined,
+                      leading: Text(
+                        t(context, 'settings.memory.count')
+                            .replaceAll('{n}', '$_memCount'),
+                        style: AppTextStyles.bodyLg(color: AppColors.starlight),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                    ),
+                  ],
                   if (AdService.privacyOptionsRequired) ...[
                     const Divider(height: 1, color: AppColors.hairline),
                     _buildRow(

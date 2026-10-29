@@ -468,6 +468,7 @@
   "auth.signin.notfound.body": "Non abbiamo trovato un account per questo accesso. Vuoi registrarti?",
   "auth.signin.notfound.yes": "Registrati",
   "auth.signin.notfound.no": "No, continua come ospite",
+  "settings.memory.count": "Memoria: {n} voci",
   "settings.legal.row": "User Agreements",
   "settings.ads_privacy": "Opzioni privacy annunci",
   "legal.privacy.body": "The Privacy Policy text will be published here.",

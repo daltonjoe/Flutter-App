@@ -468,6 +468,7 @@
   "auth.signin.notfound.body": "We could not find an account for this sign-in. Would you like to sign up?",
   "auth.signin.notfound.yes": "Sign up",
   "auth.signin.notfound.no": "No, continue as guest",
+  "settings.memory.count": "Memory: {n} entries",
   "settings.legal.row": "User Agreements",
   "settings.ads_privacy": "Ad privacy options",
   "legal.privacy.body": "The Privacy Policy text will be published here.",
