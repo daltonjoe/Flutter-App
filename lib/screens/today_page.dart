@@ -34,6 +34,7 @@ import '../providers/language_provider.dart';
 
 import '../services/checkin_service.dart';
 import '../services/notification_scheduler.dart';
+import 'notifications_page.dart' show NotificationBell;
 
 import '../services/reference_names_service.dart';
 
@@ -1350,7 +1351,10 @@ class _TodayPageState extends State<TodayPage> {
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.screenH - 8),
 
-              child: const ProfileAvatarButton(),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [NotificationBell(), ProfileAvatarButton()],
+              ),
             ),
           ],
         ),

@@ -687,5 +687,16 @@
   "tour.ask": "Ask what you're curious about here; I'll look at your chart and keep you company.",
   "tour.match": "Place two people's charts side by side; see where the connection flows easily and where it takes a little more effort.",
   "tour.profile": "Your profiles, your journey, and your settings are here.",
-  "tour.tap_hint": "Tap to continue."
+  "tour.tap_hint": "Tap to continue.",
+  "notif.inbox.title": "Notifications",
+  "notif.inbox.today": "TODAY",
+  "notif.inbox.yesterday": "YESTERDAY",
+  "notif.inbox.mark_all": "Mark all as read",
+  "notif.inbox.empty": "No notifications yet",
+  "notif.inbox.error": "Could not load, tap to retry",
+  "notif.inbox.copied": "Copied",
+  "notif.target.ask": "Ask",
+  "notif.target.match": "Match",
+  "notif.target.forecast": "Forecast",
+  "notif.target.today": "Today"
 }

@@ -687,5 +687,16 @@
   "tour.ask": "Pergunte aqui o que desperta sua curiosidade; eu olho o seu mapa e acompanho você.",
   "tour.match": "Coloque os mapas de duas pessoas lado a lado; veja onde a afinidade flui fácil e onde pede um pouco mais de esforço.",
   "tour.profile": "Seus perfis, sua jornada e seus ajustes ficam aqui.",
-  "tour.tap_hint": "Toque para continuar."
+  "tour.tap_hint": "Toque para continuar.",
+  "notif.inbox.title": "Notifications",
+  "notif.inbox.today": "TODAY",
+  "notif.inbox.yesterday": "YESTERDAY",
+  "notif.inbox.mark_all": "Mark all as read",
+  "notif.inbox.empty": "No notifications yet",
+  "notif.inbox.error": "Could not load, tap to retry",
+  "notif.inbox.copied": "Copied",
+  "notif.target.ask": "Ask",
+  "notif.target.match": "Match",
+  "notif.target.forecast": "Forecast",
+  "notif.target.today": "Today"
 }

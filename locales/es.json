@@ -687,5 +687,16 @@
   "tour.ask": "Aquí puedes preguntar lo que despierta tu curiosidad; miraré tu carta y te acompaño.",
   "tour.match": "Pon las cartas de dos personas una al lado de la otra; mira dónde la afinidad fluye fácil y dónde cuesta un poco más.",
   "tour.profile": "Tus perfiles, tu recorrido y tus ajustes están aquí.",
-  "tour.tap_hint": "Toca para continuar."
+  "tour.tap_hint": "Toca para continuar.",
+  "notif.inbox.title": "Notifications",
+  "notif.inbox.today": "TODAY",
+  "notif.inbox.yesterday": "YESTERDAY",
+  "notif.inbox.mark_all": "Mark all as read",
+  "notif.inbox.empty": "No notifications yet",
+  "notif.inbox.error": "Could not load, tap to retry",
+  "notif.inbox.copied": "Copied",
+  "notif.target.ask": "Ask",
+  "notif.target.match": "Match",
+  "notif.target.forecast": "Forecast",
+  "notif.target.today": "Today"
 }

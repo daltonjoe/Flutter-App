@@ -687,5 +687,16 @@
   "tour.ask": "Merak ettiklerini burada sorabilirsin; haritana bakarak sana eşlik ederim.",
   "tour.match": "İki kişinin haritasını yan yana koy; uyumun nerede kolay, nerede biraz uğraştırıcı olduğunu gör.",
   "tour.profile": "Profillerin, yolculuğun ve ayarlar burada.",
-  "tour.tap_hint": "Devam etmek için dokun."
+  "tour.tap_hint": "Devam etmek için dokun.",
+  "notif.inbox.title": "Bildirimler",
+  "notif.inbox.today": "BUGÜN",
+  "notif.inbox.yesterday": "DÜN",
+  "notif.inbox.mark_all": "Tümünü okundu olarak işaretle",
+  "notif.inbox.empty": "Henüz bildirim yok",
+  "notif.inbox.error": "Yüklenemedi, tekrar dene",
+  "notif.inbox.copied": "Kopyalandı",
+  "notif.target.ask": "Sor",
+  "notif.target.match": "Uyum",
+  "notif.target.forecast": "Tahmin",
+  "notif.target.today": "Bugün"
 }

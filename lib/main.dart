@@ -23,6 +23,7 @@ import 'screens/onboarding/onboarding_first_result_page.dart';
 import 'screens/main_shell.dart';
 import 'screens/settings_page.dart';
 import 'screens/streak_page.dart';
+import 'screens/notifications_page.dart';
 import 'services/account_deletion_service.dart';
 import 'services/account_linking_service.dart';
 import "package:flutter_application/paywall/paywall_service.dart";
@@ -222,6 +223,12 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
   if (settings.name == '/settings') {
     return MaterialPageRoute(
       builder: (_) => const SettingsPage(),
+      settings: settings,
+    );
+  }
+  if (settings.name == '/notifications') {
+    return MaterialPageRoute(
+      builder: (_) => const NotificationsPage(),
       settings: settings,
     );
   }
