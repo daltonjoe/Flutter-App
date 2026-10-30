@@ -11,6 +11,10 @@ import '../core/theme/app_colors.dart';
 import '../core/theme/app_dimensions.dart';
 import '../i18n/app_localizations.dart';
 import '../services/ad_service.dart';
+import 'package:provider/provider.dart';
+import '../providers/active_profile_provider.dart';
+import '../providers/language_provider.dart';
+import '../services/notification_scheduler.dart';
 import '../services/user_settings_service.dart';
 import '../widgets/navigation/cosmic_bottom_nav.dart';
 import '../widgets/navigation/nav_tour_overlay.dart';
@@ -31,7 +35,7 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final AnimationController _fade = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 320),
@@ -77,6 +81,10 @@ class _MainShellState extends State<MainShell>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // N4-e trigger
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => unawaited(_notifReschedule()),
+    );
     _index = 1;
     shellTab.addListener(_onTab);
     askEnabled.addListener(_onAskFlag);
@@ -176,8 +184,33 @@ class _MainShellState extends State<MainShell>
     if (mounted) setState(() {});
   }
 
+  /// N4-e: rebuild notification schedule (app open / resume).
+  /// Skipped while no active profile (the scheduler would clear the plan).
+  Future<void> _notifReschedule() async {
+    if (!mounted) return;
+    try {
+      final prof = context.read<ActiveProfileProvider>();
+      final pid = prof.activeProfileId;
+      if (pid == null) return;
+      final loc = context.read<LanguageProvider>().locale.languageCode;
+      await NotificationScheduler.reschedule(
+        profileId: pid,
+        displayName: prof.summary?.name,
+        locale: loc,
+      );
+    } catch (e) {
+      debugPrint('MainShell notif reschedule failed: $e');
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) unawaited(_notifReschedule());
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     shellTab.removeListener(_onTab);
     askEnabled.removeListener(_onAskFlag);
     mapPopToRoot.removeListener(_onPopMap);

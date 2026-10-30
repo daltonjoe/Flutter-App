@@ -3,6 +3,7 @@ import 'active_chart_page.dart' show signingOut74;
 import 'package:flutter_application/paywall/subscription_settings_row.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../services/notification_scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +39,9 @@ class _SettingsPageState extends State<SettingsPage>
   String? _loadError;
   UserSettings? _settings;
   bool _notificationsFlagEnabled = false;
+  String _slotMorning = '09:00';
+  String _slotEvening = '20:00';
+  bool _slotsLoaded = false;
 
   String? _appVersion;
 
@@ -288,9 +292,13 @@ class _SettingsPageState extends State<SettingsPage>
 
   Widget _notificationsSection() {
     if (!_notificationsFlagEnabled) return const SizedBox.shrink();
+    if (!_slotsLoaded) {
+      _slotsLoaded = true;
+      _loadSlots();
+    }
     final settings = _settings!;
     final enabled = settings.notificationsEnabled;
-    final displayTime = settings.notificationTime ?? '09:00';
+    final displayTime = _slotMorning;
 
     return _wrapSectionEntrance(
       index: 0,
@@ -326,7 +334,7 @@ class _SettingsPageState extends State<SettingsPage>
                     enabled: enabled,
                     onTap: enabled ? _pickTime : null,
                     leading: Text(
-                      t(context, 'settings.notifications.time'),
+                      t(context, 'settings.notifications.time_morning'),
                       style: AppTextStyles.bodyLg(
                         color: enabled
                             ? AppColors.starlight
@@ -337,6 +345,30 @@ class _SettingsPageState extends State<SettingsPage>
                     ),
                     trailing: Text(
                       displayTime,
+                      style: AppTextStyles.bodyMd(
+                        color: enabled
+                            ? AppColors.gold
+                            : AppColors.mist.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 1, color: AppColors.hairline),
+                  _buildRow(
+                    icon: Icons.nights_stay_outlined,
+                    enabled: enabled,
+                    onTap: enabled ? _pickEvening : null,
+                    leading: Text(
+                      t(context, 'settings.notifications.time_evening'),
+                      style: AppTextStyles.bodyLg(
+                        color: enabled
+                            ? AppColors.starlight
+                            : AppColors.mist.withValues(alpha: 0.5),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: Text(
+                      _slotEvening,
                       style: AppTextStyles.bodyMd(
                         color: enabled
                             ? AppColors.gold
@@ -370,6 +402,7 @@ class _SettingsPageState extends State<SettingsPage>
     });
     try {
       await UserSettingsService.save(notificationsEnabled: value);
+      _reschedule().ignore();
     } catch (e) {
       debugPrint('save notificationsEnabled failed: $e');
       if (!mounted) return;
@@ -383,7 +416,7 @@ class _SettingsPageState extends State<SettingsPage>
   }
 
   Future<void> _pickTime() async {
-    final initialParts = (_settings!.notificationTime ?? '09:00').split(':');
+    final initialParts = _slotMorning.split(':');
     final initial = TimeOfDay(
       hour: int.tryParse(initialParts[0]) ?? 9,
       minute: int.tryParse(initialParts[1]) ?? 0,
@@ -475,6 +508,9 @@ class _SettingsPageState extends State<SettingsPage>
     });
     try {
       await UserSettingsService.save(notificationTime: newTime);
+      await NotificationScheduler.setSlotTimes(morning: newTime);
+      if (mounted) setState(() => _slotMorning = newTime);
+      _reschedule().ignore();
     } catch (e) {
       debugPrint('save notificationTime failed: $e');
       if (!mounted) return;
@@ -485,6 +521,48 @@ class _SettingsPageState extends State<SettingsPage>
         SnackBar(content: Text(t(context, 'settings.error.save'))),
       );
     }
+  }
+
+  Future<void> _loadSlots() async {
+    final s = await NotificationScheduler.slotTimes();
+    if (!mounted) return;
+    setState(() {
+      _slotMorning = s.morning;
+      _slotEvening = s.evening;
+    });
+  }
+
+  Future<void> _reschedule() async {
+    if (!mounted) return;
+    final prof = context.read<ActiveProfileProvider>();
+    final loc = context.read<LanguageProvider>().locale.languageCode;
+    await NotificationScheduler.reschedule(
+      profileId: prof.activeProfileId,
+      displayName: prof.summary?.name,
+      locale: loc,
+    );
+  }
+
+  Future<void> _pickEvening() async {
+    final parts = _slotEvening.split(':');
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(
+        hour: int.tryParse(parts[0]) ?? 20,
+        minute: int.tryParse(parts[1]) ?? 0,
+      ),
+      builder: (ctx, child) => MediaQuery(
+        data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    );
+    if (picked == null || !mounted) return;
+    final v =
+        '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+    await NotificationScheduler.setSlotTimes(evening: v);
+    if (!mounted) return;
+    setState(() => _slotEvening = v);
+    _reschedule().ignore();
   }
 
   Widget _languageSection() {
@@ -567,6 +645,7 @@ class _SettingsPageState extends State<SettingsPage>
                   onTap: () async {
                     Navigator.pop(ctx);
                     await languageProvider.setLocale(lang['code']!);
+                    _reschedule().ignore(); // N4-e trigger
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(

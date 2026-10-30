@@ -33,6 +33,7 @@ import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
 
 import '../services/checkin_service.dart';
+import '../services/notification_scheduler.dart';
 
 import '../services/reference_names_service.dart';
 
@@ -236,6 +237,15 @@ class _TodayPageState extends State<TodayPage> {
 
     try {
       await CheckinService.setMood(profileId: pid, day: day, mood: mood);
+      if (mounted) {
+        // N4-e trigger: mood changed -> rebuild schedule
+        final n4eProf = context.read<ActiveProfileProvider>();
+        unawaited(NotificationScheduler.reschedule(
+          profileId: pid,
+          displayName: n4eProf.summary?.name,
+          locale: context.read<LanguageProvider>().locale.languageCode,
+        ));
+      }
     } catch (e) {
       debugPrint('checkins save failed: $e');
 
