@@ -1,0 +1,8 @@
+{
+  "API_BASE_URL": "https://<heroku-app>.herokuapp.com",
+  "SUPABASE_URL": "",
+  "SUPABASE_ANON_KEY": "",
+  "RC_IOS_KEY": "",
+  "RC_ANDROID_KEY": "",
+  "POSTHOG_KEY": ""
+}

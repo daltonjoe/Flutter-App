@@ -61,3 +61,7 @@ run.log
 
 
 *.bak_*
+
+# local build values: copy dart_defines.example.json to dart_defines.dev.json
+dart_defines.*.json
+!dart_defines.example.json
