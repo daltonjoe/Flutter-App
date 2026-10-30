@@ -12,6 +12,7 @@ import 'checkin_service.dart';
 import 'house_lookup.dart';
 import 'notification_planner.dart';
 import 'notification_repository.dart';
+import 'notification_transit_service.dart';
 import 'user_settings_service.dart';
 
 /// OS scheduling + server sync (N4). Planning itself is pure
@@ -177,6 +178,16 @@ class NotificationScheduler {
       cusps = await ChartCuspsService.loadCusps(profileId, locale: locale);
     }
 
+    var transitTexts = <String, String>{};
+    if (content.any((r) => r.slot == 'morning' && r.kind == 'evergreen')) {
+      transitTexts = await NotificationTransitService.fetch(
+        profileId: profileId,
+        start: today,
+        days: NotificationPlanner.defaultWindowDays,
+        locale: contentLocale,
+      );
+    }
+
     final times = await slotTimes();
     final name = (displayName ?? '').trim();
     final first = name.isEmpty ? null : name.split(RegExp(r'\s+')).first;
@@ -197,6 +208,7 @@ class NotificationScheduler {
       lowMood: lowMood,
       houseOf: cusps == null ? null : (lon) => HouseLookup.houseOf(lon, cusps),
       toLocal: (utc) => tz.TZDateTime.from(utc, loc),
+      transitTexts: transitTexts,
     );
 
     await _plugin.cancelAll();

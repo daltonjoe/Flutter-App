@@ -2,12 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../i18n/app_localizations.dart';
 import '../providers/ask_context_provider.dart';
 import '../providers/ask_draft.dart';
 import '../screens/main_shell.dart' show shellTab;
 import 'notification_repository.dart';
+import 'notification_transit_service.dart';
+import '../providers/active_profile_provider.dart';
+import '../providers/language_provider.dart';
 import 'notification_tap_logic.dart';
 
 final Map<String, DateTime> _recentTaps = <String, DateTime>{};
@@ -41,6 +45,14 @@ Future<void> handleNotificationTap(
   final messenger = ScaffoldMessenger.maybeOf(context);
   final nav = Navigator.maybeOf(context);
   final tpl = t(context, 'notif.tap.awarded');
+  var n7Loc = 'en';
+  String? n7Pid;
+  try {
+    n7Loc = context.read<LanguageProvider>().locale.languageCode;
+    n7Pid = context.read<ActiveProfileProvider>().activeProfileId;
+  } catch (e) {
+    debugPrint('tap provider read failed: $e');
+  }
 
   TapResult? res;
   try {
@@ -75,8 +87,30 @@ Future<void> handleNotificationTap(
   shellTab.value = tabForTarget(target);
 
   if (q != null && q.trim().isNotEmpty && target != 'today' && askEnabled.value) {
+    var n7Q = q;
+    try {
+      var n7Ev = '';
+      final n7Rows = await NotificationRepository.content(d, d, n7Loc);
+      for (final r in n7Rows) {
+        if (r.slot == slot) {
+          n7Ev = r.eventType ?? '';
+          break;
+        }
+      }
+      final n7Topic = await NotificationRepository.topic();
+      final n7P = await NotificationTransitService.question(
+        seed: q,
+        eventType: n7Ev,
+        topic: n7Topic,
+        locale: n7Loc,
+        profileId: n7Pid,
+      ).timeout(const Duration(seconds: 6));
+      if (n7P != null && n7P.trim().isNotEmpty) n7Q = n7P;
+    } catch (e) {
+      debugPrint('personal question failed: $e');
+    }
     await Future<void>.delayed(const Duration(milliseconds: 350));
-    askDraft.value = q;
+    askDraft.value = n7Q;
   }
   if (res != null && res.awarded > 0) {
     messenger?.showSnackBar(

@@ -98,6 +98,7 @@ class NotificationPlanner {
     int? Function(double lon)? houseOf,
     DateTime Function(DateTime utc)? toLocal,
     int windowDays = defaultWindowDays,
+    Map<String, String>? transitTexts,
   }) {
     final byKey = <String, CosmicNotification>{};
     for (final r in content) {
@@ -148,18 +149,24 @@ class NotificationPlanner {
           toLocal: toLocal,
         );
 
+        final tTrim = ((transitTexts ?? const <String, String>{})[dayStr] ?? '').trim();
+        final useTransit =
+            isMorning && row.kind == 'evergreen' && tTrim.isNotEmpty;
+        final transitBody = tTrim.length <= NotificationTemplate.maxBody
+            ? tTrim
+            : '${tTrim.substring(0, NotificationTemplate.maxBody - 1)}\u2026';
         out.add(PlannedItem(
           day: dayStr,
           slot: slot,
           scheduledAt: when.toUtc(),
-          source: 'cosmic',
+          source: useTransit ? 'transit' : 'cosmic',
           notificationId: row.id,
           named: named,
           hard: hard,
           topic: topic,
           house: house,
           title: r.title,
-          body: r.body,
+          body: useTransit ? transitBody : r.body,
           question: r.question,
           target: r.target,
         ));
