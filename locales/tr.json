@@ -698,5 +698,6 @@
   "notif.target.ask": "Sor",
   "notif.target.match": "Uyum",
   "notif.target.forecast": "Tahmin",
-  "notif.target.today": "Bugün"
+  "notif.target.today": "Bugün",
+  "notif.tap.awarded": "Bildirim serisi: +{n} kredi"
 }

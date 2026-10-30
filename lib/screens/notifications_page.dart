@@ -10,6 +10,7 @@ import '../i18n/app_localizations.dart';
 import '../presentation/widgets/components/cosmic_background.dart';
 import '../services/notification_inbox_grouping.dart';
 import '../services/notification_repository.dart';
+import '../services/notification_tap.dart';
 
 /// Bell with unread badge for the Today AppBar (N5).
 class NotificationBell extends StatefulWidget {
@@ -126,17 +127,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
     await _load();
   }
 
-  Future<void> _markOne(InboxItem it) async {
-    if (it.isRead) return;
-    try {
-      await NotificationRepository.markRead(
-        day: DateTime.parse(it.day),
-        slot: it.slot,
-      );
-    } catch (e) {
-      debugPrint('markRead failed: $e');
-    }
-    await _load();
+  Future<void> _open(InboxItem it) async {
+    await handleNotificationTap(
+      context,
+      it.day,
+      it.slot,
+      item: it,
+      popToRoot: true,
+    );
   }
 
   void _copy(InboxItem it) {
@@ -156,7 +154,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Widget _row(InboxItem it) {
     final label = t(context, 'notif.target.${it.target}');
     return InkWell(
-      onTap: () => unawaited(_markOne(it)),
+      onTap: () => unawaited(_open(it)),
       onLongPress: () => _copy(it),
       child: Padding(
         padding: const EdgeInsets.symmetric(

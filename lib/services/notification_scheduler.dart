@@ -72,6 +72,10 @@ class NotificationScheduler {
     }
     tz.setLocalLocation(_loc!);
     await _plugin.initialize(
+      onDidReceiveNotificationResponse: (r) {
+        final p = r.payload;
+        if (p != null && p.isNotEmpty) tapPayload.value = p;
+      },
       settings: const InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
         iOS: DarwinInitializationSettings(
@@ -82,6 +86,22 @@ class NotificationScheduler {
       ),
     );
     _inited = true;
+  }
+
+  /// N6: payload of the last tapped notification (foreground/background).
+  static final ValueNotifier<String?> tapPayload = ValueNotifier<String?>(null);
+
+  /// N6: payload of the notification that launched the app (killed state).
+  static Future<String?> launchPayload() async {
+    try {
+      final d = await _plugin.getNotificationAppLaunchDetails();
+      if (d != null && d.didNotificationLaunchApp) {
+        return d.notificationResponse?.payload;
+      }
+    } catch (e) {
+      debugPrint('NotificationScheduler launchPayload: $e');
+    }
+    return null;
   }
 
   /// Cancel + rebuild the OS schedule and sync the same list to the server.

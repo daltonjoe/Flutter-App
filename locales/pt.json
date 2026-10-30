@@ -698,5 +698,6 @@
   "notif.target.ask": "Ask",
   "notif.target.match": "Match",
   "notif.target.forecast": "Forecast",
-  "notif.target.today": "Today"
+  "notif.target.today": "Today",
+  "notif.tap.awarded": "Notification streak: +{n} credits"
 }

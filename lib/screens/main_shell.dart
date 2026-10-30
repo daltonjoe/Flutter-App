@@ -15,6 +15,8 @@ import 'package:provider/provider.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/notification_scheduler.dart';
+import '../services/notification_tap.dart';
+import '../services/notification_tap_logic.dart';
 import '../services/user_settings_service.dart';
 import '../widgets/navigation/cosmic_bottom_nav.dart';
 import '../widgets/navigation/nav_tour_overlay.dart';
@@ -82,6 +84,8 @@ class _MainShellState extends State<MainShell>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this); // N4-e trigger
+    NotificationScheduler.tapPayload.addListener(_onNotifTap); // N6
+    unawaited(_notifLaunch()); // N6
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => unawaited(_notifReschedule()),
     );
@@ -184,6 +188,36 @@ class _MainShellState extends State<MainShell>
     if (mounted) setState(() {});
   }
 
+  /// N6: notification tapped while the app is running.
+  void _onNotifTap() {
+    final p = NotificationScheduler.tapPayload.value;
+    if (p == null) return;
+    NotificationScheduler.tapPayload.value = null;
+    unawaited(_handleTapPayload(p));
+  }
+
+  Future<void> _handleTapPayload(String p) async {
+    final r = parseTapPayload(p);
+    if (r == null || !mounted) return;
+    await handleNotificationTap(context, r.day, r.slot);
+  }
+
+  /// N6: notification that launched the app from killed state.
+  Future<void> _notifLaunch() async {
+    try {
+      await NotificationScheduler.init();
+      var p = await NotificationScheduler.launchPayload();
+      final cur = NotificationScheduler.tapPayload.value;
+      if (cur != null) {
+        NotificationScheduler.tapPayload.value = null;
+        p ??= cur;
+      }
+      if (p != null) await _handleTapPayload(p);
+    } catch (e) {
+      debugPrint('MainShell notif launch failed: $e');
+    }
+  }
+
   /// N4-e: rebuild notification schedule (app open / resume).
   /// Skipped while no active profile (the scheduler would clear the plan).
   Future<void> _notifReschedule() async {
@@ -211,6 +245,7 @@ class _MainShellState extends State<MainShell>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    NotificationScheduler.tapPayload.removeListener(_onNotifTap); // N6
     shellTab.removeListener(_onTab);
     askEnabled.removeListener(_onAskFlag);
     mapPopToRoot.removeListener(_onPopMap);
