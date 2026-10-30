@@ -26,6 +26,7 @@ import 'screens/streak_page.dart';
 import 'screens/notifications_page.dart';
 import 'services/account_deletion_service.dart';
 import 'services/account_linking_service.dart';
+import 'services/analytics_service.dart';
 import "package:flutter_application/paywall/paywall_service.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "session/resolve_entry.dart";
@@ -72,6 +73,7 @@ void main() async {
       debugPrint('Anonymous Supabase sign-in failed: $e');
     }
   }
+  AnalyticsService.init();
   _netFail80 =
       Supabase.instance.client.auth.currentSession == null ||
       !await _reachable80();
