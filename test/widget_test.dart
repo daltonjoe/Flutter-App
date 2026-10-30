@@ -20,6 +20,8 @@ class _FakeSource implements SessionDataSource {
   Future<EntryIntent> authIntent() async => EntryIntent.none;
   @override
   Future<void> clearIntent() async {}
+  @override
+  Future<void> recordConsent() async {}
 }
 
 void main() {

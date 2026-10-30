@@ -5,6 +5,8 @@ import '../../core/motion/app_motion.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../i18n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import '../../providers/language_provider.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../services/ai_consent_service.dart';
 import '../../services/consent_service.dart';
@@ -76,6 +78,36 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
     await AiConsentService.grantAi();
   }
 
+  void _pickLanguage() {
+    final lp = context.read<LanguageProvider>();
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.bgVoid,
+      builder: (ctx) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (final l in LanguageProvider.supportedLanguages)
+              ListTile(
+                leading: Text(l['flag']!, style: const TextStyle(fontSize: 22)),
+                title: Text(
+                  l['label']!,
+                  style: AppTextStyles.bodyMd(color: AppColors.starlight),
+                ),
+                trailing: lp.locale.languageCode == l['code']
+                    ? const Icon(Icons.check, color: AppColors.gold)
+                    : null,
+                onTap: () {
+                  unawaited(lp.setLocale(l['code']!));
+                  Navigator.of(ctx).pop();
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _openLegal(String titleKey, String bodyKey) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -119,6 +151,13 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
+                Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: IconButton(
+                    icon: const Icon(Icons.language, color: AppColors.mist),
+                    onPressed: _pickLanguage,
+                  ),
+                ),
                 Expanded(
                   child: Center(
                     child: SingleChildScrollView(
@@ -232,6 +271,12 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
                           ],
                         ),
                         textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        t(context, 'onboarding.welcome.memory'),
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.bodyXs(color: AppColors.mist),
                       ),
                     ],
                   ),

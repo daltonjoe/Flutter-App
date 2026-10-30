@@ -1,5 +1,20 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+/// Picks the app locale: saved choice if supported, else device language
+/// (language part only) if supported, else 'en'.
+String pickLocaleCode(
+  String? saved,
+  String deviceCode,
+  Iterable<String> supported,
+) {
+  if (saved != null && supported.contains(saved)) return saved;
+  final device = deviceCode.toLowerCase().split(RegExp(r'[_-]')).first;
+  if (supported.contains(device)) return device;
+  return 'en';
+}
 
 class LanguageProvider extends ChangeNotifier {
   static const List<Map<String, String>> supportedLanguages = [
@@ -31,7 +46,11 @@ class LanguageProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString(_prefKey);
     _chosen = saved != null;
-    final langCode = saved ?? 'tr';
+    final langCode = pickLocaleCode(
+      saved,
+      PlatformDispatcher.instance.locale.languageCode,
+      supportedLanguages.map((l) => l['code']!),
+    );
     _locale = Locale(langCode);
     _isLoading = false;
     notifyListeners();

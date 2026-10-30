@@ -10,6 +10,7 @@ import "../../core/theme/app_decorations.dart";
 import "../../core/theme/app_dimensions.dart";
 import "../../core/theme/app_typography.dart";
 import "../../i18n/app_localizations.dart";
+import "../../services/consent_service.dart";
 import "../../providers/active_profile_provider.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "../../main.dart" show showNotFound70;
@@ -116,10 +117,14 @@ class _OnboardingSignInPageState extends State<OnboardingSignInPage> {
       } catch (e) {
         debugPrint("signin consent check failed: $e");
       }
-      nav.pushNamedAndRemoveUntil(
-        consented81 ? "/home" : "/onboarding/consent",
-        (r) => false,
-      );
+      if (!consented81) {
+        try {
+          await ConsentService.recordAccept();
+        } catch (e) {
+          debugPrint("signin consent record failed: $e");
+        }
+      }
+      nav.pushNamedAndRemoveUntil("/home", (r) => false);
     }
   }
 

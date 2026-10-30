@@ -12,6 +12,7 @@ abstract class SessionDataSource {
   Future<Set<String>> consentKinds();
   Future<EntryIntent> authIntent();
   Future<void> clearIntent();
+  Future<void> recordConsent();
 }
 
 class SessionController extends ChangeNotifier {
@@ -82,6 +83,16 @@ class SessionController extends ChangeNotifier {
         await profiles.setActive(ids.first);
       }
     }
+    if (ids != null &&
+        ids.isNotEmpty &&
+        kinds != null &&
+        !kinds.containsAll(kRequiredConsents)) {
+      try {
+        await source.recordConsent();
+      } catch (e) {
+        debugPrint("recordConsent failed: $e");
+      }
+    }
     debugPrint("DIAG68 gate kind=${kind.name} ids=${ids?.length} kinds=${kinds?.length} intent=${intent.name} chosen=${language.chosen}");
     _set(resolveEntry(
       session: kind,
@@ -89,7 +100,6 @@ class SessionController extends ChangeNotifier {
       consentKinds: kinds,
       showSignin: _showSignin,
       intent: intent,
-      languageChosen: language.chosen,
     ));
   }
 

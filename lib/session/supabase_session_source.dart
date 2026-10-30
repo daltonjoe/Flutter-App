@@ -1,6 +1,7 @@
 // lib/session/supabase_session_source.dart (adim 6c; main e bagli DEGIL)
 import "package:shared_preferences/shared_preferences.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
+import "../services/consent_service.dart";
 import "resolve_entry.dart";
 import "session_controller.dart";
 
@@ -46,4 +47,7 @@ class SupabaseSessionSource implements SessionDataSource {
     final sp = await SharedPreferences.getInstance();
     await sp.remove("auth_intent");
   }
+
+  @override
+  Future<void> recordConsent() => ConsentService.recordAccept();
 }

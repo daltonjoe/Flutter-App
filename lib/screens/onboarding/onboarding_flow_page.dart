@@ -6,11 +6,9 @@ import '../../models/onboarding_data.dart';
 import 'onboarding_name_page.dart';
 import 'onboarding_birthtime_page.dart';
 import 'onboarding_city_page.dart';
-import 'onboarding_gender_page.dart';
 import 'onboarding_relationship_page.dart';
 import '../../presentation/widgets/components/onboarding_progress_bar.dart';
 import 'onboarding_birthdate_page.dart';
-import 'onboarding_language_page.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui' show ImageFilter, TileMode, lerpDouble;
 import '../../core/motion/app_motion.dart';
@@ -20,10 +18,9 @@ import 'onboarding_welcome_page.dart';
 
 
 class OnboardingFlowPage extends StatefulWidget {
-  const OnboardingFlowPage({super.key, required this.isFirstProfile, this.skipLanguage = false});
+  const OnboardingFlowPage({super.key, required this.isFirstProfile});
 
   final bool isFirstProfile;
-  final bool skipLanguage;
 
   @override
   State<OnboardingFlowPage> createState() => _OnboardingFlowPageState();
@@ -35,14 +32,14 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
   final ResolutionController _res = ResolutionController();
   late int _step;
 
-  static const int totalSteps = 8;
+  static const int totalSteps = 6;
 
   /// Adım indeksine göre onboarding çözünürlüğü (plan Bölüm 3.2).
   static const List<double> _resolutionByStep = [
-    0.0, 0.05, 0.18, 0.34, 0.48, 0.62, 0.70, 0.78,
+    0.0, 0.18, 0.34, 0.48, 0.62, 0.78,
   ];
 
-  int get _minStep => (widget.isFirstProfile && !widget.skipLanguage) ? 0 : 2;
+  int get _minStep => widget.isFirstProfile ? 0 : 1;
 
   @override
   void initState() {
@@ -53,9 +50,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
       if (!mounted) return;
     });
     _controller = PageController(initialPage: _minStep);
-    if (!widget.isFirstProfile || widget.skipLanguage) {
-      data.languageCode = context.read<LanguageProvider>().locale.languageCode;
-    }
+    data.languageCode = context.read<LanguageProvider>().locale.languageCode;
   }
 
   @override
@@ -65,6 +60,7 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
   }
 
   void _next() {
+    data.languageCode = context.read<LanguageProvider>().locale.languageCode;
     if (_step < totalSteps - 1) {
       setState(() => _step++);
       _res.setTarget(_resolutionByStep[_step]);
@@ -141,8 +137,6 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
                     },
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      OnboardingLanguagePage(
-                          data: data, onNext: _next, onBack: _back),
                       OnboardingWelcomePage(onNext: _next),
                       OnboardingNamePage(
                           data: data, onNext: _next, onBack: _back),
@@ -151,8 +145,6 @@ class _OnboardingFlowPageState extends State<OnboardingFlowPage> {
                       OnboardingBirthtimePage(
                           data: data, onNext: _next, onBack: _back),
                       OnboardingCityPage(
-                          data: data, onNext: _next, onBack: _back),
-                      OnboardingGenderPage(
                           data: data, onNext: _next, onBack: _back),
                       OnboardingRelationshipPage(
                         data: data,

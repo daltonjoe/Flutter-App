@@ -17,7 +17,6 @@ import '../../presentation/widgets/components/cosmic_loader.dart';
 import '../../providers/active_profile_provider.dart';
 import '../../services/chart_repository.dart';
 import 'onboarding_first_question_page.dart';
-import 'onboarding_memory_page.dart';
 
 const String _fr = 'onboarding.first_result.';
 const List<String> _signKeys = [
@@ -170,20 +169,12 @@ class _OnboardingFirstResultPageState extends State<OnboardingFirstResultPage>
     }
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => OnboardingMemoryPage(
+        builder: (_) => OnboardingFirstQuestionPage(
+          sunSign: _sun,
+          moonSign: _moon,
           onDone: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute<void>(
-                builder: (_) => OnboardingFirstQuestionPage(
-                  sunSign: _sun,
-                  moonSign: _moon,
-                  onDone: () {
-                    Navigator.of(context).pop();
-                    _afterAi();
-                  },
-                ),
-              ),
-            );
+            Navigator.of(context).pop();
+            _afterAi();
           },
         ),
       ),

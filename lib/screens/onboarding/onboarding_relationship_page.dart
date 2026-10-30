@@ -16,7 +16,6 @@ import '../../i18n/app_localizations.dart';
 import '../../providers/language_provider.dart';
 import '../../providers/active_profile_provider.dart';
 import 'onboarding_chat_page.dart';
-import 'onboarding_notes_intro_page.dart';
 
 class OnboardingRelationshipPage extends StatefulWidget {
   final OnboardingData data;
@@ -134,24 +133,25 @@ class _OnboardingRelationshipPageState
       return;
     }
 
+    final relStatus = widget.data.relationshipStatus;
+    final String? relNote =
+        (relStatus == null || relStatus == 'prefer_not_to_say')
+            ? null
+            : t(
+                context,
+                'onboarding.relationship.note',
+                args: {
+                  'status': t(context, 'onboarding.relationship.$relStatus'),
+                },
+              );
     List<String> notes = const [];
     await navigator.push(
       MaterialPageRoute<void>(
         builder: (_) => OnboardingChatPage(
           onNotes: (n) => notes = n,
           onDone: () {
-            if (widget.isFirstProfile && notes.isNotEmpty) {
-              _saveNotes(notes).ignore();
-              navigator.pushReplacement(
-                MaterialPageRoute<void>(
-                  builder: (_) => OnboardingNotesIntroPage(
-                    notes: notes,
-                    onDone: openCalculating,
-                  ),
-                ),
-              );
-              return;
-            }
+            final all = <String>[if (relNote != null) relNote, ...notes];
+            if (all.isNotEmpty) _saveNotes(all).ignore();
             openCalculating();
           },
         ),

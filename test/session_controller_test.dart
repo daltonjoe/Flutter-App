@@ -28,6 +28,7 @@ class _Src implements SessionDataSource {
   Set<String>? kinds = <String>{"privacy", "terms"};
   EntryIntent intent = EntryIntent.none;
   int cleared = 0;
+  int recorded = 0;
   @override
   SessionKind sessionKind() => kind;
   @override
@@ -50,6 +51,11 @@ class _Src implements SessionDataSource {
   Future<void> clearIntent() async {
     cleared++;
     intent = EntryIntent.none;
+  }
+
+  @override
+  Future<void> recordConsent() async {
+    recorded++;
   }
 }
 
@@ -105,7 +111,7 @@ void main() {
     await c.refresh();
     await c.resolveNotFound();
     expect(src.cleared, 1);
-    expect(c.route, EntryRoute.consent);
+    expect(c.route, EntryRoute.onboarding);
   });
   test("7 profil var aktif yok setActive(first)", () async {
     await c.refresh();
@@ -122,9 +128,23 @@ void main() {
     await c.refresh();
     expect(c.route, EntryRoute.home);
   });
-  test("10 profil var yalniz privacy -> consent", () async {
+  test("10 profil var yalniz privacy -> home", () async {
     src.kinds = <String>{"privacy"};
     await c.refresh();
-    expect(c.route, EntryRoute.consent);
+    expect(c.route, EntryRoute.home);
+  });
+  test("11 profil var yalniz privacy -> recordConsent 1 kez", () async {
+    src.kinds = <String>{"privacy"};
+    await c.refresh();
+    expect(c.route, EntryRoute.home);
+    expect(src.recorded, 1);
+  });
+  test("12 riza tam veya profil yok -> recordConsent cagrilmaz", () async {
+    await c.refresh();
+    expect(src.recorded, 0);
+    src.ids = <String>[];
+    src.kinds = <String>{};
+    await c.refresh();
+    expect(src.recorded, 0);
   });
 }

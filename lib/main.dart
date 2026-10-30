@@ -16,7 +16,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/supabase_config.dart';
 import 'screens/onboarding/onboarding_link_account_page.dart';
 import 'screens/onboarding/onboarding_register_page.dart';
-import 'screens/onboarding/onboarding_consent_page.dart';
 import 'screens/onboarding/onboarding_sign_in_page.dart';
 import 'screens/onboarding/onboarding_calculating_page.dart';
 import 'screens/onboarding/onboarding_first_result_page.dart';
@@ -209,9 +208,6 @@ Route<dynamic>? appOnGenerateRoute(RouteSettings settings) {
   }
   if (settings.name == '/onboarding/email') {
     return MaterialPageRoute(builder: (_) => const OnboardingLinkAccountPage());
-  }
-  if (settings.name == '/onboarding/consent') {
-    return MaterialPageRoute(builder: (_) => const OnboardingConsentPage());
   }
   if (settings.name == '/signin') {
     return MaterialPageRoute(
@@ -457,12 +453,7 @@ class _Gate80State extends State<_Gate80> {
     }
     return switch (r) {
       EntryRoute.home => const MainShell(),
-      EntryRoute.consent => const OnboardingConsentPage(),
-      EntryRoute.language => const OnboardingFlowPage(isFirstProfile: true),
-      EntryRoute.name => const OnboardingFlowPage(
-        isFirstProfile: true,
-        skipLanguage: true,
-      ),
+      EntryRoute.onboarding => const OnboardingFlowPage(isFirstProfile: true),
       EntryRoute.signin => const OnboardingSignInPage(),
       EntryRoute.retry => Scaffold(
         body: Center(
