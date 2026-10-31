@@ -1,0 +1,113 @@
+Ephemerai — Gizlilik Politikası ve KVKK Aydınlatma Metni
+Son güncelleme: 30 Ekim 2026
+
+1. Bu metin nedir?
+
+Bu metin, Ephemerai iOS uygulamasını ("Uygulama") kullanırken kişisel verilerinizin nasıl işlendiğini açıklar. Aynı zamanda 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun ("KVKK") 10. maddesi kapsamındaki aydınlatma yükümlülüğümüzü yerine getirir.
+
+Bu metin bir rıza formu değildir; okumanız bilgilendirme içindir. Açık rıza gerektiren işlemler için rızanız ayrıca, işaretsiz bir onay kutusuyla istenir (bkz. "Yapay Zekâ Sohbeti Açık Rıza Metni").
+
+2. Veri sorumlusu
+
+Veri sorumlusu — Talha Güzel (bireysel geliştirici)
+E-posta — ephemer.ai.app.main@gmail.com
+
+Çalışan sayısı ve yıllık mali bilanço bakımından Kişisel Verileri Koruma Kurulu'nun belirlediği eşiklerin altında olduğumuz ve ana faaliyetimiz özel nitelikli kişisel veri işlemek olmadığı için VERBİS'e kayıt yükümlülüğümüz bulunmamaktadır.
+
+3. İşlediğimiz kişisel veriler
+
+- Hesap verileri: İlk açılışta oluşturulan anonim hesap kimliği. Apple veya Google ile giriş yaparsanız, giriş sağlayıcısının verdiği hesap kimliği ve e-posta adresi (Apple'da "E-postamı Gizle" seçeneğini kullanırsanız Apple'ın verdiği gizli adres).
+- Profil ve doğum verileri: İsim, doğum tarihi, doğum saati, doğum şehri, ilişki durumu. Uyum özelliği için başka bir kişinin profilini eklerseniz o kişinin aynı bilgileri.
+- İçerik verileri: Sohbete yazdığınız sorular, Uygulamanın ürettiği cevaplar ve sohbetlerden kaydedilen kısa notlar.
+- Abonelik verileri: Abonelik durumu, ürün ve işlem tanımlayıcıları, deneme/yenileme/iptal bilgileri. Kart ve ödeme bilgileriniz Apple tarafından işlenir; bize ulaşmaz.
+- Kullanım ve teknik veriler: Uygulama içi etkileşim olayları, cihaz modeli, iOS ve uygulama sürümü, dil. Analitik aracımızda IP adresi kaydı kapalıdır.
+- Bildirim tercihleri: Bildirimler cihazınızda planlanır; yalnızca tercihleriniz saklanır.
+
+Sohbetleriniz, notlarınız veya ilişki durumunuz sağlığınız, inancınız ya da cinsel hayatınız gibi özel nitelikli bilgileri ortaya koyabilir. Bu tür bilgileri paylaşmak zorunda değilsiniz; paylaşmamanızı öneririz. Şifre, kimlik numarası ve ödeme bilgisi yazmayın. Başka bir kişinin profilini eklerken o kişinin bilgisini paylaşmaya yetkili olmalısınız.
+
+4. İşleme amaçları ve hukuki sebepler
+
+Hesabınızı oluşturmak, doğum haritası ve yorumları hesaplamak, profillerinizi ve notlarınızı saklamak — Sözleşmenin kurulması veya ifası (KVKK md. 5/2-c)
+Aboneliği doğrulamak, erişim hakkınızı yönetmek, destek taleplerini yanıtlamak — Sözleşmenin ifası (md. 5/2-c)
+Yapay zekâ sohbeti: sorularınızı ve gerekli bağlamı yapay zekâ sağlayıcılarına iletip cevap üretmek; sohbette paylaşabileceğiniz özel nitelikli verileri işlemek ve bu amaçla yurt dışına aktarmak — Açık rıza (md. 6 ve md. 9) — karşılama ekranında ayrı ve işaretsiz bir onay kutusuyla alınır
+Hata ayıklama, güvenlik, kötüye kullanımın önlenmesi, özelliklerin kullanım ölçümüyle geliştirilmesi — Meşru menfaat (md. 5/2-f) — temel hak ve özgürlüklerinize zarar vermemek kaydıyla
+Vergi, muhasebe, mevzuat ve resmî makam talepleri — Hukuki yükümlülük (md. 5/2-ç)
+Hakkın tesisi, kullanılması veya korunması (uyuşmazlık) — md. 5/2-e
+
+Doğum tarihi, saati ve şehri KVKK'ya göre özel nitelikli veri değildir; hizmetin kendisi bu bilgilerle hesaplandığı için sözleşmenin ifası kapsamında işlenir.
+
+Açık rızanızı Ayarlar → Veri ve gizlilik → Yapay zekâ iznini geri al adımıyla veya bize yazarak dilediğiniz zaman geri alabilirsiniz. Geri alma ileriye dönük sonuç doğurur: kaydedilmiş notlarınız silinir ve yeniden izin verene kadar yapay zekâ sohbeti kullanılamaz; Uygulamanın diğer özellikleri çalışmaya devam eder.
+
+5. Verilerin aktarıldığı taraflar
+
+Hizmeti sunmak için aşağıdaki hizmet sağlayıcılarla veri paylaşırız. Her sağlayıcı yalnızca kendi işlevi için gerekli veriyi alır.
+
+Supabase — Veritabanı, kimlik doğrulama — Hesap, profil, doğum, not ve sohbet verileri — AB (İrlanda)
+Heroku (Salesforce) — Harita hesaplama ve sohbet sunucusu — Sunucudan geçen istekler — AB (İrlanda)
+Google (Gemini API) — Sohbet cevaplarının üretilmesi (ana sağlayıcı) — Aşağıdaki "yapay zekâya giden veriler" — ABD ve diğer ülkeler
+Groq, OpenRouter — Ana sağlayıcı yanıt vermediğinde yedek cevap üretimi — Aşağıdaki "yapay zekâya giden veriler" — ABD
+PostHog — Ürün analitiği (IP kaydı kapalı) — Kullanım olayları, cihaz/uygulama bilgisi — AB (Almanya)
+RevenueCat — Abonelik yönetimi ve erişim doğrulama — Hesap kimliği, abonelik ve işlem bilgileri — ABD
+Apple — Uygulama dağıtımı, giriş, abonelik ve ödeme — Giriş ve işlem bilgileri; Apple kendi gizlilik politikasına tabidir — ABD ve diğer ülkeler
+
+Yapay zekâya giden veriler: sorunuz, aynı sohbetteki son mesajlar, kaydedilmiş notlarınız ve doğum haritanızdan hesaplanan gezegen, burç ve ev konumları. İsminiz, doğum tarihiniz, saatiniz ve şehriniz yapay zekâ sağlayıcılarına gönderilmez.
+
+Kişisel verilerinizi satmayız. Yasal bir zorunluluk, yetkili makam talebi veya hukuki uyuşmazlık halinde gerekli olan en dar kapsamda yetkili kurumlarla paylaşabiliriz.
+
+6. Yurt dışına aktarım
+
+Yukarıdaki sağlayıcıların sunucuları Türkiye dışında olduğundan verileriniz yurt dışına aktarılır. Aktarımlarda KVKK md. 9'daki mekanizmalara başvururuz: yeterlilik kararı bulunan ülkelere aktarım, Kurul'un yayımladığı standart sözleşmeler ve diğer uygun güvenceler; bunların bulunmadığı hâllerde, md. 9/6 kapsamında açık rızanız. Yapay zekâ sohbeti için gereken aktarımlar ayrıca istenen açık rızanıza dayanır. Hangi ülkelere ve hangi güvencelerle aktarım yapıldığını öğrenmek için bize yazabilirsiniz.
+
+7. Yapay zekâ ile ilgili önemli bilgiler
+
+- Cevaplar yapay zekâ tarafından üretilir; hatalı, eksik veya tutarsız olabilir. Astroloji eğlence ve kişisel gelişim amaçlıdır; tıbbi, psikolojik, hukuki veya finansal tavsiye değildir.
+- Yapay zekâ sağlayıcılarının ücretli API hizmetlerini kullanırız. Bu hizmetlerin şartlarına göre gönderilen veriler sağlayıcıların model eğitiminde kullanılmaz; sağlayıcılar verileri kötüye kullanımı izlemek için sınırlı bir süre saklayabilir.
+- Sohbetler gerçek zamanlı olarak izlenmez; Uygulama bir acil durum hizmeti değildir. Acil bir tehlike varsa 112'yi arayın.
+- Sohbet içeriğinize yalnızca sizin destek talebiniz, bir hatanın giderilmesi veya kötüye kullanımın incelenmesi gerektiğinde, bu amaçla sınırlı olarak erişilir.
+
+8. Saklama süreleri
+
+Hesap, profil, doğum verileri, notlar, sohbetler — Hesabınız aktif olduğu sürece. Hesabı sildiğinizde canlı sistemden hemen silinir.
+Yedekler — Silinen veriler yedeklerden en geç 30 gün içinde kalkar
+Analitik olaylar — En fazla 12 ay
+Abonelik ve işlem kayıtları — Vergi ve ticaret mevzuatının gerektirdiği süre (en fazla 10 yıl)
+Destek yazışmaları — Talebin kapanmasından sonra 2 yıl
+
+Süre sonunda veriler silinir, yok edilir veya anonim hâle getirilir.
+
+9. Yaş sınırı
+
+Uygulamayı kullanmak için en az 18 yaşında olmanız gerekir. 18 yaşından küçük birinin hesap oluşturduğunu fark edersek hesabı ve verilerini sileriz. Bir çocuğun verisinin işlendiğini düşünüyorsanız bize yazın.
+
+10. Güvenlik
+
+Verilerinizi korumak için makul teknik ve idari tedbirler uygularız (şifreli bağlantı, satır bazlı erişim kuralları, erişim yetkisinin sınırlanması). Hiçbir sistem mutlak güvenlik sağlayamaz. Bir veri ihlali olursa KVKK'nın öngördüğü şekilde Kurul'a ve etkilenen kişilere bildirimde bulunuruz.
+
+11. İlgili kişi olarak haklarınız (KVKK md. 11)
+
+Veri sorumlusuna başvurarak şunları talep edebilirsiniz:
+
+1. Kişisel verilerinizin işlenip işlenmediğini öğrenme,
+2. İşlenmişse buna ilişkin bilgi talep etme,
+3. İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme,
+4. Yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme,
+5. Eksik veya yanlış işlenmişse düzeltilmesini isteme,
+6. KVKK md. 7 kapsamında silinmesini veya yok edilmesini isteme,
+7. Düzeltme, silme/yok etme işlemlerinin verilerin aktarıldığı üçüncü kişilere bildirilmesini isteme,
+8. İşlenen verilerin münhasıran otomatik sistemlerle analiz edilmesi sonucu aleyhinize bir sonuç çıkmasına itiraz etme,
+9. Kanuna aykırı işleme nedeniyle zarara uğramanız hâlinde zararın giderilmesini talep etme.
+
+Başvuru yöntemi:
+
+- Uygulama içinden: Profil bilgilerinizi Profil sekmesinden düzeltebilir, hesabınızı ve tüm verilerinizi Ayarlar → Tehlikeli bölge → Hesabı sil adımıyla kendiniz silebilirsiniz. Bu, anonim hesaplar için de geçerlidir.
+- E-posta ile: Apple veya Google ile giriş yaptığınız ve bizim sistemimizde kayıtlı olan e-posta adresinizden ephemer.ai.app.main@gmail.com adresine yazabilirsiniz. Anonim hesabınız varsa önce hesabınızı Ayarlar'dan Apple veya Google ile bağlayın; aksi hâlde hesabın size ait olduğunu doğrulayamayız.
+
+Başvurunuzda adınız, soyadınız, e-posta adresiniz ve talebinizin konusu yer almalıdır. Başvurunuzu en geç 30 gün içinde ücretsiz yanıtlarız. Yanıtımızı yetersiz bulursanız veya süresinde yanıt alamazsanız Kişisel Verileri Koruma Kurulu'na şikâyette bulunabilirsiniz.
+
+12. Değişiklikler
+
+Bu metni değiştirebiliriz. Önemli değişiklikleri Uygulama içinde duyururuz; rıza gerektiren bir değişiklikte rızanızı yeniden isteriz.
+
+13. İletişim
+
+Talha Güzel — ephemer.ai.app.main@gmail.com

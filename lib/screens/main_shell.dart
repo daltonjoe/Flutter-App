@@ -10,7 +10,6 @@ import 'today_page.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_dimensions.dart';
 import '../i18n/app_localizations.dart';
-import '../services/ad_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/language_provider.dart';
@@ -105,26 +104,12 @@ class _MainShellState extends State<MainShell>
   Future<void> _maybeStartTour() async {
     await Future.wait([_loadMatchFlag(), _loadAskFlag()]);
     if (!mounted) return;
-    if (await navTourSeen()) {
-      unawaited(_initAds()); // tur yok: yedek başlatma hemen
-      return;
-    }
+    if (await navTourSeen()) return;
     if (!mounted) return;
     setState(() {
       _tourTabs = List<int>.of(_visible);
       _tourOn = true;
     });
-  }
-
-  /// Yedek reklam başlatma (K5): onboarding'i bu sürümden önce bitirmiş
-  /// kullanıcılar için. AdService.init() idempotent olduğundan sohbet
-  /// çağrısıyla çakışmaz; hata sohbeti/kabuğu durdurmaz.
-  Future<void> _initAds() async {
-    try {
-      await AdService.init();
-    } catch (e) {
-      debugPrint('MainShell AdService.init failed: $e');
-    }
   }
 
   /// Alt çubuk pilinin global (ekran) koordinatındaki dikdörtgeni.
@@ -449,7 +434,6 @@ class _MainShellState extends State<MainShell>
                     unawaited(navTourMarkSeen());
                     setState(() => _tourOn = false);
                     shellTab.value = 1;
-                    unawaited(_initAds()); // tur bitti: yedek başlatma
                   },
                 ),
               ),

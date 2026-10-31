@@ -4,13 +4,19 @@ import 'package:supabase_flutter/supabase_flutter.dart'
 
 /// user_consents kind 'ai' (kolonlar bilinmediği için 3 şema varyasyonu denenir).
 class AiConsentService {
+  /// Rızası bu oturumda doğrulanmış kullanıcı; her soruda sorgu atılmasın diye.
+  static String? _okUid;
+
   static Future<bool> hasAi() async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid != null && uid == _okUid) return true;
     try {
       final rows = await Supabase.instance.client
           .from('user_consents')
           .select('kind')
           .eq('kind', 'ai')
           .limit(1);
+      if (rows.isNotEmpty) _okUid = uid;
       return rows.isNotEmpty;
     } catch (e) {
       debugPrint('AiConsentService.hasAi failed: $e');
@@ -21,6 +27,7 @@ class AiConsentService {
   static Future<bool> revokeAi() async {
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (uid == null) return false;
+    _okUid = null;
     try {
       await Supabase.instance.client
           .from('user_consents')
@@ -45,9 +52,13 @@ class AiConsentService {
     for (final v in variants) {
       try {
         await Supabase.instance.client.from('user_consents').insert(v);
+        _okUid = uid;
         return true;
       } on PostgrestException catch (e) {
-        if (e.code == '23505') return true; // zaten var
+        if (e.code == '23505') { // zaten var
+          _okUid = uid;
+          return true;
+        }
         debugPrint('AiConsentService.grantAi failed: ${e.code} ${e.message}');
       } catch (e) {
         debugPrint('AiConsentService.grantAi failed: $e');

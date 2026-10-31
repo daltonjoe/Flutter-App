@@ -1,0 +1,113 @@
+Ephemerai — Privacy Policy and Notice under Turkish Data Protection Law (KVKK)
+Last updated: 30 October 2026
+
+1. What this notice is
+
+This notice explains how your personal data is handled when you use the Ephemerai iOS app (the "App"). It also serves as our information notice under Article 10 of Turkish Law No. 6698 on the Protection of Personal Data ("KVKK").
+
+This is not a consent form; it is here to inform you. Where processing requires explicit consent, we ask for it separately with an unticked checkbox (see "AI Chat Explicit Consent").
+
+2. Data controller
+
+Data controller — Talha Güzel (individual developer)
+Email — ephemer.ai.app.main@gmail.com
+
+We are below the employee and annual balance-sheet thresholds set by the Personal Data Protection Board and our main activity is not processing special-category data, so we are not required to register with VERBİS.
+
+3. Personal data we process
+
+- Account data: an anonymous account ID created on first launch. If you sign in with Apple or Google, the account ID and email address your provider gives us (a private relay address if you use Apple's "Hide My Email").
+- Profile and birth data: name, date, time and city of birth, relationship status. If you add another person's profile for the compatibility feature, that person's same details.
+- Content data: questions you ask in chat, the answers the App generates, and short notes saved from your chats.
+- Subscription data: subscription status, product and transaction identifiers, trial/renewal/cancellation information. Card and payment details are handled by Apple and do not reach us.
+- Usage and technical data: in-app interaction events, device model, iOS and app version, language. IP address logging is turned off in our analytics tool.
+- Notification preferences: notifications are scheduled on your device; we store only your preferences.
+
+Your chats, notes or relationship status may reveal special-category information such as health, beliefs or sex life. You don't have to share such details, and we recommend that you don't. Do not enter passwords, ID numbers or payment details. When you add someone else's profile, you must be entitled to share their information.
+
+4. Purposes and legal bases
+
+Creating your account, calculating birth charts and readings, storing your profiles and notes — Formation or performance of a contract (KVKK Art. 5(2)(c))
+Verifying subscriptions, managing access, answering support requests — Performance of a contract (Art. 5(2)(c))
+AI chat: sending your questions and the needed context to AI providers to generate answers; processing any special-category data you share in chat and transferring it abroad for this purpose — Explicit consent (Art. 6 and Art. 9) — collected with a separate, unticked checkbox on the welcome screen
+Debugging, security, abuse prevention, improving features through usage measurement — Legitimate interests (Art. 5(2)(f)), provided your fundamental rights are not harmed
+Tax, accounting, legislation and official requests — Legal obligation (Art. 5(2)(ç))
+Establishing, exercising or defending legal claims — Art. 5(2)(e)
+
+Date, time and place of birth are not special-category data under KVKK; because the service itself is calculated from them, they are processed as necessary to perform the contract.
+
+You can withdraw explicit consent at any time under Settings → Data & privacy → Withdraw AI permission, or by writing to us. Withdrawal takes effect going forward: your saved notes are deleted and AI chat cannot be used until you allow it again, while the rest of the App keeps working.
+
+5. Who we share data with
+
+We share data with the service providers below to run the App. Each receives only what its function requires.
+
+Supabase — Database, authentication — Account, profile, birth, note and chat data — EU (Ireland)
+Heroku (Salesforce) — Chart calculation and chat server — Requests passing through the server — EU (Ireland)
+Google (Gemini API) — Generating chat answers (main provider) — "Data sent to AI" below — USA and other countries
+Groq, OpenRouter — Backup answer generation when the main provider is unavailable — "Data sent to AI" below — USA
+PostHog — Product analytics (IP logging disabled) — Usage events, device/app information — EU (Germany)
+RevenueCat — Subscription management and entitlement checks — Account ID, subscription and transaction information — USA
+Apple — App distribution, sign-in, subscription and payment — Sign-in and transaction information; Apple's own privacy policy applies — USA and other countries
+
+Data sent to AI: your question, recent messages in the same chat, your saved notes, and the planet, sign and house positions calculated from your birth chart. Your name and your date, time and city of birth are not sent to AI providers.
+
+We do not sell your personal data. We may disclose the minimum necessary to competent authorities where required by law, an official request or a legal dispute.
+
+6. Transfers abroad
+
+Our providers' servers are outside Türkiye, so your data is transferred abroad. We use the mechanisms in KVKK Art. 9: transfers to countries with an adequacy decision, standard contracts published by the Board and other appropriate safeguards; where none of these is available, your explicit consent under Art. 9(6). Transfers needed for AI chat rely on the explicit consent we ask for separately. Write to us to learn which countries and safeguards apply.
+
+7. Important information about AI
+
+- Answers are generated by AI and may be wrong, incomplete or inconsistent. Astrology is for entertainment and personal reflection; it is not medical, psychological, legal or financial advice.
+- We use the paid API services of AI providers. Under those services' terms, the data we send is not used to train the providers' models; providers may keep it for a limited time to monitor abuse.
+- Chats are not monitored in real time, and the App is not an emergency service. If you are in danger, call 112 (Türkiye) or your local emergency number.
+- Your chat content is accessed only when needed for your support request, to fix a bug or to investigate abuse, and only for that purpose.
+
+8. Retention
+
+Account, profile, birth data, notes, chats — While your account is active. Deleted from live systems immediately when you delete your account.
+Backups — Deleted data leaves backups within 30 days at most
+Analytics events — Up to 12 months
+Subscription and transaction records — As long as tax and commercial law requires (up to 10 years)
+Support correspondence — 2 years after the request is closed
+
+When the period ends, data is deleted, destroyed or anonymized.
+
+9. Age limit
+
+You must be at least 18 years old to use the App. If we learn that someone under 18 has created an account, we will delete the account and its data. If you believe a child's data is being processed, write to us.
+
+10. Security
+
+We apply reasonable technical and organizational measures (encrypted connections, row-level access rules, restricted access rights). No system is perfectly secure. If a data breach occurs, we notify the Board and affected people as KVKK requires.
+
+11. Your rights as a data subject (KVKK Art. 11)
+
+You may apply to the data controller to:
+
+1. Learn whether your personal data is processed,
+2. Request information if it has been processed,
+3. Learn the purpose of processing and whether it is used accordingly,
+4. Know the third parties to whom data is transferred in Türkiye or abroad,
+5. Request correction of incomplete or inaccurate data,
+6. Request deletion or destruction under KVKK Art. 7,
+7. Request that corrections and deletions be notified to third parties who received the data,
+8. Object to an outcome against you resulting exclusively from automated analysis,
+9. Claim compensation if you suffer damage due to unlawful processing.
+
+How to apply:
+
+- In the app: correct your details in the Profile tab, and delete your account and all data yourself under Settings → Danger zone → Delete account. This also works for anonymous accounts.
+- By email: write to ephemer.ai.app.main@gmail.com from the email address you signed in with through Apple or Google, which is registered in our system. If your account is anonymous, first link it to Apple or Google in Settings; otherwise we cannot verify that the account is yours.
+
+Include your full name, email address and the subject of your request. We respond free of charge within 30 days at most. If you find our response inadequate or get none in time, you may complain to the Personal Data Protection Board.
+
+12. Changes
+
+We may update this notice. We announce material changes in the App and ask for consent again where a change requires it.
+
+13. Contact
+
+Talha Güzel — ephemer.ai.app.main@gmail.com

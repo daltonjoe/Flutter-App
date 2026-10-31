@@ -15,11 +15,10 @@ import '../providers/ask_context_provider.dart';
 import '../providers/language_provider.dart';
 import '../services/ask_service.dart';
 import '../services/chat_store.dart';
-import '../services/ad_service.dart';
+import '../services/ai_consent_service.dart';
 import '../services/astro_service.dart';
 import '../providers/active_profile_provider.dart';
 import '../providers/ask_draft.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 import '../services/user_settings_service.dart';
 import '../presentation/widgets/components/cosmic_background.dart';
@@ -32,6 +31,7 @@ import '../redesign/ask/ask_hero.dart';
 import '../redesign/ask/star_typing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'notes_page.dart';
+import 'legal_agreements_page.dart';
 import 'chat_history_page.dart';
 
 class _Msg {
@@ -55,9 +55,8 @@ class _Msg {
   });
 }
 
-/// `credit_status` yanıtı: bakiye ve bugün kalan reklam hakkı (`ad_left_today`).
-/// `adLeft` null ise alan yok/ayrıştırılamadı → bilinmiyor, reklam açık kalır.
-typedef _CreditStatus = ({int? balance, int? adLeft, String? tier, int? dailyLeft});
+/// `credit_status` yanıtı: bakiye, abonelik katmanı ve günlük kalan hak.
+typedef _CreditStatus = ({int? balance, String? tier, int? dailyLeft});
 
 class AskPage extends StatefulWidget {
   const AskPage({super.key});
@@ -581,6 +580,9 @@ class _AskPageState extends State<AskPage> {
       _pickPartner();
       return;
     }
+    if (!await AiConsentService.hasAi()) {
+      if (!mounted || !await _askAiConsent()) return;
+    }
     HapticFeedback.selectionClick();
     _ctl.clear();
     final gen = _gen;
@@ -645,21 +647,15 @@ class _AskPageState extends State<AskPage> {
     try {
       await showDialog<void>(
         context: context,
-        builder: (_) => _CreditsEmptyDialog(
-          readStatus: _readCreditStatus,
-          onGoPremium: _goPremium,
-          onSignIn: _goLinkAccount,
-          onCredited: _onRewardCredited,
-        ),
+        builder: (_) => _CreditsEmptyDialog(onGoPremium: _goPremium),
       );
     } finally {
       _creditsDialogOpen = false;
     }
   }
 
-  /// Sunucu kredi durumunu okur: bakiye + bugün kalan reklam hakkı
-  /// (`ad_left_today`). İstemci krediyi ASLA kendi eklemez; yalnızca sunucu
-  /// değerini yansıtır. Alan yok/ayrıştırılamazsa null döner (bilinmiyor).
+  /// Sunucu kredi durumunu okur. İstemci krediyi ASLA kendi eklemez; yalnızca
+  /// sunucu değerini yansıtır. Alan yok/ayrıştırılamazsa null döner (bilinmiyor).
   Future<_CreditStatus> _readCreditStatus() async {
     try {
       final r = await Supabase.instance.client.rpc('credit_status');
@@ -668,14 +664,12 @@ class _AskPageState extends State<AskPage> {
           : (r is List && r.isNotEmpty && r.first is Map ? r.first : null);
       if (m is Map) {
         final b = m['balance'];
-        final a = m['ad_left_today'];
         final dlRaw = m['daily_limit'];
         final duRaw = m['daily_used'];
         final dl = int.tryParse('$dlRaw');
         final du = int.tryParse('$duRaw');
         return (
           balance: b is int ? b : (b == null ? null : int.tryParse('$b')),
-          adLeft: a is int ? a : (a == null ? null : int.tryParse('$a')),
           tier: m['tier'] is String ? m['tier'] as String : null,
           dailyLeft: (dl == null || du == null) ? null : (dl - du < 0 ? 0 : dl - du),
         );
@@ -683,7 +677,7 @@ class _AskPageState extends State<AskPage> {
     } catch (e) {
       debugPrint('AskPage credit_status failed: $e');
     }
-    return (balance: null, adLeft: null, tier: null, dailyLeft: null);
+    return (balance: null, tier: null, dailyLeft: null);
   }
 
   void _goPremium() {
@@ -698,113 +692,37 @@ class _AskPageState extends State<AskPage> {
     });
   }
 
-  void _goLinkAccount() {
-    Navigator.of(
-      context,
-      rootNavigator: true,
-    ).pushNamed('/onboarding/link-account');
-  }
-
-  /// Ödül sunucuda doğrulandığında: hata satırını temizleyip girişe odaklanır.
-  void _onRewardCredited() {
-    _refreshCredit();
-    if (!mounted) return;
-    setState(() {
-      _failed = false;
-      _errKey = 'ask.error';
-    });
-    _inputFocus.requestFocus();
-  }
-
-  Future<void> _pickMonth() async {
-    final now = DateTime.now();
-    var m = _fMonth == null ? now.month : int.parse(_fMonth!.substring(5));
-    var y = _fMonth == null ? now.year : int.parse(_fMonth!.substring(0, 4));
-    const y0 = 2020, y1 = 2099;
-    final mc = FixedExtentScrollController(initialItem: m - 1);
-    final yc = FixedExtentScrollController(initialItem: y - y0);
-    final ok = await showModalBottomSheet<bool>(
+  /// Yapay zekâ rızası yoksa sorar; kabul edilirse kaydeder (Apple 5.1.2(i), KVKK md. 6/9).
+  Future<bool> _askAiConsent() async {
+    final ok = await showDialog<bool>(
       context: context,
-      useRootNavigator: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: AppSpacing.cardGap),
-            SizedBox(
-              height: 200,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: CupertinoPicker(
-                      scrollController: mc,
-                      itemExtent: 40,
-                      onSelectedItemChanged: (i) {
-                        m = i + 1;
-                        HapticFeedback.selectionClick();
-                      },
-                      children: [
-                        for (var i = 1; i <= 12; i++)
-                          Center(
-                            child: Text(
-                              i.toString().padLeft(2, '0'),
-                              style: AppTextStyles.bodyLg(
-                                color: AppColors.starlight,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: CupertinoPicker(
-                      scrollController: yc,
-                      itemExtent: 40,
-                      onSelectedItemChanged: (i) {
-                        y = y0 + i;
-                        HapticFeedback.selectionClick();
-                      },
-                      children: [
-                        for (var i = y0; i <= y1; i++)
-                          Center(
-                            child: Text(
-                              '$i',
-                              style: AppTextStyles.bodyLg(
-                                color: AppColors.starlight,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: FilledButton(
-                  onPressed: () => Navigator.pop(ctx, true),
-                  child: Text(t(ctx, 'settings.save')),
+      builder: (ctx) => AlertDialog(
+        title: Text(t(ctx, 'ai_consent.title')),
+        content: SingleChildScrollView(child: Text(t(ctx, 'ai_consent.body'))),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const LegalTextPage(
+                  titleKey: 'ai_consent.title',
+                  doc: 'consent',
                 ),
               ),
             ),
-          ],
-        ),
+            child: Text(t(ctx, 'ai_consent.details')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(t(ctx, 'common.cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(t(ctx, 'ai_consent.accept')),
+          ),
+        ],
       ),
     );
-    mc.dispose();
-    yc.dispose();
-    if (ok != true || !mounted) return;
-    final v = '$y-${m.toString().padLeft(2, '0')}';
-    if (v == _fMonth) return;
-    setState(() {
-      _fMonth = v;
-    });
-    _persist();
+    return ok == true && await AiConsentService.grantAi();
   }
 
   /// Öneri kartlarının solundaki gezegen glyph'i — moda göre.
@@ -1660,9 +1578,6 @@ class _AskPageState extends State<AskPage> {
       if ((c.balance ?? 0) > 0) {
         key = 'ask.credits.left';
         n = c.balance;
-      } else if (c.balance == 0 && c.adLeft != null) {
-        key = 'ask.credits.left_ads';
-        n = c.adLeft;
       }
     } else if (c.dailyLeft != null) {
       key = 'ask.credits.left_daily';
@@ -2137,180 +2052,29 @@ class _BubbleSeqState extends State<_BubbleSeq> {
 }
 
 /// Geçici "kredi bitti" diyaloğu (21c kredi ekranları gelene kadar).
-///
-/// Desteklenen platform (kayıtlı veya misafir): ödüllü reklam; misafire ayrıca
-/// "giriş yap" seçeneği sunulur. Web/masaüstü: yalnızca Premium. Kredi hiçbir
-/// durumda istemcide eklenmez; yalnızca sunucu bakiyesi yoklanır.
-class _CreditsEmptyDialog extends StatefulWidget {
-  final Future<_CreditStatus> Function() readStatus;
+/// Tek yol Premium; kredi hiçbir durumda istemcide eklenmez.
+class _CreditsEmptyDialog extends StatelessWidget {
   final VoidCallback onGoPremium;
-  final VoidCallback onSignIn;
-  final VoidCallback onCredited;
-  const _CreditsEmptyDialog({
-    required this.readStatus,
-    required this.onGoPremium,
-    required this.onSignIn,
-    required this.onCredited,
-  });
-
-  @override
-  State<_CreditsEmptyDialog> createState() => _CreditsEmptyDialogState();
-}
-
-class _CreditsEmptyDialogState extends State<_CreditsEmptyDialog> {
-  bool _busy = false; // reklam gösteriliyor / ödül doğrulanıyor
-  String? _noteKey; // 'ask.ad.unavailable' | 'ask.credits.verifying'
-  int? _adLeft; // bugün kalan reklam hakkı; null = bilinmiyor
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshAdLeft();
-  }
-
-  /// Tek seferlik okuma: kalan reklam hakkını öğrenip butonu buna göre kilitler.
-  /// Yoklama DÖNGÜSÜ değildir; yalnızca açılışta bir kez okunur.
-  Future<void> _refreshAdLeft() async {
-    final st = await widget.readStatus();
-    if (!mounted || st.adLeft == null) return;
-    setState(() => _adLeft = st.adLeft);
-  }
+  const _CreditsEmptyDialog({required this.onGoPremium});
 
   @override
   Widget build(BuildContext context) {
-    final user = Supabase.instance.client.auth.currentUser;
-    final isGuest = user?.isAnonymous ?? true;
-    // Misafir de kayıtlı gibi reklam izler (K6); giriş yönlendirmesi ek seçenek.
-    final canAd = AdService.supported && user?.id != null;
-    final guestAd = AdService.supported && isGuest && user?.id != null;
-    // Günlük reklam hakkı dolduysa reklam yolu kapanır (Premium/giriş açık).
-    final adBlocked = canAd && _adLeft == 0;
-    final primaryKey = canAd
-        ? 'ask.credits.watch_ad'
-        : 'ask.credits.go_premium';
-    final noteKey = _noteKey ?? (adBlocked ? 'ask.credits.ad_limit' : null);
-
     return AlertDialog(
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(t(context, 'ask.error.credits'), style: AppTextStyles.bodyLg()),
-          if (noteKey != null) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              t(context, noteKey),
-              style: AppTextStyles.bodySm(color: AppColors.mist),
-            ),
-          ],
           const SizedBox(height: AppSpacing.md),
           CosmicCtaButton(
-            label: t(context, primaryKey),
-            disabled: _busy || adBlocked,
+            label: t(context, 'ask.credits.go_premium'),
             onTap: () {
-              if (canAd) {
-                _watchAd();
-              } else {
-                Navigator.of(context).pop();
-                widget.onGoPremium();
-              }
+              Navigator.of(context).pop();
+              onGoPremium();
             },
           ),
-          if (canAd) ...[
-            const SizedBox(height: AppSpacing.xs),
-            TextButton(
-              onPressed: _busy
-                  ? null
-                  : () {
-                      Navigator.of(context).pop();
-                      widget.onGoPremium();
-                    },
-              style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
-              child: Text(
-                t(context, 'ask.credits.go_premium'),
-                style: AppTextStyles.bodySm(color: AppColors.gold),
-              ),
-            ),
-          ],
-          // Misafir: reklamın yanında giriş yönlendirmesi (ek seçenek).
-          if (guestAd) ...[
-            TextButton(
-              onPressed: _busy
-                  ? null
-                  : () {
-                      Navigator.of(context).pop();
-                      widget.onSignIn();
-                    },
-              style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
-              child: Text(
-                t(context, 'ask.credits.signin_for_ad'),
-                style: AppTextStyles.bodySm(color: AppColors.gold),
-              ),
-            ),
-          ],
         ],
       ),
     );
-  }
-
-  Future<void> _watchAd() async {
-    if (_busy) return;
-    final uid = Supabase.instance.client.auth.currentUser?.id;
-    if (uid == null) return;
-    setState(() {
-      _busy = true;
-      _noteKey = null;
-    });
-    final st0 = await widget.readStatus();
-    if (!mounted) return;
-    final before = st0.balance;
-    if (st0.adLeft != null) _adLeft = st0.adLeft;
-    RewardedResult res;
-    try {
-      res = await AdService.showRewarded(userId: uid);
-    } catch (e) {
-      debugPrint('AskPage rewarded failed: $e');
-      res = RewardedResult.error;
-    }
-    if (!mounted) return;
-    if (res == RewardedResult.unavailable) {
-      setState(() {
-        _busy = false;
-        _noteKey = 'ask.ad.unavailable';
-      });
-      return;
-    }
-    if (res != RewardedResult.shown) {
-      setState(() => _busy = false);
-      return;
-    }
-    // Kredi istemcide EKLENMEZ: sunucu SSV ile verir; bakiyeyi kısa aralıklarla
-    // en fazla 6 kez (1.5 sn) yokla; artarsa diyalog kapanır.
-    setState(() => _noteKey = 'ask.credits.verifying');
-    var credited = false;
-    for (var i = 0; i < 6; i++) {
-      await Future<void>.delayed(const Duration(milliseconds: 1500));
-      if (!mounted) return;
-      final st = await widget.readStatus();
-      if (st.adLeft != null) _adLeft = st.adLeft;
-      final now = st.balance;
-      if (before != null && now != null && now > before) {
-        credited = true;
-        break;
-      }
-    }
-    if (!mounted) return;
-    if (credited) {
-      Navigator.of(context).pop();
-      widget.onCredited();
-      return;
-    }
-    setState(() {
-      _busy = false;
-      // Limit dolduysa (bakiye artmadı, hak kalmadı) doğrulama yerine limit metni.
-      _noteKey = _adLeft == 0
-          ? 'ask.credits.ad_limit'
-          : 'ask.credits.verifying';
-    });
   }
 }

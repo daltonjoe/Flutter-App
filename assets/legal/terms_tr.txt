@@ -1,0 +1,82 @@
+Ephemerai — Kullanım Şartları
+Son güncelleme: 30 Ekim 2026
+
+1. Anlaşma
+
+Bu Şartlar, Ephemerai uygulamasını ve ilgili hizmetleri ("Hizmet") kullanımınızı düzenler; sizinle Talha Güzel ("biz") arasındaki sözleşmedir. Uygulamayı kullanmaya başlayarak bu Şartları kabul etmiş olursunuz. Kabul etmiyorsanız Uygulamayı kullanmayın.
+
+Kişisel verilerin işlenmesi Gizlilik Politikası ve KVKK Aydınlatma Metni ile düzenlenir. Bu Şartları kabul etmeniz, açık rıza gerektiren işlemler için rıza verdiğiniz anlamına gelmez; o rızalar ayrıca istenir.
+
+Kanunen vazgeçilemeyen tüketici ve kişisel veri haklarınız saklıdır.
+
+2. Uygunluk ve hesap
+
+- En az 18 yaşında olmalı ve sözleşme yapma ehliyetine sahip olmalısınız.
+- İlk açılışta anonim bir hesap oluşturulur. İsterseniz Apple veya Google ile giriş yaparak hesabınızı bağlayabilirsiniz. Bağlamadan cihazı değiştirir veya Uygulamayı silerseniz anonim hesabınıza erişimi kaybedebilirsiniz.
+- Doğum bilgilerinizi doğru girin; yanlış bilgi harita ve yorumların hatalı olmasına yol açar.
+- Başka bir kişinin profilini eklerseniz, o kişinin bilgilerini paylaşmaya yetkili olduğunuzu kabul edersiniz.
+- Hesabınızın ve cihazınızın güvenliğinden siz sorumlusunuz; yetkisiz erişim şüphesini bize bildirin.
+
+3. Hizmetin niteliği ve sınırları
+
+Ephemerai; yapay zekâ destekli astroloji yorumları ve sohbet sunar. Bu içerikler eğlence ve kişisel gelişim amaçlıdır.
+
+- Yapay zekâ ile etkileşim kurarsınız; karşınızda bir insan danışman yoktur.
+- Yorumlar hatalı, eksik veya tutarsız olabilir. Gelecekte belirli bir olayın gerçekleşeceğini veya belirli bir sonuç elde edeceğinizi vaat etmeyiz.
+- Hizmet tıbbi, psikolojik, hukuki, finansal veya başka bir mesleki tavsiye değildir ve bunların yerine geçmez. Önemli kararları yalnızca Uygulamaya dayanarak vermeyin.
+- Hizmet bir acil durum hizmeti değildir; sohbetler gerçek zamanlı izlenmez. Acil tehlikede 112'yi arayın.
+- Şifre, kimlik numarası, finansal bilgi gibi hassas verileri sohbete yazmayın.
+
+4. Abonelik, ücretsiz deneme, yenileme, iptal ve iade
+
+- Ücretli özellikler ücretsiz deneme sonrasında otomatik yenilenen abonelik ile sunulur. Fiyat, deneme süresi ve fatura dönemi satın alma ekranında gösterilir; satın almadan önce okuyun.
+- Ödeme Apple tarafından, Apple Kimliğiniz üzerinden alınır. RevenueCat, aboneliği doğrulamamıza ve erişiminizi yönetmemize yardımcı olur.
+- Abonelik, mevcut dönem bitmeden en az 24 saat önce iptal edilmezse bir sonraki dönem için otomatik yenilenir ve ücretlendirilir. Deneme süresinin bitiminde de aynı kural geçerlidir.
+- İptal Apple üzerinden yapılır: iPhone'da Ayarlar → [adınız] → Abonelikler. Uygulamayı veya Ephemerai hesabınızı silmek aboneliği iptal etmez.
+- İade Apple üzerinden talep edilir (reportaproblem.apple.com). İade, Apple'ın kuralları ve yürürlükteki mevzuata tabidir; yetkisi bizde değildir.
+- Abonelik, elektronik ortamda anında ifa edilen bir hizmettir. Mesafeli Sözleşmeler Yönetmeliği md. 15 uyarınca, satın alma onayıyla birlikte hizmetin ifasına hemen başlandığından cayma hakkı kullanılamaz. Bu durum Apple'ın iade sürecini ve kanundan doğan diğer haklarınızı etkilemez.
+- Fiyat değişikliklerinde Apple'ın kurallarına ve mevzuata uygun şekilde bilgilendirilirsiniz; ödenmiş dönemin fiyatı artırılmaz.
+
+5. Kabul edilebilir kullanım
+
+Şunları yapmamalısınız: hukuka aykırı kullanım veya başkalarının haklarını ihlal; başkalarını tehdit, taciz veya aldatma; yetkisiz erişim, güvenlik önlemlerini aşma, zararlı kod; otomatik erişim, kazıma veya kullanım sınırlarını veya abonelik gereksinimini dolanma; Hizmetin korunan kısımlarını izinsiz kopyalama veya tersine mühendislik (kanunun izin verdiği hâller hariç); yapay zekâ çıktısını mesleki tavsiye gibi sunma veya başkalarını yanıltmak için kullanma.
+
+Size kişisel, ticari olmayan, devredilemez, münhasır olmayan, sınırlı bir kullanım lisansı veriyoruz.
+
+6. İçeriğiniz, yapay zekâ çıktısı ve fikrî haklar
+
+- Gönderdiğiniz içerik üzerindeki haklarınız sizde kalır. Hizmeti sunmak ve Gizlilik Politikası'ndaki amaçları yerine getirmek için bu içeriği barındırma, işleme ve hizmet sağlayıcılarımıza iletme konusunda bize sınırlı, münhasır olmayan bir izin verirsiniz. Bu izin içeriğinizi satmamıza veya reklamda kullanmamıza izin vermez.
+- Yapay zekâ çıktısını kişisel amaçla kullanabilirsiniz; çıktının doğruluğunu, özgünlüğünü veya üçüncü kişi haklarından bağımsız olduğunu garanti etmeyiz. Benzer çıktılar başka kullanıcılara da üretilebilir.
+- Uygulamanın yazılımı, tasarımı ve markası bize veya lisans verenlerimize aittir.
+
+7. Üçüncü taraf hizmetler
+
+Apple ve Google gibi bağımsız hizmetlerin kendi şartları geçerlidir. Hizmeti işletmek için sağlayıcı kullanmamız, kendi yükümlülüklerimizi ortadan kaldırmaz.
+
+8. Hizmetin sürekliliği ve değişiklikler
+
+Hizmeti geliştirebilir, değiştirebilir veya güncelleyebiliriz. Kesintisiz ve hatasız çalışacağını garanti etmeyiz. Ücretli özelliklerde esaslı azaltma veya sonlandırma olursa mevzuatın ve satın alma koşullarınızın gerektirdiği bildirimi ve çözümleri sağlarız.
+
+9. Hesabın kapatılması
+
+Hesabınızı istediğiniz zaman Ayarlar → Tehlikeli bölge → Hesabı sil adımıyla silebilirsiniz. Şartların esaslı ihlali, hukuka aykırı kullanım, güvenlik riski veya yasal/platform zorunluluğu hâllerinde erişimi sınırlayabilir veya sonlandırabiliriz; mümkün ve uygun olduğunda önce gerekçeyi bildirir ve giderilebilir ihlallerde düzeltme imkânı tanırız.
+
+10. Garanti reddi ve sorumluluğun sınırı
+
+Kanunun izin verdiği ölçüde Hizmet "olduğu gibi" ve "mevcut hâliyle" sunulur. Kasıt ve ağır ihmalden doğan sorumluluğumuz (Türk Borçlar Kanunu md. 115), kişisel zarar ve kanunen sınırlandırılamayacak diğer sorumluluklarımız ile tüketici haklarınız bu hükümlerden etkilenmez. Bunun dışında, kanunun izin verdiği ölçüde dolaylı zararlardan sorumlu değiliz ve toplam sorumluluğumuz, talebe konu olaydan önceki 12 ayda Hizmet için ödediğiniz tutarla sınırlıdır.
+
+11. Uygulanacak hukuk ve uyuşmazlıklar
+
+Bu Şartlar Türkiye Cumhuriyeti hukukuna tabidir. Tüketici olarak, parasal sınırlar dahilinde yerleşim yerinizdeki veya işlemi yaptığınız yerdeki tüketici hakem heyetlerine ve tüketici mahkemelerine başvuru hakkınız saklıdır. Tüketici sıfatı taşımayan kullanıcılarla uyuşmazlıklarda İstanbul (Merkez) Mahkemeleri ve İcra Daireleri yetkilidir. Önce bizimle iletişime geçmenizi rica ederiz; bu, yasal haklarınızı kullanmanıza engel olmaz.
+
+12. Apple'a özgü hükümler
+
+Uygulamayı Apple App Store'dan edindiyseniz: (a) Bu Şartlar sizinle bizim aramızdadır, Apple ile değil; Uygulamadan ve içeriğinden biz sorumluyuz. (b) Lisansınız Apple'ın Media Services Usage Rules'una tabidir. (c) Bakım ve destek yükümlülüğü bizdedir, Apple'da değildir. (d) Uygulama geçerli bir garantiye uymazsa Apple'a bildirebilirsiniz ve Apple satın alma bedelini iade eder; diğer garanti, ürün sorumluluğu, mevzuata uyum ve tüketici taleplerinden biz sorumluyuz. (e) Üçüncü kişilerin fikrî mülkiyet iddialarını biz ele alırız. (f) Ambargolu veya yasaklı taraf listesinde olmadığınızı beyan edersiniz. (g) Üçüncü taraf sözleşmelerine (ör. mobil veri sözleşmeniz) uymalısınız. (h) Apple ve bağlı şirketleri bu Şartların üçüncü taraf lehtarlarıdır ve Şartları size karşı uygulayabilir.
+
+13. Güncellemeler ve genel hükümler
+
+Şartları güncelleyebiliriz; önemli değişiklikleri yürürlüğe girmeden en az 15 gün önce Uygulama içinde duyururuz. Değişiklikler ileriye dönük uygulanır; mevcut ücretli hakların ve verdiğiniz rızaların kapsamını geriye dönük değiştirmez. Bir hüküm geçersiz sayılırsa diğerleri geçerliliğini korur.
+
+14. İletişim
+
+Talha Güzel — ephemer.ai.app.main@gmail.com

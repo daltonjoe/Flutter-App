@@ -1,0 +1,13 @@
+Ephemerai — AI Chat Explicit Consent
+
+The Ask feature generates its answers with third-party AI providers. To use it:
+
+- Data sent: your question, recent messages in the same chat, your saved notes, and the planet, sign and house positions calculated from your birth chart. Your name and your date, time and city of birth are not sent.
+- Recipients: Google (Gemini API); Groq and OpenRouter when the main provider is unavailable.
+- Location: these providers' servers are outside Türkiye, mainly in the USA.
+- Purpose: only to generate an answer to your question. The data is not used to train the providers' models.
+- Special-category data: if you share health, belief, sex-life or similar information in chat, it is processed and transferred for the same purpose. We recommend that you don't share it.
+
+I give explicit consent to the data above being transferred to AI providers abroad to generate chat answers, and to any special-category data I share in chat being processed for this purpose.
+
+Because AI chat is the App's core feature, this permission is asked at the start; chat cannot be used without it. You can withdraw consent at any time under Settings → Data & privacy → Withdraw AI permission; your saved notes are then deleted and the rest of the App keeps working. Details are in the Privacy Policy and KVKK Notice.

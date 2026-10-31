@@ -1,0 +1,82 @@
+Ephemerai — Terms of Use
+Last updated: 30 October 2026
+
+1. Agreement
+
+These Terms govern your use of the Ephemerai app and related services (the "Service"); they are a contract between you and Talha Güzel ("we"). By starting to use the App you accept these Terms. If you do not accept, do not use the App.
+
+Personal data is handled under the Privacy Policy and KVKK Notice. Accepting these Terms does not mean you have given consent to processing that requires explicit consent; that consent is asked for separately.
+
+Your non-waivable consumer and data protection rights remain unaffected.
+
+2. Eligibility and account
+
+- You must be at least 18 years old and legally able to enter a contract.
+- An anonymous account is created on first launch. You may later sign in with Apple or Google to link it. If you change device or delete the App without linking, you may lose access to your anonymous account.
+- Enter your birth details accurately; wrong details lead to wrong charts and readings.
+- If you add another person's profile, you confirm that you are entitled to share their information.
+- You are responsible for the security of your account and device; report suspected unauthorized access to us.
+
+3. What the Service is, and is not
+
+Ephemerai provides AI-assisted astrology readings and chat. This content is for entertainment and personal reflection.
+
+- You are interacting with AI, not a human advisor.
+- Answers can be inaccurate, incomplete or inconsistent. We do not promise that any event will occur or that you will achieve any outcome.
+- The Service is not medical, psychological, legal, financial or other professional advice and does not replace it. Do not base important decisions on the App alone.
+- The Service is not an emergency service, and chats are not monitored in real time. In an emergency, call 112 (Türkiye) or your local emergency number.
+- Do not enter passwords, ID numbers or financial credentials in chat.
+
+4. Subscription, free trial, renewal, cancellation and refunds
+
+- Paid features are offered through a subscription that renews automatically after a free trial. The price, trial length and billing period appear on the purchase screen; read them before buying.
+- Payment is taken by Apple through your Apple ID. RevenueCat helps us verify the subscription and manage your access.
+- A subscription renews and is charged for the next period unless cancelled at least 24 hours before the current period ends. The same applies when a trial ends.
+- Cancel through Apple: on iPhone, Settings → [your name] → Subscriptions. Deleting the App or your Ephemerai account does not cancel the subscription.
+- Request refunds through Apple (reportaproblem.apple.com). Refunds depend on Apple's rules and applicable law; we cannot issue them on Apple's behalf.
+- The subscription is a service performed instantly in electronic form. Under Article 15 of the Turkish Distance Contracts Regulation, the right of withdrawal does not apply because performance starts as soon as you confirm the purchase. This does not affect Apple's refund process or your other statutory rights.
+- For price changes, you will be informed as Apple's rules and the law require; a period you have already paid for is not repriced.
+
+5. Acceptable use
+
+You must not: use the Service unlawfully or infringe others' rights; threaten, harass or deceive others; gain unauthorized access, bypass security measures or distribute malicious code; use automated access, scraping, or means to evade usage limits or subscription requirements; copy or reverse-engineer protected parts of the Service (except where the law allows); or present AI output as professional advice or use it to mislead others.
+
+We grant you a limited, personal, non-commercial, non-transferable, non-exclusive licence to use the Service.
+
+6. Your content, AI output and intellectual property
+
+- You keep the rights you have in content you submit. You give us a limited, non-exclusive permission to host, process and pass that content to our service providers only as needed to provide the Service and carry out the purposes in the Privacy Policy. This does not permit us to sell your content or use it in advertising.
+- You may use AI output for personal purposes. We do not guarantee its accuracy, originality or freedom from third-party rights, and similar output may be generated for other users.
+- The App's software, design and brand belong to us or our licensors.
+
+7. Third-party services
+
+Independent services such as Apple and Google have their own terms. Using providers to operate the Service does not remove our own obligations.
+
+8. Availability and changes
+
+We may improve, change or update the Service and do not guarantee uninterrupted or error-free operation. If paid features are materially reduced or discontinued, we will give the notice and remedies required by law and your purchase terms.
+
+9. Ending your account
+
+You can delete your account at any time under Settings → Danger zone → Delete account. We may restrict or end access for a material breach of these Terms, unlawful use, security risk, or a legal/platform requirement; where possible and appropriate we will first state the reason and allow remediable breaches to be corrected.
+
+10. Disclaimer and limit of liability
+
+To the extent the law allows, the Service is provided "as is" and "as available". Nothing here limits our liability for intent or gross negligence (Turkish Code of Obligations Art. 115), personal injury or anything else that cannot lawfully be limited, nor your consumer rights. Otherwise, to the extent permitted, we are not liable for indirect losses, and our total liability is limited to the amount you paid for the Service in the 12 months before the event giving rise to the claim.
+
+11. Governing law and disputes
+
+These Terms are governed by the laws of the Republic of Türkiye. As a consumer, you keep the right to apply, within the statutory monetary limits, to the consumer arbitration committees and consumer courts where you live or where the transaction took place. For disputes with users who are not consumers, the Istanbul (Central) Courts and Enforcement Offices have jurisdiction. Please contact us first; this does not prevent you from exercising your legal rights.
+
+12. Apple-specific terms
+
+If you obtained the App from the Apple App Store: (a) These Terms are between you and us, not Apple; we are responsible for the App and its content. (b) Your licence is subject to Apple's Media Services Usage Rules. (c) We, not Apple, are responsible for maintenance and support. (d) If the App fails to meet an applicable warranty, you may notify Apple, which will refund the purchase price; we are responsible for other warranty, product liability, compliance and consumer claims. (e) We handle third-party IP claims. (f) You confirm you are not on an embargoed-country or prohibited-party list. (g) You must comply with applicable third-party agreements (e.g. your mobile data agreement). (h) Apple and its subsidiaries are third-party beneficiaries of these Terms and may enforce them against you.
+
+13. Updates and general terms
+
+We may update these Terms and will announce material changes in the App at least 15 days before they take effect. Changes apply going forward and do not retroactively alter existing paid rights or consents you have given. If a provision is invalid, the others remain in force.
+
+14. Contact
+
+Talha Güzel — ephemer.ai.app.main@gmail.com

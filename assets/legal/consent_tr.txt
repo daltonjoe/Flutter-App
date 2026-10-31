@@ -1,0 +1,13 @@
+Ephemerai — Yapay Zekâ Sohbeti Açık Rıza Metni
+
+Sor özelliği, cevaplarını üçüncü taraf yapay zekâ sağlayıcılarıyla üretir. Bu özelliği kullanabilmeniz için:
+
+- Gönderilen veriler: sorunuz, aynı sohbetteki son mesajlar, kaydedilmiş notlarınız ve doğum haritanızdan hesaplanan gezegen, burç ve ev konumları. İsminiz ve doğum tarihiniz, saatiniz, şehriniz gönderilmez.
+- Alıcılar: Google (Gemini API); ana sağlayıcı yanıt vermediğinde Groq ve OpenRouter.
+- Konum: Bu sağlayıcıların sunucuları ABD başta olmak üzere Türkiye dışındadır.
+- Amaç: Yalnızca sorunuza cevap üretmek. Veriler sağlayıcıların model eğitiminde kullanılmaz.
+- Özel nitelikli veriler: Sohbette sağlık, inanç, cinsel hayat gibi bilgiler paylaşırsanız bunlar da aynı amaçla işlenir ve aktarılır. Paylaşmamanızı öneririz.
+
+Yukarıdaki verilerin, sohbet cevabı üretmek amacıyla yurt dışındaki yapay zekâ sağlayıcılarına aktarılmasına ve sohbette paylaşabileceğim özel nitelikli verilerin bu amaçla işlenmesine açık rıza veriyorum.
+
+Uygulamanın temel özelliği yapay zekâ sohbeti olduğu için bu izin başlangıçta istenir; izin olmadan sohbet kullanılamaz. Rızanızı Ayarlar → Veri ve gizlilik → Yapay zekâ iznini geri al adımıyla dilediğiniz zaman geri alabilirsiniz; bu durumda kaydedilmiş notlarınız silinir ve Uygulamanın diğer özellikleri çalışmaya devam eder. Ayrıntılar Gizlilik Politikası ve KVKK Aydınlatma Metni'ndedir.

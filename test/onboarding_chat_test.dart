@@ -1,5 +1,4 @@
 // test/onboarding_chat_test.dart
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ Widget _app({
   Future<bool?> Function()? onNotification,
   Future<void> Function()? onReview,
   void Function(List<String> notes)? onNotes,
-  Future<void> Function()? onInitAds,
 }) {
   return MaterialApp(
     locale: const Locale('en'),
@@ -35,9 +33,6 @@ Widget _app({
           onDone: onDone,
           requestNotificationPermission: onNotification,
           requestReview: onReview,
-          // Testte gerçek AdService.init hiç tamamlanmaz; varsayılan olarak
-          // anında tamamlanan sahte init enjekte edilir.
-          initAds: onInitAds ?? () async {},
           onNotes: onNotes,
         ),
       ),
@@ -354,128 +349,6 @@ void main() {
         'When something goes wrong, I usually act right away.',
         "I'd like you to alert me about: everything.",
       ]);
-    });
-
-    testWidgets('init tamamlanana kadar review adımına geçilmez', (
-      tester,
-    ) async {
-      SharedPreferences.setMockInitialValues(<String, Object>{});
-      final gate = Completer<void>();
-      var initCalls = 0;
-
-      await tester.pumpWidget(
-        _app(
-          onDone: () {},
-          onNotification: () async => true,
-          onReview: () async {},
-          onInitAds: () {
-            initCalls++;
-            return gate.future;
-          },
-        ),
-      );
-      await _settle(tester);
-
-      await _tap(tester, 'Myself');
-      await _tap(tester, 'Love');
-      await _tap(tester, 'I act right away');
-      await _tap(tester, 'Gently');
-      await _tap(tester, 'All of them');
-      await _tap(tester, 'Allow');
-
-      // init henüz tamamlanmadı: sohbet review adımına geçemez.
-      expect(initCalls, 1);
-      expect(find.text('Yes'), findsNothing);
-
-      gate.complete();
-      await _settle(tester);
-
-      // init bitti: review adımı açılır.
-      expect(find.text('Yes'), findsOneWidget);
-      expect(find.text('No'), findsOneWidget);
-    });
-
-    testWidgets('init 30 sn icinde bitmezse akis yine de review adimina gecer', (
-      tester,
-    ) async {
-      SharedPreferences.setMockInitialValues(<String, Object>{});
-      final never = Completer<void>();
-
-      await tester.pumpWidget(
-        _app(
-          onDone: () {},
-          onNotification: () async => true,
-          onReview: () async {},
-          onInitAds: () => never.future,
-        ),
-      );
-      await _settle(tester);
-
-      await _tap(tester, 'Myself');
-      await _tap(tester, 'Love');
-      await _tap(tester, 'I act right away');
-      await _tap(tester, 'Gently');
-      await _tap(tester, 'All of them');
-      await _tap(tester, 'Allow');
-
-      expect(find.text('Yes'), findsNothing);
-
-      await tester.pump(const Duration(seconds: 31));
-      await _settle(tester);
-
-      expect(find.text('Yes'), findsOneWidget);
-      expect(find.text('No'), findsOneWidget);
-    });
-
-    testWidgets('init hata verirse akis review adimina gecer', (tester) async {
-      SharedPreferences.setMockInitialValues(<String, Object>{});
-
-      await tester.pumpWidget(
-        _app(
-          onDone: () {},
-          onNotification: () async => true,
-          onReview: () async {},
-          onInitAds: () => Future<void>.error(StateError('init failed')),
-        ),
-      );
-      await _settle(tester);
-
-      await _tap(tester, 'Myself');
-      await _tap(tester, 'Love');
-      await _tap(tester, 'I act right away');
-      await _tap(tester, 'Gently');
-      await _tap(tester, 'All of them');
-      await _tap(tester, 'Allow');
-
-      expect(find.text('Yes'), findsOneWidget);
-    });
-
-    testWidgets('init beklenirken sayfa kapanirsa hata atilmaz', (tester) async {
-      SharedPreferences.setMockInitialValues(<String, Object>{});
-      final gate = Completer<void>();
-
-      await tester.pumpWidget(
-        _app(
-          onDone: () {},
-          onNotification: () async => true,
-          onReview: () async {},
-          onInitAds: () => gate.future,
-        ),
-      );
-      await _settle(tester);
-
-      await _tap(tester, 'Myself');
-      await _tap(tester, 'Love');
-      await _tap(tester, 'I act right away');
-      await _tap(tester, 'Gently');
-      await _tap(tester, 'All of them');
-      await _tap(tester, 'Allow');
-
-      await tester.pumpWidget(const SizedBox.shrink());
-      gate.complete();
-      await _settle(tester);
-
-      expect(tester.takeException(), isNull);
     });
   });
 }

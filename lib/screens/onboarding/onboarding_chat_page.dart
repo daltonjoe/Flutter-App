@@ -20,7 +20,6 @@ import '../../presentation/widgets/components/cosmic_background.dart';
 import '../../presentation/widgets/components/cosmic_chip.dart';
 import '../../presentation/widgets/components/cosmic_cta_button.dart';
 import '../../redesign/ask/star_typing.dart';
-import '../../services/ad_service.dart';
 
 // ── Sabit anahtar tabloları (id → tam anahtar; birleştirme yok) ──────────
 
@@ -295,7 +294,6 @@ class OnboardingChatPage extends StatefulWidget {
     required this.onDone,
     this.requestNotificationPermission,
     this.requestReview,
-    this.initAds,
     this.onNotes,
   });
 
@@ -308,10 +306,6 @@ class OnboardingChatPage extends StatefulWidget {
 
   /// Test için enjekte edilebilir; varsayılan gerçek inceleme isteği.
   final Future<void> Function()? requestReview;
-
-  /// Test için enjekte edilebilir; varsayılan `AdService.init`.
-  /// Bildirim adımı bittikten sonra await edilir (30 sn üst sınırla).
-  final Future<void> Function()? initAds;
 
   /// Sohbet bitince üretilen not metinleriyle (kayıt sırasıyla) çağrılır.
   /// Not yoksa bos liste gelir.
@@ -433,7 +427,7 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
     // Web'de bildirim ve puan adımları atlanır; izin sorulmadı.
     if (kIsWeb) {
       _answers['notif'] = 'skipped';
-      _startAdsThen(_closeStep);
+      _closeStep();
       return;
     }
     _notifStep();
@@ -469,7 +463,7 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
       granted == true
           ? _notifGrantedByTone[_tone]!
           : _notifDeniedByTone[_tone]!,
-      after: () => _startAdsThen(_reviewStep),
+      after: _reviewStep,
     );
   }
 
@@ -482,27 +476,8 @@ class _OnboardingChatPageState extends State<OnboardingChatPage> {
     });
     _reveal(
       _notifDeniedByTone[_tone]!,
-      after: () => _startAdsThen(_reviewStep),
+      after: _reviewStep,
     );
-  }
-
-  /// Bildirim adımı bittiğinde (granted/denied/skipped) reklam SDK'sını
-  /// başlatır (UMP -> ATT -> initialize); hazır olunca [next] çağrılır.
-  /// UMP formu kullanıcı etkileşimi bekleyebildiği için 30 sn üst sınır konur;
-  /// üst sınır aşılırsa veya init hata verirse akış yine de [next] ile sürer.
-  /// Zaman aşımı init'i iptal ETMEZ (init idempotent, arka planda tamamlanır).
-  Future<void> _startAdsThen(VoidCallback next) async {
-    try {
-      await (widget.initAds ?? AdService.init)().timeout(
-        const Duration(seconds: 30),
-      );
-    } on TimeoutException catch (e) {
-      debugPrint('onboarding AdService.init timed out: $e');
-    } catch (e) {
-      debugPrint('onboarding AdService.init failed: $e');
-    }
-    if (!mounted) return;
-    next();
   }
 
   void _reviewStep() {

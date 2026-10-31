@@ -30,15 +30,18 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
   bool _started = false;
   late final TapGestureRecognizer _termsTap;
   late final TapGestureRecognizer _privacyTap;
+  late final TapGestureRecognizer _consentTap;
+  bool _aiAgree = false; // yapay zekâ açık rızası; işaretlenmeden ilerlenmez
 
   @override
   void initState() {
     super.initState();
     _termsTap = TapGestureRecognizer()
-      ..onTap = () => _openLegal('settings.privacy.terms', 'legal.terms.body');
+      ..onTap = () => _openLegal('settings.privacy.terms', 'terms');
     _privacyTap = TapGestureRecognizer()
-      ..onTap = () =>
-          _openLegal('settings.privacy.policy', 'legal.privacy.body');
+      ..onTap = () => _openLegal('settings.privacy.policy', 'privacy');
+    _consentTap = TapGestureRecognizer()
+      ..onTap = () => _openLegal('ai_consent.title', 'consent');
     _scene = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3600),
@@ -69,10 +72,11 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
     _breath.dispose();
     _termsTap.dispose();
     _privacyTap.dispose();
+    _consentTap.dispose();
     super.dispose();
   }
 
-  /// Ilerle: privacy, terms ve ai (not) rizasi sessizce yazilir; UI beklemez.
+  /// Ilerle: privacy ve terms kaydi + isaretlenen ai rizasi yazilir; UI beklemez.
   Future<void> _accept() async {
     await ConsentService.recordAccept();
     await AiConsentService.grantAi();
@@ -108,10 +112,10 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
     );
   }
 
-  void _openLegal(String titleKey, String bodyKey) {
+  void _openLegal(String titleKey, String doc) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => LegalTextPage(titleKey: titleKey, bodyKey: bodyKey),
+        builder: (_) => LegalTextPage(titleKey: titleKey, doc: doc),
       ),
     );
   }
@@ -219,8 +223,46 @@ class _OnboardingWelcomePageState extends State<OnboardingWelcomePage>
                   1.0,
                   Column(
                     children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: _aiAgree,
+                            onChanged: (v) =>
+                                setState(() => _aiAgree = v ?? false),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: Text.rich(
+                                TextSpan(
+                                  style: AppTextStyles.bodyXs(
+                                    color: AppColors.mist,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: t(context, 'ai_consent.check'),
+                                    ),
+                                    TextSpan(
+                                      text: t(context, 'ai_consent.details'),
+                                      style: AppTextStyles.bodyXs(
+                                        color: AppColors.starlight,
+                                      ).copyWith(
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                      recognizer: _consentTap,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
                       CosmicCtaButton(
                         label: t(context, 'onboarding.welcome.cta'),
+                        disabled: !_aiAgree,
                         onTap: () {
                           // "İleri" = privacy + terms onayı; UI beklemez.
                           unawaited(_accept());

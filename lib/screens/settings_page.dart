@@ -18,9 +18,9 @@ import '../presentation/widgets/components/cosmic_error_state.dart';
 import '../presentation/widgets/components/overline_text.dart';
 import '../providers/active_profile_provider.dart';
 import 'legal_agreements_page.dart';
+import 'notes_page.dart' show withdrawAiConsentAndNotes;
 import '../providers/language_provider.dart';
 import '../services/account_deletion_service.dart';
-import '../services/ad_service.dart';
 import '../services/user_settings_service.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -69,6 +69,37 @@ class _SettingsPageState extends State<SettingsPage>
     });
     _loadAll();
     _loadMemCount();
+  }
+
+  /// Yapay zekâ rızasını geri alır: notlar silinir, sohbet bir sonraki soruda izin ister.
+  Future<void> _withdrawAi() async {
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t(ctx, 'settings.ai_consent.withdraw')),
+        content: Text(t(ctx, 'settings.ai_consent.withdraw_body')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(t(ctx, 'notes.cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(t(ctx, 'settings.ai_consent.withdraw_confirm')),
+          ),
+        ],
+      ),
+    );
+    if (yes != true) return;
+    final ok = await withdrawAiConsentAndNotes();
+    if (!mounted) return;
+    unawaited(_loadMemCount());
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(t(context,
+            ok ? 'settings.ai_consent.withdraw_done' : 'settings.ai_consent.withdraw_error')),
+      ),
+    );
   }
 
   Future<void> _loadMemCount() async {
@@ -802,6 +833,18 @@ class _SettingsPageState extends State<SettingsPage>
                       ),
                     ),
                   ),
+                  const Divider(height: 1, color: AppColors.hairline),
+                  _buildRow(
+                    icon: Icons.smart_toy_outlined,
+                    leading: Text(
+                      t(context, 'settings.ai_consent.withdraw'),
+                      style: AppTextStyles.bodyLg(color: AppColors.starlight),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                    onTap: _withdrawAi,
+                  ),
                   if (_memCount != null) ...[
                     const Divider(height: 1, color: AppColors.hairline),
                     _buildRow(
@@ -814,20 +857,6 @@ class _SettingsPageState extends State<SettingsPage>
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                       ),
-                    ),
-                  ],
-                  if (AdService.privacyOptionsRequired) ...[
-                    const Divider(height: 1, color: AppColors.hairline),
-                    _buildRow(
-                      icon: Icons.privacy_tip_outlined,
-                      leading: Text(
-                        t(context, 'settings.ads_privacy'),
-                        style: AppTextStyles.bodyLg(color: AppColors.starlight),
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ),
-                      onTap: () => AdService.showPrivacyOptionsForm(),
                     ),
                   ],
                 ],

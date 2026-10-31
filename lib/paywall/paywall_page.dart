@@ -180,10 +180,10 @@ class _PaywallPageState extends State<PaywallPage>
     }
   }
 
-  void _legal(String titleKey, String bodyKey) {
+  void _legal(String titleKey, String doc) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => LegalTextPage(titleKey: titleKey, bodyKey: bodyKey),
+        builder: (_) => LegalTextPage(titleKey: titleKey, doc: doc),
       ),
     );
   }
@@ -559,14 +559,14 @@ class _PaywallPageState extends State<PaywallPage>
       children: [
         _link(
           _t("settings.privacy.policy"),
-          () => _legal("settings.privacy.policy", "legal.privacy.body"),
+          () => _legal("settings.privacy.policy", "privacy"),
         ),
         _dot(),
         _link(_t("paywall.restore"), _restore),
         _dot(),
         _link(
           _t("settings.privacy.terms"),
-          () => _legal("settings.privacy.terms", "legal.terms.body"),
+          () => _legal("settings.privacy.terms", "terms"),
         ),
       ],
     );
