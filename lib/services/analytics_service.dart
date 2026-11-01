@@ -36,13 +36,18 @@ class AnalyticsEvents {
 
 /// PostHog analitiği (AB bulutu, HTTP batch API; yerel eklenti yok).
 ///
-/// Anahtar `--dart-define=POSTHOG_KEY=phc_...` ile verilir. Anahtar yoksa
-/// olaylar gönderilmez, yalnız debug log'a yazılır. distinct_id = Supabase uid
+/// Proje anahtarı (PostHog proje 327396, yalnız yazma; istemcide açık olabilir)
+/// gömülüdür. Olaylar yalnız release sürümünde gönderilir; debug'da veya
+/// `--dart-define=POSTHOG_KEY=` ile boşaltılırsa yalnız debug log'a yazılır.
+/// distinct_id = Supabase uid
 /// (anonim dahil; linkIdentity uid'i değiştirmediği için huni kopmaz).
 class AnalyticsService {
   AnalyticsService._();
 
-  static const String _key = String.fromEnvironment('POSTHOG_KEY');
+  static const String _key = String.fromEnvironment(
+    'POSTHOG_KEY',
+    defaultValue: 'phc_zKYmHWJzHpFrQQ253sVxaShLmANzLS72FaTETDuabGFE',
+  );
   static const String _host = 'https://eu.i.posthog.com';
   static const int _maxQueue = 20;
 
@@ -50,7 +55,7 @@ class AnalyticsService {
   static Timer? _timer;
   static AppLifecycleListener? _lifecycle;
 
-  static bool get enabled => _key.isNotEmpty;
+  static bool get enabled => kReleaseMode && _key.isNotEmpty;
 
   /// main()'de bir kez; arka plana geçişte kuyruğu boşaltır.
   static void init() {

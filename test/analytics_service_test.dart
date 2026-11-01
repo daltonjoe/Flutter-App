@@ -19,7 +19,7 @@ void main() {
     expect(p.containsKey('platform'), true);
   });
 
-  test('anahtar yoksa kapali (debug log modu)', () {
+  test('debug surumunde kapali (yalniz log)', () {
     expect(AnalyticsService.enabled, false);
   });
 }
