@@ -72,7 +72,7 @@ class NotificationScheduler {
       _loc = tz.UTC;
     }
     tz.setLocalLocation(_loc!);
-    await _plugin.initialize(
+    if (!kIsWeb) await _plugin.initialize(
       onDidReceiveNotificationResponse: (r) {
         final p = r.payload;
         if (p != null && p.isNotEmpty) tapPayload.value = p;
@@ -94,6 +94,7 @@ class NotificationScheduler {
 
   /// N6: payload of the notification that launched the app (killed state).
   static Future<String?> launchPayload() async {
+    if (kIsWeb) return null;
     try {
       final d = await _plugin.getNotificationAppLaunchDetails();
       if (d != null && d.didNotificationLaunchApp) {
@@ -145,7 +146,7 @@ class NotificationScheduler {
     } catch (_) {}
     final enabled = us?.notificationsEnabled ?? false;
     if (!enabled || profileId == null) {
-      await _plugin.cancelAll();
+      if (!kIsWeb) await _plugin.cancelAll();
       try {
         await NotificationRepository.schedule(const []);
       } catch (e) {
@@ -211,6 +212,7 @@ class NotificationScheduler {
       transitTexts: transitTexts,
     );
 
+    if (!kIsWeb) {
     await _plugin.cancelAll();
     const details = NotificationDetails(
       android: AndroidNotificationDetails(
@@ -235,6 +237,7 @@ class NotificationScheduler {
       } catch (e) {
         debugPrint('NotificationScheduler zonedSchedule ${it.payload}: $e');
       }
+    }
     }
 
     try {
